@@ -197,7 +197,7 @@ function renderPlan(root) {
   // Kacheln
   const tiles = h("div", { class: "tiles" });
   tiles.append(tile("Bis zur Prüfung", left > 0 ? String(left) : left === 0 ? "heute" : "vorbei", null, left > 0 ? (left === 1 ? "Tag" : "Tage") : ""));
-  const nextMs = (plan.milestones || []).filter(m => m.date && m.date >= today && m.date < plan.exam).sort((a, b) => a.date.localeCompare(b.date))[0];
+  const nextMs = (plan.milestones || []).filter(m => !m.prep && m.date && m.date >= today && m.date < plan.exam).sort((a, b) => a.date.localeCompare(b.date))[0];
   if (nextMs) { const n = daysBetween(today, nextMs.date); tiles.append(tile(nextMs.name || "Nächste Etappe", n ? String(n) : "heute", null, n ? (n === 1 ? "Tag" : "Tage") : "")); }
   tiles.append(tile("Plan erledigt", `${progress[0]}`, progress[1] ? progress[0] / progress[1] : 0, "/ " + progress[1]));
   for (const s of plan.sources) {
@@ -258,12 +258,12 @@ function groupLabel(it, plan) {
 function dayCard(day, today) {
   const { plan } = S.data;
   const isToday = day.d === today, isExam = day.d === plan.exam;
-  const sec = h("section", { class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d) ? " exam" : "") });
+  const sec = h("section", { class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d && !m.prep) ? " exam" : "") });
   const mins = day.items.filter(it => !it.moved && it.kind !== "note").reduce((a, it) => a + (it.min || 0), 0);
   const note = [plan.dayNotes && plan.dayNotes[day.d], mins ? "≈ " + hm(mins) : null].filter(Boolean).join(" · ");
   const msDay = (plan.milestones || []).find(m => m.date === day.d);
   const h2 = h("h2", null, fmt(day.d), isToday ? h("span", { class: "badge" }, "HEUTE") : null, isExam ? h("span", { class: "badge warn" }, "PRÜFUNG") : null,
-    msDay && !isExam ? h("span", { class: "badge warn" }, (msDay.name || "ETAPPE").toUpperCase()) : null);
+    msDay && !isExam ? h("span", { class: "badge" + (msDay.prep ? "" : " warn") }, msDay.prep ? "PRÄPSAAL" : (msDay.name || "ETAPPE").toUpperCase()) : null);
   const head = h("div", { class: "dhead" }, h("div", null, h2, h("div", { class: "note" }, note)));
   sec.append(head);
   const groups = new Map();
@@ -454,12 +454,14 @@ function renderEdit(root) {
 function milestonesEl(p) {
   p.milestones = p.milestones || [];
   const box = h("div", { style: "margin-top:12px" }, h("h3", null, "Etappen / Testate vor der Prüfung"),
-    h("p", { class: "muted small", style: "margin:0 0 6px" }, "Hat das Fach Zwischentermine (Testate, Teilprüfungen)? Dann hier eintragen und bei jedem Thema wählen, wozu es gehört. Der Plan macht den Stoff jeder Etappe vor ihrem Termin fertig – egal in welcher Reihenfolge er im Buch steht."));
+    h("p", { class: "muted small", style: "margin:0 0 6px" }, "Zwischentermine (Testate, Teilprüfungen) hier eintragen und bei jedem Thema wählen, wozu es gehört: der Stoff ist dann vor dem Termin fertig – egal in welcher Reihenfolge er im Buch steht. Mit „Präpsaal“ markierte Termine sind weich: bis dahin nur Lesen + Video, die Karten laufen bis zum nächsten Testat weiter."));
   for (const m of p.milestones.slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""))) {
     box.append(h("div", { class: "inline", style: "margin-bottom:5px" },
       h("input", { type: "text", value: m.name, placeholder: "z. B. Testat Becken", style: "flex:1;min-width:180px", onchange: e => { m.name = e.target.value; } }),
       dateInput(m.date, v => { m.date = v; render(); }),
       timeInput(m.time, v => { m.time = v; }),
+      h("label", { class: "wd", title: "Präpsaal-Termin: bis dahin nur lesen + Video, Karten laufen bis zum Testat weiter, kein Wiederholungstag davor" },
+        h("input", { type: "checkbox", checked: !!m.prep, onchange: e => { m.prep = e.target.checked; render(); } }), "Präpsaal"),
       h("button", { class: "ghost danger", title: "Etappe löschen", onclick: () => { p.milestones = p.milestones.filter(x => x !== m); for (const t of p.topics) if (t.milestone === m.id) delete t.milestone; render(); } }, "✕")));
   }
   box.append(h("button", { onclick: () => { p.milestones.push({ id: uid("m"), name: "", date: "", time: "" }); render(); } }, "+ Etappe / Testat"));
@@ -595,7 +597,7 @@ function topicEl(t, ix, n) {
   const tl = h("div", { class: "tl" });
   const sg = (S.sugg[t.id] || {});
   if ((p.milestones || []).length) tl.append(h("span", null, "Gehört zu"), h("select", { onchange: e => { if (e.target.value) t.milestone = e.target.value; else delete t.milestone; render(); } },
-    h("option", { value: "" }, "Prüfung (Ende)"), p.milestones.map(m => h("option", { value: m.id, selected: t.milestone === m.id || null }, `${m.name || "Etappe"}${m.date ? " · " + fmt(m.date) : ""}`))));
+    h("option", { value: "" }, "Prüfung (Ende)"), p.milestones.slice().sort((a, b) => (a.date || "").localeCompare(b.date || "")).map(m => h("option", { value: m.id, selected: t.milestone === m.id || null }, `${m.prep ? "Präpsaal " : ""}${m.date ? fmt(m.date) + " · " : ""}${m.name || "Etappe"}`))));
   for (const s of p.sources) {
     if (s.type === "pages") {
       t.pages = t.pages || {};

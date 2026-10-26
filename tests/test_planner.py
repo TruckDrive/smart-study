@@ -170,6 +170,26 @@ def test_milestones():
     print("milestones ok")
 
 
+def test_prep():
+    plan = sample()
+    plan["milestones"] = [{"id": "s1", "name": "Leber präparieren", "date": "2026-10-28", "prep": True}]
+    plan["topics"][0]["milestone"] = "s1"
+    lq = P.topic_query(plan, plan["topics"][0], plan["sources"][2])
+    c = counts_for(plan, {lq: 50})
+    P.build(plan, c, date(2026, 10, 26))
+    items = flat(plan)
+    prep = [(d, it) for d, it in items if it.get("topic") == "t2" and it["kind"] in ("pages", "video")]
+    assert prep and all(d < "2026-10-28" for d, _ in prep), prep
+    cards = [d for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards"]
+    assert sum(it["cards"] for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards") == 50
+    assert [it for d, it in items if d == "2026-10-28" and it["kind"] == "note" and "Präpsaal" in it["text"]]
+    assert not [it for d, it in items if d == "2026-10-27" and it["kind"] == "note"], "kein Wiederholungstag vor Präpsaal"
+    # Präpsaal vorbei, Vorbereitung offen: wird trotzdem eingeplant
+    P.build(plan, c, date(2026, 10, 29))
+    assert [it for d, it in flat(plan) if d >= "2026-10-29" and it.get("topic") == "t2" and it["kind"] == "pages"]
+    print("prep ok")
+
+
 def test_misc():
     assert P.streak({"2026-10-24", "2026-10-23", "2026-10-21"}, "2026-10-24") == 2
     assert P.streak({"2026-10-23", "2026-10-22"}, "2026-10-24") == 2
@@ -190,4 +210,5 @@ if __name__ == "__main__":
     test_parse_and_match()
     test_misc()
     test_milestones()
+    test_prep()
     print("ALLE TESTS OK")
