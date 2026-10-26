@@ -306,6 +306,13 @@ function itemEl(it, day) {
   if (it.moved) t.append(h("span", { class: "chip info" }, "→ neu eingeplant"));
   if (it.min && !auto && !it.moved) t.append(h("span", { class: "chip info" }, hm(it.min)));
   if (it.for) t.append(h("span", { class: "chip info" }, "für " + it.for));
+  const act = (label, fn) => t.append(h("a", { class: "small", style: "margin-left:6px;white-space:nowrap", onclick: e => { e.preventDefault(); e.stopPropagation(); fn(); } }, label));
+  if ((it.kind === "cards" || it.kind === "reviews") && !it.moved) act("▶ lernen", async () => {
+    const r = await run(call("studyItem", { id: plan.id, item: it.id }));
+    if (r && r.ok === false) toast("Keine passenden Karten (mehr) gefunden.");
+  });
+  const psrc = it.kind === "pages" && plan.sources.find(s => s.id === it.source);
+  if (psrc && psrc.file) act("📖 öffnen", async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r.noPage) toast(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`); });
   if (it.url) t.append(h("a", { class: "small", style: "margin-left:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url }); } }, "öffnen ↗"));
   const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: "Entfernen", onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));
@@ -501,7 +508,15 @@ function sourceEl(s) {
     h("button", { class: "ghost danger", onclick: rm }, "Entfernen")));
   const rate = h("span", { class: "inline small" }, h("input", { type: "number", step: "0.5", min: 0, value: s.minPerUnit ?? "", placeholder: String(defaultRate(s.type)),
     onchange: e => { s.minPerUnit = e.target.value ? +e.target.value : null; } }), h("span", { class: "muted" }, UNIT[s.type]));
-  if (s.type === "pages") box.append(h("div", { class: "inline small" }, "Tempo:", rate, h("span", { class: "muted" }, "· Seitenbereiche trägst du bei den Themen ein.")));
+  if (s.type === "pages") {
+    const file = h("input", { type: "text", value: s.file || "", placeholder: "PDF-Datei (optional) – dann öffnet der Plan direkt die richtige Seite", style: "flex:1;min-width:240px", onchange: e => { s.file = e.target.value.trim(); } });
+    box.append(h("div", { class: "inline small" }, "Tempo:", rate, h("span", { class: "muted" }, "· Seitenbereiche trägst du bei den Themen ein.")),
+      h("div", { class: "inline small", style: "margin-top:6px" }, file,
+        h("button", { onclick: async () => { const p = await call("pickFile"); if (p) { s.file = p; file.value = p; } } }, "Datei wählen …")),
+      h("div", { class: "inline small", style: "margin-top:4px" }, "PDF-Seite = Buchseite +",
+        h("input", { type: "number", value: s.pageOffset || 0, style: "width:60px", onchange: e => { s.pageOffset = +e.target.value || 0; } }),
+        h("span", { class: "muted" }, "(z. B. 4, wenn Buchseite 17 im PDF auf Seite 21 liegt)")));
+  }
   if (s.type === "anki") {
     const info = h("div", { class: "small muted", style: "margin-top:4px" });
     const mx = h("input", { type: "number", min: 0, value: s.maxNew ?? "", placeholder: "∞", onchange: e => { s.maxNew = e.target.value ? +e.target.value : null; } });

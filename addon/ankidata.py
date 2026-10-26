@@ -1,6 +1,7 @@
 # Alles, was Daten aus der Anki-Sammlung liest oder Decks anlegt.
 # Funktionen bekommen die Collection übergeben (in Anki: mw.col), damit sie
 # auch mit einer Test-Sammlung laufen.
+import re
 from datetime import date, datetime, timedelta
 
 from anki.errors import FilteredDeckError
@@ -167,6 +168,29 @@ def make_filtered(col, name, search, limit, order, reschedule=True):
     except FilteredDeckError:  # keine passenden Karten
         return None, 0
     return did, len(col.find_cards(f'deck:"{name}"'))
+
+
+def study_target(col, plan, item):
+    """Wohin „▶ lernen“ führt: (Deck-ID, None) für ein einzelnes vorhandenes Deck,
+    sonst ein gefiltertes Deck mit genau den Karten des Punkts."""
+    if item.get("kind") == "reviews":
+        decks = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s)]
+        if len(decks) == 1 and col.decks.id_for_name(decks[0]):
+            return col.decks.id_for_name(decks[0]), None
+        q, limit, name = f"{plan_query(plan)} is:due", 9999, "fällig"
+        order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
+    else:
+        topic = next((t for t in plan.get("topics", []) if t["id"] == item.get("topic")), None)
+        tq = (topic or {}).get("anki", {}).get(item.get("source"), "")
+        m = re.fullmatch(r'deck:"((?:[^"\\]|\\.)+)"', tq.strip())
+        if m:
+            did = col.decks.id_for_name(m.group(1).replace('\\"', '"'))
+            if did:
+                return did, None
+        q, limit, name = f"({item['auto']['query']}) is:new -is:suspended", int(item.get("cards") or 50), "jetzt lernen"
+        order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].ADDED
+    did, n = make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · {name}", q, limit, order)
+    return did, n
 
 
 def ahead_deck(col, plan):

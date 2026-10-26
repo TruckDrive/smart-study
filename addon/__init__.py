@@ -2,11 +2,14 @@
 # Öffnen über Extras → Lernplan oder den Link „Lernplan“ in der oberen Leiste.
 # Anki-Punkte hakt der Plan selbst ab; alles andere per Klick.
 import json
+import os
+import shutil
+import subprocess
 import time
 import traceback
 
 from aqt import gui_hooks, mw
-from aqt.qt import QAction, QDialog, QTimer, QVBoxLayout, Qt
+from aqt.qt import QAction, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
@@ -45,6 +48,21 @@ def view(pid):
     if plan.get("sim", {}).get("started"):
         out["simResult"] = ankidata.sim_result(mw.col, plan, plan["sim"])
     return out
+
+
+def open_pdf(path, page):
+    """PDF auf einer Seite öffnen: Okular/Evince können direkt springen, sonst Standardprogramm."""
+    path = os.path.expanduser(path)
+    if not os.path.isfile(path):
+        raise ValueError("PDF nicht gefunden – unter Bearbeiten → Quellen die Datei wählen.")
+    page = max(1, page)
+    for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-i", str(page)])):
+        if shutil.which(prog):
+            subprocess.Popen([prog, *args, path], start_new_session=True,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return {"ok": True, "page": page}
+    QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+    return {"ok": True, "page": page, "noPage": True}
 
 
 def home():
@@ -190,10 +208,27 @@ def handle(cmd, a):
         mw.reset()
         return {"did": did, "count": n}
     if cmd == "openLink":
-        if not str(a["url"]).startswith(("http://", "https://")):
-            raise ValueError("nur Web-Links")
+        if not str(a["url"]).startswith(("http://", "https://", "file://")):
+            raise ValueError("nur Web-Links oder Dateien")
         openLink(a["url"])
         return True
+    if cmd == "studyItem":
+        plan = store.load(a["id"])
+        it = next(i for _, i in planner.all_items(plan) if i["id"] == a["item"])
+        did, n = ankidata.study_target(col, plan, it)
+        if not did:
+            return {"ok": False}
+        mw.reset()
+        a = {"did": did}
+        cmd = "study"
+    if cmd == "openPages":
+        plan = store.load(a["id"])
+        it = next(i for _, i in planner.all_items(plan) if i["id"] == a["item"])
+        src = next(s for s in plan["sources"] if s["id"] == it["source"])
+        return open_pdf(src.get("file", ""), int(it["pages"][0]) + int(src.get("pageOffset") or 0))
+    if cmd == "pickFile":
+        path, _ = QFileDialog.getOpenFileName(_win, "Datei wählen", os.path.expanduser("~"), "PDF (*.pdf);;Alle Dateien (*)")
+        return path or None
     if cmd == "study":
         col.decks.select(a["did"])
         mw.moveToState("overview")

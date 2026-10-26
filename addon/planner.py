@@ -634,7 +634,7 @@ def parse_list(text):
     for line in text.splitlines():
         line = line.strip().lstrip("-•*").strip()
         url = None
-        m = re.search(r"https?://\S+", line)
+        m = re.search(r"(?:https?|file)://\S+", line)
         if m:
             url = m.group(0)
             line = (line[:m.start()] + line[m.end():]).strip().rstrip("|;").strip()

@@ -95,3 +95,20 @@ A.maintenance(col, plan, False)
 assert col.decks.get(col.decks.id_for_name("SEKU::Bauch::Leber"))["conf"] == conf_before
 col.close()
 print("ANKIDATA OK")
+
+# „▶ lernen“: einzelnes Unterdeck direkt, sonst gefiltertes Deck
+col = Collection(path)
+P.build(plan, A.stats(col, plan)["counts"], A.today(col))
+items = [it for d in plan["days"] for it in d["items"]]
+card_it = next(it for it in items if it["kind"] == "cards" and it.get("topic") == "t2")
+did, n = A.study_target(col, plan, card_it)
+assert did == col.decks.id_for_name("SEKU::Bauch::Peritoneum") and n is None, (did, n)
+tag_it = next((it for it in items if it["kind"] == "cards" and it.get("topic") == "t3"), None)
+if tag_it:
+    did, n = A.study_target(col, plan, tag_it)
+    assert col.decks.is_filtered(did) and n > 0, (did, n)
+rev = next(it for it in items if it["kind"] == "reviews")
+did, n = A.study_target(col, plan, rev)
+assert did == col.decks.id_for_name("SEKU::Bauch")
+col.close()
+print("STUDY OK")
