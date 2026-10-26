@@ -1,5 +1,5 @@
-# Lernplan: study plans up to the exam from books, videos, tasks and Anki decks.
-# Open it via Tools → Lernplan or the "Lernplan" link in the top bar.
+# Smart Study Plan: study plans up to the exam from books, videos, tasks and Anki decks.
+# Open it via Tools → Smart Study Plan or the "Study Plan" link in the top bar.
 # The plan checks off Anki items by itself; everything else with a click.
 import json
 import os
@@ -17,7 +17,8 @@ from aqt.webview import AnkiWebView
 from . import ankidata, planner, store
 from .planner import tr
 
-VERSION = "0.1.0"
+NAME = "Smart Study Plan"
+VERSION = "0.1.1"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
 mw.addonManager.setWebExports(MODULE, r"web/.*\.(js|css)")
@@ -85,7 +86,7 @@ def home():
         heat[d] = heat.get(d, 0) + 1
     plans.sort(key=lambda p: (p["status"] != "active", (p["exam"] or "9999") if p["status"] == "active" else "~" + p["exam"]))
     return {"plans": plans, "today": t, "heat": heat, "streak": planner.streak(set(heat), t),
-            "profile": store.profile(), "version": VERSION}
+            "profile": store.profile(), "version": VERSION, "name": NAME}
 
 
 def generate_all(pid):
@@ -307,10 +308,10 @@ def handle(cmd, a):
     raise ValueError(f"unknown command {cmd}")
 
 
-class LernplanWindow(QDialog):
+class StudyPlanWindow(QDialog):
     def __init__(self):
         super().__init__(None, Qt.WindowType.Window)
-        self.setWindowTitle("Lernplan")
+        self.setWindowTitle(NAME)
         self.setMinimumSize(420, 500)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
@@ -354,7 +355,7 @@ def open_window():
     if not mw.col:
         return
     if _win is None or not _win.isVisible():
-        _win = LernplanWindow()
+        _win = StudyPlanWindow()
         _win.finished.connect(_closed)
     _win.show()
     _win.raise_()
@@ -375,7 +376,7 @@ def _changed(*_):
 
 
 def _toolbar(links, toolbar):
-    links.append(toolbar.create_link("lernplan", "Lernplan", open_window, tip=tr("Lernplan öffnen", "Open Lernplan"), id="lernplan"))
+    links.append(toolbar.create_link("lernplan", "Study Plan", open_window, tip=tr(f"{NAME} öffnen", f"Open {NAME}"), id="lernplan"))
 
 
 def _profile_closing():
@@ -383,7 +384,7 @@ def _profile_closing():
         _win.close()
 
 
-action = QAction("Lernplan…", mw)
+action = QAction(f"{NAME}…", mw)
 action.triggered.connect(open_window)
 mw.form.menuTools.addAction(action)
 gui_hooks.top_toolbar_did_init_links.append(_toolbar)

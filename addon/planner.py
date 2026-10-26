@@ -633,7 +633,7 @@ def norm(s):
 STOP = {"und", "der", "die", "das", "des", "mit", "von", "im", "in", "teil", "the", "and", "of", "a", "m", "a"}
 ROMAN = {r: str(i) for i, r in enumerate(
     "i ii iii iv v vi vii viii ix x xi xii xiii xiv xv xvi xvii xviii xix xx".split(), 1) if r != "i"}
-GENERIC = {"testat", "pruefung", "prufung", "klausur", "lernplan", "plan", "exam", "sip", "anki", "deck",
+GENERIC = {"testat", "pruefung", "prufung", "klausur", "lernplan", "smart", "plan", "exam", "sip", "anki", "deck",
            "test", "final", "midterm", "study"}
 
 

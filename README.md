@@ -1,12 +1,12 @@
-# Lernplan
+# Smart Study Plan
 
 **Study plans up to your exam, built from your book, your lectures and your Anki decks, and checked off by Anki as you study.**
 
-You tell Lernplan what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest.
+You tell Smart Study Plan what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest.
 
 ![Plan view](screenshots/plan.png)
 
-*"Lernplan" is German for "study plan". The interface is in English and German and follows Anki's language.*
+*An Anki add-on. No AI and no account: the scheduler runs locally on your computer. The interface is in English and German and follows Anki's language.*
 
 ## Features
 
@@ -52,33 +52,33 @@ You tell Lernplan what you have to learn (book pages, videos, lists of tasks, An
 
 ## Install
 
-Lernplan needs a recent Anki (developed and tested on 26.09).
+Smart Study Plan needs a recent Anki (developed and tested on 26.09).
 
-**From a release**: download `lernplan.ankiaddon` from the [latest release](https://github.com/TruckDrive/lernplan/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
+**From a release**: download `smart_study_plan.ankiaddon` from the [latest release](https://github.com/TruckDrive/smart-study-plan/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
 
 **From source**:
 ```sh
-git clone https://github.com/TruckDrive/lernplan.git
-ln -s "$PWD/lernplan/addon" ~/.local/share/Anki2/addons21/lernplan   # Linux; on macOS/Windows copy the folder
+git clone https://github.com/TruckDrive/smart-study-plan.git
+ln -s "$PWD/smart-study-plan/addon" ~/.local/share/Anki2/addons21/smart_study_plan   # Linux; on macOS/Windows copy the folder
 ```
 
 ## Usage
 
-1. Open it via **Tools → Lernplan…** or the **Lernplan** link in Anki's top bar.
+1. Open it via **Tools → Smart Study Plan…** or the **Study Plan** link in Anki's top bar.
 2. **+ New plan**: name and exam date (you can leave the date empty for a draft).
 3. **Basics**: study time per day, days off, milestones, single days (e.g. 0 minutes on a busy day).
 4. **Sources**: add your book (pace in minutes per page, optional PDF), your lectures (one per line: `Name | 25 | https://…`), lists and Anki decks (search, or pick from the suggestions matching your plan name).
 5. **Topics**: paste the table of contents (`Peritoneum ...... 78`) or create topics from subdecks, then **Suggest links automatically** and check the ★ suggestions.
 6. **Create plan**. From then on, study in Anki as usual; the plan keeps up.
 
-Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. Filtered decks created by Lernplan live under a `Lernplan` parent deck.
+Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. Filtered decks created by the add-on live under a `Smart Study Plan` parent deck.
 
 ## Development
 
 ```sh
 python -I tests/test_planner.py               # scheduler, no Anki needed
 python -I tests/test_ankidata.py <empty dir>  # Anki queries on a throwaway collection
-./build.sh                                     # → dist/lernplan.ankiaddon
+./build.sh                                     # → dist/smart_study_plan.ankiaddon
 ```
 
 - `addon/planner.py`: the scheduler, plain Python

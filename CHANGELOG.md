@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 – 2026-10-26
+
+- Renamed from "Lernplan" to **Smart Study Plan**. New filtered decks go under `Smart Study Plan`; existing ones under `Lernplan` keep working and can be deleted when you no longer need them
+- The `.ankiaddon` file now installs into a `smart_study_plan` folder
+
 ## 0.1.0 – 2026-10-26
 
 First public release.

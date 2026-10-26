@@ -10,7 +10,7 @@ from anki.utils import ids2str
 from . import planner
 from .planner import tr
 
-FILTER_PREFIX = "Lernplan"
+FILTER_PREFIX = "Smart Study Plan"
 
 
 def today(col):
@@ -332,7 +332,7 @@ def maintenance(col, plan, on):
     if on:
         if m.get("on"):
             return m
-        name = tr(f"Lernplan · Erhaltung ({plan['title']})", f"Lernplan · Maintenance ({plan['title']})")
+        name = tr(f"{FILTER_PREFIX} · Erhaltung ({plan['title']})", f"{FILTER_PREFIX} · Maintenance ({plan['title']})")
         conf = next((c for c in col.decks.all_config() if c["name"] == name), None)
         if not conf:
             first = plan_dids(col, plan)
