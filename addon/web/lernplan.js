@@ -169,6 +169,8 @@ function renderPlan(root) {
   // Kacheln
   const tiles = h("div", { class: "tiles" });
   tiles.append(tile("Bis zur Prüfung", left > 0 ? String(left) : left === 0 ? "heute" : "vorbei", null, left > 0 ? (left === 1 ? "Tag" : "Tage") : ""));
+  const nextMs = (plan.milestones || []).filter(m => m.date && m.date >= today && m.date < plan.exam).sort((a, b) => a.date.localeCompare(b.date))[0];
+  if (nextMs) { const n = daysBetween(today, nextMs.date); tiles.append(tile(nextMs.name || "Nächste Etappe", n ? String(n) : "heute", null, n ? (n === 1 ? "Tag" : "Tage") : "")); }
   tiles.append(tile("Plan erledigt", `${progress[0]}`, progress[1] ? progress[0] / progress[1] : 0, "/ " + progress[1]));
   for (const s of plan.sources) {
     if (s.type === "anki" && stats.decks[s.id]) {
@@ -228,10 +230,12 @@ function groupLabel(it, plan) {
 function dayCard(day, today) {
   const { plan } = S.data;
   const isToday = day.d === today, isExam = day.d === plan.exam;
-  const sec = h("section", { class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam ? " exam" : "") });
+  const sec = h("section", { class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d) ? " exam" : "") });
   const mins = day.items.filter(it => !it.moved && it.kind !== "note").reduce((a, it) => a + (it.min || 0), 0);
   const note = [plan.dayNotes && plan.dayNotes[day.d], mins ? "≈ " + hm(mins) : null].filter(Boolean).join(" · ");
-  const h2 = h("h2", null, fmt(day.d), isToday ? h("span", { class: "badge" }, "HEUTE") : null, isExam ? h("span", { class: "badge warn" }, "PRÜFUNG") : null);
+  const msDay = (plan.milestones || []).find(m => m.date === day.d);
+  const h2 = h("h2", null, fmt(day.d), isToday ? h("span", { class: "badge" }, "HEUTE") : null, isExam ? h("span", { class: "badge warn" }, "PRÜFUNG") : null,
+    msDay && !isExam ? h("span", { class: "badge warn" }, (msDay.name || "ETAPPE").toUpperCase()) : null);
   const head = h("div", { class: "dhead" }, h("div", null, h2, h("div", { class: "note" }, note)));
   sec.append(head);
   const groups = new Map();
@@ -273,6 +277,8 @@ function itemEl(it, day) {
   if (auto) t.append(h("span", { class: "chip" + (r && r.done ? " ok" : "") }, r && r.text ? "Anki · " + r.text : "Anki"));
   if (it.moved) t.append(h("span", { class: "chip info" }, "→ neu eingeplant"));
   if (it.min && !auto && !it.moved) t.append(h("span", { class: "chip info" }, hm(it.min)));
+  if (it.for) t.append(h("span", { class: "chip info" }, "für " + it.for));
+  if (it.url) t.append(h("a", { class: "small", style: "margin-left:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url }); } }, "öffnen ↗"));
   const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: "Entfernen", onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));
   return row;
@@ -397,17 +403,18 @@ function renderEdit(root) {
   field("Lernzeit pro Tag", h("div", { class: "inline" }, bind("minutesPerDay", "number", { min: 0, step: 15 }), h("span", { class: "muted small" }, "Minuten (einzelne Tage unten anpassen)")));
   field("Freie Wochentage", h("div", { class: "inline" }, WD_MO.map(([l, n]) => h("label", { class: "wd" }, h("input", { type: "checkbox", checked: p.offWeekdays.includes(n),
     onchange: e => { p.offWeekdays = e.target.checked ? [...p.offWeekdays, n] : p.offWeekdays.filter(x => x !== n); render(); } }), l))));
-  root.append(h("div", { class: "card" }, h("h2", null, "1 · Eckdaten"), h("div", { style: "margin-top:10px" }, f), calendar(p)));
+  root.append(h("div", { class: "card" }, h("h2", null, "1 · Eckdaten"), h("div", { style: "margin-top:10px" }, f), milestonesEl(p), calendar(p)));
 
   // 2. Quellen
   const srcBox = h("div", { style: "margin-top:10px" }, p.sources.map(s => sourceEl(s)));
   root.append(h("div", { class: "card" }, h("h2", null, "2 · Quellen"),
     h("p", { class: "muted small", style: "margin:2px 0 0" }, "Alles, womit du lernst. Anki-Decks werden automatisch verfolgt; Seiten, Videos und Aufgaben hakst du ab."),
     srcBox, h("div", { class: "tools" },
-      h("button", { onclick: () => addSource("pages") }, "+ Buch / Skript (Seiten)"),
-      h("button", { onclick: () => addSource("videos") }, "+ Videos"),
+      h("button", { onclick: () => addSource("pages") }, "+ Buch / Skript / Folien (Seiten)"),
+      h("button", { onclick: () => addSource("videos") }, "+ Videos / Vorlesungen"),
       h("button", { onclick: () => addSource("anki") }, "+ Anki-Deck"),
-      h("button", { onclick: () => addSource("tasks") }, "+ Aufgaben / Liste"))));
+      h("button", { onclick: () => addSource("tasks") }, "+ Liste (VMC-Module, Altfragen, Übungen …)")),
+    h("p", { class: "muted small" }, "Quellen, auf die der Plan keinen Zugriff hat (VMC, YouTube, Moodle, Bücher), trägst du als Liste ein – mit Link, wenn du willst. Der Plan verteilt sie trotzdem; abhaken tust du sie selbst.")));
 
   // 3. Themen
   root.append(topicsCard(p));
@@ -416,15 +423,31 @@ function renderEdit(root) {
     h("button", { onclick: saveEdit }, "Speichern"), h("button", { class: "primary", onclick: () => saveEdit(true) }, p.days.length ? "Speichern & neu planen" : "Plan erstellen")));
 }
 
+function milestonesEl(p) {
+  p.milestones = p.milestones || [];
+  const box = h("div", { style: "margin-top:12px" }, h("h3", null, "Etappen / Testate vor der Prüfung"),
+    h("p", { class: "muted small", style: "margin:0 0 6px" }, "Hat das Fach Zwischentermine (Testate, Teilprüfungen)? Dann hier eintragen und bei jedem Thema wählen, wozu es gehört. Der Plan macht den Stoff jeder Etappe vor ihrem Termin fertig – egal in welcher Reihenfolge er im Buch steht."));
+  for (const m of p.milestones.slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""))) {
+    box.append(h("div", { class: "inline", style: "margin-bottom:5px" },
+      h("input", { type: "text", value: m.name, placeholder: "z. B. Testat Becken", style: "flex:1;min-width:180px", onchange: e => { m.name = e.target.value; } }),
+      h("input", { type: "date", value: m.date || "", onchange: e => { m.date = e.target.value; render(); } }),
+      h("input", { type: "time", value: m.time || "", onchange: e => { m.time = e.target.value; } }),
+      h("button", { class: "ghost danger", title: "Etappe löschen", onclick: () => { p.milestones = p.milestones.filter(x => x !== m); for (const t of p.topics) if (t.milestone === m.id) delete t.milestone; render(); } }, "✕")));
+  }
+  box.append(h("button", { onclick: () => { p.milestones.push({ id: uid("m"), name: "", date: "", time: "" }); render(); } }, "+ Etappe / Testat"));
+  return box;
+}
+function msName(p, id) { const m = (p.milestones || []).find(m => m.id === id); return m ? (m.name || "Etappe") : null; }
+
 function calendar(p) {
   const cal = h("div", { class: "cal" });
   if (!p.start || !p.exam || p.exam < p.start) return cal;
   for (let d = p.start; d <= p.exam; d = addDays(d, 1)) {
     const wd = (dt(d).getDay() + 6) % 7, has = d in p.dayMinutes;
     const val = has ? p.dayMinutes[d] : (p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay);
-    const exam = d === p.exam;
-    cal.append(h("div", { class: "c" + (val ? "" : " off") + (exam ? " exam" : "") },
-      h("div", null, h("b", null, fmt(d)), exam ? " · Prüfung" : ""),
+    const exam = d === p.exam, ms = (p.milestones || []).find(m => m.date === d);
+    cal.append(h("div", { class: "c" + (val ? "" : " off") + (exam || ms ? " exam" : "") },
+      h("div", null, h("b", null, fmt(d)), exam ? " · Prüfung" : ms ? " · " + (ms.name || "Etappe") : ""),
       exam ? null : h("div", { class: "inline" }, h("input", { type: "number", min: 0, step: 15, value: val, title: "Minuten an diesem Tag",
         onchange: e => { const v = +e.target.value; const def = p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay; if (v === def) delete p.dayMinutes[d]; else p.dayMinutes[d] = v; render(); } }), h("span", { class: "muted" }, "min")),
       h("input", { type: "text", placeholder: "Notiz", value: (p.dayNotes || {})[d] || "", onchange: e => { p.dayNotes = p.dayNotes || {}; if (e.target.value) p.dayNotes[d] = e.target.value; else delete p.dayNotes[d]; } })));
@@ -433,7 +456,7 @@ function calendar(p) {
 }
 
 function addSource(type) {
-  const s = { id: uid("s"), type, name: { pages: "Handbuch", videos: "Präpvideos", anki: "", tasks: "Aufgaben" }[type], minPerUnit: null };
+  const s = { id: uid("s"), type, name: { pages: "Skript", videos: "Videos", anki: "", tasks: "Liste" }[type], minPerUnit: null };
   if (type === "videos") { s.videos = []; s.defaultMin = 20; }
   if (type === "tasks") s.tasks = [];
   if (type === "anki") { s.deck = ""; s.maxNew = null; }
@@ -470,12 +493,12 @@ function sourceEl(s) {
   }
   if (s.type === "videos" || s.type === "tasks") {
     const key = s.type, list = s[key];
-    const ta = h("textarea", { placeholder: key === "videos" ? "Ein Video pro Zeile, Dauer optional:\nBauchsitus 1 – Allgemeines | 25\nLeber (18 min)\nOberbauchgefäße 12:30" : "Eine Aufgabe pro Zeile, Dauer optional:\nÜbungsblatt 1 | 45" });
-    ta.value = list.map(v => v.min ? `${v.name} | ${v.min}` : v.name).join("\n");
+    const ta = h("textarea", { placeholder: key === "videos" ? "Ein Video pro Zeile, Dauer und Link optional:\nBauchsitus 1 – Allgemeines | 25\nNiere Histologie (18 min)\nVMC Endokrinologie 1 | 40 | https://…" : "Ein Eintrag pro Zeile, Dauer und Link optional:\nVMC-Modul Niere | 45 | https://…\nAltfragen Embryo 2023 | 60" });
+    ta.value = list.map(v => v.name + (v.min ? " | " + v.min : "") + (v.url ? " | " + v.url : "")).join("\n");
     ta.addEventListener("change", async () => {
       const parsed = await call("parseList", { text: ta.value });
       const old = new Map(list.map(v => [v.name, v]));
-      s[key] = parsed.map(x => Object.assign(old.get(x.name) || { id: uid(key === "videos" ? "v" : "t") }, { name: x.name, min: x.min }));
+      s[key] = parsed.map(x => Object.assign(old.get(x.name) || { id: uid(key === "videos" ? "v" : "t") }, { name: x.name, min: x.min, url: x.url || null }));
       const ids = new Set(s[key].map(v => v.id));
       for (const t of p.topics) if (t[key] && t[key][s.id]) t[key][s.id] = t[key][s.id].filter(i => ids.has(i));
       S.sugg = {}; render();
@@ -497,7 +520,7 @@ function topicsCard(p) {
     h("button", { onclick: () => { p.topics.push({ id: uid("k"), name: "", pages: {}, videos: {}, tasks: {}, anki: {} }); render(); } }, "+ Thema"),
     p.topics.length ? h("button", { class: "primary", onclick: autoAssign }, "Zuordnung automatisch vorschlagen") : null,
     h("span", { class: "inline small", style: "margin-left:auto" }, "Reihenfolge:",
-      h("select", { onchange: e => { p.order = e.target.value; render(); } }, h("option", { value: "auto", selected: p.order === "auto" || null }, "automatisch (nach Seiten)"), h("option", { value: "manual", selected: p.order === "manual" || null }, "wie in der Liste")))));
+      h("select", { onchange: e => { p.order = e.target.value; render(); } }, h("option", { value: "auto", selected: p.order === "auto" || null }, "automatisch (nach Testat, dann Seiten)"), h("option", { value: "manual", selected: p.order === "manual" || null }, "wie in der Liste")))));
   const list = p.order === "auto" ? sortedTopics(p) : p.topics;
   list.forEach((t, ix) => card.append(topicEl(t, ix, list.length)));
   // nicht zugeordnete Videos/Aufgaben
@@ -509,8 +532,9 @@ function topicsCard(p) {
 }
 function sortedTopics(p) {
   const ps = p.sources.filter(s => s.type === "pages").map(s => s.id);
+  const due = t => { const m = (p.milestones || []).find(m => m.id === t.milestone && m.date); return m ? m.date : p.exam; };
   const key = t => { for (const id of ps) { const r = (t.pages || {})[id]; if (r && r[0]) return r[0]; } return Infinity; };
-  return p.topics.map((t, i) => [t, i]).sort((a, b) => key(a[0]) - key(b[0]) || a[1] - b[1]).map(x => x[0]);
+  return p.topics.map((t, i) => [t, i]).sort((a, b) => due(a[0]).localeCompare(due(b[0])) || key(a[0]) - key(b[0]) || a[1] - b[1]).map(x => x[0]);
 }
 
 function topicEl(t, ix, n) {
@@ -523,6 +547,8 @@ function topicEl(t, ix, n) {
     h("button", { class: "ghost danger", onclick: () => { p.topics = p.topics.filter(x => x !== t); render(); }, title: "Thema löschen" }, "✕")));
   const tl = h("div", { class: "tl" });
   const sg = (S.sugg[t.id] || {});
+  if ((p.milestones || []).length) tl.append(h("span", null, "Gehört zu"), h("select", { onchange: e => { if (e.target.value) t.milestone = e.target.value; else delete t.milestone; render(); } },
+    h("option", { value: "" }, "Prüfung (Ende)"), p.milestones.map(m => h("option", { value: m.id, selected: t.milestone === m.id || null }, `${m.name || "Etappe"}${m.date ? " · " + fmt(m.date) : ""}`))));
   for (const s of p.sources) {
     if (s.type === "pages") {
       t.pages = t.pages || {};
@@ -569,7 +595,9 @@ async function tocDialog() {
   const p = S.edit, pageSrc = p.sources.filter(s => s.type === "pages");
   const ta = h("textarea", { style: "min-height:180px", placeholder: "Aus dem Inhaltsverzeichnis kopieren, z. B.\nPeritoneum ............ 78\nLeistenkanal 82–84\n85 Dünndarm" });
   const sel = h("select", null, pageSrc.map(s => h("option", { value: s.id }, s.name)));
-  const ok = await modal("Inhaltsverzeichnis einfügen", h("div", null, pageSrc.length > 1 ? h("div", { class: "inline", style: "margin-bottom:6px" }, "Für:", sel) : null, ta,
+  const msSel = h("select", null, h("option", { value: "" }, "Prüfung (Ende)"), (p.milestones || []).map(m => h("option", { value: m.id }, m.name || "Etappe")));
+  const ok = await modal("Inhaltsverzeichnis einfügen", h("div", null, pageSrc.length > 1 ? h("div", { class: "inline", style: "margin-bottom:6px" }, "Für:", sel) : null,
+    (p.milestones || []).length ? h("div", { class: "inline", style: "margin-bottom:6px" }, "Diese Kapitel gehören zu:", msSel) : null, ta,
     h("p", { class: "muted small" }, "Eine Zeile pro Kapitel mit Seitenzahl. Endet ein Kapitel nicht mit einer Angabe, geht es bis eine Seite vor dem nächsten. Vorhandene Themen mit gleichem Namen bekommen die Seiten.")),
     [["Abbrechen", null], ["Übernehmen", true, "primary"]]);
   if (!ok || !ta.value.trim()) return;
@@ -580,6 +608,7 @@ async function tocDialog() {
     let t = p.topics.find(t => t.name.trim().toLowerCase() === r.name.toLowerCase());
     if (!t) { t = { id: uid("k"), name: r.name, pages: {}, videos: {}, tasks: {}, anki: {} }; p.topics.push(t); added++; }
     t.pages = t.pages || {}; t.pages[sid] = [r.from, r.to];
+    if (msSel.value) t.milestone = msSel.value;
   }
   toast(`${rows.length} Kapitel erkannt, ${added} neue Themen.`);
   render();
@@ -610,6 +639,7 @@ function validate(p) {
   if (!p.title.trim()) return "Bitte einen Namen eingeben.";
   if (!p.exam || !p.start || p.exam <= p.start) return "Die Prüfung muss nach dem Start liegen.";
   if (!p.sources.length) return "Füge mindestens eine Quelle hinzu (z. B. ein Anki-Deck oder das Handbuch).";
+  if ((p.milestones || []).some(m => !m.date || m.date <= p.start || m.date >= p.exam)) return "Jede Etappe braucht ein Datum zwischen Start und Prüfung.";
   const bad = p.sources.find(s => s.type === "anki" && !s.deck);
   if (bad) return "Bei einer Anki-Quelle fehlt noch das Deck.";
   return null;

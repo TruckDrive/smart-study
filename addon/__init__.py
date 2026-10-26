@@ -7,7 +7,7 @@ import traceback
 
 from aqt import gui_hooks, mw
 from aqt.qt import QAction, QDialog, QTimer, QVBoxLayout, Qt
-from aqt.utils import restoreGeom, saveGeom, tooltip
+from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
 from . import ankidata, planner, store
@@ -67,7 +67,7 @@ def home():
 
 
 SETUP_KEYS = ("title", "exam", "examTime", "start", "minutesPerDay", "offWeekdays", "dayMinutes", "dayNotes",
-              "order", "sources", "topics", "subtitle")
+              "order", "sources", "topics", "subtitle", "milestones")
 
 
 def handle(cmd, a):
@@ -185,6 +185,11 @@ def handle(cmd, a):
             store.save(plan)
         mw.reset()
         return {"did": did, "count": n}
+    if cmd == "openLink":
+        if not str(a["url"]).startswith(("http://", "https://")):
+            raise ValueError("nur Web-Links")
+        openLink(a["url"])
+        return True
     if cmd == "study":
         col.decks.select(a["did"])
         mw.moveToState("overview")

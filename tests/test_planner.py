@@ -140,6 +140,36 @@ def test_parse_and_match():
     print("parse/match ok")
 
 
+def test_milestones():
+    plan = sample()
+    plan["sources"].append({"id": "vmc", "type": "tasks", "name": "VMC", "tasks": [
+        {"id": "x1", "name": "VMC Niere 1", "min": 40, "url": "https://vmc.example/niere1"}]})
+    plan["milestones"] = [{"id": "m1", "name": "Testat Leber", "date": "2026-10-30", "time": "13:15"}]
+    plan["topics"][0]["milestone"] = "m1"          # Leber (S. 82) kommt zuerst, obwohl Peritoneum S. 78 hat
+    plan["topics"][0]["tasks"] = {"vmc": ["x1"]}
+    assert [t["id"] for t in P.ordered_topics(plan)] == ["t2", "t1", "t3"]
+    lq = P.topic_query(plan, plan["topics"][0], plan["sources"][2])
+    c = counts_for(plan, {lq: 50})
+    P.build(plan, c, date(2026, 10, 26))
+    items = flat(plan)
+    leber = [(d, it) for d, it in items if it.get("topic") == "t2" and it["kind"] != "reviews"]
+    assert leber and all(d < "2026-10-30" for d, _ in leber), leber
+    assert any(it.get("url") for _, it in leber)
+    assert all(it.get("for") == "Testat Leber" for _, it in leber)
+    notes = [it["text"] for d, it in items if d == "2026-10-30" and it["kind"] == "note"]
+    assert notes and "Testat Leber um 13:15" in notes[0], notes
+    assert [it for d, it in items if d == "2026-10-29" and it["kind"] == "note"], "Wiederholungstag vor dem Testat fehlt"
+    other = [d for d, it in items if it.get("topic") in ("t1", "t3") and it["kind"] in ("pages", "video")]
+    assert other and min(other) > "2026-10-30", other
+    # Testat vorbei: Stoff dafür wird nicht mehr eingeplant
+    P.build(plan, c, date(2026, 10, 31))
+    assert not [it for d, it in flat(plan) if d >= "2026-10-31" and it.get("topic") == "t2" and it["kind"] != "reviews"]
+    lst = P.parse_list("VMC Endokrinologie 2 | 35 | https://vmc.x/abc\nhttps://vmc.x/only")
+    assert lst[0] == {"name": "VMC Endokrinologie 2", "min": 35, "url": "https://vmc.x/abc"}, lst
+    assert lst[1]["url"] == "https://vmc.x/only"
+    print("milestones ok")
+
+
 def test_misc():
     assert P.streak({"2026-10-24", "2026-10-23", "2026-10-21"}, "2026-10-24") == 2
     assert P.streak({"2026-10-23", "2026-10-22"}, "2026-10-24") == 2
@@ -159,4 +189,5 @@ if __name__ == "__main__":
     test_evaluate()
     test_parse_and_match()
     test_misc()
+    test_milestones()
     print("ALLE TESTS OK")

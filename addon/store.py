@@ -54,7 +54,7 @@ def new_plan(title, exam, start, profile):
     return {
         "id": planner.new_id("p"), "title": title, "exam": exam, "examTime": "", "start": start,
         "status": "active", "minutesPerDay": int(profile.get("minutesPerDay", 180)), "offWeekdays": [],
-        "dayMinutes": {}, "dayNotes": {}, "order": "auto", "sources": [], "topics": [], "days": [],
+        "dayMinutes": {}, "dayNotes": {}, "order": "auto", "milestones": [], "sources": [], "topics": [], "days": [],
         "done": {}, "autoDone": {}, "notes": [],
     }
 

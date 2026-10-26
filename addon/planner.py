@@ -82,19 +82,29 @@ def queries(plan):
     return sorted(out)
 
 
+def milestones(plan):
+    """Etappen (z. B. Testate) nach Datum; die Prüfung selbst ist immer die letzte."""
+    ms = sorted((m for m in plan.get("milestones", []) if m.get("date") and m["date"] < plan["exam"]),
+                key=lambda m: m["date"])
+    return ms + [{"id": None, "name": "Prüfung", "date": plan["exam"], "time": plan.get("examTime", ""), "final": True}]
+
+
 def ordered_topics(plan):
+    """Automatisch: nach Termin der Etappe, dann nach Seite. Sonst wie in der Liste."""
     topics = list(plan.get("topics", []))
     if plan.get("order", "auto") != "auto":
         return topics
     psrc = [s["id"] for s in plan.get("sources", []) if s["type"] == "pages"]
+    due = {m["id"]: m["date"] for m in milestones(plan) if m["id"]}
 
     def key(ix_t):
         ix, t = ix_t
+        d = due.get(t.get("milestone"), plan["exam"])
         for sid in psrc:
             r = t.get("pages", {}).get(sid)
             if r:
-                return (0, int(r[0]), ix)
-        return (1, 0, ix)
+                return (d, 0, int(r[0]), ix)
+        return (d, 1, 0, ix)
 
     return [t for _, t in sorted(enumerate(topics), key=key)]
 
@@ -237,112 +247,142 @@ def build(plan, counts, today, ev=None):
         days.setdefault(d2s(d), {"d": d2s(d), "items": []})
     days[d2s(start)]["items"][0:0] = carry
 
-    # Kapazität: Tage vor der Prüfung mit Lernzeit; am Ende Reservetage für Wiederholung
-    avail = [d for d in daterange(start, exam - timedelta(days=1)) if capacity(plan, d) > 0]
-    r = reserve_count(len(avail))
-    content, reserve = avail[:len(avail) - r], avail[len(avail) - r:]
-    if not content:
-        content, reserve = avail, []
+    # Etappen: jedes Testat bekommt ein eigenes Zeitfenster bis zu seinem Termin.
+    # Stoff eines vergangenen Testats wird nicht mehr eingeplant.
+    ms = milestones(plan)
+    ms_open = [m for m in ms if s2d(m["date"]) >= start]
+    ms_date = {m["id"]: m["date"] for m in ms if m["id"]}
+    units = []
+    groups = [[] for _ in ms_open]
+    for u in remaining_work(plan, counts, ev):
+        t = topics.get(u["topic"])
+        due = ms_date.get(t.get("milestone")) if t else None
+        due = due or plan["exam"]
+        if due < d2s(start):
+            continue
+        j = next(j for j, m in enumerate(ms_open) if m["date"] >= due)
+        groups[j].append(u)
+        units.append(u)
+
     used_today = sum(it.get("min", 0) for it in days[d2s(start)]["items"]
                      if is_done(plan, it, ev) and it.get("kind") != "reviews")
-    cap = [max(0, capacity(plan, d) - (used_today if d == start else 0)) for d in content]
-
-    units = remaining_work(plan, counts, ev)
-    work = sum(u["n"] * u["cost"] for u in units)
-    total = sum(cap)
-    notes = []
-    if content and work > total * 1.02:
-        notes.append(f"Der Plan ist zu voll: {round((work - total) / 60, 1)} h mehr Stoff als Lernzeit bis zur Prüfung. "
-                     "Mehr Zeit pro Tag eintragen oder Stoff streichen.")
-    scale = work / total if total else 0
-    budget = [c * scale for c in cap]
-
     has_anki = bool(anki_sources(plan))
-    generated = {d2s(d): [] for d in content}
-    i, rem = 0, budget[0] if budget else 0
-    new_per_day = {}
-    seen_so_far = {}
+    generated, reserve_map = {}, {}
+    new_per_day, seen_so_far = {}, {}
+    notes = []
+    multi = len(ms_open) > 1
 
-    def next_day():
-        nonlocal i, rem
-        if i < len(content) - 1:
-            i += 1
-            rem = budget[i]
-            return True
-        return False
+    def fill(units, content, cap, m):
+        budget_total = sum(cap)
+        work = sum(u["n"] * u["cost"] for u in units)
+        label = "zur Prüfung" if m.get("final") else f"zu „{m['name']}“"
+        if work > budget_total * 1.02:
+            notes.append(f"Bis {label} ist der Plan zu voll: {round((work - budget_total) / 60, 1)} h mehr Stoff als Lernzeit. "
+                         "Mehr Zeit pro Tag eintragen oder Stoff streichen.")
+        scale = work / budget_total if budget_total else 0
+        budget = [c * scale for c in cap]
+        st = {"i": 0, "rem": budget[0] if budget else 0}
 
-    def emit(u, k):
-        nonlocal rem
-        t = topics.get(u["topic"])
-        tname = t["name"] if t else None
-        src = srcs[u["source"]]
-        it = {"id": new_id(), "kind": u["kind"], "topic": u["topic"], "source": u["source"], "min": round(k * u["cost"])}
-        if u["kind"] == "pages":
-            a = u["from"]
-            it["pages"] = [a, a + k - 1]
-            rng = f"S. {a}" if k == 1 else f"S. {a}–{a + k - 1}"
-            it["text"] = f"{rng}" + (f" · {tname}" if tname else "")
-            u["from"] += k
-        elif u["kind"] == "video":
-            v = next(v for v in src["videos"] if v["id"] == u["video"])
-            it["video"] = u["video"]
-            it["text"] = v["name"]
-        elif u["kind"] == "task":
-            x = next(x for x in src["tasks"] if x["id"] == u["task"])
-            it["task"] = u["task"]
-            it["text"] = x["name"]
-        else:
-            base = seen_so_far.setdefault(u["query"], u["seen"])
-            seen_so_far[u["query"]] = base + k
-            it["cards"] = k
-            it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
-            it["text"] = f"{k} neue Karten" + (f" · {tname}" if tname else " · übrige Karten")
-            key = (i, u["source"])
-            new_per_day[key] = new_per_day.get(key, 0) + k
-        generated[d2s(content[i])].append(it)
-        rem -= k * u["cost"]
-        u["n"] -= k
+        def next_day():
+            if st["i"] < len(content) - 1:
+                st["i"] += 1
+                st["rem"] = budget[st["i"]]
+                return True
+            return False
 
-    for u in units:
-        if not content:
-            break
-        while u["n"] > 0:
-            if u["split"]:
-                k = u["n"] if i == len(content) - 1 else min(u["n"], int(rem / u["cost"] + 0.5))
-                if u["kind"] == "cards":
-                    mx = srcs[u["source"]].get("maxNew")
-                    if mx:
-                        k = min(k, int(mx) - new_per_day.get((i, u["source"]), 0))
-                if k <= 0:
-                    if not next_day():
-                        k = u["n"]
-                        emit(u, k)
-                    continue
-                emit(u, k)
-                if rem < u["cost"] * 0.5:
-                    next_day()
+        def emit(u, k):
+            t = topics.get(u["topic"])
+            tname = t["name"] if t else None
+            src = srcs[u["source"]]
+            day = d2s(content[st["i"]])
+            it = {"id": new_id(), "kind": u["kind"], "topic": u["topic"], "source": u["source"], "min": round(k * u["cost"])}
+            if multi:
+                it["for"] = "Prüfung" if m.get("final") else m["name"]
+            if u["kind"] == "pages":
+                a = u["from"]
+                it["pages"] = [a, a + k - 1]
+                rng = f"S. {a}" if k == 1 else f"S. {a}–{a + k - 1}"
+                it["text"] = f"{rng}" + (f" · {tname}" if tname else "")
+                u["from"] += k
+            elif u["kind"] in ("video", "task"):
+                key = "videos" if u["kind"] == "video" else "tasks"
+                x = next(x for x in src[key] if x["id"] == u[u["kind"]])
+                it[u["kind"]] = u[u["kind"]]
+                it["text"] = x["name"]
+                if x.get("url"):
+                    it["url"] = x["url"]
             else:
-                if rem < u["cost"] * 0.5 and rem < budget[i] and next_day():
-                    continue
-                emit(u, 1)
-                if rem <= 0:
-                    next_day()
-    overflow = [d2s(content[j]) for j in range(len(content)) for sid, mx in
-                [(s["id"], s.get("maxNew")) for s in anki_sources(plan)] if mx and new_per_day.get((j, sid), 0) > int(mx)]
-    if overflow:
-        notes.append("Das Tageslimit für neue Karten reicht nicht bis zur Prüfung; am letzten Lerntag liegen mehr neue Karten.")
+                base = seen_so_far.setdefault(u["query"], u["seen"])
+                seen_so_far[u["query"]] = base + k
+                it["cards"] = k
+                it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
+                it["text"] = f"{k} neue Karten" + (f" · {tname}" if tname else " · übrige Karten")
+                new_per_day[(day, u["source"])] = new_per_day.get((day, u["source"]), 0) + k
+            generated.setdefault(day, []).append(it)
+            st["rem"] -= k * u["cost"]
+            u["n"] -= k
+
+        for u in units:
+            while u["n"] > 0:
+                last = st["i"] == len(content) - 1
+                if u["split"]:
+                    k = u["n"] if last else min(u["n"], int(st["rem"] / u["cost"] + 0.5))
+                    if u["kind"] == "cards" and not last:
+                        mx = srcs[u["source"]].get("maxNew")
+                        if mx:
+                            k = min(k, int(mx) - new_per_day.get((d2s(content[st["i"]]), u["source"]), 0))
+                    if k <= 0:
+                        if not next_day():
+                            emit(u, u["n"])
+                        continue
+                    emit(u, k)
+                    if st["rem"] < u["cost"] * 0.5:
+                        next_day()
+                else:
+                    if st["rem"] < u["cost"] * 0.5 and st["rem"] < budget[st["i"]] and next_day():
+                        continue
+                    emit(u, 1)
+                    if st["rem"] <= 0:
+                        next_day()
+
+    prev = start - timedelta(days=1)
+    for j, m in enumerate(ms_open):
+        deadline = s2d(m["date"])
+        avail = [d for d in daterange(prev + timedelta(days=1), deadline - timedelta(days=1)) if capacity(plan, d) > 0]
+        r = reserve_count(len(avail)) if m.get("final") else (1 if len(avail) >= 3 else 0)
+        content, reserve = avail[:len(avail) - r], avail[len(avail) - r:]
+        if not content:
+            content, reserve = avail, []
+        for k, d in enumerate(reserve):
+            reserve_map[d2s(d)] = reserve_items(plan, k, len(reserve)) if m.get("final") else [
+                {"id": new_id(), "kind": "note", "text": f"Wiederholen für „{m['name']}“: Themen dieser Etappe laut erklären, "
+                                                         "Schwachstellen anschauen, nichts Neues."}]
+        if groups[j] and not content:
+            if j + 1 < len(ms_open):
+                notes.append(f"Vor „{m['name']}“ ist keine Lernzeit mehr – der Stoff dafür rutscht in die nächste Etappe.")
+                groups[j + 1][0:0] = groups[j]
+            else:
+                notes.append("Bis zur Prüfung ist keine Lernzeit mehr eingetragen.")
+        elif groups[j]:
+            cap = [max(0, capacity(plan, d) - (used_today if d == start else 0)) for d in content]
+            fill(groups[j], content, cap, m)
+        prev = deadline
+    lim = {s["id"]: s.get("maxNew") for s in anki_sources(plan)}
+    if any(lim.get(sid) and n > int(lim[sid]) for (_, sid), n in new_per_day.items()):
+        notes.append("Das Tageslimit für neue Karten reicht nicht; am letzten Lerntag vor einem Termin liegen mehr neue Karten.")
 
     # Tage zusammensetzen: Wiederholungen zuerst, dann der Stoff
+    by_date = {m["date"]: m for m in ms_open}
     for d in daterange(start, exam):
         s = d2s(d)
         items = days[s]["items"]
-        gen = generated.get(s, [])
-        if d in reserve:
-            gen = reserve_items(plan, reserve.index(d), len(reserve))
-        if d == exam:
-            label = "Prüfung" + (f" um {plan['examTime']}" if plan.get("examTime") else "")
-            gen = [{"id": new_id(), "kind": "note", "text": f"{label}: nur leicht wiederholen, vorher etwas essen."}]
-        if has_anki and (capacity(plan, d) > 0 or d == exam) and not any(x.get("kind") == "reviews" for x in items):
+        gen = reserve_map.get(s) or generated.get(s, [])
+        m = by_date.get(s)
+        if m:
+            when = f" um {m['time']}" if m.get("time") else ""
+            gen = [{"id": new_id(), "kind": "note", "text": f"Prüfung{when}: nur leicht wiederholen, vorher etwas essen."
+                    if m.get("final") else f"{m['name']}{when}: vorher kurz wiederholen. Viel Erfolg!"}]
+        if has_anki and (capacity(plan, d) > 0 or m) and not any(x.get("kind") == "reviews" for x in items):
             gen.insert(0, {"id": new_id(), "kind": "reviews", "text": "Fällige Wiederholungen", "auto": {"type": "reviews"}})
         days[s]["items"] = items + [g for g in gen if not any(x.get("kind") == g["kind"] and g["kind"] in NO_CHECK
                                                               for x in items)]
@@ -506,12 +546,21 @@ def parse_minutes(s):
 
 
 def parse_list(text):
-    """Eine Zeile pro Video/Aufgabe, optional Dauer: 'Name | 25', 'Name (25 min)', 'Name 12:30'."""
+    """Eine Zeile pro Video/Aufgabe, optional Dauer und Link:
+    'Name | 25', 'Name (25 min)', 'Name 12:30', 'Name | 25 | https://…'."""
     out = []
     for line in text.splitlines():
         line = line.strip().lstrip("-•*").strip()
+        url = None
+        m = re.search(r"https?://\S+", line)
+        if m:
+            url = m.group(0)
+            line = (line[:m.start()] + line[m.end():]).strip().rstrip("|;").strip()
         if not line:
-            continue
+            if url:
+                line = url
+            else:
+                continue
         mins = None
         m = re.match(r"(.+?)\s*[|;\t]\s*([\d:.,]+\s*\w*)$", line) or \
             re.match(r"(.+?)\s*\(([\d:.,]+\s*(?:min|m|minuten|h|std)?)\)$", line, re.I) or \
@@ -520,7 +569,10 @@ def parse_list(text):
             mins = parse_minutes(m.group(2))
             if mins is not None:
                 line = m.group(1).strip()
-        out.append({"name": line, "min": mins})
+        item = {"name": line, "min": mins}
+        if url:
+            item["url"] = url
+        out.append(item)
     return out
 
 
