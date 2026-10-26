@@ -1,17 +1,19 @@
-# python -I tests/test_ankidata.py <leerer Ordner>  – nutzt eine Wegwerf-Sammlung, nie die echte
+# python -I tests/test_ankidata.py <empty folder>  – uses a throwaway collection, never your real one
 import os
 import sys
 import types
 from datetime import timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-pkg = types.ModuleType("lp")  # Add-on-Ordner als Paket laden, ohne __init__ (braucht mw)
+pkg = types.ModuleType("lp")  # load the add-on folder as a package without __init__ (needs mw)
 pkg.__path__ = [os.path.join(ROOT, "addon")]
 sys.modules["lp"] = pkg
 
 from anki.collection import Collection  # noqa: E402
 
 from lp import ankidata as A, planner as P  # noqa: E402
+
+P.LANG = "de"
 
 base = sys.argv[1]
 path = os.path.join(base, "test.anki2")
@@ -44,12 +46,12 @@ assert plan["topics"][0]["anki"]["ab"] == 'deck:"SEKU::Bauch::Leber"', plan["top
 assert plan["topics"][2]["anki"]["ab"] == 'tag:"Leistenkanal"', plan["topics"]
 
 st = A.stats(col, plan)
-assert st["counts"][P.rest_query(plan, plan["sources"][0])]["new"] == 0  # alles ist einem Thema zugeordnet
+assert st["counts"][P.rest_query(plan, plan["sources"][0])]["new"] == 0  # everything is assigned to a topic
 P.build(plan, st["counts"], today, P.evaluate(plan, st))
 cards_items = [it for d in plan["days"] for it in d["items"] if it["kind"] == "cards"]
 assert sum(it["cards"] for it in cards_items) == 25, cards_items
 
-# 10 Leber-Karten lernen, davon 4 mal "Nochmal"
+# study 10 Leber cards, 4 of them "Again"
 col.decks.select(col.decks.id_for_name("SEKU::Bauch::Leber"))
 col.sched.extend_limits(0, 0)
 answered = 0
@@ -59,7 +61,7 @@ for i in range(10):
         break
     col.sched.answerCard(c, 1 if i < 4 else 3)
     answered += 1
-for _ in range(8):  # die Nochmal-Karten noch einmal falsch
+for _ in range(8):  # the Again cards wrong once more
     c = col.sched.getCard()
     if not c:
         break
@@ -99,7 +101,7 @@ assert col.decks.get(col.decks.id_for_name("SEKU::Bauch::Leber"))["conf"] == con
 col.close()
 print("ANKIDATA OK")
 
-# „▶ lernen“: einzelnes Unterdeck direkt, sonst gefiltertes Deck
+# "▶ study": a single subdeck directly, otherwise a filtered deck
 col = Collection(path)
 P.build(plan, A.stats(col, plan)["counts"], A.today(col))
 items = [it for d in plan["days"] for it in d["items"]]

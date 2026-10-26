@@ -1,6 +1,6 @@
-# Alles, was Daten aus der Anki-Sammlung liest oder Decks anlegt.
-# Funktionen bekommen die Collection übergeben (in Anki: mw.col), damit sie
-# auch mit einer Test-Sammlung laufen.
+# Everything that reads data from the Anki collection or creates decks.
+# Functions take the collection as an argument (in Anki: mw.col) so they
+# also work with a test collection.
 import re
 from datetime import date, datetime, timedelta
 
@@ -8,17 +8,18 @@ from anki.errors import FilteredDeckError
 from anki.utils import ids2str
 
 from . import planner
+from .planner import tr
 
 FILTER_PREFIX = "Lernplan"
 
 
 def today(col):
-    """Anki-Tag (Tageswechsel laut Einstellung, meist 4 Uhr)."""
+    """Anki day (day rollover as set in preferences, usually 4 am)."""
     return (datetime.fromtimestamp(col.sched.day_cutoff) - timedelta(days=1)).date()
 
 
 def day_of(col, ms):
-    """Anki-Datum eines Revlog-Zeitstempels (ms)."""
+    """Anki date of a revlog timestamp (ms)."""
     ago = (col.sched.day_cutoff - 1 - ms // 1000) // 86400
     return today(col) - timedelta(days=int(ago))
 
@@ -38,7 +39,7 @@ def counts(col, qs):
             ids = col.find_cards(q)
             new = col.find_cards(f"({q}) is:new -is:suspended") if ids else []
             out[q] = {"total": len(ids), "new": len(new)}
-        except Exception:  # ungültige Suche (z. B. gelöschtes Deck)
+        except Exception:  # invalid search (e.g. deleted deck)
             out[q] = {"total": 0, "new": 0, "error": True}
     return out
 
@@ -49,7 +50,7 @@ def plan_query(plan):
 
 
 def stats(col, plan):
-    """Zahlen für evaluate(): fällig, Bewertungen pro Tag, Zählungen pro Suche."""
+    """Numbers for evaluate(): due, ratings per day, counts per search."""
     q = plan_query(plan)
     t = today(col)
     st = {"today": t.isoformat(), "due": 0, "rated": {}, "counts": {}, "decks": {}}
@@ -72,7 +73,7 @@ def stats(col, plan):
 
 
 def candidates(col, decks):
-    """Unterdecks und Tags der Decks einer Quelle als mögliche Themen-Verknüpfung."""
+    """Subdecks and tags of a source's decks as possible topic links."""
     if isinstance(decks, str):
         decks = [decks]
     out = []
@@ -109,7 +110,7 @@ def deck_info(col, deck):
 
 
 def weak(col, plan):
-    """Pro Thema: Fehler (Nochmal) seit Planbeginn, Lapses, Anzahl schwacher Karten."""
+    """Per topic: mistakes (Again) since the plan started, lapses, number of weak cards."""
     since = day_start_ms(col, min(planner.s2d(plan["start"]), today(col)))
     out = []
     for t in plan.get("topics", []):
@@ -152,10 +153,10 @@ def weak_search(col, plan, topic_ids=None):
 
 
 def make_filtered(col, name, search, limit, order, reschedule=True):
-    """Gefiltertes Deck anlegen oder (gleicher Name) neu füllen. Gibt (did, Kartenzahl) zurück."""
+    """Create a filtered deck or (same name) rebuild it. Returns (did, card count)."""
     did = col.decks.id_for_name(name)
     if did and not col.decks.is_filtered(did):
-        raise ValueError(f"Es gibt schon ein normales Deck namens „{name}“.")
+        raise ValueError(tr(f"Es gibt schon ein normales Deck namens „{name}“.", f"There already is a regular deck called “{name}”."))
     deck = col.sched.get_or_create_filtered_deck(did or 0)
     deck.name = name
     term = deck.config.search_terms[0]
@@ -166,14 +167,14 @@ def make_filtered(col, name, search, limit, order, reschedule=True):
     deck.config.reschedule = reschedule
     try:
         did = col.sched.add_or_update_filtered_deck(deck).id
-    except FilteredDeckError:  # keine passenden Karten
+    except FilteredDeckError:  # no matching cards
         return None, 0
     return did, len(col.find_cards(f'deck:"{name}"'))
 
 
 def study_target(col, plan, item):
-    """Wohin „▶ lernen“ führt: (Deck-ID, None) für ein einzelnes vorhandenes Deck,
-    sonst ein gefiltertes Deck mit genau den Karten des Punkts."""
+    """Where "▶ study" leads: (deck id, None) for a single existing deck,
+    otherwise a filtered deck with exactly the item's cards."""
     if item.get("kind") == "reviews":
         decks = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s)]
         scoped = plan.get("onceOnly") or any(s.get("reviewsFrom") for s in planner.anki_sources(plan))
@@ -181,8 +182,8 @@ def study_target(col, plan, item):
             return col.decks.id_for_name(decks[0]), None
         rq = planner.review_query(plan, today(col).isoformat())
         if not rq:
-            raise ValueError("Heute ist in diesem Plan nichts zu wiederholen.")
-        q, limit, name = f"{rq} is:due", 9999, "fällig"
+            raise ValueError(tr("Heute ist in diesem Plan nichts zu wiederholen.", "Nothing to review in this plan today."))
+        q, limit, name = f"{rq} is:due", 9999, tr("fällig", "due")
         order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
     else:
         topic = next((t for t in plan.get("topics", []) if t["id"] == item.get("topic")), None)
@@ -192,17 +193,17 @@ def study_target(col, plan, item):
             did = col.decks.id_for_name(m.group(1).replace('\\"', '"'))
             if did:
                 return did, None
-        q, limit, name = f"({item['auto']['query']}) is:new -is:suspended", int(item.get("cards") or 50), "jetzt lernen"
+        q, limit, name = f"({item['auto']['query']}) is:new -is:suspended", int(item.get("cards") or 50), tr("jetzt lernen", "study now")
         order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].ADDED
     did, n = make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · {name}", q, limit, order)
     return did, n
 
 
 def ahead_deck(col, plan):
-    """Vorziehen: Karten, die erst nach der Prüfung fällig wären."""
+    """Study ahead: cards that would only be due after the exam."""
     q = plan_query(plan)
     n = (planner.s2d(plan["exam"]) - today(col)).days
-    name = f"{FILTER_PREFIX}::{plan['title']} · vorziehen"
+    name = f"{FILTER_PREFIX}::{plan['title']} · " + tr("vorziehen", "study ahead")
     order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
     return make_filtered(col, name, f"{q} is:review -is:suspended -is:buried prop:due>{max(0, n)}", 9999, order)
 
@@ -212,20 +213,20 @@ def weak_deck(col, plan, topic_ids=None):
     if not s:
         return None, 0
     order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].LAPSES
-    return make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · Schwachstellen", s, 9999, order)
+    return make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · " + tr("Schwachstellen", "weak spots"), s, 9999, order)
 
 
 def sim_deck(col, plan, n):
-    """Probeprüfung: zufällige, schon gelernte Karten aus allen Plan-Decks."""
+    """Mock exam: random, already studied cards from all plan decks."""
     q = plan_query(plan)
     order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].RANDOM
-    name = f"{FILTER_PREFIX}::{plan['title']} · Probeprüfung"
+    name = f"{FILTER_PREFIX}::{plan['title']} · " + tr("Probeprüfung", "mock exam")
     did, cnt = make_filtered(col, name, f"{q} -is:new -is:suspended", n, order)
     return did, cnt, list(col.find_cards(f'deck:"{name}"')) if did else []
 
 
 def sim_result(col, plan, sim):
-    """Erste Antwort pro Karte seit Start der Probeprüfung, aufgeteilt nach Thema."""
+    """First answer per card since the mock exam started, split by topic."""
     cids = sim.get("cards") or []
     if not cids:
         return None
@@ -248,8 +249,8 @@ def sim_result(col, plan, sim):
 
 
 def forecast(col, plan):
-    """Fällige Wiederholungen pro Tag ab heute (negativ = überfällig) und Minuten pro Wiederholung.
-    Nur Karten und Zeiträume laut planner.review_scopes()."""
+    """Due reviews per day from today (negative = overdue) and minutes per review.
+    Only cards and periods according to planner.review_scopes()."""
     t = today(col)
     due, seen = {}, set()
     for q, frm, until in planner.review_scopes(plan):
@@ -258,9 +259,9 @@ def forecast(col, plan):
         last = (planner.s2d(until) - t).days
         first = (planner.s2d(frm) - t).days if frm else None
         for queue, d in col.db.all(f"select queue, due from cards where id in {ids2str(cids)} and queue in (1, 2, 3)"):
-            k = 0 if queue == 1 else d - col.sched.today  # queue 1: Lernschritt, due ist ein Zeitstempel von heute
+            k = 0 if queue == 1 else d - col.sched.today  # queue 1: learning step, due is a timestamp from today
             if first is not None and first > 0 and k < first:
-                k = first  # vorher nicht wiederholen – dann ist die Karte an diesem Tag fällig
+                k = first  # no reviews before – the card is due on that day then
             if max(k, 0) > last:
                 continue
             due[k] = due.get(k, 0) + 1
@@ -276,7 +277,7 @@ def forecast(col, plan):
 
 
 def time_stats(col, plan):
-    """Tatsächliche Anki-Zeit seit Planbeginn und daraus Minuten pro neuer Karte."""
+    """Actual Anki time since the plan started and minutes per new card from that."""
     q = plan_query(plan)
     if not q:
         return None
@@ -293,7 +294,7 @@ def time_stats(col, plan):
 
 
 def activity(col, days=371):
-    """Bewertungen pro Tag in der ganzen Sammlung (für Heatmap und Serie)."""
+    """Ratings per day across the whole collection (for heatmap and streak)."""
     t = today(col)
     out = {}
     for ms, in col.db.all("select id from revlog where id >= ? and ease > 0", day_start_ms(col, t - timedelta(days=days))):
@@ -303,7 +304,7 @@ def activity(col, days=371):
 
 
 def find_decks(col, title, query, exclude=()):
-    """Deck-Vorschläge (nach Plan-Name) oder Suchtreffer, mit Kartenzahlen."""
+    """Deck suggestions (by plan name) or search results, with card counts."""
     names = [n for n in deck_names(col) if n not in exclude]
     out = planner.rank_decks(title, names, query)
     for r in out:
@@ -325,13 +326,13 @@ def plan_dids(col, plan):
 
 
 def maintenance(col, plan, on):
-    """Erhaltungsmodus: eigene Optionsgruppe (0 neue, max. 50 Wiederholungen/Tag) für die
-    Plan-Decks. Die vorherigen Gruppen werden gemerkt und beim Ausschalten zurückgesetzt."""
+    """Maintenance mode: own options preset (0 new, max. 50 reviews/day) for the plan's
+    decks. The previous presets are remembered and restored when switching it off."""
     m = plan.setdefault("maintenance", {})
     if on:
         if m.get("on"):
             return m
-        name = f"Lernplan · Erhaltung ({plan['title']})"
+        name = tr(f"Lernplan · Erhaltung ({plan['title']})", f"Lernplan · Maintenance ({plan['title']})")
         conf = next((c for c in col.decks.all_config() if c["name"] == name), None)
         if not conf:
             first = plan_dids(col, plan)

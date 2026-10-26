@@ -1,6 +1,6 @@
-# Lernplan: Lernpläne bis zur Prüfung aus Handbuch, Videos, Aufgaben und Anki-Decks.
-# Öffnen über Extras → Lernplan oder den Link „Lernplan“ in der oberen Leiste.
-# Anki-Punkte hakt der Plan selbst ab; alles andere per Klick.
+# Lernplan: study plans up to the exam from books, videos, tasks and Anki decks.
+# Open it via Tools → Lernplan or the "Lernplan" link in the top bar.
+# The plan checks off Anki items by itself; everything else with a click.
 import json
 import os
 import shutil
@@ -8,17 +8,20 @@ import subprocess
 import time
 import traceback
 
+from anki.lang import current_lang
 from aqt import gui_hooks, mw
 from aqt.qt import QAction, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
 from . import ankidata, planner, store
+from .planner import tr
 
 VERSION = "0.1.0"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
 mw.addonManager.setWebExports(MODULE, r"web/.*\.(js|css)")
+planner.LANG = "de" if (current_lang or "").startswith("de") else "en"
 
 
 def today():
@@ -26,14 +29,14 @@ def today():
 
 
 def view(pid):
-    """Alles, was die Seite für einen Plan braucht."""
+    """Everything the page needs for one plan."""
     plan = store.load(pid)
     st = ankidata.stats(mw.col, plan)
     ev = planner.evaluate(plan, st)
     t = st["today"]
     now = time.strftime("%Y-%m-%dT%H:%M")
     changed = False
-    for iid, r in ev.items():  # Zeitpunkt merken, an dem Anki einen Punkt erledigt hat (für den Rückblick)
+    for iid, r in ev.items():  # remember when Anki finished an item (for the retrospective)
         if r["done"] and iid not in plan.setdefault("autoDone", {}):
             plan["autoDone"][iid] = now
             changed = True
@@ -51,10 +54,11 @@ def view(pid):
 
 
 def open_pdf(path, page):
-    """PDF auf einer Seite öffnen: Okular/Evince können direkt springen, sonst Standardprogramm."""
+    """Open a PDF at a page: Okular/Evince can jump there directly, otherwise the default app."""
     path = os.path.expanduser(path)
     if not os.path.isfile(path):
-        raise ValueError("PDF nicht gefunden – unter Bearbeiten → Quellen die Datei wählen.")
+        raise ValueError(tr("PDF nicht gefunden – unter Bearbeiten → Quellen die Datei wählen.",
+                            "PDF not found – choose the file under Edit → Sources."))
     page = max(1, page)
     for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-i", str(page)])):
         if shutil.which(prog):
@@ -85,9 +89,9 @@ def home():
 
 
 def generate_all(pid):
-    """Plant alle laufenden Pläne neu, weil sie sich die Lernzeit teilen: die nächste
-    Prüfung zuerst, jeder weitere Plan bekommt, was an dem Tag noch frei ist.
-    Gibt die Hinweise des angefragten Plans zurück."""
+    """Replans all running plans because they share the study time: the nearest
+    exam first, every further plan gets what is still free on that day.
+    Returns the notes of the requested plan."""
     t = today()
     budget = store.profile().get("budget")
     plans = [p for p in store.list_plans() if p["id"] == pid or (
@@ -124,7 +128,7 @@ def handle(cmd, a):
         return ankidata.deck_info(col, a["deck"])
     if cmd == "create":
         prof = store.profile()
-        if a.get("from"):  # nächster Plan mit den Quellen-Arten des alten
+        if a.get("from"):  # next plan with the source types of the old one
             old = store.load(a["from"])
             plan = store.new_plan(a["title"], a["exam"], a["start"], prof)
             plan["minutesPerDay"] = old.get("minutesPerDay", plan["minutesPerDay"])
@@ -227,7 +231,7 @@ def handle(cmd, a):
         return {"did": did, "count": n}
     if cmd == "openLink":
         if not str(a["url"]).startswith(("http://", "https://", "file://")):
-            raise ValueError("nur Web-Links oder Dateien")
+            raise ValueError(tr("nur Web-Links oder Dateien", "only web links or files"))
         openLink(a["url"])
         return True
     if cmd == "studyItem":
@@ -245,7 +249,8 @@ def handle(cmd, a):
         src = next(s for s in plan["sources"] if s["id"] == it["source"])
         return open_pdf(src.get("file", ""), int(it["pages"][0]) + int(src.get("pageOffset") or 0))
     if cmd == "pickFile":
-        path, _ = QFileDialog.getOpenFileName(_win, "Datei wählen", os.path.expanduser("~"), "PDF (*.pdf);;Alle Dateien (*)")
+        path, _ = QFileDialog.getOpenFileName(_win, tr("Datei wählen", "Choose file"), os.path.expanduser("~"),
+                                              tr("PDF (*.pdf);;Alle Dateien (*)", "PDF (*.pdf);;All files (*)"))
         return path or None
     if cmd == "study":
         col.decks.select(a["did"])
@@ -299,7 +304,7 @@ def handle(cmd, a):
         store.save(plan)
         mw.reset()
         return m
-    raise ValueError(f"unbekannter Befehl {cmd}")
+    raise ValueError(f"unknown command {cmd}")
 
 
 class LernplanWindow(QDialog):
@@ -314,7 +319,7 @@ class LernplanWindow(QDialog):
         lay.addWidget(self.web)
         restoreGeom(self, "lernplan", default_size=(980, 860))
         base = f"/_addons/{FOLDER}/web/"
-        self.web.stdHtml('<div id="app"></div>', css=[base + "lernplan.css"], js=[base + "lernplan.js"], context=self)
+        self.web.stdHtml(f'<div id="app" data-lang="{planner.LANG}"></div>', css=[base + "lernplan.css"], js=[base + "lernplan.js"], context=self)
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(lambda: self.web.eval("window.LP && LP.refresh()"))
@@ -370,7 +375,7 @@ def _changed(*_):
 
 
 def _toolbar(links, toolbar):
-    links.append(toolbar.create_link("lernplan", "Lernplan", open_window, tip="Lernplan öffnen", id="lernplan"))
+    links.append(toolbar.create_link("lernplan", "Lernplan", open_window, tip=tr("Lernplan öffnen", "Open Lernplan"), id="lernplan"))
 
 
 def _profile_closing():

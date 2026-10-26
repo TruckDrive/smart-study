@@ -123,6 +123,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 .modal { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; width: min(560px, 92vw); max-height: 86vh; overflow: auto; }
 .modal .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 details summary { cursor: pointer; color: var(--muted); margin: 6px 0; }
+details[open] > .panel-tools { margin-bottom: 14px; }
 canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 @media (max-width: 600px) { .row, .form, .tl { grid-template-columns: 1fr; } }
 .deck-list { max-height: 260px; overflow: auto; margin-top: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }

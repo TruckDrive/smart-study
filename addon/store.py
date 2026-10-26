@@ -1,4 +1,4 @@
-# Pläne liegen als JSON in user_files/ (bleibt bei Add-on-Updates erhalten).
+# Plans are stored as JSON in user_files/ (kept across add-on updates).
 import json
 import os
 import re
@@ -20,7 +20,7 @@ def _write(path, data):
 
 def _path(pid):
     if not re.fullmatch(r"[A-Za-z0-9_-]+", pid):
-        raise ValueError("ungültige Plan-ID")
+        raise ValueError("invalid plan id")
     return os.path.join(PLANS, pid + ".json")
 
 

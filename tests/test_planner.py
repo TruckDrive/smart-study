@@ -1,10 +1,12 @@
-# python -I tests/test_planner.py  (ohne Anki)
+# python -I tests/test_planner.py  (no Anki needed)
 import os
 import sys
 from datetime import date
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "addon"))
 import planner as P  # noqa: E402
+
+P.LANG = "de"  # the assertions check the German texts
 
 
 def sample():
@@ -48,13 +50,13 @@ def test_build():
     items = flat(plan)
     days = [d["d"] for d in plan["days"]]
     assert days[0] == "2026-10-26" and days[-1] == "2026-11-06", days
-    # Reihenfolge automatisch nach Seiten: Peritoneum (78) vor Leber (82)
+    # automatic order by page: Peritoneum (78) before Leber (82)
     pages = [it for _, it in items if it["kind"] == "pages"]
     assert pages[0]["pages"][0] == 78, pages[0]
     assert sum(it["pages"][1] - it["pages"][0] + 1 for it in pages) == 14
-    # alle Videos drin, auch das unzugeordnete
+    # all videos included, also the unassigned one
     assert sorted(it["video"] for _, it in items if it["kind"] == "video") == ["v1", "v2", "v3", "v4"]
-    # alle neuen Karten verteilt, Ziele kumulativ
+    # all new cards distributed, targets cumulative
     cards = [it for _, it in items if it["kind"] == "cards"]
     assert sum(it["cards"] for it in cards) == 240
     per_q = {}
@@ -63,19 +65,19 @@ def test_build():
     for q, ts in per_q.items():
         assert ts == sorted(ts), ts
     assert per_q[tq][-1] == 10 + 120
-    # Tageslimit 60 neue pro Tag
+    # daily limit of 60 new cards
     by_day = {}
     for d, it in items:
         if it["kind"] == "cards":
             by_day[d] = by_day.get(d, 0) + it["cards"]
     assert max(by_day.values()) <= 60, by_day
-    # Sonntag frei, keine Inhalte; Reservetage am Ende
+    # Sunday off, no content; reserve days at the end
     assert not [it for d, it in items if d == "2026-11-01" and it["kind"] not in ("reviews",)]
     kinds = {d: {it["kind"] for it in plan["days"][i]["items"]} for i, d in enumerate(days)}
     assert "final" not in kinds
     assert "sim" in kinds["2026-11-04"] and "weakround" in kinds["2026-11-03"], kinds
     assert kinds["2026-11-06"] >= {"note", "reviews"}
-    # Für jedes Thema: Lesen vor Karten
+    # for every topic: reading before cards
     order = [it["kind"] for _, it in items if it.get("topic") == "t1"]
     assert order.index("pages") < order.index("cards"), order
     print("build ok", notes, by_day)
@@ -84,7 +86,7 @@ def test_build():
 
 def test_replan():
     plan, c = test_build()
-    # Tag 1 halb erledigt: erste Seiten-Einheit abgehakt, Rest offen
+    # day 1 half done: first page unit checked, rest open
     first = [it for d, it in flat(plan) if d == "2026-10-26" and it["kind"] == "pages"][0]
     plan["done"][first["id"]] = "2026-10-26T18:00"
     tq = P.topic_query(plan, plan["topics"][1], plan["sources"][2])
@@ -96,7 +98,7 @@ def test_replan():
     assert moved and all(d == "2026-10-26" for d, _ in [(d, it) for d, it in items if it.get("moved")])
     pages = [it for d, it in items if it["kind"] == "pages" and not it.get("moved")]
     covered = sum(it["pages"][1] - it["pages"][0] + 1 for it in pages)
-    assert covered == 14, covered  # erledigte + neu verteilte = alle Seiten genau einmal
+    assert covered == 14, covered  # done + redistributed = every page exactly once
     nums = [n for it in pages for n in range(it["pages"][0], it["pages"][1] + 1)]
     assert len(nums) == len(set(nums))
     assert P.overdue(plan, {}, "2026-10-27") == []
@@ -114,7 +116,7 @@ def test_evaluate():
     q = first_cards["auto"]["query"]
     c[q]["new"] -= first_cards["cards"]
     assert P.evaluate(plan, st)[first_cards["id"]]["done"]
-    c[q] = {"total": 0, "new": 0}  # Deck gelöscht/umbenannt: nicht als erledigt werten
+    c[q] = {"total": 0, "new": 0}  # deck deleted/renamed: don't count as done
     assert first_cards["id"] not in P.evaluate(plan, st)
     print("evaluate ok")
 
@@ -147,7 +149,7 @@ def test_milestones():
     plan["sources"].append({"id": "vmc", "type": "tasks", "name": "VMC", "tasks": [
         {"id": "x1", "name": "VMC Niere 1", "min": 40, "url": "https://vmc.example/niere1"}]})
     plan["milestones"] = [{"id": "m1", "name": "Testat Leber", "date": "2026-10-30", "time": "13:15"}]
-    plan["topics"][0]["milestone"] = "m1"          # Leber (S. 82) kommt zuerst, obwohl Peritoneum S. 78 hat
+    plan["topics"][0]["milestone"] = "m1"          # Leber (p. 82) comes first although Peritoneum has p. 78
     plan["topics"][0]["tasks"] = {"vmc": ["x1"]}
     assert [t["id"] for t in P.ordered_topics(plan)] == ["t2", "t1", "t3"]
     lq = P.topic_query(plan, plan["topics"][0], plan["sources"][2])
@@ -160,10 +162,10 @@ def test_milestones():
     assert all(it.get("for") == "Testat Leber" for _, it in leber)
     notes = [it["text"] for d, it in items if d == "2026-10-30" and it["kind"] == "note"]
     assert notes and "Testat Leber um 13:15" in notes[0], notes
-    assert [it for d, it in items if d == "2026-10-29" and it["kind"] == "note"], "Wiederholungstag vor dem Testat fehlt"
+    assert [it for d, it in items if d == "2026-10-29" and it["kind"] == "note"], "review day before the test is missing"
     other = [d for d, it in items if it.get("topic") in ("t1", "t3") and it["kind"] in ("pages", "video")]
     assert other and min(other) > "2026-10-30", other
-    # Testat vorbei: Stoff dafür wird nicht mehr eingeplant
+    # test is over: its material is no longer scheduled
     P.build(plan, c, date(2026, 10, 31))
     assert not [it for d, it in flat(plan) if d >= "2026-10-31" and it.get("topic") == "t2" and it["kind"] != "reviews"]
     lst = P.parse_list("VMC Endokrinologie 2 | 35 | https://vmc.x/abc\nhttps://vmc.x/only")
@@ -185,8 +187,8 @@ def test_prep():
     cards = [d for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards"]
     assert sum(it["cards"] for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards") == 50
     assert [it for d, it in items if d == "2026-10-28" and it["kind"] == "note" and "Präpsaal" in it["text"]]
-    assert not [it for d, it in items if d == "2026-10-27" and it["kind"] == "note"], "kein Wiederholungstag vor Präpsaal"
-    # Präpsaal vorbei, Vorbereitung offen: wird trotzdem eingeplant
+    assert not [it for d, it in items if d == "2026-10-27" and it["kind"] == "note"], "no review day before a lab session"
+    # lab session over, preparation still open: scheduled anyway
     P.build(plan, c, date(2026, 10, 29))
     assert [it for d, it in flat(plan) if d >= "2026-10-29" and it.get("topic") == "t2" and it["kind"] == "pages"]
     print("prep ok")
@@ -200,7 +202,7 @@ def test_misc():
     assert "Peritoneum: 9 Fehler" in w[0]["text"] and "S. 78–81" in w[0]["text"], w
     rs = P.review_stats(plan, {})
     assert rs["planned"] > 0 and rs["done"] == 0
-    # Prüfung vorbei
+    # exam is over
     P.build(plan, c, date(2026, 11, 10))
     print("misc ok")
 
@@ -212,14 +214,14 @@ def test_reviews_and_budget():
     fc = {"due": {-3: 200, 0: 40, 2: 30}, "min": 0.5}
     P.build(plan, c, date(2026, 10, 26), forecast=fc)
     rev = {d["d"]: it for d in plan["days"] for it in d["items"] if it["kind"] == "reviews"}
-    # 200 überfällige auf 4 Tage verteilt + 40 heute
+    # 200 overdue spread over 4 days + 40 today
     assert rev["2026-10-26"]["reviews"] >= 90 and rev["2026-10-26"]["min"] == round(rev["2026-10-26"]["reviews"] * 0.5), rev["2026-10-26"]
-    # neue Karten kommen wieder: am Tag danach gibt es Wiederholungen
+    # new cards come back: there are reviews the day after
     load = P.day_load(plan, date(2026, 10, 26))
     for s, m in load.items():
         cap = P.capacity(plan, P.s2d(s))
         assert m <= cap + 30, (s, m, cap)
-    # Gesamtbudget: ein anderer Plan belegt schon 150 von 200 Minuten
+    # total budget: another plan already uses 150 of 200 minutes
     plan2 = sample()
     budget = {"minutesPerDay": 200, "dayMinutes": {}}
     taken = {d: 150 for d in ("2026-10-26", "2026-10-27", "2026-10-29", "2026-10-30")}
@@ -237,7 +239,7 @@ def test_once_and_review_only():
     sc = P.review_scopes(plan)
     assert any(b == "2026-10-29" for _, _, b in sc) and any(b == plan["exam"] for _, _, b in sc), sc
     assert P.review_query(plan, "2026-11-02") and "Peritoneum" not in P.review_query(plan, "2026-11-02")
-    # Rückkehr neuer Karten endet am Termin der Einheit
+    # returning new cards stop at the unit's date
     rl = P.review_load(None, date(2026, 10, 26), date(2026, 11, 6), [], {("2026-10-27", "2026-10-29"): 10})
     assert rl == {"2026-10-28": 10}, rl
     plan2 = sample()
@@ -260,4 +262,4 @@ if __name__ == "__main__":
     test_prep()
     test_reviews_and_budget()
     test_once_and_review_only()
-    print("ALLE TESTS OK")
+    print("ALL TESTS OK")
