@@ -78,13 +78,11 @@ assert w and w[0]["name"] == "Leber" and w[0]["agains"] >= 4, w
 items = P.weak_items(plan, w)
 assert "Leber" in items[0]["text"]
 
-did, n = A.weak_deck(col, plan)
-print("weak deck", n)
-did2, n2, cids = A.sim_deck(col, plan, 5)
-assert n2 <= 5
-did3, n3 = A.ahead_deck(col, plan)
-print("ahead", n3, "sim", n2)
-col.sched.empty_filtered_deck(did2)
+ws = A.weak_search(col, plan)
+assert ws and col.find_cards(ws), ws
+mc = A.mock_cards(col, plan, 5)
+assert 0 < len(mc) <= 5 and all(c["q"] for c in mc), mc
+print("weak cards", len(col.find_cards(ws)), "mock cards", len(mc))
 ts = A.time_stats(col, plan)
 assert ts["newCards"] >= answered, ts
 assert A.activity(col)[today.isoformat()] >= 10
@@ -101,7 +99,7 @@ assert col.decks.get(col.decks.id_for_name("SEKU::Bauch::Leber"))["conf"] == con
 col.close()
 print("ANKIDATA OK")
 
-# "▶ study": a single subdeck directly, otherwise a filtered deck
+# "▶ study": always the item's own deck, never a filtered deck
 col = Collection(path)
 P.build(plan, A.stats(col, plan)["counts"], A.today(col))
 items = [it for d in plan["days"] for it in d["items"]]
@@ -111,7 +109,7 @@ assert did == col.decks.id_for_name("SEKU::Bauch::Peritoneum") and n is None, (d
 tag_it = next((it for it in items if it["kind"] == "cards" and it.get("topic") == "t3"), None)
 if tag_it:
     did, n = A.study_target(col, plan, tag_it)
-    assert col.decks.is_filtered(did) and n > 0, (did, n)
+    assert not col.decks.is_filtered(did), did
 rev = next(it for it in items if it["kind"] == "reviews")
 did, n = A.study_target(col, plan, rev)
 assert did == col.decks.id_for_name("SEKU::Bauch")

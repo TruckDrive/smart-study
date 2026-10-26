@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 – 2026-10-26
+
+- No filtered decks any more. **▶ study** opens the item's own deck, the cards stay where they are
+- Mock exam runs in the plan window: random studied cards, show the answer, mark right or wrong, per-topic result. Nothing is moved
+- "Study weak cards" opens Anki's browser with a search for the weak cards
+- Removed "Study ahead"
+
 ## 0.1.1 – 2026-10-26
 
 - Renamed from "Lernplan" to **Smart Study Plan**. New filtered decks go under `Smart Study Plan`; existing ones under `Lernplan` keep working and can be deleted when you no longer need them
