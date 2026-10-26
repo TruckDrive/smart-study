@@ -56,7 +56,7 @@ def open_pdf(path, page):
     if not os.path.isfile(path):
         raise ValueError("PDF nicht gefunden – unter Bearbeiten → Quellen die Datei wählen.")
     page = max(1, page)
-    for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-i", str(page)])):
+    for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-p", str(page)])):
         if shutil.which(prog):
             subprocess.Popen([prog, *args, path], start_new_session=True,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
