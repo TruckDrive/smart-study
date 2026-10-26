@@ -114,6 +114,8 @@ def test_evaluate():
     q = first_cards["auto"]["query"]
     c[q]["new"] -= first_cards["cards"]
     assert P.evaluate(plan, st)[first_cards["id"]]["done"]
+    c[q] = {"total": 0, "new": 0}  # Deck gelöscht/umbenannt: nicht als erledigt werten
+    assert first_cards["id"] not in P.evaluate(plan, st)
     print("evaluate ok")
 
 
@@ -203,6 +205,51 @@ def test_misc():
     print("misc ok")
 
 
+def test_reviews_and_budget():
+    plan = sample()
+    tq = P.topic_query(plan, plan["topics"][1], plan["sources"][2])
+    c = counts_for(plan, {tq: 120})
+    fc = {"due": {-3: 200, 0: 40, 2: 30}, "min": 0.5}
+    P.build(plan, c, date(2026, 10, 26), forecast=fc)
+    rev = {d["d"]: it for d in plan["days"] for it in d["items"] if it["kind"] == "reviews"}
+    # 200 überfällige auf 4 Tage verteilt + 40 heute
+    assert rev["2026-10-26"]["reviews"] >= 90 and rev["2026-10-26"]["min"] == round(rev["2026-10-26"]["reviews"] * 0.5), rev["2026-10-26"]
+    # neue Karten kommen wieder: am Tag danach gibt es Wiederholungen
+    load = P.day_load(plan, date(2026, 10, 26))
+    for s, m in load.items():
+        cap = P.capacity(plan, P.s2d(s))
+        assert m <= cap + 30, (s, m, cap)
+    # Gesamtbudget: ein anderer Plan belegt schon 150 von 200 Minuten
+    plan2 = sample()
+    budget = {"minutesPerDay": 200, "dayMinutes": {}}
+    taken = {d: 150 for d in ("2026-10-26", "2026-10-27", "2026-10-29", "2026-10-30")}
+    P.build(plan2, c, date(2026, 10, 26), budget=budget, taken=taken)
+    l2 = P.day_load(plan2, date(2026, 10, 26))
+    assert l2.get("2026-10-26", 0) <= 55 and l2.get("2026-10-31", 0) > 55, l2
+    print("reviews/budget ok")
+
+
+def test_once_and_review_only():
+    plan = sample()
+    plan["onceOnly"] = True
+    plan["milestones"] = [{"id": "m1", "name": "Einheit 1", "date": "2026-10-29"}]
+    plan["topics"][1]["milestone"] = "m1"
+    sc = P.review_scopes(plan)
+    assert any(b == "2026-10-29" for _, _, b in sc) and any(b == plan["exam"] for _, _, b in sc), sc
+    assert P.review_query(plan, "2026-11-02") and "Peritoneum" not in P.review_query(plan, "2026-11-02")
+    # Rückkehr neuer Karten endet am Termin der Einheit
+    rl = P.review_load(None, date(2026, 10, 26), date(2026, 11, 6), [], {("2026-10-27", "2026-10-29"): 10})
+    assert rl == {"2026-10-28": 10}, rl
+    plan2 = sample()
+    plan2["sources"][2]["reviewOnly"] = True
+    plan2["sources"][2]["reviewsFrom"] = "2026-11-01"
+    tq = P.topic_query(plan2, plan2["topics"][1], plan2["sources"][2])
+    P.build(plan2, counts_for(plan2, {tq: 50}), date(2026, 10, 26))
+    assert not [it for d in plan2["days"] for it in d["items"] if it["kind"] == "cards"]
+    assert P.review_scopes(plan2)[0][1] == "2026-11-01" and P.review_query(plan2, "2026-10-27") is None
+    print("once/reviewOnly ok")
+
+
 if __name__ == "__main__":
     test_build()
     test_replan()
@@ -211,4 +258,6 @@ if __name__ == "__main__":
     test_misc()
     test_milestones()
     test_prep()
+    test_reviews_and_budget()
+    test_once_and_review_only()
     print("ALLE TESTS OK")

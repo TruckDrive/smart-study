@@ -55,7 +55,8 @@ def stats(col, plan):
     st = {"today": t.isoformat(), "due": 0, "rated": {}, "counts": {}, "decks": {}}
     if not q:
         return st
-    st["due"] = len(col.find_cards(f"{q} is:due -is:suspended -is:buried"))
+    rq = planner.review_query(plan, t.isoformat())
+    st["due"] = len(col.find_cards(f"{rq} is:due -is:suspended -is:buried")) if rq else 0
     st["counts"] = counts(col, planner.queries(plan))
     for s in planner.anki_sources(plan):
         if planner.src_query(s):
@@ -175,9 +176,13 @@ def study_target(col, plan, item):
     sonst ein gefiltertes Deck mit genau den Karten des Punkts."""
     if item.get("kind") == "reviews":
         decks = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s)]
-        if len(decks) == 1 and col.decks.id_for_name(decks[0]):
+        scoped = plan.get("onceOnly") or any(s.get("reviewsFrom") for s in planner.anki_sources(plan))
+        if len(decks) == 1 and not scoped and col.decks.id_for_name(decks[0]):
             return col.decks.id_for_name(decks[0]), None
-        q, limit, name = f"{plan_query(plan)} is:due", 9999, "fällig"
+        rq = planner.review_query(plan, today(col).isoformat())
+        if not rq:
+            raise ValueError("Heute ist in diesem Plan nichts zu wiederholen.")
+        q, limit, name = f"{rq} is:due", 9999, "fällig"
         order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
     else:
         topic = next((t for t in plan.get("topics", []) if t["id"] == item.get("topic")), None)
@@ -240,6 +245,34 @@ def sim_result(col, plan, sim):
             per.append({"name": t["name"], "n": len(hit), "ok": sum(1 for c in hit if first[c] > 1)})
     per.sort(key=lambda p: p["ok"] / p["n"])
     return {"total": len(cids), "answered": len(first), "ok": sum(1 for e in first.values() if e > 1), "topics": per}
+
+
+def forecast(col, plan):
+    """Fällige Wiederholungen pro Tag ab heute (negativ = überfällig) und Minuten pro Wiederholung.
+    Nur Karten und Zeiträume laut planner.review_scopes()."""
+    t = today(col)
+    due, seen = {}, set()
+    for q, frm, until in planner.review_scopes(plan):
+        cids = [c for c in col.find_cards(f"({q}) -is:new -is:suspended -is:buried") if c not in seen]
+        seen.update(cids)
+        last = (planner.s2d(until) - t).days
+        first = (planner.s2d(frm) - t).days if frm else None
+        for queue, d in col.db.all(f"select queue, due from cards where id in {ids2str(cids)} and queue in (1, 2, 3)"):
+            k = 0 if queue == 1 else d - col.sched.today  # queue 1: Lernschritt, due ist ein Zeitstempel von heute
+            if first is not None and first > 0 and k < first:
+                k = first  # vorher nicht wiederholen – dann ist die Karte an diesem Tag fällig
+            if max(k, 0) > last:
+                continue
+            due[k] = due.get(k, 0) + 1
+    since = day_start_ms(col, t - timedelta(days=30))
+
+    def per_review(where):
+        n, ms = col.db.first(f"select count(), coalesce(sum(min(time, 60000)), 0) from revlog "
+                             f"where type = 1 and id >= ? {where}", since)
+        return ms / 60000 / n if n >= 50 else None
+
+    m = (seen and per_review(f"and cid in {ids2str(seen)}")) or per_review("") or planner.REVIEW_MIN
+    return {"due": due, "min": round(m, 2)}
 
 
 def time_stats(col, plan):

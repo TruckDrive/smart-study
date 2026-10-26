@@ -10,7 +10,10 @@ from datetime import date, datetime, timedelta
 
 DEFAULT_RATES = {"pages": 6.0, "videos": 20.0, "tasks": 30.0, "anki": 1.0}  # Minuten pro Einheit
 NO_CHECK = ("note", "weakround", "sim")
-PREP_DAYS = 7  # so viele Tage vor einem Präpsaal-Termin wird vorbereitet  # Punkte ohne Häkchen-Pflicht
+PREP_DAYS = 7  # so viele Tage vor einem Präpsaal-Termin wird vorbereitet
+REVIEW_MIN = 0.4  # Minuten pro Wiederholung, solange nichts gemessen ist
+REVIEW_STEPS = (1, 3, 7, 14, 30)  # grob: an diesen Tagen nach dem ersten Lernen kommt eine Karte wieder
+BACKLOG_DAYS = 4  # überfällige Wiederholungen werden auf so viele Tage verteilt
 
 
 def d2s(d):
@@ -38,6 +41,64 @@ def capacity(plan, d):
     if d.weekday() in plan.get("offWeekdays", []):
         return 0
     return int(plan.get("minutesPerDay", 180))
+
+
+def budget_capacity(budget, d):
+    """Gesamte Lernzeit des Tages über alle Pläne (Profil); None = keine Grenze."""
+    if not budget:
+        return None
+    s = d2s(d)
+    if s in budget.get("dayMinutes", {}):
+        return max(0, int(budget["dayMinutes"][s]))
+    return int(budget.get("minutesPerDay", 360))
+
+
+def day_load(plan, today):
+    """Minuten, die dieser Plan ab heute pro Tag belegt (inkl. Wiederholungen)."""
+    out = {}
+    for day, it in all_items(plan):
+        if day["d"] >= d2s(today) and not it.get("moved") and it.get("kind") != "note":
+            out[day["d"]] = out.get(day["d"], 0) + it.get("min", 0)
+    return out
+
+
+def review_load(forecast, start, exam, study_days, returns=None, backlog_days=BACKLOG_DAYS):
+    """Erwartete Wiederholungen pro Tag: fällige laut Anki (überfällige verteilt)
+    plus die Wiederkehr der neu eingeplanten Karten."""
+    out = {}
+    if forecast:
+        late = sum(n for k, n in forecast["due"].items() if int(k) < 0)
+        spread = study_days[:backlog_days] or [start]
+        for d in spread:
+            out[d2s(d)] = out.get(d2s(d), 0) + late / len(spread)
+        for k, n in forecast["due"].items():
+            d = start + timedelta(days=max(0, int(k)))
+            if int(k) >= 0 and d <= exam:
+                out[d2s(d)] = out.get(d2s(d), 0) + n
+    for (s, until), n in (returns or {}).items():
+        for step in REVIEW_STEPS:
+            d = s2d(s) + timedelta(days=step)
+            if d <= min(exam, s2d(until)):
+                out[d2s(d)] = out.get(d2s(d), 0) + n
+    return out
+
+
+def review_scopes(plan):
+    """(Suche, ab, bis): welche gelernten Karten in welchem Zeitraum wiederholt werden.
+    onceOnly: einmalige Einheiten – Karten eines Themas nur bis zu dessen Termin.
+    reviewsFrom an einer Quelle: deren Karten erst ab diesem Tag (z. B. nach dem eigenen Testat)."""
+    if plan.get("onceOnly"):
+        due = {m["id"]: m["date"] for m in milestones(plan) if m["id"]}
+        return [(q, None, due.get(t.get("milestone"), plan["exam"]))
+                for t in plan.get("topics", []) for src in anki_sources(plan)
+                for q in [topic_query(plan, t, src)] if q]
+    return [(src_query(src), src.get("reviewsFrom"), plan["exam"]) for src in anki_sources(plan) if src_query(src)]
+
+
+def review_query(plan, today):
+    """Suche über die Karten, die heute wiederholt werden sollen (für 'noch X fällig')."""
+    qs = [q for q, a, b in review_scopes(plan) if (not a or a <= today) and b >= today]
+    return "(" + " OR ".join("(" + q + ")" for q in qs) + ")" if qs else None
 
 
 def all_items(plan):
@@ -197,7 +258,7 @@ def remaining_work(plan, counts, ev):
                                   "cost": float(byid[tid].get("min") or DEFAULT_RATES["tasks"]), "split": False})
         for src in anki_sources(plan):
             q = topic_query(plan, t, src)
-            if q and counts.get(q, {}).get("new"):
+            if q and counts.get(q, {}).get("new") and not src.get("reviewOnly"):
                 units.append({"kind": "cards", "topic": t["id"], "source": src["id"], "query": q,
                               "n": counts[q]["new"], "cost": rate(src), "split": True,
                               "seen": counts[q]["total"] - counts[q]["new"]})
@@ -218,7 +279,7 @@ def remaining_work(plan, counts, ev):
                                   "cost": float(x.get("min") or DEFAULT_RATES["tasks"]), "split": False})
     for src in anki_sources(plan):
         q = rest_query(plan, src)
-        if q and counts.get(q, {}).get("new"):
+        if q and counts.get(q, {}).get("new") and not src.get("reviewOnly"):
             units.append({"kind": "cards", "topic": None, "source": src["id"], "query": q,
                           "n": counts[q]["new"], "cost": rate(src), "split": True,
                           "seen": counts[q]["total"] - counts[q]["new"]})
@@ -233,12 +294,16 @@ def reserve_count(n_days):
     return 1 if n_days >= 2 else 0
 
 
-def build(plan, counts, today, ev=None):
+def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
     """(Neu-)Planung ab heute. Vergangene Tage bleiben als Verlauf stehen; offene
     Punkte von dort werden als 'verschoben' markiert und neu verteilt.
     counts: {query: {"total", "new"}}; ev: Ergebnis von evaluate() (Auto-Häkchen).
+    forecast: {"due": {Tage ab heute: Anzahl}, "min": Minuten pro Wiederholung} aus Anki –
+    Wiederholungen bekommen damit eigene Zeit. taken: {Datum: Minuten}, die Pläne mit
+    früherer Prüfung schon belegen; budget: Lernzeit aller Pläne zusammen (Profil).
     Gibt eine Liste von Hinweisen zurück (z. B. Überlastung)."""
     ev = ev or {}
+    taken = taken or {}
     exam = s2d(plan["exam"])
     start = max(today, s2d(plan["start"]))
     if start > exam:
@@ -267,6 +332,19 @@ def build(plan, counts, today, ev=None):
         days.setdefault(d2s(d), {"d": d2s(d), "items": []})
     days[d2s(start)]["items"][0:0] = carry
 
+    used_today = sum(it.get("min", 0) for it in days[d2s(start)]["items"]
+                     if is_done(plan, it, ev) and it.get("kind") != "reviews")
+    has_anki = bool(anki_sources(plan))
+    rev_min = float((forecast or {}).get("min") or REVIEW_MIN)
+
+    def room(d):
+        """Lernzeit dieses Plans an einem Tag (eigene Grenze und was das Gesamtbudget noch hergibt)."""
+        c = capacity(plan, d)
+        b = budget_capacity(budget, d)
+        return c if b is None else min(c, max(0, b - taken.get(d2s(d), 0)))
+
+    study = [d for d in daterange(start, exam) if room(d) > 0]
+
     # Etappen: jedes Testat bekommt ein eigenes Zeitfenster bis zu seinem Termin.
     # Stoff eines vergangenen Testats wird nicht mehr eingeplant.
     # Präpsaal-Termine (prep) sind weiche Etappen: bis dahin nur lesen + Video,
@@ -274,144 +352,164 @@ def build(plan, counts, today, ev=None):
     ms = milestones(plan)
     ms_open = [m for m in ms if s2d(m["date"]) >= start]
     ms_by_id = {m["id"]: m for m in ms if m["id"]}
-    groups = [[] for _ in ms_open]
-
-    def target(due, hard):
-        return next(j for j, m in enumerate(ms_open) if m["date"] >= due and not (hard and m.get("prep")))
-
-    for u in remaining_work(plan, counts, ev):
-        t = topics.get(u["topic"])
-        m = ms_by_id.get(t.get("milestone")) if t else None
-        due = m["date"] if m else plan["exam"]
-        prep = bool(m and m.get("prep"))
-        if due < d2s(start) and not prep:
-            continue
-        groups[target(max(due, d2s(start)), prep and u["kind"] == "cards")].append(u)
-
-    used_today = sum(it.get("min", 0) for it in days[d2s(start)]["items"]
-                     if is_done(plan, it, ev) and it.get("kind") != "reviews")
-    has_anki = bool(anki_sources(plan))
-    generated, reserve_map, used = {}, {}, {}
-    new_per_day, seen_so_far = {}, {}
-    notes = []
     multi = len(ms_open) > 1
 
-    def fill(units, content, cap, m):
-        budget_total = sum(cap)
-        work = sum(u["n"] * u["cost"] for u in units)
-        label = "zur Prüfung" if m.get("final") else f"zu „{m['name']}“"
-        if m.get("prep") and work > budget_total * 1.02:
-            notes.append(f"Vor dem Präpsaal „{m['name']}“ ist die Vorbereitung knapp ({round(work / 60, 1)} h Lesen/Videos, "
-                         f"{round(budget_total / 60, 1)} h Zeit).")
-        elif work > budget_total * 1.02:
-            notes.append(f"Bis {label} ist der Plan zu voll: {round((work - budget_total) / 60, 1)} h mehr Stoff als Lernzeit. "
-                         "Mehr Zeit pro Tag eintragen oder Stoff streichen.")
-        scale = work / budget_total if budget_total else 0
-        budget = [c * scale for c in cap]
-        st = {"i": 0, "rem": budget[0] if budget else 0}
+    def allocate(rev):
+        """Verteilt den offenen Stoff; rev = erwartete Wiederholungen pro Tag (Zeit dafür ist reserviert)."""
+        groups = [[] for _ in ms_open]
 
-        def next_day():
-            if st["i"] < len(content) - 1:
-                st["i"] += 1
-                st["rem"] = budget[st["i"]]
-                return True
-            return False
+        def target(due, hard):
+            return next(j for j, m in enumerate(ms_open) if m["date"] >= due and not (hard and m.get("prep")))
 
-        def emit(u, k):
+        for u in remaining_work(plan, counts, ev):
             t = topics.get(u["topic"])
-            tname = t["name"] if t else None
-            src = srcs[u["source"]]
-            day = d2s(content[st["i"]])
-            it = {"id": new_id(), "kind": u["kind"], "topic": u["topic"], "source": u["source"], "min": round(k * u["cost"])}
-            if multi:
-                it["for"] = "Prüfung" if m.get("final") else m["name"]
-            if u["kind"] == "pages":
-                a = u["from"]
-                it["pages"] = [a, a + k - 1]
-                rng = f"S. {a}" if k == 1 else f"S. {a}–{a + k - 1}"
-                it["text"] = f"{rng}" + (f" · {tname}" if tname else "")
-                u["from"] += k
-            elif u["kind"] in ("video", "task"):
-                key = "videos" if u["kind"] == "video" else "tasks"
-                x = next(x for x in src[key] if x["id"] == u[u["kind"]])
-                it[u["kind"]] = u[u["kind"]]
-                it["text"] = x["name"]
-                if x.get("url"):
-                    it["url"] = x["url"]
-            else:
-                base = seen_so_far.setdefault(u["query"], u["seen"])
-                seen_so_far[u["query"]] = base + k
-                it["cards"] = k
-                it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
-                it["text"] = f"{k} neue Karten" + (f" · {tname}" if tname else " · übrige Karten")
-                new_per_day[(day, u["source"])] = new_per_day.get((day, u["source"]), 0) + k
-            generated.setdefault(day, []).append(it)
-            used[day] = used.get(day, 0) + k * u["cost"]
-            st["rem"] -= k * u["cost"]
-            u["n"] -= k
+            m = ms_by_id.get(t.get("milestone")) if t else None
+            due = m["date"] if m else plan["exam"]
+            prep = bool(m and m.get("prep"))
+            if due < d2s(start) and not prep:
+                continue
+            groups[target(max(due, d2s(start)), prep and u["kind"] == "cards")].append(u)
 
-        for u in units:
-            while u["n"] > 0:
-                last = st["i"] == len(content) - 1
-                if u["split"]:
-                    k = u["n"] if last else min(u["n"], int(st["rem"] / u["cost"] + 0.5))
-                    if u["kind"] == "cards" and not last:
-                        mx = srcs[u["source"]].get("maxNew")
-                        if mx:
-                            k = min(k, int(mx) - new_per_day.get((d2s(content[st["i"]]), u["source"]), 0))
-                    if k <= 0:
-                        if not next_day():
-                            emit(u, u["n"])
-                        continue
-                    emit(u, k)
-                    if st["rem"] < u["cost"] * 0.5:
-                        next_day()
+        generated, reserve_map, used = {}, {}, {}
+        new_per_day, seen_so_far, returns = {}, {}, {}
+        notes = []
+
+        def fill(units, content, cap, m):
+            budget_total = sum(cap)
+            work = sum(u["n"] * u["cost"] for u in units)
+            label = "zur Prüfung" if m.get("final") else f"zu „{m['name']}“"
+            if m.get("prep") and work > budget_total * 1.02:
+                notes.append(f"Vor dem Präpsaal „{m['name']}“ ist die Vorbereitung knapp ({round(work / 60, 1)} h Lesen/Videos, "
+                             f"{round(budget_total / 60, 1)} h Zeit).")
+            elif work > budget_total * 1.02:
+                notes.append(f"Bis {label} ist der Plan zu voll: {round((work - budget_total) / 60, 1)} h mehr Stoff als Lernzeit "
+                             "(Wiederholungen schon abgezogen). Mehr Zeit pro Tag eintragen oder Stoff streichen.")
+            scale = work / budget_total if budget_total else 0
+            budget_ = [c * scale for c in cap]
+            st = {"i": 0, "rem": budget_[0] if budget_ else 0}
+
+            def next_day():
+                if st["i"] < len(content) - 1:
+                    st["i"] += 1
+                    st["rem"] = budget_[st["i"]]
+                    return True
+                return False
+
+            def emit(u, k):
+                t = topics.get(u["topic"])
+                tname = t["name"] if t else None
+                src = srcs[u["source"]]
+                day = d2s(content[st["i"]])
+                it = {"id": new_id(), "kind": u["kind"], "topic": u["topic"], "source": u["source"], "min": round(k * u["cost"])}
+                if multi:
+                    it["for"] = "Prüfung" if m.get("final") else m["name"]
+                if u["kind"] == "pages":
+                    a = u["from"]
+                    it["pages"] = [a, a + k - 1]
+                    rng = f"S. {a}" if k == 1 else f"S. {a}–{a + k - 1}"
+                    it["text"] = f"{rng}" + (f" · {tname}" if tname else "")
+                    u["from"] += k
+                elif u["kind"] in ("video", "task"):
+                    key = "videos" if u["kind"] == "video" else "tasks"
+                    x = next(x for x in src[key] if x["id"] == u[u["kind"]])
+                    it[u["kind"]] = u[u["kind"]]
+                    it["text"] = x["name"]
+                    if x.get("url"):
+                        it["url"] = x["url"]
                 else:
-                    if st["rem"] < u["cost"] * 0.5 and st["rem"] < budget[st["i"]] and next_day():
-                        continue
-                    emit(u, 1)
-                    if st["rem"] <= 0:
-                        next_day()
+                    base = seen_so_far.setdefault(u["query"], u["seen"])
+                    seen_so_far[u["query"]] = base + k
+                    it["cards"] = k
+                    it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
+                    it["text"] = f"{k} neue Karten" + (f" · {tname}" if tname else " · übrige Karten")
+                    new_per_day[(day, u["source"])] = new_per_day.get((day, u["source"]), 0) + k
+                    until = m["date"] if plan.get("onceOnly") else plan["exam"]
+                    returns[(day, until)] = returns.get((day, until), 0) + k
+                generated.setdefault(day, []).append(it)
+                used[day] = used.get(day, 0) + k * u["cost"]
+                st["rem"] -= k * u["cost"]
+                u["n"] -= k
 
-    def caps(content):
-        return [max(0, capacity(plan, d) - (used_today if d == start else 0) - used.get(d2s(d), 0)) for d in content]
+            for u in units:
+                while u["n"] > 0:
+                    last = st["i"] == len(content) - 1
+                    if u["split"]:
+                        k = u["n"] if last else min(u["n"], int(st["rem"] / u["cost"] + 0.5))
+                        if u["kind"] == "cards" and not last:
+                            mx = srcs[u["source"]].get("maxNew")
+                            if mx:
+                                k = min(k, int(mx) - new_per_day.get((d2s(content[st["i"]]), u["source"]), 0))
+                        if k <= 0:
+                            if not next_day():
+                                emit(u, u["n"])
+                            continue
+                        emit(u, k)
+                        if st["rem"] < u["cost"] * 0.5:
+                            next_day()
+                    else:
+                        if st["rem"] < u["cost"] * 0.5 and st["rem"] < budget_[st["i"]] and next_day():
+                            continue
+                        emit(u, 1)
+                        if st["rem"] <= 0:
+                            next_day()
 
-    prev = start - timedelta(days=1)
-    pj = 0
-    for j, m in enumerate(ms_open):
-        if m.get("prep"):
-            continue
-        deadline = s2d(m["date"])
-        avail = [d for d in daterange(prev + timedelta(days=1), deadline - timedelta(days=1)) if capacity(plan, d) > 0]
-        r = reserve_count(len(avail)) if m.get("final") else (1 if len(avail) >= 3 else 0)
-        content, reserve = avail[:len(avail) - r], avail[len(avail) - r:]
-        if not content:
-            content, reserve = avail, []
-        for k, d in enumerate(reserve):
-            reserve_map[d2s(d)] = reserve_items(plan, k, len(reserve)) if m.get("final") else [
-                {"id": new_id(), "kind": "note", "text": f"Wiederholen für „{m['name']}“: Themen dieser Etappe laut erklären, "
-                                                         "Schwachstellen anschauen, nichts Neues."}]
-        for k in range(pj, j):  # Präpsaal-Termine in diesem Fenster zuerst
-            pm, pdl = ms_open[k], s2d(ms_open[k]["date"])
-            # Vorbereitung in der Woche davor (nicht wochenlang verstreut, nicht alles am Vortag)
-            sub = [d for d in content if d < pdl and (pdl - d).days <= PREP_DAYS] or [d for d in content if d < pdl]
-            if groups[k] and sub:
-                fill(groups[k], sub, caps(sub), pm)
-            elif groups[k]:
-                groups[k + 1][0:0] = groups[k]
-        pj = j + 1
-        if groups[j] and not content:
-            if j + 1 < len(ms_open):
-                notes.append(f"Vor „{m['name']}“ ist keine Lernzeit mehr – der Stoff dafür rutscht in die nächste Etappe.")
-                groups[j + 1][0:0] = groups[j]
-            else:
-                notes.append("Bis zur Prüfung ist keine Lernzeit mehr eingetragen.")
-        elif groups[j]:
-            fill(groups[j], content, caps(content), m)
-        prev = deadline
-    lim = {s["id"]: s.get("maxNew") for s in anki_sources(plan)}
-    if any(lim.get(sid) and n > int(lim[sid]) for (_, sid), n in new_per_day.items()):
-        notes.append("Das Tageslimit für neue Karten reicht nicht; am letzten Lerntag vor einem Termin liegen mehr neue Karten.")
+        def caps(content):
+            return [max(0, room(d) - rev.get(d2s(d), 0) * rev_min - (used_today if d == start else 0) - used.get(d2s(d), 0))
+                    for d in content]
+
+        prev = start - timedelta(days=1)
+        pj = 0
+        for j, m in enumerate(ms_open):
+            if m.get("prep"):
+                continue
+            deadline = s2d(m["date"])
+            avail = [d for d in daterange(prev + timedelta(days=1), deadline - timedelta(days=1)) if room(d) > 0]
+            r = reserve_count(len(avail)) if m.get("final") else (1 if len(avail) >= 3 else 0)
+            content, reserve = avail[:len(avail) - r], avail[len(avail) - r:]
+            if not content:
+                content, reserve = avail, []
+            for k, d in enumerate(reserve):
+                reserve_map[d2s(d)] = reserve_items(plan, k, len(reserve)) if m.get("final") else [
+                    {"id": new_id(), "kind": "note", "text": f"Wiederholen für „{m['name']}“: Themen dieser Etappe laut erklären, "
+                                                             "Schwachstellen anschauen, nichts Neues."}]
+            for k in range(pj, j):  # Präpsaal-Termine in diesem Fenster zuerst
+                pm, pdl = ms_open[k], s2d(ms_open[k]["date"])
+                # Vorbereitung in der Woche davor (nicht wochenlang verstreut, nicht alles am Vortag)
+                sub = [d for d in content if d < pdl and (pdl - d).days <= PREP_DAYS] or [d for d in content if d < pdl]
+                if groups[k] and sub:
+                    fill(groups[k], sub, caps(sub), pm)
+                elif groups[k]:
+                    groups[k + 1][0:0] = groups[k]
+            pj = j + 1
+            if groups[j] and not content:
+                if j + 1 < len(ms_open):
+                    notes.append(f"Vor „{m['name']}“ ist keine Lernzeit mehr – der Stoff dafür rutscht in die nächste Etappe.")
+                    groups[j + 1][0:0] = groups[j]
+                else:
+                    notes.append("Bis zur Prüfung ist keine Lernzeit mehr eingetragen.")
+            elif groups[j]:
+                fill(groups[j], content, caps(content), m)
+            prev = deadline
+        lim = {s["id"]: s.get("maxNew") for s in anki_sources(plan)}
+        if any(lim.get(sid) and n > int(lim[sid]) for (_, sid), n in new_per_day.items()):
+            notes.append("Das Tageslimit für neue Karten reicht nicht; am letzten Lerntag vor einem Termin liegen mehr neue Karten.")
+        return generated, reserve_map, returns, notes
+
+    # Überfällige so verteilen, dass sie höchstens die Hälfte der freien Zeit belegen.
+    late = sum(n for k, n in (forecast or {}).get("due", {}).items() if int(k) < 0) * rev_min
+    nb = BACKLOG_DAYS
+    while nb < len(study) and late / nb > 0.5 * sum(room(d) for d in study[:nb]) / nb:
+        nb += 1
+
+    # Wiederholungen hängen davon ab, wann neue Karten drankommen – ein paar Runden, bis es passt.
+    rev = review_load(forecast, start, exam, study, None, nb) if has_anki else {}
+    for _ in range(3):
+        generated, reserve_map, returns, notes = allocate(rev)
+        rev = review_load(forecast, start, exam, study, returns, nb) if has_anki else {}
+    full = [d for d in study if rev.get(d2s(d), 0) * rev_min > room(d) + 5]
+    if full:
+        notes.append(f"An {len(full)} Tag(en) brauchen die Wiederholungen allein schon mehr Zeit als frei ist "
+                     f"(z. B. {full[0].strftime('%d.%m.')}). Weniger neue Karten oder mehr Lernzeit.")
 
     # Tage zusammensetzen: Wiederholungen zuerst, dann der Stoff
     by_date = {m["date"]: m for m in ms_open}
@@ -427,8 +525,10 @@ def build(plan, counts, today, ev=None):
             when = f" um {m['time']}" if m.get("time") else ""
             gen = [{"id": new_id(), "kind": "note", "text": f"Prüfung{when}: nur leicht wiederholen, vorher etwas essen."
                     if m.get("final") else f"{m['name']}{when}: vorher kurz wiederholen. Viel Erfolg!"}]
-        if has_anki and (capacity(plan, d) > 0 or m) and not any(x.get("kind") == "reviews" for x in items):
-            gen.insert(0, {"id": new_id(), "kind": "reviews", "text": "Fällige Wiederholungen", "auto": {"type": "reviews"}})
+        if has_anki and (room(d) > 0 or m) and not any(x.get("kind") == "reviews" for x in items):
+            n = round(rev.get(s, 0))
+            gen.insert(0, {"id": new_id(), "kind": "reviews", "auto": {"type": "reviews"}, "reviews": n,
+                           "min": round(n * rev_min), "text": f"Wiederholungen (ca. {n})" if n else "Fällige Wiederholungen"})
         days[s]["items"] = items + [g for g in gen if not any(x.get("kind") == g["kind"] and g["kind"] in NO_CHECK
                                                               for x in items)]
     plan["days"] = [days[k] for k in sorted(days)]
@@ -442,9 +542,9 @@ def reserve_items(plan, ix, n):
     kinds = {3: ["weakround", "sim", "final"], 2: ["sim", "final"], 1: ["final"]}[n]
     kind = kinds[ix]
     if kind == "weakround":
-        return [{"id": new_id(), "kind": "weakround", "text": "Schwachstellen-Runde: die schwächsten Themen gezielt wiederholen"}]
+        return [{"id": new_id(), "kind": "weakround", "min": 60, "text": "Schwachstellen-Runde: die schwächsten Themen gezielt wiederholen"}]
     if kind == "sim":
-        return [{"id": new_id(), "kind": "sim", "text": "Probeprüfung: gemischte Karten auf Zeit + zufällige Themen frei erklären"}]
+        return [{"id": new_id(), "kind": "sim", "min": 60, "text": "Probeprüfung: gemischte Karten auf Zeit + zufällige Themen frei erklären"}]
     return [{"id": new_id(), "kind": "note", "text": "Letzter Tag: nur wiederholen, Schwachstellen kurz anschauen, nichts Neues. Früh schlafen."}]
 
 
@@ -463,7 +563,7 @@ def evaluate(plan, st):
                 out[it["id"]] = {"done": st["due"] == 0, "text": "alles erledigt" if st["due"] == 0 else f"noch {st['due']} fällig"}
         elif a["type"] == "seen":
             c = st["counts"].get(a["query"])
-            if not c:
+            if not c or not c["total"]:  # keine Karten: Deck gelöscht/umbenannt, nicht "fertig"
                 continue
             seen = c["total"] - c["new"]
             k = it.get("cards", 0)

@@ -84,6 +84,28 @@ def home():
             "profile": store.profile(), "version": VERSION}
 
 
+def generate_all(pid):
+    """Plant alle laufenden Pläne neu, weil sie sich die Lernzeit teilen: die nächste
+    Prüfung zuerst, jeder weitere Plan bekommt, was an dem Tag noch frei ist.
+    Gibt die Hinweise des angefragten Plans zurück."""
+    t = today()
+    budget = store.profile().get("budget")
+    plans = [p for p in store.list_plans() if p["id"] == pid or (
+        p.get("status") == "active" and p.get("days") and p.get("exam") and p["exam"] >= t.isoformat())]
+    plans.sort(key=lambda p: (p["exam"], p["id"]))
+    taken, notes = {}, []
+    for plan in plans:
+        st = ankidata.stats(mw.col, plan)
+        n = planner.build(plan, st["counts"], t, planner.evaluate(plan, st),
+                          forecast=ankidata.forecast(mw.col, plan), taken=taken, budget=budget)
+        store.save(plan)
+        for d, m in planner.day_load(plan, t).items():
+            taken[d] = taken.get(d, 0) + m
+        if plan["id"] == pid:
+            notes = n
+    return notes
+
+
 SETUP_KEYS = ("title", "exam", "examTime", "start", "minutesPerDay", "offWeekdays", "dayMinutes", "dayNotes",
               "order", "sources", "topics", "subtitle", "milestones")
 
@@ -129,11 +151,7 @@ def handle(cmd, a):
         store.save(plan)
         return True
     if cmd == "generate":
-        plan = store.load(a["id"])
-        st = ankidata.stats(col, plan)
-        notes = planner.build(plan, st["counts"], today(), planner.evaluate(plan, st))
-        store.save(plan)
-        return {"notes": notes}
+        return {"notes": generate_all(a["id"])}
     if cmd == "toggle":
         plan = store.load(a["id"])
         if a["on"]:

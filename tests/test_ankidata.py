@@ -86,6 +86,9 @@ col.sched.empty_filtered_deck(did2)
 ts = A.time_stats(col, plan)
 assert ts["newCards"] >= answered, ts
 assert A.activity(col)[today.isoformat()] >= 10
+fc = A.forecast(col, plan)
+assert sum(fc["due"].values()) >= 10 and fc["min"] > 0, fc
+P.build(plan, A.stats(col, plan)["counts"], today, forecast=fc)
 
 conf_before = col.decks.get(col.decks.id_for_name("SEKU::Bauch::Leber"))["conf"]
 A.maintenance(col, plan, True)
