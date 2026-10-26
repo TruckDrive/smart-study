@@ -53,23 +53,42 @@ def deck_query(name):
     return 'deck:"%s"' % name.replace('"', '\\"')
 
 
+def src_decks(src):
+    """Decks einer Anki-Quelle (früher ein einzelnes "deck", jetzt Liste "decks")."""
+    if src.get("decks"):
+        return list(src["decks"])
+    return [src["deck"]] if src.get("deck") else []
+
+
+def src_query(src):
+    qs = [deck_query(d) for d in src_decks(src)]
+    if not qs:
+        return None
+    return qs[0] if len(qs) == 1 else "(" + " OR ".join(qs) + ")"
+
+
 def rest_query(plan, src):
-    """Karten des Decks, die keinem Thema zugeordnet sind."""
+    """Karten der Quelle, die keinem Thema zugeordnet sind."""
+    base = src_query(src)
+    if not base:
+        return None
     qs = [t["anki"][src["id"]] for t in plan.get("topics", []) if t.get("anki", {}).get(src["id"])]
-    base = deck_query(src["deck"])
     return base if not qs else f"{base} -({' OR '.join('(' + q + ')' for q in qs)})"
 
 
 def topic_query(plan, topic, src):
     q = topic.get("anki", {}).get(src["id"])
-    return f"{deck_query(src['deck'])} ({q})" if q else None
+    base = src_query(src)
+    return f"{base} ({q})" if q and base else None
 
 
 def queries(plan):
     """Alle Anki-Suchen, deren Zahlen build() und evaluate() brauchen."""
     out = set()
     for src in anki_sources(plan):
-        out.add(deck_query(src["deck"]))
+        if not src_query(src):
+            continue
+        out.add(src_query(src))
         out.add(rest_query(plan, src))
         for t in plan.get("topics", []):
             q = topic_query(plan, t, src)
@@ -198,7 +217,7 @@ def remaining_work(plan, counts, ev):
                                   "cost": float(x.get("min") or DEFAULT_RATES["tasks"]), "split": False})
     for src in anki_sources(plan):
         q = rest_query(plan, src)
-        if counts.get(q, {}).get("new"):
+        if q and counts.get(q, {}).get("new"):
             units.append({"kind": "cards", "topic": None, "source": src["id"], "query": q,
                           "n": counts[q]["new"], "cost": rate(src), "split": True,
                           "seen": counts[q]["total"] - counts[q]["new"]})
@@ -456,10 +475,47 @@ def norm(s):
 
 
 STOP = {"und", "der", "die", "das", "des", "mit", "von", "im", "in", "teil", "the", "and", "of", "a", "m", "a"}
+ROMAN = {r: str(i) for i, r in enumerate(
+    "i ii iii iv v vi vii viii ix x xi xii xiii xiv xv xvi xvii xviii xix xx".split(), 1) if r != "i"}
+GENERIC = {"testat", "pruefung", "prufung", "klausur", "lernplan", "plan", "exam", "sip", "anki", "deck"}
 
 
 def tokens(s):
-    return [t for t in norm(s).split() if t not in STOP and len(t) > 1]
+    """Normalisierte Wörter; 'PM8' -> pm 8, 'VIII' -> 8."""
+    s = re.sub(r"(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])", " ", norm(s))
+    out = []
+    for t in s.split():
+        t = ROMAN.get(t, t)
+        if t not in STOP and (len(t) > 1 or t.isdigit()):
+            out.append(t)
+    return out
+
+
+def _tok_match(x, y):
+    return x == y or (len(x) >= 5 and len(y) >= 5 and (x[:5] == y[:5] or x in y or y in x))
+
+
+def rank_decks(title, names, query="", limit=15):
+    """Decks passend zum Plan-Namen (ohne Suchtext) oder zur Suche.
+    Höhere Decks zuerst, damit man ein ganzes Fach mit einem Klick nimmt."""
+    out = []
+    if query.strip():
+        want = tokens(query) or [norm(query)]
+        for n in names:
+            nt = tokens(n)
+            if all(any(_tok_match(w, t) or t.startswith(w) for t in nt) for w in want):
+                out.append((1.0, n))
+    else:
+        want = [t for t in dict.fromkeys(tokens(title)) if t not in GENERIC]
+        if not want:
+            return []
+        for n in names:
+            nt = tokens(n)
+            hit = sum(1 for w in want if any(_tok_match(w, t) for t in nt))
+            if hit:
+                out.append((hit / len(want), n))
+    out.sort(key=lambda x: (-x[0], x[1].count("::"), x[1].lower()))
+    return [{"name": n, "score": round(sc, 2)} for sc, n in out[:limit]]
 
 
 def similarity(a, b):

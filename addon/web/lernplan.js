@@ -28,6 +28,32 @@ const addDays = (s, n) => { const d = dt(s); d.setDate(d.getDate() + n); return 
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const uid = p => p + Math.random().toString(16).slice(2, 12);
 const clone = o => JSON.parse(JSON.stringify(o));
+const de = s => s ? `${s.slice(8, 10)}.${s.slice(5, 7)}.${s.slice(0, 4)}` : "";
+// Eigene Eingabefelder statt <input type=date>, damit es immer TT.MM.JJJJ und 24 h ist
+function dateInput(val, onset, attrs) {
+  const e = h("input", Object.assign({ type: "text", value: de(val), placeholder: "TT.MM.JJJJ", style: "width:118px", inputmode: "numeric" }, attrs || {}));
+  e.addEventListener("change", () => {
+    const v = e.value.trim();
+    if (!v) { onset(""); return; }
+    const m = v.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-]?(\d{2}|\d{4})?$/);
+    const y = m && (m[3] ? (m[3].length === 2 ? "20" + m[3] : m[3]) : String(new Date().getFullYear()));
+    const out = m && `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+    if (!out || isNaN(dt(out)) || iso(dt(out)) !== out) { toast("Datum bitte als TT.MM.JJJJ, z. B. 28.11.2026"); e.value = de(val); return; }
+    e.value = de(out); val = out; onset(out);
+  });
+  return e;
+}
+function timeInput(val, onset) {
+  const e = h("input", { type: "text", value: val || "", placeholder: "HH:MM", style: "width:70px", inputmode: "numeric" });
+  e.addEventListener("change", () => {
+    const v = e.value.trim();
+    if (!v) { onset(""); return; }
+    const m = v.match(/^(\d{1,2})(?:[:.h ]?(\d{2}))?$/);
+    if (!m || +m[1] > 23 || +(m[2] || 0) > 59) { toast("Uhrzeit bitte als HH:MM, z. B. 13:15"); e.value = val || ""; return; }
+    val = `${m[1].padStart(2, "0")}:${m[2] || "00"}`; e.value = val; onset(val);
+  });
+  return e;
+}
 const hm = m => m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? " " + (m % 60) + " min" : ""}` : `${m} min`;
 
 function call(cmd, args) {
@@ -69,7 +95,8 @@ async function go(view, pid) {
   if (view === "plan") S.data = await run(call("open", { id: S.pid }));
   if (view === "edit") {
     const d = await run(call("open", { id: S.pid }));
-    S.edit = clone(d.plan); S.decks = await call("decks"); S.cands = {}; S.sugg = {};
+    S.edit = clone(d.plan); S.cands = {}; S.sugg = {};
+    for (const s of S.edit.sources) if (s.type === "anki" && !s.decks) { s.decks = s.deck ? [s.deck] : []; delete s.deck; }
     await loadCands();
   }
   if (view === "review") S.data = await run(call("review", { id: S.pid }));
@@ -110,10 +137,10 @@ function renderHome(root) {
   root.append(h("p", { class: "muted small", style: "margin-top:30px" }, `Lernplan ${d.version} · Pläne liegen im Add-on-Ordner unter user_files/plans.`));
 }
 function planCard(p) {
-  const left = daysBetween(S.data.today, p.exam), [dn, tot] = p.progress;
+  const left = p.exam ? daysBetween(S.data.today, p.exam) : null, [dn, tot] = p.progress;
   return h("div", { class: "card plan-card", onclick: () => go("plan", p.id) },
-    h("div", { class: "days-left" }, left > 0 ? String(left) : left === 0 ? "heute" : "✓", h("small", null, left > 0 ? (left === 1 ? "Tag" : "Tage") : left === 0 ? "Prüfung" : "vorbei")),
-    h("div", { class: "grow" }, h("h2", null, p.title), h("div", { class: "muted small" }, `Prüfung ${fmt(p.exam)} · ${dn}/${tot} erledigt`),
+    h("div", { class: "days-left" }, left == null ? "?" : left > 0 ? String(left) : left === 0 ? "heute" : "✓", h("small", null, left == null ? "Entwurf" : left > 0 ? (left === 1 ? "Tag" : "Tage") : left === 0 ? "Prüfung" : "vorbei")),
+    h("div", { class: "grow" }, h("h2", null, p.title), h("div", { class: "muted small" }, p.exam ? `Prüfung ${fmt(p.exam)}, ${de(p.exam)} · ${dn}/${tot} erledigt` : "Entwurf – Prüfungsdatum fehlt noch"),
       h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `width:${tot ? 100 * dn / tot : 0}%` }))));
 }
 function heatmap(heat, today) {
@@ -131,15 +158,16 @@ function heatmap(heat, today) {
 async function newPlan(from) {
   const t = S.data.today || iso(new Date());
   const title = h("input", { type: "text", placeholder: "z. B. Kopf-Hals-Testat", style: "width:100%" });
-  const exam = h("input", { type: "date", value: addDays(t, 14) });
-  const start = h("input", { type: "date", value: t });
+  let examV = "", startV = t;
+  const exam = dateInput("", v => { examV = v; }), start = dateInput(t, v => { startV = v; });
   const ok = await modal(from ? "Nächsten Plan anlegen" : "Neuer Plan", h("div", { class: "form" },
-    h("label", null, "Name"), title, h("label", null, "Prüfungsdatum"), exam, h("label", null, "Start"), start,
+    h("label", null, "Name"), title, h("label", null, "Prüfungsdatum"), h("div", { class: "inline" }, exam, h("span", { class: "muted small" }, "leer lassen, wenn noch unbekannt")), h("label", null, "Start"), start,
     from ? h("p", { class: "muted small", style: "grid-column:1/-1" }, "Die Quellen-Arten (Handbuch, Videos, Anki …) und dein Tempo werden übernommen. Decks, Seiten und Themen trägst du neu ein.") : null));
   if (!ok) return;
+  exam.dispatchEvent(new Event("change")); start.dispatchEvent(new Event("change"));
   if (!title.value.trim()) return toast("Bitte einen Namen eingeben.");
-  if (exam.value <= start.value) return toast("Die Prüfung muss nach dem Start liegen.");
-  const p = await run(call("create", { title: title.value.trim(), exam: exam.value, start: start.value, from }));
+  if (examV && examV <= startV) return toast("Die Prüfung muss nach dem Start liegen.");
+  const p = await run(call("create", { title: title.value.trim(), exam: examV, start: startV, from }));
   go("edit", p.id);
 }
 
@@ -158,7 +186,7 @@ function renderPlan(root) {
   if (phase === "setup") { S.view = "edit"; return go("edit"); }
   root.append(h("div", { class: "top" },
     h("div", null, h("a", { class: "small", onclick: () => go("home") }, "← Alle Pläne"), h("h1", null, plan.title),
-      h("p", { class: "sub" }, `Prüfung ${fmt(plan.exam)}${plan.examTime ? ", " + plan.examTime : ""}${plan.subtitle ? " · " + plan.subtitle : ""}`)),
+      h("p", { class: "sub" }, `Prüfung ${fmt(plan.exam)} ${plan.exam.slice(0, 4)}${plan.examTime ? ", " + plan.examTime + " Uhr" : ""}${plan.subtitle ? " · " + plan.subtitle : ""}`)),
     h("div", { class: "bar-actions" },
       h("button", { onclick: () => go("edit") }, "Bearbeiten"),
       h("button", { onclick: () => replan() }, "Neu planen"),
@@ -377,7 +405,7 @@ function celebrate(pid) {
 
 // ---------- Bearbeiten ----------
 async function loadCands() {
-  for (const s of S.edit.sources) if (s.type === "anki" && s.deck && !S.cands[s.id]) {
+  for (const s of S.edit.sources) if (s.type === "anki" && (s.decks || []).length && !S.cands[s.id]) {
     const r = await call("candidates", { plan: { sources: [s] } });
     S.cands[s.id] = r[s.id] || [];
   }
@@ -398,8 +426,8 @@ function renderEdit(root) {
   const bind = (key, type = "text", attrs = {}) => h("input", Object.assign({ type, value: p[key] ?? "", onchange: e => { p[key] = type === "number" ? +e.target.value : e.target.value; if (["exam", "start", "minutesPerDay"].includes(key)) render(); } }, attrs));
   field("Name", bind("title", "text", { style: "width:100%" }));
   field("Zusatzzeile", bind("subtitle", "text", { style: "width:100%", placeholder: "z. B. Fach, weitere Termine" }));
-  field("Prüfung", h("div", { class: "inline" }, bind("exam", "date"), bind("examTime", "time")));
-  field("Start", bind("start", "date"));
+  field("Prüfung", h("div", { class: "inline" }, dateInput(p.exam, v => { p.exam = v; render(); }), timeInput(p.examTime, v => { p.examTime = v; }), h("span", { class: "muted small" }, "Datum · Uhrzeit")));
+  field("Start", dateInput(p.start, v => { p.start = v; render(); }));
   field("Lernzeit pro Tag", h("div", { class: "inline" }, bind("minutesPerDay", "number", { min: 0, step: 15 }), h("span", { class: "muted small" }, "Minuten (einzelne Tage unten anpassen)")));
   field("Freie Wochentage", h("div", { class: "inline" }, WD_MO.map(([l, n]) => h("label", { class: "wd" }, h("input", { type: "checkbox", checked: p.offWeekdays.includes(n),
     onchange: e => { p.offWeekdays = e.target.checked ? [...p.offWeekdays, n] : p.offWeekdays.filter(x => x !== n); render(); } }), l))));
@@ -430,8 +458,8 @@ function milestonesEl(p) {
   for (const m of p.milestones.slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""))) {
     box.append(h("div", { class: "inline", style: "margin-bottom:5px" },
       h("input", { type: "text", value: m.name, placeholder: "z. B. Testat Becken", style: "flex:1;min-width:180px", onchange: e => { m.name = e.target.value; } }),
-      h("input", { type: "date", value: m.date || "", onchange: e => { m.date = e.target.value; render(); } }),
-      h("input", { type: "time", value: m.time || "", onchange: e => { m.time = e.target.value; } }),
+      dateInput(m.date, v => { m.date = v; render(); }),
+      timeInput(m.time, v => { m.time = v; }),
       h("button", { class: "ghost danger", title: "Etappe löschen", onclick: () => { p.milestones = p.milestones.filter(x => x !== m); for (const t of p.topics) if (t.milestone === m.id) delete t.milestone; render(); } }, "✕")));
   }
   box.append(h("button", { onclick: () => { p.milestones.push({ id: uid("m"), name: "", date: "", time: "" }); render(); } }, "+ Etappe / Testat"));
@@ -459,7 +487,7 @@ function addSource(type) {
   const s = { id: uid("s"), type, name: { pages: "Skript", videos: "Videos", anki: "", tasks: "Liste" }[type], minPerUnit: null };
   if (type === "videos") { s.videos = []; s.defaultMin = 20; }
   if (type === "tasks") s.tasks = [];
-  if (type === "anki") { s.deck = ""; s.maxNew = null; }
+  if (type === "anki") { s.decks = []; s.maxNew = null; s.pick = true; }
   S.edit.sources.push(s); render();
 }
 
@@ -473,23 +501,18 @@ function sourceEl(s) {
     onchange: e => { s.minPerUnit = e.target.value ? +e.target.value : null; } }), h("span", { class: "muted" }, UNIT[s.type]));
   if (s.type === "pages") box.append(h("div", { class: "inline small" }, "Tempo:", rate, h("span", { class: "muted" }, "· Seitenbereiche trägst du bei den Themen ein.")));
   if (s.type === "anki") {
-    const dl = "decks-" + s.id;
     const info = h("div", { class: "small muted", style: "margin-top:4px" });
-    const showInfo = async () => {
-      if (!s.deck) return;
-      const i = await call("deckInfo", { deck: s.deck });
-      if (!i) { info.textContent = "Deck nicht gefunden."; return; }
-      info.textContent = `${i.new} neue von ${i.total} Karten · ${i.children.length} Unterdecks · Anki-Limit ${i.perDay ?? "?"} neue/Tag`;
-      if (!s.name) { s.name = s.deck.split("::").pop(); box.querySelector("input.name").value = s.name; }
-      if (s.maxNew == null && i.perDay) { s.maxNew = i.perDay; mx.value = i.perDay; }
-    };
     const mx = h("input", { type: "number", min: 0, value: s.maxNew ?? "", placeholder: "∞", onchange: e => { s.maxNew = e.target.value ? +e.target.value : null; } });
-    box.append(h("div", { class: "inline" },
-      h("input", { type: "text", list: dl, value: s.deck, placeholder: "Deck wählen …", style: "flex:1;min-width:240px",
-        onchange: async e => { s.deck = e.target.value; delete S.cands[s.id]; await loadCands(); showInfo(); render(); } }),
-      h("datalist", { id: dl }, (S.decks || []).map(n => h("option", { value: n })))),
-      h("div", { class: "inline small", style: "margin-top:6px" }, "Tempo:", rate, h("span", { class: "muted" }, "· max. neue/Tag:"), mx), info);
-    showInfo();
+    const chips = h("div", null, s.decks.map(d => h("span", { class: "pill", title: d }, h("span", { class: "muted" }, d.split("::").slice(0, -1).join(" › ") + (d.includes("::") ? " › " : "")), d.split("::").pop(),
+      h("button", { title: "Deck entfernen", onclick: () => { s.decks = s.decks.filter(x => x !== d); delete S.cands[s.id]; render(); } }, "×"))));
+    box.append(chips, deckPicker(s), h("div", { class: "inline small", style: "margin-top:6px" }, "Tempo:", rate, h("span", { class: "muted" }, "· max. neue/Tag:"), mx), info);
+    (async () => {
+      if (!s.decks.length) return;
+      let n = 0, tot = 0, per = [];
+      for (const d of s.decks) { const i = await call("deckInfo", { deck: d }); if (!i) continue; n += i.new; tot += i.total; if (i.perDay) per.push(i.perDay); }
+      info.textContent = `${n} neue von ${tot} Karten` + (per.length ? ` · Anki-Limit ${Math.min(...per)} neue/Tag` : "");
+      if (s.maxNew == null && per.length) { s.maxNew = Math.min(...per); mx.value = s.maxNew; }
+    })();
   }
   if (s.type === "videos" || s.type === "tasks") {
     const key = s.type, list = s[key];
@@ -508,12 +531,36 @@ function sourceEl(s) {
   }
   return box;
 }
+// Deck-Auswahl: ohne Suchtext Vorschläge passend zum Plan-Namen, sonst Suchtreffer
+function deckPicker(s) {
+  const wrap = h("div", { style: "margin-top:6px" });
+  const q = h("input", { type: "text", placeholder: s.decks.length ? "+ weiteres Deck suchen …" : "Deck suchen, z. B. „altfragen pm“ …", style: "width:100%" });
+  const list = h("div", { class: "deck-list" });
+  let timer = null, open = !!s.pick || !s.decks.length;
+  const load = async () => {
+    const r = await call("findDecks", { title: S.edit.title, q: q.value, exclude: s.decks });
+    list.replaceChildren();
+    if (!q.value.trim() && r.length) list.append(h("div", { class: "muted small", style: "padding:2px 4px" }, `Passend zu „${S.edit.title}“:`));
+    if (!r.length) list.append(h("div", { class: "muted small", style: "padding:2px 4px" }, q.value.trim() ? "Kein Deck gefunden." : "Kein passendes Deck zum Namen – einfach oben suchen."));
+    for (const d of r) {
+      const parts = d.name.split("::"), depth = parts.length - 1;
+      list.append(h("div", { class: "deck-row", onclick: () => { s.decks.push(d.name); delete S.cands[s.id]; if (!s.name || s.name === "Anki") s.name = parts[parts.length - 1]; s.pick = false; loadCands().then(render); } },
+        h("span", { class: "dname" }, h("span", { class: "muted" }, parts.slice(0, -1).join(" › ") + (depth ? " › " : "")), h("b", null, parts[depth])),
+        h("span", { class: "muted small" }, `${d.new} neu / ${d.total}`), h("span", { class: "add" }, "+")));
+    }
+  };
+  q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(load, 200); });
+  q.addEventListener("focus", () => { if (!list.childElementCount) load(); });
+  wrap.append(q, list);
+  if (open) load();
+  return wrap;
+}
 function defaultRate(t) { const prof = (S.data && S.data.profile) || {}; return (prof.rates || {})[t] ?? { pages: 6, videos: 20, tasks: 30, anki: 1 }[t]; }
 
 function topicsCard(p) {
   const card = h("div", { class: "card" }, h("h2", null, "3 · Themen"),
     h("p", { class: "muted small", style: "margin:2px 0 0" }, "Ein Thema bündelt, was zusammengehört: Handbuchseiten + Unterdeck/Tag + Videos. Der Plan arbeitet die Themen nacheinander ab: erst lesen, dann Video, dann Karten zum selben Thema."));
-  const ankiSrc = p.sources.filter(s => s.type === "anki" && s.deck), pageSrc = p.sources.filter(s => s.type === "pages");
+  const ankiSrc = p.sources.filter(s => s.type === "anki" && (s.decks || []).length), pageSrc = p.sources.filter(s => s.type === "pages");
   card.append(h("div", { class: "tools" },
     pageSrc.length ? h("button", { onclick: tocDialog }, "Inhaltsverzeichnis einfügen") : null,
     ankiSrc.length ? h("button", { onclick: fromDecks }, "Themen aus Unterdecks") : null,
@@ -615,17 +662,18 @@ async function tocDialog() {
 }
 
 async function fromDecks() {
-  const p = S.edit, srcs = p.sources.filter(s => s.type === "anki" && s.deck);
-  const sel = h("select", null, srcs.map(s => h("option", { value: s.id }, s.name || s.deck)));
+  const p = S.edit, srcs = p.sources.filter(s => s.type === "anki" && (s.decks || []).length);
+  const sel = h("select", null, srcs.flatMap(s => s.decks.map((d, i) => h("option", { value: s.id + "|" + i }, (s.name || "Anki") + " – " + d.split("::").pop()))));
   const ok = await modal("Themen aus Unterdecks", h("div", null, h("div", { class: "inline" }, "Deck:", sel),
     h("p", { class: "muted small" }, "Für jedes direkte Unterdeck entsteht ein Thema, das schon mit dem Unterdeck verknüpft ist. Danach „Zuordnung automatisch vorschlagen“ für Videos.")),
     [["Abbrechen", null], ["Erstellen", true, "primary"]]);
   if (!ok) return;
-  const s = srcs.find(s => s.id === sel.value) || srcs[0];
-  const info = await run(call("deckInfo", { deck: s.deck }));
+  const [sid, di] = (sel.value || srcs[0].id + "|0").split("|");
+  const s = srcs.find(s => s.id === sid), deck = s.decks[+di];
+  const info = await run(call("deckInfo", { deck }));
   let added = 0;
   for (const child of info.children) {
-    const q = `deck:"${(s.deck + "::" + child).replace(/"/g, '\\"')}"`;
+    const q = `deck:"${(deck + "::" + child).replace(/"/g, '\\"')}"`;
     if (p.topics.some(t => (t.anki || {})[s.id] === q)) continue;
     let t = p.topics.find(t => t.name.trim().toLowerCase() === child.toLowerCase());
     if (!t) { t = { id: uid("k"), name: child, pages: {}, videos: {}, tasks: {}, anki: {} }; p.topics.push(t); added++; }
@@ -637,10 +685,11 @@ async function fromDecks() {
 
 function validate(p) {
   if (!p.title.trim()) return "Bitte einen Namen eingeben.";
-  if (!p.exam || !p.start || p.exam <= p.start) return "Die Prüfung muss nach dem Start liegen.";
+  if (!p.exam) return "Bitte das Prüfungsdatum eintragen.";
+  if (!p.start || p.exam <= p.start) return "Die Prüfung muss nach dem Start liegen.";
   if (!p.sources.length) return "Füge mindestens eine Quelle hinzu (z. B. ein Anki-Deck oder das Handbuch).";
   if ((p.milestones || []).some(m => !m.date || m.date <= p.start || m.date >= p.exam)) return "Jede Etappe braucht ein Datum zwischen Start und Prüfung.";
-  const bad = p.sources.find(s => s.type === "anki" && !s.deck);
+  const bad = p.sources.find(s => s.type === "anki" && !(s.decks || []).length);
   if (bad) return "Bei einer Anki-Quelle fehlt noch das Deck.";
   return null;
 }

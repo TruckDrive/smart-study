@@ -43,7 +43,7 @@ def counts(col, qs):
 
 
 def plan_query(plan):
-    qs = [planner.deck_query(s["deck"]) for s in planner.anki_sources(plan)]
+    qs = [planner.src_query(s) for s in planner.anki_sources(plan) if planner.src_query(s)]
     return "(" + " OR ".join(qs) + ")" if qs else None
 
 
@@ -57,7 +57,8 @@ def stats(col, plan):
     st["due"] = len(col.find_cards(f"{q} is:due -is:suspended -is:buried"))
     st["counts"] = counts(col, planner.queries(plan))
     for s in planner.anki_sources(plan):
-        st["decks"][s["id"]] = st["counts"].get(planner.deck_query(s["deck"]), {"total": 0, "new": 0})
+        if planner.src_query(s):
+            st["decks"][s["id"]] = st["counts"].get(planner.src_query(s), {"total": 0, "new": 0})
     start = min(planner.s2d(plan["start"]), t)
     cids = col.find_cards(q)
     if cids:
@@ -68,16 +69,22 @@ def stats(col, plan):
     return st
 
 
-def candidates(col, deck):
-    """Unterdecks und Tags eines Decks als mögliche Themen-Verknüpfung."""
+def candidates(col, decks):
+    """Unterdecks und Tags der Decks einer Quelle als mögliche Themen-Verknüpfung."""
+    if isinstance(decks, str):
+        decks = [decks]
     out = []
-    did = col.decks.id_for_name(deck)
-    if not did:
+    for deck in decks:
+        did = col.decks.id_for_name(deck)
+        if not did:
+            continue
+        pre = deck.split("::")[-1] + " › " if len(decks) > 1 else ""
+        for name, _ in col.decks.children(did):
+            out.append({"label": pre + (name[len(deck) + 2:] or name), "query": planner.deck_query(name), "kind": "deck"})
+    if not decks:
         return out
-    for name, _ in col.decks.children(did):
-        out.append({"label": name[len(deck) + 2:] or name, "query": planner.deck_query(name), "kind": "deck"})
     tags = set()
-    cids = col.find_cards(planner.deck_query(deck))
+    cids = col.find_cards(" OR ".join(planner.deck_query(d) for d in decks))
     if cids:
         for tagstr, in col.db.all(f"select distinct n.tags from notes n join cards c on c.nid = n.id where c.id in {ids2str(cids)}"):
             tags.update(tagstr.split())
@@ -238,13 +245,25 @@ def activity(col, days=371):
     return out
 
 
+def find_decks(col, title, query, exclude=()):
+    """Deck-Vorschläge (nach Plan-Name) oder Suchtreffer, mit Kartenzahlen."""
+    names = [n for n in deck_names(col) if n not in exclude]
+    out = planner.rank_decks(title, names, query)
+    for r in out:
+        q = planner.deck_query(r["name"])
+        r["total"] = len(col.find_cards(q))
+        r["new"] = len(col.find_cards(f"{q} is:new -is:suspended")) if r["total"] else 0
+    return out
+
+
 def plan_dids(col, plan):
     dids = []
     for s in planner.anki_sources(plan):
-        did = col.decks.id_for_name(s["deck"])
-        if did:
-            dids.append(did)
-            dids.extend(d for _, d in col.decks.children(did))
+        for deck in planner.src_decks(s):
+            did = col.decks.id_for_name(deck)
+            if did:
+                dids.append(did)
+                dids.extend(d for _, d in col.decks.children(did))
     return list(dict.fromkeys(dids))
 
 

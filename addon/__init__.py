@@ -61,7 +61,7 @@ def home():
     heat = dict(act)
     for d in active:
         heat[d] = heat.get(d, 0) + 1
-    plans.sort(key=lambda p: (p["status"] != "active", p["exam"] if p["status"] == "active" else "~" + p["exam"]))
+    plans.sort(key=lambda p: (p["status"] != "active", (p["exam"] or "9999") if p["status"] == "active" else "~" + p["exam"]))
     return {"plans": plans, "today": t, "heat": heat, "streak": planner.streak(set(heat), t),
             "profile": store.profile(), "version": VERSION}
 
@@ -78,6 +78,8 @@ def handle(cmd, a):
         return view(a["id"])
     if cmd == "decks":
         return ankidata.deck_names(col)
+    if cmd == "findDecks":
+        return ankidata.find_decks(col, a.get("title", ""), a.get("q", ""), a.get("exclude") or ())
     if cmd == "deckInfo":
         return ankidata.deck_info(col, a["deck"])
     if cmd == "create":
@@ -95,7 +97,7 @@ def handle(cmd, a):
                 if s["type"] == "tasks":
                     ns["tasks"] = []
                 if s["type"] == "anki":
-                    ns["deck"], ns["maxNew"] = "", s.get("maxNew")
+                    ns["decks"], ns["maxNew"] = [], s.get("maxNew")
                 plan["sources"].append(ns)
         else:
             plan = store.new_plan(a["title"], a["exam"], a["start"], prof)
@@ -141,10 +143,12 @@ def handle(cmd, a):
         return True
     if cmd == "candidates":
         plan = a["plan"]
-        return {s["id"]: ankidata.candidates(col, s["deck"]) for s in planner.anki_sources(plan) if s.get("deck")}
+        return {s["id"]: ankidata.candidates(col, planner.src_decks(s)) for s in planner.anki_sources(plan)
+                if planner.src_decks(s)}
     if cmd == "suggest":
         plan = a["plan"]
-        cands = {s["id"]: ankidata.candidates(col, s["deck"]) for s in planner.anki_sources(plan) if s.get("deck")}
+        cands = {s["id"]: ankidata.candidates(col, planner.src_decks(s)) for s in planner.anki_sources(plan)
+                if planner.src_decks(s)}
         sugg = planner.suggest(plan, cands)
         if a.get("apply"):
             n = planner.apply_suggestions(plan, sugg)

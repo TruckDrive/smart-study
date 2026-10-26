@@ -125,3 +125,10 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 details summary { cursor: pointer; color: var(--muted); margin: 6px 0; }
 canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 @media (max-width: 600px) { .row, .form, .tl { grid-template-columns: 1fr; } }
+.deck-list { max-height: 260px; overflow: auto; margin-top: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.deck-list:empty { display: none; }
+.deck-row { display: flex; gap: 8px; align-items: center; padding: 5px 8px; cursor: pointer; border-bottom: 1px solid var(--line); font-size: 13px; }
+.deck-row:last-child { border-bottom: 0; }
+.deck-row:hover { background: var(--accent-bg); }
+.deck-row .dname { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.deck-row .add { color: var(--accent); font-weight: 700; }
