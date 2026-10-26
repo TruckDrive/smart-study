@@ -1,10 +1,11 @@
 # Everything that reads data from the Anki collection or creates decks.
 # Functions take the collection as an argument (in Anki: mw.col) so they
 # also work with a test collection.
+import html
+import random
 import re
 from datetime import date, datetime, timedelta
 
-from anki.errors import FilteredDeckError
 from anki.utils import ids2str
 
 from . import planner
@@ -147,93 +148,51 @@ def weak_search(col, plan, topic_ids=None):
             q = planner.topic_query(plan, t, src)
             if q:
                 parts.append(f"({q})")
-    if not parts:
+    base = f"({' OR '.join(parts)})" if parts else plan_query(plan)
+    if not base:
         return None
-    return f"({' OR '.join(parts)}) -is:new -is:suspended (prop:lapses>=3 OR rated:{max(1, min(days, 365))}:1)"
-
-
-def make_filtered(col, name, search, limit, order, reschedule=True):
-    """Create a filtered deck or (same name) rebuild it. Returns (did, card count)."""
-    did = col.decks.id_for_name(name)
-    if did and not col.decks.is_filtered(did):
-        raise ValueError(tr(f"Es gibt schon ein normales Deck namens „{name}“.", f"There already is a regular deck called “{name}”."))
-    deck = col.sched.get_or_create_filtered_deck(did or 0)
-    deck.name = name
-    term = deck.config.search_terms[0]
-    term.search = search
-    term.limit = limit
-    term.order = order
-    del deck.config.search_terms[1:]
-    deck.config.reschedule = reschedule
-    try:
-        did = col.sched.add_or_update_filtered_deck(deck).id
-    except FilteredDeckError:  # no matching cards
-        return None, 0
-    return did, len(col.find_cards(f'deck:"{name}"'))
+    return f"{base} -is:new -is:suspended (prop:lapses>=3 OR rated:{max(1, min(days, 365))}:1)"
 
 
 def study_target(col, plan, item):
-    """Where "▶ study" leads: (deck id, None) for a single existing deck,
-    otherwise a filtered deck with exactly the item's cards."""
-    if item.get("kind") == "reviews":
-        decks = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s)]
-        scoped = plan.get("onceOnly") or any(s.get("reviewsFrom") for s in planner.anki_sources(plan))
-        if len(decks) == 1 and not scoped and col.decks.id_for_name(decks[0]):
-            return col.decks.id_for_name(decks[0]), None
-        rq = planner.review_query(plan, today(col).isoformat())
-        if not rq:
-            raise ValueError(tr("Heute ist in diesem Plan nichts zu wiederholen.", "Nothing to review in this plan today."))
-        q, limit, name = f"{rq} is:due", 9999, tr("fällig", "due")
-        order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
-    else:
+    """Where "▶ study" leads: the topic's subdeck if it has one, otherwise the source's deck.
+    No filtered deck is created, so the cards stay in their normal decks."""
+    tq = ""
+    if item.get("kind") != "reviews":
         topic = next((t for t in plan.get("topics", []) if t["id"] == item.get("topic")), None)
         tq = (topic or {}).get("anki", {}).get(item.get("source"), "")
-        m = re.fullmatch(r'deck:"((?:[^"\\]|\\.)+)"', tq.strip())
-        if m:
-            did = col.decks.id_for_name(m.group(1).replace('\\"', '"'))
-            if did:
-                return did, None
-        q, limit, name = f"({item['auto']['query']}) is:new -is:suspended", int(item.get("cards") or 50), tr("jetzt lernen", "study now")
-        order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].ADDED
-    did, n = make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · {name}", q, limit, order)
-    return did, n
+    src = next(iter(planner.anki_sources(plan)), None) if item.get("kind") == "reviews" else \
+        next((s for s in planner.anki_sources(plan) if s["id"] == item.get("source")), None)
+    m = re.fullmatch(r'deck:"((?:[^"\\]|\\.)+)"', tq.strip())
+    name = m.group(1).replace('\\"', '"') if m else next(iter(planner.src_decks(src)), None) if src else None
+    did = col.decks.id_for_name(name) if name else None
+    return (did, None) if did else (None, 0)
 
 
-def ahead_deck(col, plan):
-    """Study ahead: cards that would only be due after the exam."""
+def mock_cards(col, plan, n):
+    """Random, already studied cards from the plan decks. They are shown in the add-on,
+    so no card is moved anywhere."""
     q = plan_query(plan)
-    n = (planner.s2d(plan["exam"]) - today(col)).days
-    name = f"{FILTER_PREFIX}::{plan['title']} · " + tr("vorziehen", "study ahead")
-    order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].DUE
-    return make_filtered(col, name, f"{q} is:review -is:suspended -is:buried prop:due>{max(0, n)}", 9999, order)
+    cids = col.find_cards(f"{q} -is:new -is:suspended -is:buried") if q else []
+    out = []
+    for cid in random.sample(cids, min(n, len(cids))):
+        card = col.get_card(cid)
+        out.append({"cid": cid, "q": _plain(card.question()), "a": _plain(card.answer().split("<hr id=answer>")[-1])})
+    return out
 
 
-def weak_deck(col, plan, topic_ids=None):
-    s = weak_search(col, plan, topic_ids)
-    if not s:
-        return None, 0
-    order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].LAPSES
-    return make_filtered(col, f"{FILTER_PREFIX}::{plan['title']} · " + tr("Schwachstellen", "weak spots"), s, 9999, order)
-
-
-def sim_deck(col, plan, n):
-    """Mock exam: random, already studied cards from all plan decks."""
-    q = plan_query(plan)
-    order = col.sched.get_or_create_filtered_deck(0).config.search_terms[0].RANDOM
-    name = f"{FILTER_PREFIX}::{plan['title']} · " + tr("Probeprüfung", "mock exam")
-    did, cnt = make_filtered(col, name, f"{q} -is:new -is:suspended", n, order)
-    return did, cnt, list(col.find_cards(f'deck:"{name}"')) if did else []
+def _plain(page):
+    text = re.sub(r"<style.*?</style>|<script.*?</script>", "", page, flags=re.S)
+    text = re.sub(r"<br\s*/?>|</div>|</p>", "\n", text)
+    return html.unescape(re.sub(r"<[^>]+>", "", text)).strip()
 
 
 def sim_result(col, plan, sim):
-    """First answer per card since the mock exam started, split by topic."""
+    """Right/wrong answers of the mock exam as marked in the add-on, split by topic."""
     cids = sim.get("cards") or []
     if not cids:
         return None
-    first = {}
-    for cid, ease in col.db.all(f"select cid, ease from revlog where id >= ? and ease > 0 and cid in {ids2str(cids)} order by id",
-                                sim["started"]):
-        first.setdefault(cid, ease)
+    answers = {int(k): bool(v) for k, v in (sim.get("answers") or {}).items()}
     per = []
     for t in plan.get("topics", []):
         ids = set()
@@ -241,11 +200,11 @@ def sim_result(col, plan, sim):
             q = planner.topic_query(plan, t, src)
             if q:
                 ids.update(col.find_cards(q))
-        hit = [c for c in first if c in ids]
+        hit = [c for c in answers if c in ids]
         if hit:
-            per.append({"name": t["name"], "n": len(hit), "ok": sum(1 for c in hit if first[c] > 1)})
+            per.append({"name": t["name"], "n": len(hit), "ok": sum(1 for c in hit if answers[c])})
     per.sort(key=lambda p: p["ok"] / p["n"])
-    return {"total": len(cids), "answered": len(first), "ok": sum(1 for e in first.values() if e > 1), "topics": per}
+    return {"total": len(cids), "answered": len(answers), "ok": sum(answers.values()), "topics": per}
 
 
 def forecast(col, plan):

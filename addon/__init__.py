@@ -9,7 +9,7 @@ import time
 import traceback
 
 from anki.lang import current_lang
-from aqt import gui_hooks, mw
+from aqt import dialogs, gui_hooks, mw
 from aqt.qt import QAction, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
@@ -18,7 +18,7 @@ from . import ankidata, planner, store
 from .planner import tr
 
 NAME = "Smart Study Plan"
-VERSION = "0.1.1"
+VERSION = "0.2.0"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
 mw.addonManager.setWebExports(MODULE, r"web/.*\.(js|css)")
@@ -217,19 +217,26 @@ def handle(cmd, a):
         target["items"].extend(i for i in items if i["topic"] not in have)
         store.save(plan)
         return {"day": target["d"], "n": len(items)}
-    if cmd == "filtered":
+    if cmd == "weakBrowse":
         plan = store.load(a["id"])
-        if a["kind"] == "ahead":
-            did, n = ankidata.ahead_deck(col, plan)
-        elif a["kind"] == "weak":
-            did, n = ankidata.weak_deck(col, plan, a.get("topics"))
-        else:
-            did, n, cids = ankidata.sim_deck(col, plan, int(a.get("n", 50)))
-            plan["sim"] = {"started": int(time.time() * 1000), "cards": cids, "minutes": int(a.get("minutes", 30)),
-                           "deck": did}
-            store.save(plan)
-        mw.reset()
-        return {"did": did, "count": n}
+        search = ankidata.weak_search(col, plan, a.get("topics"))
+        if not search:
+            return {"ok": False}
+        browser = dialogs.open("Browser", mw)
+        browser.search_for(search)
+        return {"ok": True}
+    if cmd == "mockStart":
+        plan = store.load(a["id"])
+        cards = ankidata.mock_cards(col, plan, int(a.get("n", 50)))
+        minutes = int(a.get("minutes", 30))
+        plan["sim"] = {"started": int(time.time() * 1000), "cards": [c["cid"] for c in cards], "answers": {}, "minutes": minutes}
+        store.save(plan)
+        return {"cards": cards, "minutes": minutes}
+    if cmd == "mockAnswer":
+        plan = store.load(a["id"])
+        plan["sim"]["answers"][str(a["cid"])] = bool(a["ok"])
+        store.save(plan)
+        return True
     if cmd == "openLink":
         if not str(a["url"]).startswith(("http://", "https://", "file://")):
             raise ValueError(tr("nur Web-Links oder Dateien", "only web links or files"))
@@ -259,9 +266,8 @@ def handle(cmd, a):
         mw.activateWindow()
         mw.raise_()
         return True
-    if cmd == "simStop":
+    if cmd == "mockStop":
         plan = store.load(a["id"])
-        plan.setdefault("sim", {})["stopped"] = int(time.time() * 1000)
         res = ankidata.sim_result(col, plan, plan["sim"])
         plan["sim"]["result"] = res
         plan.setdefault("simHistory", []).append({"at": time.strftime("%Y-%m-%d"), "result": res})
