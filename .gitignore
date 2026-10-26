@@ -1,0 +1,4 @@
+__pycache__/
+addon/meta.json
+addon/user_files/
+dist/
