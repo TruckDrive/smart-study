@@ -228,7 +228,7 @@ function renderPlan(root) {
   if (plan.sources.some(s => s.type === "anki")) tiles.append(tile(L("Jetzt fällig", "Due now"), String(stats.due), null, stats.due === 0 ? "✓" : L("Karten", "cards")));
   root.append(tiles);
 
-  if (plan.sim && (plan.sim.started || plan.sim.result)) root.append(simPanel());
+  if (S.mock) root.append(mockPanel());
 
   if (overdue.length) root.append(h("div", { class: "card warn" }, h("h2", null, L(`${overdue.length} Punkte von vergangenen Tagen offen`, `${overdue.length} items from past days still open`)),
     h("p", { class: "small", style: "margin:4px 0 8px" }, L("„Neu planen“ verteilt sie (und alles andere, was noch offen ist) auf die Tage bis zur Prüfung.", "“Replan” spreads them (and everything else still open) over the days until the exam.")),
@@ -245,7 +245,7 @@ function renderPlan(root) {
         h("button", { onclick: async () => { await run(call("archive", { id: plan.id, on: true })); toast(L("Archiviert.", "Archived.")); go("home"); } }, L("Archivieren", "Archive")))));
   } else {
     root.append(h("details", { open: store.get("toolsOpen") || null, ontoggle: e => store.set("toolsOpen", e.target.open) },
-      h("summary", null, L("Werkzeuge: Schwachstellen · Vorziehen · Probeprüfung", "Tools: weak spots · study ahead · mock exam")), toolsPanel(false)));
+      h("summary", null, L("Werkzeuge: Schwachstellen · Probeprüfung", "Tools: weak spots · mock exam")), toolsPanel(false)));
   }
   if (progress[1] && progress[0] === progress[1] && phase !== "after") celebrate(plan.id);
 
@@ -301,7 +301,7 @@ function itemEl(it, day) {
   const { plan, ev } = S.data;
   if (it.kind === "note") return h("div", { class: "plain" }, it.text);
   if (it.kind === "weakround") return h("div", null, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
-    h("button", { onclick: () => weakDialog() }, L("Schwachstellen ansehen & einplanen", "View & schedule weak spots")), h("button", { onclick: () => filtered("weak") }, L("Schwache Karten lernen", "Study weak cards"))));
+    h("button", { onclick: () => weakDialog() }, L("Schwachstellen ansehen & einplanen", "View & schedule weak spots")), h("button", { onclick: () => weakBrowse() }, L("Schwache Karten lernen", "Study weak cards"))));
   if (it.kind === "sim") return h("div", null, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
     h("button", { class: "primary", onclick: () => simStart() }, L("Probeprüfung starten", "Start mock exam"))));
   const r = ev[it.id], auto = !!it.auto, done = itemDone(it);
@@ -340,8 +340,6 @@ function toolsPanel(early) {
   return h("div", { class: "panel-tools" },
     h("div", { class: "tool" }, h("b", null, L("Schwachstellen-Runde", "Weak spots round")), h("p", null, L("Findet die Themen mit den meisten Fehlern in Anki und plant Handbuch, Video und schwache Karten dafür neu ein.", "Finds the topics with the most mistakes in Anki and schedules the book pages, video and weak cards for them again.")),
       h("button", { class: early ? "primary" : null, onclick: () => weakDialog() }, L("Schwachstellen ansehen", "View weak spots"))),
-    h("div", { class: "tool" }, h("b", null, L("Vorziehen", "Study ahead")), h("p", null, L("Gefiltertes Deck mit Karten, die erst nach der Prüfung fällig wären – damit du sie vorher noch einmal siehst.", "Filtered deck with cards that would only be due after the exam – so you see them once more before it.")),
-      h("button", { onclick: () => filtered("ahead") }, L("Deck „vorziehen“ erstellen", "Create “study ahead” deck"))),
     h("div", { class: "tool" }, h("b", null, L("Probeprüfung", "Mock exam")), h("p", null, L("Zufällige Karten aus allen Decks auf Zeit, ohne Kapitel-Hinweis, plus Themen zum freien Erklären.", "Random cards from all decks against the clock, without chapter hints, plus topics to explain freely.")),
       h("button", { onclick: () => simStart() }, L("Probeprüfung starten", "Start mock exam"))));
 }
@@ -354,54 +352,58 @@ async function weakDialog() {
     h("h3", null, L("Wird eingeplant", "Will be scheduled")), h("ul", { class: "weak-list" }, r.items.map(i => h("li", null, i.text))));
   const v = await modal(L("Schwachstellen seit Planbeginn", "Weak spots since the plan started"), body, [[L("Schließen", "Close"), null], [L("Nur Karten lernen", "Only study cards"), "cards"], [L("Einplanen", "Schedule"), "plan", "primary"]]);
   if (v === "plan") { const x = await run(call("addWeak", { id: S.pid })); toast(L(`Eingeplant am ${fmt(x.day)}.`, `Scheduled on ${fmt(x.day)}.`)); refresh(); }
-  if (v === "cards") filtered("weak");
+  if (v === "cards") weakBrowse();
 }
 
-async function filtered(kind, extra) {
-  const r = await run(call("filtered", Object.assign({ id: S.pid, kind }, extra || {})));
-  if (!r.count) { toast(kind === "ahead" ? L("Keine Karten, die erst nach der Prüfung fällig wären.", "No cards that would only be due after the exam.") : L("Keine passenden Karten gefunden.", "No matching cards found.")); return r; }
-  if (kind !== "sim") {
-    const v = await modal(L("Deck erstellt", "Deck created"), h("p", null, L(`${r.count} Karten im gefilterten Deck. Es liegt unter „Smart Study Plan“ in deiner Deckliste.`, `${r.count} cards in the filtered deck. You'll find it under “Smart Study Plan” in your deck list.`)), [[L("Später", "Later"), null], [L("Jetzt lernen", "Study now"), true, "primary"]]);
-    if (v) call("study", { did: r.did });
-  }
-  return r;
+async function weakBrowse() {
+  const b = await run(call("weakBrowse", { id: S.pid }));
+  if (!b.ok) toast(L("Keine schwachen Karten gefunden.", "No weak cards found."));
 }
-
 async function simStart() {
   const n = h("input", { type: "number", value: 50, min: 5, max: 500 }), m = h("input", { type: "number", value: 30, min: 5, max: 240 });
   const ok = await modal(L("Probeprüfung", "Mock exam"), h("div", null, h("div", { class: "form" }, h("label", null, L("Karten", "Cards")), n, h("label", null, L("Zeit (Minuten)", "Time (minutes)")), m),
-    h("p", { class: "muted small" }, L("Es wird ein gefiltertes Deck mit zufälligen, schon gelernten Karten erstellt. Lerne es im Hauptfenster; hier läuft die Uhr. Danach siehst du, welche Themen sitzen.", "A filtered deck with random, already studied cards is created. Study it in the main window; the clock runs here. Afterwards you see which topics stick."))), [[L("Abbrechen", "Cancel"), null], [L("Starten", "Start"), true, "primary"]]);
+    h("p", { class: "muted small" }, L("Zufällige, schon gelernte Karten werden hier gezeigt. Nichts wird in deinen Decks verschoben. Antwort zeigen, dann richtig oder falsch markieren.", "Random, already studied cards are shown here. Nothing is moved in your decks. Show the answer, then mark it right or wrong."))), [[L("Abbrechen", "Cancel"), null], [L("Starten", "Start"), true, "primary"]]);
   if (!ok) return;
-  const r = await filtered("sim", { n: +n.value, minutes: +m.value });
-  if (r.count) { await refresh(); call("study", { did: r.did }); }
+  const r = await run(call("mockStart", { id: S.pid, n: +n.value, minutes: +m.value }));
+  if (!r.cards.length) return toast(L("Noch keine gelernten Karten in den Plan-Decks.", "No studied cards in the plan decks yet."));
+  S.mock = { cards: r.cards, i: 0, shown: false, ok: 0, started: Date.now(), minutes: r.minutes };
+  render();
 }
-
-function simPanel() {
-  const { plan, simResult } = S.data, sim = plan.sim || {};
+async function mockAnswer(cur, right) {
+  await run(call("mockAnswer", { id: S.pid, cid: cur.cid, ok: right }));
+  S.mock.i++; S.mock.shown = false; if (right) S.mock.ok++;
+  render();
+}
+async function mockStop() {
+  const r = await run(call("mockStop", { id: S.pid }));
+  clearInterval(S.simTimer); S.mock = null; render();
+  modal(L("Probeprüfung – Ergebnis", "Mock exam – result"), simTable(r), [["OK", true, "primary"]]);
+}
+function mockPanel() {
+  const m = S.mock, cur = m.cards[m.i];
   const card = h("div", { class: "card hl" });
-  if (sim.started) {
-    const end = sim.started + sim.minutes * 60e3;
-    const timer = h("div", { class: "timer" });
-    const tick = () => { const s = Math.max(0, Math.round((end - Date.now()) / 1000)); timer.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; if (!s) timer.style.color = "var(--bad)"; };
-    tick(); clearInterval(S.simTimer); S.simTimer = setInterval(() => document.body.contains(timer) ? tick() : clearInterval(S.simTimer), 1000);
-    const topics = plan.topics.slice().sort(() => Math.random() - .5).slice(0, 3);
-    card.append(h("h2", null, L("Probeprüfung läuft", "Mock exam running")), timer,
-      h("div", { class: "small muted" }, simResult ? L(`${simResult.answered}/${simResult.total} Karten beantwortet · ${simResult.ok} richtig`, `${simResult.answered}/${simResult.total} cards answered · ${simResult.ok} correct`) : ""),
-      topics.length ? h("p", { class: "small" }, L("Frei erklären (laut, ohne Unterlagen): ", "Explain freely (out loud, without notes): "), h("b", null, topics.map(t => t.name).join(" · "))) : null,
-      h("div", { class: "bar-actions" }, h("button", { onclick: () => call("study", { did: sim.deck }) }, L("Zum Lernen", "Go study")),
-        h("button", { class: "primary", onclick: async () => { const r = await run(call("simStop", { id: plan.id })); showSim(r); refresh(); } }, L("Beenden & auswerten", "Finish & evaluate"))));
-  } else if (sim.result) {
-    card.append(h("h2", null, L("Letzte Probeprüfung", "Last mock exam")), simTable(sim.result));
+  const end = m.started + m.minutes * 60e3;
+  const timer = h("div", { class: "timer" });
+  const tick = () => { const s = Math.max(0, Math.round((end - Date.now()) / 1000)); timer.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; if (!s) timer.style.color = "var(--bad)"; };
+  tick(); clearInterval(S.simTimer); S.simTimer = setInterval(() => document.body.contains(timer) ? tick() : clearInterval(S.simTimer), 1000);
+  card.append(h("h2", null, L("Probeprüfung läuft", "Mock exam running")), timer,
+    h("div", { class: "small muted" }, cur ? L(`Karte ${m.i + 1} von ${m.cards.length} · ${m.ok} richtig bisher`, `Card ${m.i + 1} of ${m.cards.length} · ${m.ok} right so far`) : L(`Alle ${m.cards.length} Karten durch · ${m.ok} richtig`, `All ${m.cards.length} cards done · ${m.ok} right`)));
+  if (cur) {
+    card.append(h("p", { style: "white-space:pre-wrap" }, cur.q));
+    if (m.shown) card.append(h("p", { style: "white-space:pre-wrap" }, cur.a), h("div", { class: "bar-actions" },
+      h("button", { class: "primary", onclick: () => mockAnswer(cur, true) }, L("Richtig", "Right")), h("button", { onclick: () => mockAnswer(cur, false) }, L("Falsch", "Wrong"))));
+    else card.append(h("div", { class: "bar-actions" }, h("button", { class: "primary", onclick: () => { m.shown = true; render(); } }, L("Antwort zeigen", "Show answer"))));
   }
+  card.append(h("div", { class: "bar-actions" }, h("button", { onclick: mockStop }, L("Beenden & auswerten", "Finish & evaluate"))));
   return card;
 }
+
 function simTable(r) {
   if (!r || !r.answered) return h("p", { class: "muted" }, L("Keine Antworten gefunden.", "No answers found."));
   return h("div", null, h("p", null, `${r.ok}/${r.answered} ${L("richtig", "correct")} (${Math.round(100 * r.ok / r.answered)} %)`),
     r.topics.length ? h("table", null, h("tr", null, h("th", null, L("Thema", "Topic")), h("th", null, L("richtig", "correct"))),
       r.topics.map(t => h("tr", null, h("td", null, t.name), h("td", null, `${t.ok}/${t.n}`)))) : null);
 }
-function showSim(r) { modal(L("Probeprüfung – Ergebnis", "Mock exam – result"), simTable(r), [["OK", true, "primary"]]); }
 
 // ---------- Confetti ----------
 function celebrate(pid) {

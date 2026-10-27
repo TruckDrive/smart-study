@@ -21,10 +21,10 @@ You tell Smart Study Plan what you have to learn (book pages, videos, lists of t
 
 **While studying**
 - **Auto checkmarks**: card and review items are checked off from your Anki activity, everything else with a click
-- **▶ study** opens the right deck (or a filtered deck with exactly that item's cards), **📖 open** opens the PDF at the right page (Okular/Evince)
+- **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **📖 open** opens the PDF at the right page (Okular/Evince)
 - **Weak spots round**: finds the topics with the most mistakes and schedules the pages, video and weak cards for them again
-- **Study ahead**: a filtered deck with cards that would only be due after the exam
-- **Mock exam**: random studied cards against the clock, plus random topics to explain out loud, with a per-topic result
+- **Weak cards** open in Anki's browser with a search, nothing gets moved
+- **Mock exam** runs in the plan window: random studied cards against the clock, show the answer, mark it right or wrong, with a per-topic result
 
 **Afterwards**
 - **Retrospective**: planned vs. done, on time vs. late, per source, time spent in Anki and your measured pace, which becomes the default for your next plan
@@ -71,7 +71,7 @@ ln -s "$PWD/smart-study-plan/addon" ~/.local/share/Anki2/addons21/smart_study_pl
 5. **Topics**: paste the table of contents (`Peritoneum ...... 78`) or create topics from subdecks, then **Suggest links automatically** and check the ★ suggestions.
 6. **Create plan**. From then on, study in Anki as usual; the plan keeps up.
 
-Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. Filtered decks created by the add-on live under a `Smart Study Plan` parent deck.
+Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. They are also kept in your Anki collection, so **AnkiWeb sync brings them to your other devices** (install the add-on there too). If you change a plan on two devices without syncing in between, the newer copy wins. The add-on does not create filtered decks any more.
 
 ## Development
 
