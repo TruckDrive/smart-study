@@ -71,7 +71,7 @@ ln -s "$PWD/smart-study-plan/addon" ~/.local/share/Anki2/addons21/smart_study_pl
 5. **Topics**: paste the table of contents (`Peritoneum ...... 78`) or create topics from subdecks, then **Suggest links automatically** and check the ★ suggestions.
 6. **Create plan**. From then on, study in Anki as usual; the plan keeps up.
 
-Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. The add-on does not create filtered decks any more.
+Your plans are stored as JSON in the add-on folder under `user_files/plans/`, so they survive add-on updates. They are also kept in your Anki collection, so **AnkiWeb sync brings them to your other devices** (install the add-on there too). If you change a plan on two devices without syncing in between, the newer copy wins. The add-on does not create filtered decks any more.
 
 ## Development
 

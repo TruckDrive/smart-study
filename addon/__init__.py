@@ -18,7 +18,7 @@ from . import ankidata, planner, store
 from .planner import tr
 
 NAME = "Smart Study Plan"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
 mw.addonManager.setWebExports(MODULE, r"web/.*\.(js|css)")
@@ -395,5 +395,19 @@ action.triggered.connect(open_window)
 mw.form.menuTools.addAction(action)
 gui_hooks.top_toolbar_did_init_links.append(_toolbar)
 gui_hooks.reviewer_did_answer_card.append(_changed)
+gui_hooks.sync_did_finish.append(_changed)  # plans may have arrived from another device
+
+
+def _store_plans(*_):
+    """Puts plans that were written as files (e.g. by a script) into the collection, so the sync takes them along."""
+    try:
+        store.list_plans()
+        store.profile()
+    except Exception:
+        traceback.print_exc()
+
+
+gui_hooks.sync_will_start.append(_store_plans)
+gui_hooks.profile_did_open.append(_store_plans)
 gui_hooks.operation_did_execute.append(lambda changes, handler: _changed())
 gui_hooks.profile_will_close.append(_profile_closing)
