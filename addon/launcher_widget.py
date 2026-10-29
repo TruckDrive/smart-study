@@ -206,6 +206,8 @@ class SidebarWidget(QWidget):
             constants.GAME_ICON_FILENAME: ("gamification_sidebar_enabled", getattr(study_plan_trigger, 'trigger_gamification_sidebar_action', None), "GamificationSidebar"),
         }
         
+        self._feature_actions = {dock: action for _key, action, dock in feature_map.values() if dock}
+
         top_icon_definitions = [
             (constants.AI_TOOL_ICON_FILENAME, _("Show/Hide AI Assistant")), (constants.WEBSITE_ICON_FILENAME, _("Show/Hide Website Viewer")),
             (constants.NOTEBOOK_ICON_FILENAME, _("Show/Hide Notebook")), (constants.MINDMAP_ICON_FILENAME, _("Show/Hide MindMap")),
@@ -302,6 +304,9 @@ class SidebarWidget(QWidget):
         Handles the button click. Executes the module action first (which should lazy-load 
         the widget if it's not created yet), then attempts to connect the visibility listeners.
         """
+        target = mw.findChild(QDockWidget, dock_name) if (mw and dock_name) else None
+        if not (target is not None and target.isVisible()):
+            self._close_other_features(dock_name)
         try:
             if callable(action_func):
                 action_func()
@@ -310,6 +315,20 @@ class SidebarWidget(QWidget):
 
         if dock_name and dock_name not in self._dock_visibility_connections:
             self._setup_dock_visibility_connection(button_weak_ref, dock_name)
+
+    def _close_other_features(self, keep_dock_name: Optional[str]):
+        """Only one launcher tool may be open: close every other visible tool first."""
+        if not mw:
+            return
+        for dock_name, action_func in getattr(self, "_feature_actions", {}).items():
+            if dock_name == keep_dock_name or not callable(action_func):
+                continue
+            other = mw.findChild(QDockWidget, dock_name)
+            if other is not None and other.isVisible():
+                try:
+                    action_func()
+                except Exception as e:
+                    print(f"Error closing sidebar {dock_name}: {e}")
 
     def _setup_dock_visibility_connection(self, button_weak_ref: weakref.ReferenceType['PushButtonType'], dock_object_name: str):
         button = button_weak_ref() if button_weak_ref else None
