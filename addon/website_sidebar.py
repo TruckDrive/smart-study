@@ -29,6 +29,7 @@ try:
                         QSize, Qt, QByteArray, QDesktopServices)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
+    from PyQt6 import sip
     WebAction = QWebEnginePage.WebAction
     print("Website Sidebar: Using Qt6 components")
     _qt_available = True
@@ -740,21 +741,29 @@ def create_website_dock() -> Optional[QDockWidget]:
         button_container_layout.addWidget(home_button_widget) 
         button_container_layout.addStretch(1)
 
-        page = sidebar_webview.page()
-        if page and QAction is not object and WebAction is not object:
-            action_enum = WebAction if hasattr(WebAction, 'Back') else QWebEnginePage.WebAction
-            back_action = page.action(action_enum.Back)
-            forward_action = page.action(action_enum.Forward)
-            reload_action = page.action(action_enum.Reload)
-            if qconnect and back_button and forward_button and refresh_button:
-                qconnect(back_button.clicked, lambda: diagnostics.record('browser.back'))
-                qconnect(forward_button.clicked, lambda: diagnostics.record('browser.forward'))
-                qconnect(refresh_button.clicked, lambda: diagnostics.record('browser.reload'))
-                qconnect(back_button.clicked, back_action.trigger)
-                qconnect(forward_button.clicked, forward_action.trigger)
-                qconnect(refresh_button.clicked, reload_action.trigger)
-                qconnect(back_action.changed, lambda: back_button.setEnabled(back_action.isEnabled()) if back_button is not None else None)
-                qconnect(forward_action.changed, lambda: forward_button.setEnabled(forward_action.isEnabled()) if forward_button is not None else None)
+        # Navigation goes through the view and the button state is read from
+        # the history after each URL change.  Connecting Python slots to the
+        # page's Back/Forward QAction.changed signals crashed Anki (SIGSEGV
+        # inside QWebEnginePagePrivate::updateNavigationActions) while searching.
+        if qconnect and back_button and forward_button and refresh_button:
+            qconnect(back_button.clicked, lambda: diagnostics.record('browser.back'))
+            qconnect(forward_button.clicked, lambda: diagnostics.record('browser.forward'))
+            qconnect(refresh_button.clicked, lambda: diagnostics.record('browser.reload'))
+            qconnect(back_button.clicked, view.back)
+            qconnect(forward_button.clicked, view.forward)
+            qconnect(refresh_button.clicked, view.reload)
+            buttons = (back_button, forward_button)
+            def sync_nav_buttons(*_args):
+                # Deferred, so the page has finished updating its history.
+                def apply():
+                    if sip.isdeleted(view) or any(sip.isdeleted(b) for b in buttons):
+                        return
+                    history = view.history()
+                    buttons[0].setEnabled(history.canGoBack())
+                    buttons[1].setEnabled(history.canGoForward())
+                QTimer.singleShot(0, apply)
+            qconnect(view.urlChanged, sync_nav_buttons)
+            qconnect(view.loadFinished, sync_nav_buttons)
         
         if qconnect and not hasattr(sidebar_webview, '_urlChangedConnected_ws'):
             qconnect(sidebar_webview.urlChanged, on_webview_url_changed)
