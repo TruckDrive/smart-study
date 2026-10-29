@@ -79,6 +79,20 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 
 ![Retrospective](screenshots/review.png)
 
+**Workspace**: notebook with PDF viewer, mind maps, AI assistant and website sidebar, all next to your Anki cards
+
+| Notebook with PDF viewer | Mind maps |
+|---|---|
+| ![Notebook](screenshots/workspace-notebook.png) | ![Mind map](screenshots/workspace-mindmap.png) |
+
+| AI assistant | Website sidebar (DuckDuckGo) |
+|---|---|
+| ![AI assistant](screenshots/workspace-ai-assistant.png) | ![Website](screenshots/workspace-website.png) |
+
+**Study plan window**: all your plans, streak and activity at a glance
+
+![Study plan window](screenshots/workspace-study-plan.png)
+
 ## Install
 
 Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
