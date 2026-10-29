@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import re
 from typing import Optional
 
 from aqt import mw
@@ -612,7 +613,15 @@ html:has(body.nightMode.smartstudy-custom-background.top-toolbar) #header:has(a#
     studied_mode = str(
         _settings.get("custom_background_studied_text", "dark") or "dark"
     ).lower()
-    if studied_mode == "light":
+    custom = str(_settings.get("custom_background_studied_color") or "")
+    if studied_mode == "custom" and re.fullmatch(r"#[0-9A-Fa-f]{6}", custom):
+        studied_color = custom
+        # A shadow in the opposite brightness keeps any colour readable.
+        r, g, b = (int(custom[i:i + 2], 16) for i in (1, 3, 5))
+        light = 0.299 * r + 0.587 * g + 0.114 * b > 140
+        studied_shadow = ("0 1px 3px rgba(0,0,0,0.58)" if light
+                          else "0 1px 2px rgba(255,255,255,0.32)")
+    elif studied_mode == "light":
         studied_color = "#ffffff"
         studied_shadow = "0 1px 3px rgba(0,0,0,0.58)"
     else:

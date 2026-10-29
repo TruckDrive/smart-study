@@ -164,7 +164,8 @@ def get_default_settings() -> Dict[str, Any]:
         "custom_background_blur": 0,
         "custom_background_overlay": 0,
         "custom_background_position": "center",
-        "custom_background_studied_text": "dark",
+        "custom_background_studied_text": "dark",  # "dark", "light" or "custom"
+        "custom_background_studied_color": "#FFFFFF",  # used with "custom"
         "deck_counter_colors_enabled": False,
         "deck_counter_new_light": "#0071D3",
         "deck_counter_learn_light": "#E60012",

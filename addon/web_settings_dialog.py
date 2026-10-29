@@ -257,6 +257,8 @@ if _QT_AVAILABLE:
             s["deck_counter_colors_enabled"] = bool(s.get("deck_counter_colors_enabled", False))
             for key, fallback in _COUNTER_COLOR_DEFAULTS.items():
                 s[key] = _safe_counter_color(s.get(key), fallback)
+            s["custom_background_studied_color"] = _safe_counter_color(
+                s.get("custom_background_studied_color"), "#FFFFFF")
             return s
 
         # -- bridge ----------------------------------------------------------
@@ -748,9 +750,12 @@ if _QT_AVAILABLE:
                     else "center"
                 ),
                 "custom_background_studied_text": (
-                    "light" if cfg.get("custom_background_studied_text") == "light"
+                    cfg.get("custom_background_studied_text")
+                    if cfg.get("custom_background_studied_text") in ("light", "custom")
                     else "dark"
                 ),
+                "custom_background_studied_color": _safe_counter_color(
+                    cfg.get("custom_background_studied_color"), "#FFFFFF"),
                 "deck_counter_colors_enabled": bool(cfg.get("deck_counter_colors_enabled", False)),
                 "sidebar_shortcuts": dict(self._shortcut_values),
             }

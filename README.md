@@ -23,6 +23,7 @@ ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Lin
 - **Same add-ons on all your devices**: Smart Study asks once whether to sync your AnkiWeb add-ons; other devices then offer to install what is missing
 - **Install add-ons by code** under *Settings → Add-ons*
 - **New color Orange** and the **Orange Pixel Wallpaper** example background
+- **Your own text color** for the "Studied … today" line on custom backgrounds
 - The leftover "Study Plan" decks from early versions are now called **Smart Study system data**
 
 ## What's new in 2.2

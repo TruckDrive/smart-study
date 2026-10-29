@@ -537,7 +537,8 @@
               <div class="row"><div class="rl"><div class="rt">Blur</div><div class="rd">Applied once and cached for smooth performance.</div></div><div class="rc range-control"><input type="range" id="custom_background_blur" min="0" max="30" step="1"><span class="range-value" id="customBackgroundBlurValue">0 px</span></div></div>
               <div class="row"><div class="rl"><div class="rt">Dark Overlay</div><div class="rd">Darkens the image to improve readability.</div></div><div class="rc range-control"><input type="range" id="custom_background_overlay" min="0" max="70" step="1"><span class="range-value" id="customBackgroundOverlayValue">0%</span></div></div>
               <div class="row"><div class="rl"><div class="rt">Image Position</div><div class="rd">Choose which part of the image stays visible when it is cropped.</div></div><div class="rc"><select class="field" id="custom_background_position"><option value="top">Top</option><option value="center">Center</option><option value="bottom">Bottom</option></select></div></div>
-              <div class="row"><div class="rl"><div class="rt">Studied Text</div><div class="rd">Choose a light or dark colour for the studied-today summary.</div></div><div class="rc"><select class="field" id="custom_background_studied_text"><option value="dark">Dark</option><option value="light">Light</option></select></div></div>
+              <div class="row"><div class="rl"><div class="rt">Studied Text</div><div class="rd">Choose a light, dark or your own colour for the studied-today summary.</div></div><div class="rc"><select class="field" id="custom_background_studied_text"><option value="dark">Dark</option><option value="light">Light</option><option value="custom">Custom</option></select></div></div>
+              <div class="row" id="studiedColorRow" hidden><div class="rl"><div class="rt">Text Colour</div><div class="rd">Pick a colour that is easy to read on your wallpaper.</div></div><div class="rc"><input type="color" id="custom_background_studied_color" style="width:44px;height:30px;padding:2px;border:1px solid var(--group-border);border-radius:6px;cursor:pointer;"></div></div>
               <div class="row">
                 <div class="rl"><div class="rt">Show while studying</div><div class="rd">Use the same image behind your learning cards.</div></div>
                 <div class="rc"><label class="switch"><input type="checkbox" id="custom_background_review_enabled" aria-label="Show while studying" onchange="requestReviewBackground()"><span class="slider"></span></label></div>
@@ -1156,7 +1157,9 @@
       document.getElementById('custom_background_blur').value = Number(cfg.custom_background_blur)||0;
       document.getElementById('custom_background_overlay').value = Number(cfg.custom_background_overlay)||0;
       setSelect('custom_background_position', ['top','center','bottom'].indexOf(cfg.custom_background_position)>=0 ? cfg.custom_background_position : 'center');
-      setSelect('custom_background_studied_text', cfg.custom_background_studied_text === 'light' ? 'light' : 'dark');
+      setSelect('custom_background_studied_text', ['light','custom'].indexOf(cfg.custom_background_studied_text)>=0 ? cfg.custom_background_studied_text : 'dark');
+      document.getElementById('custom_background_studied_color').value = /^#[0-9a-fA-F]{6}$/.test(cfg.custom_background_studied_color||'') ? cfg.custom_background_studied_color : '#FFFFFF';
+      document.getElementById('custom_background_studied_text').addEventListener('change', syncCustomBackgroundControls);
       updateCustomBackground(data.customBackground || {});
       _exampleWallpapers=(data.customBackground&&Array.isArray(data.customBackground.examples))?data.customBackground.examples:[];
       customEnabled.addEventListener('change', syncCustomBackgroundControls);
@@ -1295,7 +1298,8 @@
       custom_background_blur: Number(val('custom_background_blur')) || 0,
       custom_background_overlay: Number(val('custom_background_overlay')) || 0,
       custom_background_position: ['top','center','bottom'].indexOf(val('custom_background_position'))>=0 ? val('custom_background_position') : 'center',
-      custom_background_studied_text: val('custom_background_studied_text') === 'light' ? 'light' : 'dark',
+      custom_background_studied_text: ['light','custom'].indexOf(val('custom_background_studied_text'))>=0 ? val('custom_background_studied_text') : 'dark',
+      custom_background_studied_color: String(val('custom_background_studied_color')||'#FFFFFF').toUpperCase(),
       deck_counter_colors_enabled: !!document.getElementById('deck_counter_colors_enabled').checked,
       deck_counter_new_light: counterColorValue('deck_counter_new_light'),
       deck_counter_learn_light: counterColorValue('deck_counter_learn_light'),
@@ -1350,6 +1354,7 @@
     preview.style.setProperty('--preview-overlay',String(overlay/100));
     var position=val('custom_background_position');
     document.getElementById('customBackgroundImage').style.objectPosition='center '+(position==='top'?'top':position==='bottom'?'bottom':'center');
+    document.getElementById('studiedColorRow').hidden = val('custom_background_studied_text')!=='custom';
   }
   function resetCustomBackgroundDefaults(){
     document.getElementById('custom_background_review_enabled').checked=false;
