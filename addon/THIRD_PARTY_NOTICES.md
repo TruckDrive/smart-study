@@ -14,10 +14,6 @@ Public License v3; each folder keeps its original license file.
   Glutanimate. [Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
   Licensed under the AGPL v3 with the additional terms in
   `integrations/heatmap/LICENSE.txt`. Modified: config storage and paths.
-- `integrations/progress_bar/` – Progress bar (Fork for 23) by Shigeyuki
-  (2024–2026), based on work by nest0r/Ja-Dark, SebastienGllmt, Glutanimate,
-  liuzikai, BluMist and others. Modified: config storage, no change-log
-  popups, Tools menu or achievement module.
 - `integrations/contanki/` – Contanki by Sam Bradshaw
   (<https://github.com/roxgib/anki-contanki>). Modified: config and user
   files location, controller scanning and identification.

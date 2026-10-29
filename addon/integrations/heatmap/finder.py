@@ -36,6 +36,7 @@ Finder extensions
 import re
 from typing import TYPE_CHECKING, List, Optional
 
+from anki.utils import ids2str
 from aqt import mw
 
 if TYPE_CHECKING:
@@ -43,21 +44,28 @@ if TYPE_CHECKING:
 
 
 # FIXME: No longer works in combination with other search specifiers
-# e.g. deck:current, which we actually add in the overview view
+# (Smart Study: except the "deck:current" prefix added in the overview view)
 
 
-def _find_cards_reviewed_between(start_date: int, end_date: int) -> List[int]:
+def _find_cards_reviewed_between(
+    start_date: int, end_date: int, current_deck_only: bool = False
+) -> List[int]:
     # select from cards instead of just selecting uniques from revlog
     # in order to exclude deleted cards
+    deck_limit = ""
+    if current_deck_only:
+        # Smart Study: the deck overview heatmap searches "deck:current rid:..."
+        dids = ids2str(mw.col.decks.deck_and_child_ids(mw.col.decks.get_current_id()))  # type: ignore
+        deck_limit = " AND (did IN {0} OR odid IN {0})".format(dids)
     return mw.col.db.list(  # type: ignore
         "SELECT id FROM cards where id in "
-        "(SELECT cid FROM revlog where id between ? and ?)",
+        "(SELECT cid FROM revlog where id between ? and ?)" + deck_limit,
         start_date,
         end_date,
     )
 
 
-_re_rid = re.compile(r"^rid:([0-9]+):([0-9]+)$")
+_re_rid = re.compile(r"^(\"?deck:current\"? )?rid:([0-9]+):([0-9]+)$")
 
 
 def find_rid(search: str) -> Optional[List[int]]:
@@ -66,15 +74,15 @@ def find_rid(search: str) -> Optional[List[int]]:
     if not match:
         return None
 
-    start_date = int(match[1])
-    end_date = int(match[2])
+    start_date = int(match[2])
+    end_date = int(match[3])
 
-    return _find_cards_reviewed_between(start_date, end_date)
+    return _find_cards_reviewed_between(start_date, end_date, bool(match[1]))
 
 
 def on_browser_will_search(search_context: "SearchContext"):
     search = search_context.search
-    if search.startswith("rid"):
+    if "rid:" in search:
         found_ids = find_rid(search)
     else:
         return

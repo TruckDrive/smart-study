@@ -152,7 +152,7 @@ class Contanki(AnkiWebView):
             _, func, *args = message.split("::")
             if func == "message":
                 tooltip(str("::".join(args)))
-            else:
+            elif func in funcs:
                 funcs[func](*args)
             return (True, None)
         else:
@@ -184,7 +184,8 @@ class Contanki(AnkiWebView):
             return
 
         buttons = [button == "true" for button in input_buttons.split(",")]
-        axes = [float(axis) for axis in input_axes.split(",")]
+        # Smart Study: a pad without axes sends "", which float() rejects
+        axes = [float(axis) for axis in input_axes.split(",") if axis]
 
         if not buttons:
             self.on_error("No buttons")

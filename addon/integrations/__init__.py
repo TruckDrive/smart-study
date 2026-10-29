@@ -11,6 +11,10 @@ add-on updates):
 
     {"enabled": {key: bool}, "choice": {key: "builtin" | "standalone"}}
 
+The "enabled" switches are mirrored into the collection (settings_sync.py), so
+AnkiWeb sync takes them to other devices; "choice" depends on what is
+installed on each device and stays local.
+
 Switching an add-on on or off takes effect after restarting Anki, because
 add-ons register their hooks while Anki starts.
 """
@@ -60,14 +64,6 @@ INTEGRATIONS: List[Integration] = [
         default=True,
     ),
     Integration(
-        key="progress_bar",
-        title="Progress bar",
-        short="Shows how much of today's reviews is done.",
-        credit='Based on <a href="https://ankiweb.net/shared/info/1708250053">Progress bar (Fork for 23)</a> by Shigeyuki and earlier authors (Glutanimate, liuzikai, SebastienGllmt, BluMist and others). AGPL-3.0, modified for Smart Study.',
-        standalone=["1708250053", "2091361802"],
-        default=True,
-    ),
-    Integration(
         key="contanki",
         title="Controller support",
         short="Study with a gamepad, e.g. the 8BitDo Zero 2.",
@@ -104,7 +100,11 @@ def load_state() -> dict:
     return state
 
 
-def save_state(state: dict) -> None:
+def save_state(state: dict, push: bool = True) -> None:
+    if push:
+        # The switches also live in the collection, so they sync to other devices.
+        from .. import settings_sync
+        settings_sync.push_integrations(state)
     os.makedirs(STORE_DIR, exist_ok=True)
     tmp = STATE_PATH + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
@@ -115,6 +115,19 @@ def save_state(state: dict) -> None:
 def is_enabled(key: str, state: Optional[dict] = None) -> bool:
     state = state or load_state()
     return bool(state["enabled"].get(key, BY_KEY[key].default))
+
+
+def set_enabled(switches: Dict[str, bool]) -> bool:
+    """Saves new on/off switches; True if one of them changed."""
+    state = load_state()
+    changed = False
+    for key, on in switches.items():
+        if key in BY_KEY and bool(on) != is_enabled(key, state):
+            state["enabled"][key] = bool(on)
+            changed = True
+    if changed:
+        save_state(state)
+    return changed
 
 
 def standalone_folder(key: str) -> Optional[str]:

@@ -162,7 +162,7 @@ class DeckStatsInjector(HeatmapInjector):
             self._view,
             limhist=limhist,
             limfcst=limfcst,
-            current_deck_only=collection_stats.wholeCollection,
+            current_deck_only=not collection_stats.wholeCollection,
         )
 
         new_html = original_html + heatmap_html

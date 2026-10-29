@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0 – 2026-10-29
+
+- **Settings sync between devices**: the Smart Study settings and the on/off switches of the built-in add-ons are kept in the Anki collection (`smartstudy_settings`), so AnkiWeb sync takes them to your other devices. Of two copies, the newer one wins. Per device stay: which copy of an add-on runs (built-in or separately installed), the launcher being open, and the "What's new" state
+- **Add-ons page in the settings**: switch each built-in add-on on or off at any time under *Settings → Add-ons* (the window under *Tools → Smart Study → Built-in add-ons…* stays for options and credits)
+- **Removed**: the built-in progress bar. Install [Progress bar](https://ankiweb.net/shared/info/1708250053) from AnkiWeb if you want it back
+- **Faster**: the dashboard statistics are reused until a review, sync or new day changes them (before: recomputed on every return to the deck list); the deck overview only reads the last 30 days of reviews; the review heatmap keeps one cached view per screen
+- **Fix – review heatmap**: settings, a new day or a profile switch now update it right away; clicking a day in the deck-overview heatmap finds the cards; the old stats window had deck and collection swapped; no more Qt5 crashes in the shortcut field
+- **Fix – controller support**: unplugging a controller is noticed; pads without sticks no longer cause an error 20 times a second
+- **Fix – Life Drain**: no crash when another panel sits where the bar goes
+- **Fix – copy selections with pictures**: Ctrl+C keeps the image, the same selection can be copied again, and pictures with "&" in the file name are found
+
 ## 2.1.1 – 2026-10-29
 
 - The windows for built-in add-ons, already installed add-ons, updates and the restart question now use the Smart Study look (title, grouped rows, switches, pill buttons) with shorter texts

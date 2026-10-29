@@ -229,6 +229,10 @@ if _QT_AVAILABLE:
 
         def get_new_settings(self) -> Dict:
             s = dict(self._result or {})
+            # Built-in add-on switches are kept apart from the settings file.
+            self.integration_switches = {
+                k.split(":", 1)[1]: bool(s.pop(k)) for k in list(s) if k.startswith("integration:")
+            }
             from .deck_overview_options import normalize
             s.update(normalize(s))
             # custom colours are managed natively (see _edit_theme), not in JS.
@@ -278,11 +282,50 @@ if _QT_AVAILABLE:
                     self._select_example_background(payload)
                 elif action == "removeBackground":
                     self._remove_background()
+                elif action == "openIntegrations":
+                    QTimer.singleShot(0, self._open_integrations)
                 elif action == "openUrl":
                     if payload:
                         QDesktopServices.openUrl(QUrl(payload))
             except Exception as e:
                 print(f"WebSettings: error handling '{action}': {e}")
+
+        def _integrations_payload(self) -> Dict[str, Any]:
+            try:
+                from . import integrations
+                from .integrations.strings import tr
+            except Exception:
+                return {}
+            state = integrations.load_state()
+            items = []
+            for i in integrations.INTEGRATIONS:
+                desc = tr(i.short)
+                if integrations.standalone_folder(i.key):
+                    desc += " " + tr("Your separately installed copy is active.")
+                elif i.key in integrations.errors:
+                    desc += " " + tr("Could not be started.")
+                items.append({"key": i.key, "title": tr(i.title), "desc": desc,
+                              "on": integrations.is_enabled(i.key, state)})
+            return {
+                "items": items,
+                "labels": {
+                    "nav": tr("Add-ons"),
+                    "title": tr("Built-in add-ons"),
+                    "sub": tr("Included in Smart Study – no separate installs. Changes apply after restarting Anki."),
+                    "note": tr("Your choice syncs to your other devices with AnkiWeb."),
+                    "more": tr("Options & credits…"),
+                },
+            }
+
+        def _open_integrations(self):
+            """Opens the full window (options, credits) and shows its result here."""
+            try:
+                from . import integrations
+                integrations.open_settings(self)
+                payload = json.dumps(self._integrations_payload())
+                self._page.runJavaScript(f"window.setIntegrations && setIntegrations({payload});")
+            except Exception as e:
+                print(f"WebSettings: built-in add-ons window failed: {e}")
 
         def _open_developer_console(self):
             try:
@@ -699,6 +742,7 @@ if _QT_AVAILABLE:
                 "supportersNote": SUPPORTERS_NOTE,
                 "aboutLogo": self._png_uri("logo_about.png"),
                 "customBackground": self._custom_background_payload(),
+                "integrations": self._integrations_payload(),
                 "config": conf,
             }
 

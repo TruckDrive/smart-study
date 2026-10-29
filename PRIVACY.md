@@ -34,7 +34,7 @@ add-on with several optional online tools.
 
 ## Built-in add-ons
 
-The bundled add-ons (copy selection as image, review heatmap, progress bar,
+The bundled add-ons (copy selection as image, review heatmap,
 controller support, Life Drain) work offline. Their settings are stored in
 `user_files/integrations/` inside the Smart Study add-on folder (kept on
 updates); the heatmap and Life Drain also keep their settings in the Anki
@@ -50,6 +50,10 @@ image" only writes to the local clipboard.
   permissions where the operating system supports them.
 - Gamification, deadlines, music preferences, and non-secret AI preferences use
   Anki collection configuration and may be included in Anki sync and backups.
+- Smart Study's general settings and the on/off switches of the built-in
+  add-ons are also mirrored into the collection configuration
+  (`smartstudy_settings`), so AnkiWeb sync takes them to your other devices.
+  They contain no API keys, history or personal content.
 - A migration removes API keys and website history from the older
   collection-synced locations when the corresponding feature is first opened.
 

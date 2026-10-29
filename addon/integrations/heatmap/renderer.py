@@ -80,6 +80,9 @@ class _RenderCache(NamedTuple):
     arguments: Tuple[HeatmapView, Optional[int], Optional[int], bool]
     deck: int
     col_mod: int
+    # Smart Study: option changes and day rollover do not bump col.mod
+    today: int
+    config: str
 
 
 class HeatmapRenderer:
@@ -131,7 +134,9 @@ class HeatmapRenderer:
         self._mw: AnkiQt = mw
         self._config: "ConfigManager" = config
         self._reporter: ActivityReporter = reporter
-        self._render_cache: Optional[_RenderCache] = None
+        # Smart Study: one entry per view/arguments, so switching between deck
+        # list and deck overview does not rescan the whole revlog every time
+        self._render_cache: Dict[tuple, _RenderCache] = {}
 
     # TODO: Consider caching on the render-level
 
@@ -142,10 +147,10 @@ class HeatmapRenderer:
         limfcst: Optional[int] = None,
         current_deck_only: bool = False,
     ) -> str:
-        if self._render_cache and self._cache_still_valid(
-            view, limhist, limfcst, current_deck_only
-        ):
-            return self._render_cache.html
+        arguments = (view, limhist, limfcst, current_deck_only)
+        cached = self._render_cache.get(arguments)
+        if cached and self._cache_still_valid(cached):
+            return cached.html
 
         prefs = self._config["profile"]
 
@@ -182,11 +187,13 @@ class HeatmapRenderer:
             content=heatmap + stats, classes=" ".join(classes)
         )
 
-        self._render_cache = _RenderCache(
+        self._render_cache[arguments] = _RenderCache(
             html=render,
-            arguments=(view, limhist, limfcst, current_deck_only),
-            deck=self._mw.col.decks.current(),
+            arguments=arguments,
+            deck=self._mw.col.decks.get_current_id(),
             col_mod=self._mw.col.mod,
+            today=self._mw.col.sched.today,
+            config=self._config_snapshot(),
         )
 
         return render
@@ -195,18 +202,21 @@ class HeatmapRenderer:
         self._reporter = reporter
 
     def invalidate_cache(self):
-        self._render_cache = None
+        self._render_cache = {}
 
-    def _cache_still_valid(self, view, limhist, limfcst, current_deck_only) -> bool:
-        # FIXME: for 2.1.28+
-        cache = self._render_cache
-        if not cache:
-            return False
-        col_unchanged = self._mw.col.mod == cache.col_mod  # type: ignore
+    def _config_snapshot(self) -> str:
+        return repr((self._config["synced"], self._config["profile"]))
+
+    def _cache_still_valid(self, cache: _RenderCache) -> bool:
+        col = self._mw.col
         return (
-            col_unchanged
-            and (view, limhist, limfcst, current_deck_only) == cache.arguments  # type: ignore
-            and (not current_deck_only or cache.deck == self._mw.col.decks.current())
+            col.mod == cache.col_mod
+            and col.sched.today == cache.today
+            and self._config_snapshot() == cache.config
+            and (
+                not cache.arguments[3]
+                or cache.deck == col.decks.get_current_id()
+            )
         )
 
     def _get_css_classes(self, view: HeatmapView) -> List[str]:

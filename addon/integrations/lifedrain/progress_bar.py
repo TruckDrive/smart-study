@@ -58,7 +58,7 @@ class ProgressBar:
             max_value: The maximum value of the bar. Up to 1 decimal place.
         """
         self._max_value = max(1, max_value)
-        self._qprogressbar.setRange(0, self._max_value * 10)
+        self._qprogressbar.setRange(0, int(self._max_value * 10))
 
     def set_current_value(self, current_value: float) -> None:
         """Sets the current value for the bar.
@@ -135,11 +135,12 @@ class ProgressBar:
         if not existing_widgets:
             self._mw.addDockWidget(dock_area, self._dock['widget'])
         else:
-            self._mw.setDockNestingEnabled(enabled=True)
+            # Smart Study: PyQt6 takes no keyword here and has no Qt.Vertical
+            self._mw.setDockNestingEnabled(True)
             self._mw.splitDockWidget(
                 existing_widgets[0],  # pyright: ignore [reportGeneralTypeIssues]
                 self._dock['widget'],
-                self._qt.Qt.Vertical,
+                self._qt.Qt.Orientation.Vertical,
             )
         self._mw.web.setFocus()
         self._qprogressbar.setVisible(bar_visible)

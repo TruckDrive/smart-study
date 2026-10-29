@@ -5,6 +5,8 @@ from __future__ import annotations
 import os, sys, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
+from . import settings_sync
+
 # --- Import Sub-Modules ---
 try:
     from . import constants, study_plan_trigger, locales
@@ -227,6 +229,8 @@ def load_addon_settings():
     addon_settings = defaults
 
 def save_addon_settings():
+    # Before writing, so a new sync stamp lands in the local file too.
+    settings_sync.push_settings(addon_settings)
     tmp_path = addon_settings_path + ".tmp"
     try:
         with open(tmp_path, 'w', encoding='utf-8') as f:
@@ -584,7 +588,7 @@ def run_onboarding_if_needed():
     except Exception:
         traceback.print_exc()
 
-def _apply_saved_settings(new_settings):
+def _apply_saved_settings(new_settings, message=None):
     """Persist the returned settings and refresh every affected piece of UI.
     Shared by the HTML settings dialog and the native fallback."""
     if not new_settings.get("workspace_mindmap_tab", True) and not new_settings.get("workspace_roadmap_tab", True):
@@ -677,7 +681,7 @@ def _apply_saved_settings(new_settings):
 
     if mw.state == "deckBrowser": mw.deckBrowser.refresh()
     if mw.state == "overview": mw.reset()
-    tooltip(_("Settings saved."))
+    tooltip(message or _("Settings saved."))
 
 
 def _redraw_top_toolbar():
@@ -837,6 +841,10 @@ def show_settings_dialog(initial_page=None, initial_section=None):
         if dlg.exec():
             settings = dlg.get_new_settings()
             _apply_saved_settings(settings)
+            switches = getattr(dlg, "integration_switches", None)
+            if switches and integrations is not None and integrations.set_enabled(switches):
+                from .integrations.ui import ask_restart
+                ask_restart()
             if mw and mw.state == "overview":
                 mw.overview.refresh()
     except Exception:
@@ -965,8 +973,32 @@ def on_theme_changed():
         mw.progress.single_shot(500, show_theme_restart_warning)
 
 
+def _pull_synced_settings() -> Dict[str, Any]:
+    """Takes settings and add-on switches changed on another device."""
+    changed: Dict[str, Any] = {}
+    try:
+        stamp = addon_settings.get(settings_sync.STAMP_KEY)
+        changed = settings_sync.pull_settings(addon_settings)
+        if changed or addon_settings.get(settings_sync.STAMP_KEY) != stamp:
+            save_addon_settings()
+        if integrations is not None:
+            state = integrations.load_state()
+            if settings_sync.pull_integrations(state):
+                integrations.save_state(state, push=False)
+                tooltip(integrations.tr("Built-in add-ons were changed on another device. Restart Anki to apply."))
+            elif settings_sync.STAMP_KEY in state:
+                integrations.save_state(state, push=False)  # keep the new sync stamp
+    except Exception as e:
+        print(f"SmartStudy: settings sync failed: {e}")
+        traceback.print_exc()
+    return changed
+
+
 def on_sync_finished(*_args) -> None:
     """Invalidate dashboard snapshots after reviews arrive through AnkiWeb."""
+    changed = _pull_synced_settings()
+    if changed:
+        _apply_saved_settings(changed, message=integrations.tr("Settings updated from your other device.") if integrations else None)
     try:
         statistics_widget.invalidate_statistics_cache()
     except Exception:
@@ -1123,6 +1155,7 @@ def on_profile_open():
         print(f"SmartStudy: Error determining profile path: {e}")
 
     load_addon_settings()
+    _pull_synced_settings()
     # Make sure the custom solid background file exists if it is selected
     # (e.g. after an add-on update wiped generated files).
     if addon_settings.get("active_theme") == "custom_solid.css":

@@ -86,10 +86,12 @@ def collect_stats(col, deck_id, settings, now=None):
     recent = int((now-30*86400)*1000)
     end = int(now*1000)
     query = f'FROM revlog WHERE cid IN (SELECT id FROM cards WHERE did IN ({placeholders})) AND ease>0 AND id<=?'
+    # Every sum below only counts rows from min(cutoff, recent) onward, so the
+    # lower bound skips the deck's older history without changing the result.
     row = col.db.first(
         'SELECT sum(CASE WHEN id>=? THEN ease>1 ELSE 0 END), sum(id>=?), '
         'sum(CASE WHEN id>=? AND type=1 THEN ease>1 ELSE 0 END), sum(id>=? AND type=1) '
-        + query, cutoff, cutoff, recent, recent, *dids, end)
+        + query + ' AND id>=?', cutoff, cutoff, recent, recent, *dids, end, min(cutoff, recent))
     success, answers, recalled, reviews = [int(value or 0) for value in row]
     state = indicator(recalled, reviews, opts)
     # Scheduler counts respect the selected deck, its children and daily limits.

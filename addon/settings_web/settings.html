@@ -394,6 +394,7 @@
           <div class="nav-item" data-page="dashboard"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</div>
           <div class="nav-item" data-page="deck"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Deck Overview</div>
           <div class="nav-item" data-page="sidebar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg></span>Sidebar</div>
+          <div class="nav-item" data-page="addons" id="addonsNav"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4a2 2 0 1 0 4 0h2v6h-2a2 2 0 1 0 0 4h2v4H3V3h2a2 2 0 1 0 4 0z"/></svg></span><span id="addonsNavLabel">Add-ons</span></div>
           <div class="nav-sep"></div>
           <div class="nav-item" data-page="changelog"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h9"/><path d="M9 12h9"/><path d="M9 19h9"/><circle cx="4.5" cy="5" r="1.3"/><circle cx="4.5" cy="12" r="1.3"/><circle cx="4.5" cy="19" r="1.3"/></svg></span>Changelog</div>
           <div class="nav-item" data-page="support"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.2l-1.7-1.6a5 5 0 1 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></svg></span>Supporters</div>
@@ -629,6 +630,15 @@
           <p class="rd" style="margin:12px 4px 0;">Shortcuts apply immediately after saving. Restart Anki after enabling or disabling sidebar tools.</p>
         </section>
 
+        <!-- ADD-ONS (built-in add-ons, see integrations/) -->
+        <section class="page" data-page="addons">
+          <h1 class="page-title" id="addonsTitle">Built-in add-ons</h1>
+          <p class="page-sub" id="addonsSub">Included in Smart Study – no separate installs. Changes apply after restarting Anki.</p>
+          <div class="group" id="integrationGroup"></div>
+          <p class="rd" id="addonsNote" style="margin:12px 4px 12px;"></p>
+          <button type="button" class="btn btn-grey" id="addonsMore" onclick="bridge('openIntegrations')">Options & credits…</button>
+        </section>
+
         <!-- CHANGELOG -->
         <section class="page" data-page="changelog">
           <h1 class="page-title">Changelog</h1>
@@ -782,6 +792,20 @@
     var note = document.getElementById('dashboardLockNote');
     if(note) note.classList.toggle('visible', locked);
   }
+
+  // Built-in add-ons: their switches are saved as "integration:<key>".
+  window.setIntegrations = function(info){
+    if(!info || !info.items || !info.items.length){ document.getElementById('addonsNav').hidden = true; return; }
+    var labels = info.labels || {};
+    if(labels.nav) document.getElementById('addonsNavLabel').textContent = labels.nav;
+    if(labels.title) document.getElementById('addonsTitle').textContent = labels.title;
+    if(labels.sub) document.getElementById('addonsSub').textContent = labels.sub;
+    if(labels.more) document.getElementById('addonsMore').textContent = labels.more;
+    document.getElementById('addonsNote').textContent = labels.note || '';
+    document.getElementById('integrationGroup').innerHTML = info.items.map(function(item){
+      return toggleRow('integration:'+item.key, item.title, item.desc, !!item.on, false);
+    }).join('');
+  };
 
   window.setSidebarShortcut = function(data){
     if(!data || !data.key) return;
@@ -1133,6 +1157,7 @@
       renderToggles('deckGroup', DECK, cfg);
       renderDeckOverviewSettings(data.deckOverview);
       renderToggles('sideGroup', SIDE, cfg, true);
+      setIntegrations(data.integrations);
       var minimalToggle = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
       if(minimalToggle) minimalToggle.addEventListener('change', syncMinimalDashboardControls);
       syncMinimalDashboardControls();

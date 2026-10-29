@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from html import unescape
 from urllib.parse import unquote, urlparse
 
 from aqt import gui_hooks, mw
@@ -31,7 +32,7 @@ JS = """
   let last = "";
   const grab = () => setTimeout(() => {
     const sel = window.getSelection();
-    if (!sel || sel.isCollapsed) return;
+    if (!sel || sel.isCollapsed) { last = ""; return; }
     const box = document.createElement("div");
     for (let i = 0; i < sel.rangeCount; i++) box.appendChild(sel.getRangeAt(i).cloneContents());
     const imgs = box.querySelectorAll("img");
@@ -44,6 +45,8 @@ JS = """
   // mouse and keyboard (Ctrl+A, Shift+arrows)
   document.addEventListener("mouseup", grab);
   document.addEventListener("keyup", grab);
+  // Ctrl+C / "Copy" puts the plain selection on the clipboard: copy the image again.
+  document.addEventListener("copy", () => { last = ""; grab(); });
 })();
 """
 
@@ -54,7 +57,8 @@ def _local_src(src: str) -> str:
     """Points a picture at its file in the collection's media folder."""
     if src.startswith("data:") or not mw.col:
         return src
-    name = unquote(os.path.basename(urlparse(src).path))
+    # innerHTML escapes "&" in attributes as "&amp;"
+    name = unquote(os.path.basename(urlparse(unescape(src)).path))
     path = os.path.join(mw.col.media.dir(), name)
     return QUrl.fromLocalFile(path).toString() if os.path.isfile(path) else src
 

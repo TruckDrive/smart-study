@@ -84,6 +84,8 @@ function on_controller_disconnect(event) {
          return;
       }
    }
+   // Smart Study: tell Python, so it drops the profile, menu entry and overlays.
+   bridgeCommand(`contanki::on_disconnect::${event}`);
 }
 
 function poll() {

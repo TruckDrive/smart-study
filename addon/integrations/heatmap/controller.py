@@ -33,7 +33,7 @@
 Overarching control of heatmap rendering and state
 """
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from aqt.main import AnkiQt
 
@@ -55,6 +55,10 @@ class HeatmapController:
         self._bridge.register()
 
         self._renderer: Optional[HeatmapRenderer] = None
+        # Smart Study: collection (and its db) the renderer was built for, so
+        # that a profile switch or full sync does not keep using a closed one
+        self._renderer_col: Any = None
+        self._renderer_db: Any = None
 
     def render_for_view(
         self,
@@ -67,9 +71,15 @@ class HeatmapController:
         if not col:
             raise CollectionError("Anki collection and/or database is not ready")
 
-        if not self._renderer:
+        if (
+            not self._renderer
+            or col is not self._renderer_col
+            or col.db is not self._renderer_db
+        ):
             reporter = ActivityReporter(col, self._config)
             self._renderer = HeatmapRenderer(self._mw, reporter, self._config)
+            self._renderer_col = col
+            self._renderer_db = col.db
         else:
             pass
             # self._renderer.set_activity_reporter(reporter)

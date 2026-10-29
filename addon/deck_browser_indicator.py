@@ -40,9 +40,13 @@ def render(tree, col, settings, translate):
                       'JOIN cards c ON c.id=r.cid WHERE r.type=1 AND r.ease>0 '
                       'AND r.id>=? AND r.id<=? GROUP BY c.did', now-30*86400000, now)
     counts = {did:(n,ok) for did,n,ok in rows}
+    # Read the manual smiley map once instead of one config lookup per deck.
+    smileys = col.get_config(options.SMILEY_KEY, default={})
+    smileys = smileys if isinstance(smileys, dict) else {}
     states = {}
     for did in candidates:
-        state = options.smiley_choice(col, did)
+        state = smileys.get(str(did))
+        state = state if state in options.SMILEY_IMAGES else 'auto'
         if state != 'auto':
             states[did] = state
             continue

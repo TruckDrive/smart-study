@@ -372,6 +372,12 @@ class ConfigManager(object):
                     pass
                 else:
                     raise
+        # Smart Study: forget the closed profile's values, so the next profile
+        # loads (and saves) its own instead of the previous profile's
+        for name in ("synced", "profile"):
+            if name in self._storages:
+                self._config.pop(name, None)
+                self._storages[name]["loaded"] = False
 
     def setConfigAction(self, action):
         """
@@ -555,7 +561,6 @@ class ConfigManager(object):
             dict -- Dictionary of synced config values
         """
         self._getStorageObj("synced")[self._conf_key] = dict(config)
-        self.mw.col.setMod()
 
     # Profile storage
     ######################################################################
@@ -577,7 +582,6 @@ class ConfigManager(object):
             dict -- Dictionary of profile config values
         """
         self._getStorageObj("profile")[self._conf_key] = dict(config)
-        self.mw.col.setMod()
 
     # Helper methods for synced & profile storage
     ######################################################################
@@ -629,7 +633,6 @@ class ConfigManager(object):
             storage_obj[conf_key] = deepMergeDicts(
                 default_dict, storage_dict, new=True)
             storage_obj[conf_key]["version"] = default_version
-            self.mw.col.setMod()
 
         return storage_obj
 

@@ -26,18 +26,56 @@ except ImportError:
 
 WIDGET_MAX_WIDTH = "860px"
 
-# DeckBrowser.refresh() can be requested more than once while Anki is settling
-# its startup layout.  Keep the expensive, read-only collection snapshot for a
-# very short window so those duplicate renders do not repeat the SQL snapshot.
-# One second is deliberately short: it coalesces a startup burst without making
-# normal review/deck changes appear stale to the user.
-_STATISTICS_CACHE_TTL_SECONDS = 1.0
+# The Deck Browser is re-rendered far more often than the data behind these
+# widgets changes (e.g. every time the user returns from a deck's overview).
+# The snapshot (a cards-table scan plus revlog aggregates of up to a year) is
+# therefore reused until something can have changed it:
+#   * any collection operation touching cards (answer, undo, suspend, add,
+#     delete, reschedule, import ...) -> operation_did_execute below,
+#   * legacy mw.reset(), collection reload, sync, profile switch and review
+#     end -> explicit invalidation,
+#   * a newer revlog entry or a new Anki day -> checked by _cache_signature(),
+#   * otherwise at the latest after the max age (covers add-ons writing via
+#     the raw DB proxy, and the slowly sliding "last N days" window).
+_STATISTICS_CACHE_MAX_AGE_SECONDS = 300.0
 _statistics_cache = {}
 
 
-def invalidate_statistics_cache() -> None:
+def invalidate_statistics_cache(*_args) -> None:
     """Drop all cached dashboard snapshots (profile/review boundary)."""
     _statistics_cache.clear()
+
+
+def _cache_signature():
+    """Cheap freshness key: rollover, Anki day and newest revlog id (PK lookup)."""
+    try:
+        rollover = _get_rollover_hour()
+        today = (datetime.now() - timedelta(hours=rollover)).date()
+        return (rollover, today, mw.col.db.scalar("SELECT max(id) FROM revlog"))
+    except Exception:
+        return None
+
+
+def _cached_statistics(cache_key, signature):
+    cached = _statistics_cache.get(cache_key)
+    if (cached and signature is not None and cached[1] == signature
+            and time.monotonic() - cached[0] <= _STATISTICS_CACHE_MAX_AGE_SECONDS):
+        return cached[2]
+    return None
+
+
+def _on_operation_did_execute(changes, _handler=None) -> None:
+    if getattr(changes, "card", False):
+        _statistics_cache.clear()
+
+
+try:
+    from aqt import gui_hooks as _gui_hooks
+    _gui_hooks.operation_did_execute.append(_on_operation_did_execute)
+    _gui_hooks.state_did_reset.append(invalidate_statistics_cache)
+    _gui_hooks.collection_did_load.append(invalidate_statistics_cache)
+except Exception:
+    pass
 
 # ── Review activity helpers ───────────────────────────────────────────────────
 def _get_rollover_hour() -> int:
@@ -119,11 +157,11 @@ def get_statistics_data(stats_days=7, chart_days=DEFAULT_CHART_DAYS):
     if chart_days not in (7, 30, 365):
         chart_days = DEFAULT_CHART_DAYS
 
-    now = time.monotonic()
     cache_key = ("full", stats_days, chart_days)
-    cached = _statistics_cache.get(cache_key)
-    if cached and now - cached[0] <= _STATISTICS_CACHE_TTL_SECONDS:
-        return cached[1]
+    signature = _cache_signature()
+    cached = _cached_statistics(cache_key, signature)
+    if cached is not None:
+        return cached
 
     chart_html = _build_mini_chart(chart_days)
 
@@ -181,7 +219,7 @@ def get_statistics_data(stats_days=7, chart_days=DEFAULT_CHART_DAYS):
         "days_scope": stats_days,
         "chart_days": chart_days,
     }
-    _statistics_cache[cache_key] = (time.monotonic(), result)
+    _statistics_cache[cache_key] = (time.monotonic(), signature, result)
     return result
 
 
@@ -195,10 +233,10 @@ def get_minimal_statistics_data(stats_days=7):
         stats_days = 7
 
     cache_key = ("minimal", stats_days)
-    now = time.monotonic()
-    cached = _statistics_cache.get(cache_key)
-    if cached and now - cached[0] <= _STATISTICS_CACHE_TTL_SECONDS:
-        return cached[1]
+    signature = _cache_signature()
+    cached = _cached_statistics(cache_key, signature)
+    if cached is not None:
+        return cached
 
     chart_html = _build_mini_chart()
     stats_start_ts = int(
@@ -235,7 +273,7 @@ def get_minimal_statistics_data(stats_days=7):
         "new_cards_percent": new_cards_percent,
         "days_scope": stats_days,
     }
-    _statistics_cache[cache_key] = (time.monotonic(), result)
+    _statistics_cache[cache_key] = (time.monotonic(), signature, result)
     return result
 
 def render_widget_html_internal(stats, visibility=None):

@@ -21,7 +21,6 @@ except ImportError:  # outside Anki
 DE: Dict[str, str] = {
     "Copy selections with pictures as an image": "Auswahl mit Bildern als Bild kopieren",
     "Review heatmap": "Lern-Heatmap",
-    "Progress bar": "Fortschrittsleiste",
     "Controller support": "Controller-Steuerung",
     "Life Drain": "Life Drain",
     "Built-in add-ons": "Eingebaute Add-ons",
@@ -46,7 +45,6 @@ DE: Dict[str, str] = {
     "Built-in add-ons: you no longer need to install them separately. Switch them on or off under Tools → Smart Study → Built-in add-ons.": "Eingebaute Add-ons: Du musst sie nicht mehr extra installieren. Ein- und ausschalten unter Extras → Smart Study → Eingebaute Add-ons.",
     "Copy selections with pictures as an image – paste card pictures into ChatGPT or Claude.": "Auswahl mit Bildern als Bild kopieren – Kartenbilder in ChatGPT oder Claude einfügen.",
     "Review heatmap on the deck list (based on Review Heatmap by Glutanimate).": "Lern-Heatmap in der Stapelübersicht (basiert auf Review Heatmap von Glutanimate).",
-    "Progress bar in the reviewer (based on Progress bar by Shigeyuki).": "Fortschrittsleiste beim Lernen (basiert auf Progress bar von Shigeyuki).",
     "Controller support (based on Contanki), with better detection: if a controller such as the 8BitDo Zero 2 cannot be recognised reliably, you are asked once which one it is.": "Controller-Steuerung (basiert auf Contanki) mit besserer Erkennung: Kann ein Controller wie der 8BitDo Zero 2 nicht sicher erkannt werden, wirst du einmal gefragt, welcher es ist.",
     "Life Drain (based on Life Drain by Yutsuten) – off by default.": "Life Drain (basiert auf Life Drain von Yutsuten) – standardmäßig aus.",
     "AI assistant: use ChatGPT, Claude or Gemini with your own account, without an API key.": "KI-Assistent: ChatGPT, Claude oder Gemini mit deinem eigenen Account nutzen, ohne API-Schlüssel.",
@@ -83,6 +81,16 @@ DE: Dict[str, str] = {
     "Your settings are taken over. “Take over” switches your separate add-ons off, “Take over & delete old ones” moves them to the trash. Change it any time under Tools → Smart Study → Built-in add-ons.": "Deine Einstellungen werden übernommen. „Übernehmen“ deaktiviert deine separaten Add-ons, „Übernehmen & alte löschen“ verschiebt sie in den Papierkorb. Jederzeit änderbar unter Extras → Smart Study → Eingebaute Add-ons.",
     "Take over": "Übernehmen",
     "Take over & delete old ones": "Übernehmen & alte löschen",
+    "Add-ons": "Add-ons",
+    "Faster dashboard, deck overview and review heatmap.": "Schnelleres Dashboard, schnellere Deck-Übersicht und Lern-Heatmap.",
+    "Fixes for the review heatmap, controller support, Life Drain and copying selections with pictures.": "Fehlerbehebungen für Lern-Heatmap, Controller-Steuerung, Life Drain und das Kopieren von Auswahlen mit Bildern.",
+    "Your Smart Study settings and the switches for the built-in add-ons now sync to your other devices with AnkiWeb.": "Deine Smart-Study-Einstellungen und die Schalter der eingebauten Add-ons werden jetzt per AnkiWeb mit deinen anderen Geräten synchronisiert.",
+    "Settings → Add-ons: switch each built-in add-on on or off at any time.": "Einstellungen → Add-ons: jedes eingebaute Add-on jederzeit an- oder ausschalten.",
+    "The built-in progress bar was removed. Install Progress bar from AnkiWeb if you want it back.": "Die eingebaute Fortschrittsleiste wurde entfernt. Wer sie zurückhaben möchte, installiert Progress bar von AnkiWeb.",
+    "Options & credits…": "Optionen & Credits…",
+    "Your choice syncs to your other devices with AnkiWeb.": "Deine Auswahl wird per AnkiWeb mit deinen anderen Geräten synchronisiert.",
+    "Built-in add-ons were changed on another device. Restart Anki to apply.": "Eingebaute Add-ons wurden auf einem anderen Gerät geändert. Starte Anki neu, damit es wirkt.",
+    "Settings updated from your other device.": "Einstellungen von deinem anderen Gerät übernommen.",
 }
 
 

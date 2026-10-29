@@ -38,7 +38,6 @@ from typing import Optional
 
 from aqt.qt import QAction, QApplication, QWidget
 
-from anki.lang import _
 from aqt import mw
 from aqt.studydeck import StudyDeck
 
@@ -147,8 +146,8 @@ class RevHmOptions(OptionsDialog):
         list_widget = self.form.listDecks
         ret = StudyDeck(
             self.mw,
-            accept=_("Choose"),
-            title=_("Choose Deck"),
+            accept="Choose",
+            title="Choose Deck",
             help="",
             parent=self,
             geomKey="selectDeck",
