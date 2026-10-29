@@ -11,7 +11,7 @@ from anki.utils import ids2str
 from . import planner
 from .planner import tr
 
-FILTER_PREFIX = "Smart Study Plan"
+FILTER_PREFIX = "Smart Study"
 
 
 def today(col):

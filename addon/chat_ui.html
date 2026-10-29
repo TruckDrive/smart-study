@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Study AI</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script src="vendor/katex/katex.min.js"></script>
+<script src="chat_math.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  color-scheme:light;
+  --bg:#ffffff;--surface:#f4f4f4;--text:#0d0d0d;--text-muted:#8e8ea0;
+  --text-faint:#c0c0cc;--border:#e5e5e5;--user-bubble:#f0f0f0;
+  --ai-bubble:#f7f7f8;--input-bg:#f4f4f4;--btn-bg:#0d0d0d;--btn-fg:#ffffff;
+  --chip-bg:#ffffff;--chip-border:#d9d9e3;
+  --error:#ef4444;--success:#22c55e;--code-bg:#f0f0f0;--overlay:rgba(0,0,0,.45);
+  --shadow-start:0 4px 28px rgba(0,0,0,.10);
+  /* Accent */
+  --accent:#3b82f6;--accent-fg:#ffffff;
+  --accent-glow:rgba(59,130,246,.12);--accent-glow-2:rgba(59,130,246,.08);
+}
+html.dark, body.dark{
+  color-scheme:dark;
+  --bg:#2c2c2c;--surface:#414141;--text:#ffffff;--text-muted:#b0b0b0;
+  --text-faint:#b0b0b0;--border:#414141;--user-bubble:#414141;
+  --ai-bubble:#252525;--input-bg:#252525;--btn-bg:#ffffff;--btn-fg:#252525;
+  --chip-bg:#252525;--chip-border:#414141;--inactive:#7e7e7e;
+  --error:#f87171;--success:#4ade80;--code-bg:#252525;--overlay:rgba(0,0,0,.65);
+  --shadow-start:0 4px 28px rgba(0,0,0,.40);
+  /* Accent dark defaults */
+  --accent:#6366f1;
+  --accent-glow:rgba(99,102,241,.18);--accent-glow-2:rgba(99,102,241,.12);
+}
+
+html.dark .context-status-dot,body.dark .context-status-dot{background:var(--inactive);}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);display:flex;flex-direction:column;
+  font-size:13px;line-height:1.55}
+
+/* ── Header ── */
+#header{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+  position:relative;z-index:100}
+#model-label{font-size:11px;font-weight:500;letter-spacing:.03em;
+  color:var(--text-muted);user-select:none}
+#header-right{display:flex;align-items:center;gap:6px}
+.hbtn{background:none;border:none;cursor:pointer;color:var(--text-muted);
+  padding:4px 5px;border-radius:6px;line-height:0;transition:background .12s,color .12s}
+.hbtn:hover{color:var(--text);background:var(--surface)}
+
+/* ── Settings panel ── */
+#settings-panel{display:none;position:absolute;top:calc(100% + 4px);right:8px;
+  background:var(--bg);border:1px solid var(--border);border-radius:14px;
+  padding:14px;width:260px;z-index:300;box-shadow:0 6px 28px rgba(0,0,0,.15);
+  max-height:calc(100vh - 80px);overflow-y:auto}
+#settings-panel.open{display:block}
+#settings-panel{width:min(300px,calc(100vw - 16px))}
+.ai-settings-tabs{display:flex;gap:3px;padding:3px;background:var(--surface);border-radius:9px;margin-bottom:16px}
+.ai-settings-tabs button{flex:1;border:0;border-radius:7px;background:transparent;color:var(--text-muted);padding:7px;font:inherit;cursor:pointer}
+.ai-settings-tabs button[aria-selected="true"]{background:var(--bg);color:var(--text);box-shadow:0 1px 3px #0001}
+.bubble .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0;max-width:100%}
+.bubble .katex{font-size:1.12em}
+
+.s-section{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
+.s-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:5px;display:block}
+.s-row{margin-bottom:10px}
+.s-row:last-child{margin-bottom:0}
+.s-select,.s-input{width:100%;background:var(--surface);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;padding:6px 10px;font-size:12px;
+  font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color .12s}
+.s-select:focus,.s-input:focus{border-color:var(--text-muted)}
+.s-select option{background:var(--bg);color:var(--text);font-size:12px}
+.s-hint{font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.4}
+.s-save{width:100%;background:var(--accent);color:var(--accent-fg);border:none;
+  border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:opacity .15s;margin-top:12px}
+.s-save:hover{opacity:.82}
+#ollama-status-line{font-size:11px;color:var(--text-muted);line-height:1.5}
+#ollama-status-line a{color:inherit;text-decoration:underline;cursor:pointer}
+
+
+/* ── Info panel ── */
+#info-panel{display:none;position:absolute;top:calc(100% + 4px);right:8px;
+  background:var(--bg);border:1px solid var(--border);border-radius:14px;
+  padding:16px;width:290px;z-index:300;box-shadow:0 6px 28px rgba(0,0,0,.15);
+  max-height:calc(100vh - 80px);overflow-y:auto}
+#info-panel.open{display:block}
+.ip-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
+.ip-section{margin-bottom:14px}
+.ip-section:last-child{margin-bottom:0}
+.ip-heading{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:5px}
+.ip-body{font-size:11.5px;color:var(--text-muted);line-height:1.6}
+.ip-body b{color:var(--text);font-weight:600}
+.ip-divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+
+/* ── Chips bar — always visible ── */
+#chips-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;
+  border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;
+  scrollbar-width:none;position:relative;z-index:1}
+#chips-bar::-webkit-scrollbar{display:none}
+#chips-bar .chip-manage-btn{margin-left:auto}
+
+/* ── Chips shared styles ── */
+.chip{display:inline-flex;align-items:center;background:var(--chip-bg);
+  border:1px solid var(--chip-border);color:var(--text);border-radius:20px;
+  padding:5px 14px;font-size:12px;font-weight:500;cursor:pointer;
+  font-family:inherit;white-space:nowrap;user-select:none;flex-shrink:0;
+  transition:background .12s,border-color .12s,opacity .12s}
+.chip:hover:not(:disabled){background:var(--surface);border-color:var(--text-muted)}
+.chip:disabled{opacity:.32;cursor:not-allowed}
+.chip-manage-btn{display:inline-flex;align-items:center;background:none;
+  border:1px dashed var(--chip-border);color:var(--text-muted);border-radius:20px;
+  padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;
+  white-space:nowrap;flex-shrink:0;transition:color .12s,border-color .12s}
+.chip-manage-btn:hover{color:var(--text);border-color:var(--text-muted)}
+
+/* ── Animated orb background (empty state only) ── */
+@keyframes orb-float-1{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%    {transform:translate(12vw,10vh) scale(1.12)}
+}
+@keyframes orb-float-2{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%    {transform:translate(-10vw,-8vh) scale(1.09)}
+}
+#bg-anim{display:none;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body.empty #bg-anim{display:block}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(72px)}
+html.dark .bg-orb,body.dark .bg-orb{opacity:.18;}
+.bg-orb-1{
+  width:68vw;height:62vh;left:-20vw;top:-18vh;
+  background:var(--accent-glow);
+  animation:orb-float-1 18s ease-in-out infinite}
+.bg-orb-2{
+  width:58vw;height:54vh;right:-18vw;bottom:-12vh;
+  background:var(--accent-glow-2);
+  animation:orb-float-2 24s ease-in-out infinite}
+
+/* ── Empty state center ── */
+#start-center{display:none;flex-direction:column;align-items:center;
+  justify-content:center;flex:1;padding:0 22px 260px;text-align:center;
+  position:relative;z-index:1}
+body.empty #start-center{display:flex}
+.start-title{
+  font-size:34px;font-weight:700;letter-spacing:-.03em;
+  color:var(--accent);margin-bottom:6px}
+
+/* ── Empty state prominent input ── */
+#start-input-box{width:100%;display:flex;align-items:center;gap:8px;
+  background:var(--bg);border:1px solid var(--border);border-radius:22px;
+  padding:12px 10px 12px 18px;transition:border-color .15s,box-shadow .15s;
+  box-shadow:var(--shadow-start);margin-top:22px}
+#start-input-box:focus-within{border-color:var(--accent);
+  box-shadow:0 4px 28px var(--accent-glow)}
+#start-user-input{flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:inherit;font-size:14px;resize:none;min-height:24px;max-height:130px;
+  line-height:1.55;padding:0}
+#start-user-input::placeholder{color:var(--text-muted)}
+#start-send-btn{width:34px;height:34px;border-radius:50%;background:var(--accent);
+  color:var(--accent-fg);border:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;transition:opacity .15s}
+#start-send-btn:disabled{opacity:.22;cursor:default}
+.start-hint{font-size:11px;color:var(--text-faint);margin-top:14px;
+  line-height:1.55;max-width:260px}
+
+/* ── Optional current-card context ── */
+.card-context-row{display:flex;align-items:center;justify-content:flex-end;gap:5px;
+  margin-top:7px;padding:0 3px;position:relative;z-index:4}
+#start-center .card-context-row{width:100%}
+.card-context-toggle{display:inline-flex;align-items:center;gap:6px;min-height:27px;
+  background:transparent;color:var(--text-muted);border:1px solid var(--border);
+  border-radius:14px;padding:4px 9px 4px 7px;font:inherit;font-size:10.5px;font-weight:550;
+  cursor:pointer;white-space:nowrap;transition:color .14s,border-color .14s,background .14s,opacity .14s}
+.card-context-toggle svg{width:13px;height:13px;flex-shrink:0}
+.card-context-toggle:hover:not(:disabled){color:var(--text);border-color:var(--text-muted)}
+.card-context-toggle.on{color:var(--accent);border-color:var(--accent);
+  background:var(--accent-glow)}
+.card-context-toggle:disabled{opacity:.38;cursor:default}
+.context-status-dot{width:5px;height:5px;border-radius:50%;background:var(--text-faint);
+  transition:background .14s,box-shadow .14s}
+.card-context-toggle.on .context-status-dot{background:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow)}
+.context-info-wrap{position:relative;display:flex;align-items:center}
+.context-info-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  border:0;background:transparent;color:var(--text-faint);border-radius:50%;font:inherit;
+  font-size:11px;font-weight:700;cursor:pointer;transition:color .12s,background .12s}
+.context-info-btn:hover,.context-info-btn[aria-expanded="true"]{color:var(--accent);background:var(--accent-glow)}
+.context-info-popover{display:none;position:absolute;right:0;bottom:calc(100% + 7px);
+  width:280px;max-width:calc(100vw - 28px);max-height:calc(100vh - 80px);overflow-y:auto;padding:10px 11px;background:var(--bg);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 7px 25px rgba(0,0,0,.14);
+  color:var(--text-muted);font-size:10.5px;font-weight:400;line-height:1.5;text-align:left;z-index:40}
+.context-info-popover.open{display:block}
+.context-info-popover b{color:var(--text);font-weight:600}
+
+/* ── Chip manager modal ── */
+#chip-modal{display:none;position:fixed;inset:0;background:var(--overlay);
+  z-index:500;align-items:center;justify-content:center}
+#chip-modal.open{display:flex}
+#chip-modal-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;
+  width:300px;max-height:82vh;overflow-y:auto;padding:18px;
+  box-shadow:0 8px 40px rgba(0,0,0,.22)}
+.cm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cm-title{font-size:14px;font-weight:600}
+.cm-close{background:none;border:1px solid var(--border);cursor:pointer;
+  color:var(--text-muted);font-size:11px;font-family:inherit;font-weight:500;
+  padding:3px 10px;border-radius:6px;line-height:1.5}
+.cm-close:hover{color:var(--text);background:var(--surface)}
+.cm-section-label{font-size:10px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-muted);margin:14px 0 6px}
+.cm-section-label:first-of-type{margin-top:0}
+.cm-row{display:flex;align-items:center;justify-content:space-between;
+  padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
+.cm-row:last-child{border-bottom:none}
+.cm-chip-label{font-size:12px}
+.cm-shortcut-input{width:34px;font-size:11px;font-family:inherit;text-align:center;
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  border-radius:6px;padding:3px 4px;outline:none;flex-shrink:0}
+.cm-shortcut-input:focus{border-color:var(--accent)}
+.cm-shortcut-label{font-size:10px;color:var(--text-muted);margin-right:2px;flex-shrink:0}
+.cm-toggle-btn{font-size:11px;font-family:inherit;padding:3px 10px;border-radius:20px;
+  border:1px solid var(--border);cursor:pointer;color:var(--text-muted);
+  background:none;flex-shrink:0;transition:all .12s}
+.cm-toggle-btn.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.cm-custom-info{flex:1;min-width:0}
+.cm-custom-name{font-size:12px;font-weight:500}
+.cm-custom-preview{font-size:10px;color:var(--text-muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm-delete-btn{background:none;border:1px solid var(--border);color:var(--text-muted);
+  cursor:pointer;font-size:11px;font-family:inherit;padding:3px 8px;
+  border-radius:6px;flex-shrink:0}
+.cm-delete-btn:hover{color:var(--error);border-color:var(--error)}
+.cm-add-form{margin-top:10px}
+.cm-add-input,.cm-add-textarea{width:100%;background:var(--surface);
+  border:1px solid var(--border);color:var(--text);border-radius:8px;
+  padding:6px 10px;font-size:12px;font-family:inherit;outline:none;margin-bottom:6px}
+.cm-add-input:focus,.cm-add-textarea:focus{border-color:var(--text-muted)}
+.cm-add-textarea{resize:vertical;min-height:60px;line-height:1.4}
+.cm-hint{font-size:10px;color:var(--text-muted);margin-bottom:8px;line-height:1.4}
+.cm-error{font-size:11px;color:var(--error);margin-top:4px;min-height:15px}
+.cm-add-btn{width:100%;background:var(--accent);color:var(--accent-fg);border:none;
+  border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:opacity .15s}
+.cm-add-btn:hover{opacity:.82}
+
+/* ── API-key help ── */
+.s-keyhelp-link{display:inline-block;font-size:10.5px;color:var(--accent);
+  cursor:pointer;margin-top:4px;text-decoration:underline;user-select:none}
+.s-keyhelp-link:hover{opacity:.8}
+#keyhelp-modal{display:none;position:fixed;inset:0;background:var(--overlay);
+  z-index:520;align-items:center;justify-content:center}
+#keyhelp-modal.open{display:flex}
+#keyhelp-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;
+  width:310px;max-height:82vh;overflow-y:auto;padding:18px;
+  box-shadow:0 8px 40px rgba(0,0,0,.22)}
+.kh-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kh-title{font-size:14px;font-weight:600}
+.kh-close{background:none;border:1px solid var(--border);cursor:pointer;
+  color:var(--text-muted);font-size:11px;font-family:inherit;font-weight:500;
+  padding:3px 10px;border-radius:6px;line-height:1.5}
+.kh-close:hover{color:var(--text);background:var(--surface)}
+.kh-intro{font-size:11.5px;color:var(--text-muted);line-height:1.55;margin-bottom:12px}
+.kh-step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.kh-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);
+  color:var(--accent-fg);font-size:11px;font-weight:700;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.kh-step-text{font-size:12px;line-height:1.55;color:var(--text)}
+.kh-step-text b{font-weight:600}
+.kh-note{font-size:10.5px;color:var(--text-muted);line-height:1.5;
+  background:var(--surface);border-radius:8px;padding:8px 10px;margin-top:4px}
+.kh-open-btn{width:100%;background:var(--accent);color:var(--accent-fg);border:none;
+  border-radius:8px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:opacity .15s;margin-top:12px}
+.kh-open-btn:hover{opacity:.82}
+#s-ollama-setup-btn{width:100%;background:var(--surface);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;
+  font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px;transition:border-color .12s}
+#s-ollama-setup-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Setup banner ── */
+#setup-banner{display:none;margin:10px 14px 0;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;padding:10px 13px;
+  font-size:12px;color:var(--text-muted);line-height:1.5;position:relative;z-index:1}
+body.empty #setup-banner{display:none!important}
+#setup-banner button{background:var(--accent);color:var(--accent-fg);border:none;
+  border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;
+  font-family:inherit;margin-top:7px;display:block;transition:opacity .15s}
+#setup-banner button:hover{opacity:.8}
+
+/* ── Chat area ── */
+#chat{display:none;flex:1;overflow-y:auto;padding:14px 14px 4px;
+  flex-direction:column;gap:var(--chat-message-gap,12px);position:relative;z-index:1}
+#chat::-webkit-scrollbar{width:5px}
+#chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+body:not(.empty) #chat{display:flex}
+
+/* ── Messages ── */
+.msg{display:flex;flex-direction:column}
+.msg.user{align-items:flex-end}
+.msg.ai{align-items:flex-start}
+.bubble{max-width:88%;padding:9px 13px;border-radius:18px;
+  font-size:var(--chat-font-size,13px);line-height:var(--chat-line-height,1.6);word-break:break-word}
+.msg.user .bubble{background:var(--user-bubble);border-bottom-right-radius:5px}
+.msg.ai   .bubble{background:var(--ai-bubble);border-bottom-left-radius:5px;
+  border:1px solid var(--accent-border,rgba(59,130,246,.18))}
+.bubble code{background:var(--code-bg);padding:1px 5px;border-radius:4px;
+  font-size:11.5px;font-family:"SF Mono","Consolas","Fira Code",monospace}
+.bubble pre{background:var(--code-bg);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;overflow-x:auto;margin:7px 0;
+  font-size:11.5px;font-family:"SF Mono","Consolas","Fira Code",monospace;
+  white-space:pre-wrap;word-break:break-all}
+.bubble pre code{background:none;padding:0;font-size:inherit}
+.bubble ul,.bubble ol{padding-left:18px;margin:4px 0}
+.bubble li{margin:2px 0}
+.bubble strong{font-weight:600}
+.message-copy{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+  margin:3px 0 0 5px;padding:0;border:0;border-radius:7px;background:transparent;
+  color:var(--text-muted);cursor:pointer;transition:background .12s,color .12s}
+.message-copy:hover{background:var(--surface);color:var(--text)}
+.message-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.message-copy svg{width:14px;height:14px;pointer-events:none}
+.msg-error{font-size:12px;padding:7px 12px;line-height:1.5;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+  border-radius:12px;color:var(--error);max-width:88%}
+.msg.ai .bubble.bubble--error{
+  border-color:rgba(239,68,68,.5);
+  background:rgba(239,68,68,.04)}
+html.dark .msg.ai .bubble.bubble--error, body.dark .msg.ai .bubble.bubble--error{
+  border-color:rgba(248,113,113,.45);
+  background:rgba(248,113,113,.06)}
+.chip-indicator{font-size:11px;color:var(--text-faint);text-align:center;
+  padding:2px 0;user-select:none}
+
+/* ── Typing indicator ── */
+.typing-bubble{background:var(--ai-bubble);border-radius:18px;
+  border-bottom-left-radius:5px;padding:8px 14px;display:inline-block}
+.typing-dots{display:flex;gap:4px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);
+  animation:bop .9s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.18s}
+.dot:nth-child(3){animation-delay:.36s}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+/* ── Regular input (active state only) ── */
+#input-wrap{display:none;padding:6px 14px 4px;flex-shrink:0;position:relative;z-index:1}
+body:not(.empty) #input-wrap{display:block}
+#input-box{display:flex;align-items:center;gap:8px;background:var(--input-bg);
+  border:1px solid var(--border);border-radius:18px;padding:8px 8px 8px 14px;
+  transition:border-color .15s}
+#input-box:focus-within{border-color:var(--accent)}
+#user-input{flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:inherit;font-size:13px;resize:none;min-height:22px;max-height:110px;
+  line-height:1.5;padding:0}
+#user-input::placeholder{color:var(--text-muted)}
+#send-btn{width:30px;height:30px;border-radius:50%;background:var(--accent);
+  color:var(--accent-fg);border:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;transition:opacity .15s}
+#send-btn:disabled{opacity:.22;cursor:default}
+
+/* ── Compact input footer ── */
+.input-meta-row{display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-top:5px;padding:0 3px;min-height:27px}
+#input-wrap .card-context-row{margin-top:0;padding:0;flex:0 0 auto}
+#disclaimer{flex:1 1 auto;min-width:0;text-align:left;font-size:9.5px;
+  line-height:1.3;color:var(--text-faint);user-select:none}
+</style>
+<script>
+  /* Apply dark mode BEFORE the first paint (avoids a white flash) —
+     Anki propagates its theme via prefers-color-scheme. */
+  try{
+    if(window.matchMedia('(prefers-color-scheme: dark)').matches)
+      document.documentElement.classList.add('dark');
+  }catch(e){}
+</script>
+<style id="smartstudy-keyboard-focus">
+body button:focus-visible, body input:focus-visible, body select:focus-visible,
+body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-visible {
+  outline: 2px solid var(--accent, var(--primary-color, #0071d3));
+  outline-offset: 2px;
+}
+</style>
+</head>
+<body class="empty">
+
+<!-- Orb background (empty state) -->
+<div id="bg-anim">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+</div>
+
+<!-- ── Header ── -->
+<div id="header">
+  <span id="model-label">AI Assistant</span>
+  <div id="header-right">
+    <button class="hbtn" onclick="clearChat()" title="Clear chat">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="info-btn" onclick="toggleInfo()" title="Help & Privacy">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="settings-btn" onclick="toggleSettings()" title="Settings">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Settings panel -->
+  <div id="settings-panel">
+    <div class="ai-settings-tabs" role="tablist" aria-label="Settings">
+      <button id="ai-basic-tab" role="tab" aria-selected="true" aria-controls="ai-basic-settings" onclick="setSettingsTab('basic')">Basic</button>
+      <button id="ai-layout-tab" role="tab" aria-selected="false" aria-controls="ai-layout-settings" tabindex="-1" onclick="setSettingsTab('layout')">Layout</button>
+    </div>
+    <div id="ai-basic-settings" role="tabpanel" aria-labelledby="ai-basic-tab">
+    <div class="s-row">
+      <label class="s-label">Provider</label>
+      <select class="s-select" id="s-provider" onchange="onProviderChange()">
+        <option value="openai">OpenAI</option>
+        <option value="gemini">Google Gemini</option>
+        <option value="openrouter">OpenRouter</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="anthropic">Anthropic Claude</option>
+        <option value="ollama">Ollama (Local)</option>
+        <option value="llamaserver">llama.cpp Server (Local)</option>
+      </select>
+    </div>
+    <div class="s-row" id="s-apikey-row">
+      <label class="s-label">API Key</label>
+      <input class="s-input" type="password" id="s-apikey" placeholder="Enter your API key..." autocomplete="off"/>
+      <span class="s-keyhelp-link" id="s-keyhelp-link" onclick="openKeyHelp()">How do I get an API key?</span>
+    </div>
+    <div class="s-row">
+      <label class="s-label">Model</label>
+      <input class="s-input" id="s-model" list="s-model-list" placeholder="Select or type a model..." autocomplete="off"/>
+      <datalist id="s-model-list"></datalist>
+      <div class="s-hint">Pick from the list or type a custom model name.</div>
+    </div>
+    <div class="s-row" id="s-ollama-ep-row" style="display:none">
+      <label class="s-label">Ollama Endpoint</label>
+      <input class="s-input" type="url" id="s-ollama-ep" placeholder="http://localhost:11434" autocomplete="off"/>
+    </div>
+    <div class="s-row" id="s-ollama-row" style="display:none">
+      <label class="s-label">Ollama Status</label>
+      <div id="ollama-status-line">Checking...</div>
+      <button id="s-ollama-setup-btn" onclick="sendToPython('setup_ollama',{})">Open Setup Assistant</button>
+    </div>
+    <div class="s-row" id="s-llama-ep-row" style="display:none">
+      <label class="s-label">Server Endpoint</label>
+      <input class="s-input" type="url" id="s-llama-ep" placeholder="http://localhost:8080" autocomplete="off"/>
+      <div class="s-hint" id="llama-endpoint-hint">Base URL of your llama.cpp server (the OpenAI-compatible /v1 path is added automatically).</div>
+    </div>
+    <div class="s-row" id="s-llama-row" style="display:none">
+      <label class="s-label">Server Status</label>
+      <div id="llama-status-line">Checking...</div>
+    </div>
+    <div class="s-section">
+      <div class="s-row">
+        <label class="s-label">Response Language</label>
+        <select class="s-select" id="s-language">
+          <option value="English">English</option><option value="German">German</option>
+          <option value="French">French</option><option value="Spanish">Spanish</option>
+          <option value="Italian">Italian</option><option value="Portuguese">Portuguese</option>
+          <option value="Dutch">Dutch</option><option value="Russian">Russian</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+          <option value="Korean">Korean</option>
+          <option value="Polish">Polish</option>
+        </select>
+      </div>
+      <div class="s-row">
+        <label class="s-label">Card Content</label>
+        <select class="s-select" id="s-source">
+          <option value="Front Only">Front Only</option>
+          <option value="Front &amp; Back" selected>Front &amp; Back</option>
+          <option value="Back Only">Back Only</option>
+        </select>
+      </div>
+    </div>
+    </div>
+    <div id="ai-layout-settings" role="tabpanel" aria-labelledby="ai-layout-tab" hidden>
+      <div class="s-row">
+        <label class="s-label">Chat Font Size</label>
+        <select class="s-select" id="s-fontsize">
+          <option value="11px">Small (11px)</option>
+          <option value="13px" selected>Normal (13px)</option>
+          <option value="15px">Large (15px)</option>
+          <option value="17px">Extra Large (17px)</option>
+        </select>
+      </div>
+
+      <div class="s-row"><label class="s-label" for="s-lineheight">Line spacing</label>
+        <select class="s-select" id="s-lineheight"><option value="1.35">Compact</option><option value="1.6" selected>Standard</option><option value="1.85">Relaxed</option></select></div>
+      <div class="s-row"><label class="s-label" for="s-messagegap">Message spacing</label>
+        <select class="s-select" id="s-messagegap"><option value="6">Compact</option><option value="12" selected>Standard</option><option value="20">Relaxed</option></select></div>
+      <p class="s-hint" style="margin-bottom:12px">Applies to all conversations. Formulas are displayed automatically.</p>
+    </div>
+    <button class="s-save" onclick="saveSettings()">Save</button>
+  </div>
+
+  <!-- Info panel — inside #header so position:absolute works correctly -->
+  <div id="info-panel">
+    <div class="ip-title">Help &amp; Privacy</div>
+
+    <div class="ip-section">
+      <div class="ip-heading">What is an API Key?</div>
+      <div class="ip-body" id="help-api-body">
+        An API key is a password that lets Smart Study AI talk to an AI service on your behalf. You create one in the provider's dashboard, paste it here, and the add-on sends your questions directly to that service.
+      </div>
+    </div>
+
+    <hr class="ip-divider">
+
+    <div class="ip-section">
+      <div class="ip-heading">Which provider should I choose?</div>
+      <div class="ip-body" id="help-provider-body">
+        OpenAI (gpt-5.4-mini) is a fast all-rounder. Google Gemini offers a capable free tier. Anthropic Claude is strong at nuanced explanations. OpenRouter provides many models with one key. Ollama runs locally without a key or usage fees.
+      </div>
+    </div>
+
+    <hr class="ip-divider">
+
+    <div class="ip-section">
+      <div class="ip-heading">Local AI with Ollama</div>
+      <div class="ip-body" id="help-ollama-body">
+        Ollama runs open-source models directly on your computer. Nothing is sent to an online AI provider. Select Ollama, open the setup assistant, and install a model such as gemma2:2b.
+      </div>
+    </div>
+
+    <hr class="ip-divider">
+
+    <div class="ip-section">
+      <div class="ip-heading">Privacy &amp; Data Security</div>
+      <div class="ip-body" id="help-privacy-body">
+        Your API key is stored in your local Anki profile and is never uploaded by Smart Study. Questions go directly to the selected provider. Visible card text is included only when you use a Quick Action or enable current-card context. The chat assistant does not collect chat analytics, logs, or conversations.
+      </div>
+    </div>
+
+    <hr class="ip-divider">
+
+    <div class="ip-section">
+      <div class="ip-heading">Common Questions</div>
+      <div class="ip-body" id="help-billing-body">
+        Chat subscriptions and API access are separate products with separate billing. Google Gemini and some OpenRouter models offer free tiers; Ollama runs locally for free. API credit is managed in the selected provider's dashboard.
+      </div>
+    </div>
+
+    <hr class="ip-divider">
+
+    <div class="ip-section">
+      <div class="ip-heading">Quick Tips</div>
+      <div class="ip-body" id="help-tips-body">
+        Open a reviewer card before using Quick Actions. Enable current-card context for your own card questions. Manage button shortcuts in the Manage dialog. Choose Front &amp; Back for richer context and adjust the chat font size in Settings.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Chips bar — always at top ── -->
+<div id="chips-bar">
+  <!-- chips rendered by JS -->
+  <button class="chip-manage-btn" id="chip-manage-btn-top" onclick="openChipManager()">Manage</button>
+</div>
+
+<!-- ── Empty state: centered title + big input + hint ── -->
+<div id="start-center">
+  <div class="start-title">Smart Study AI</div>
+  <div id="start-input-box">
+    <textarea id="start-user-input" rows="1" placeholder="Ask anything..."></textarea>
+    <button id="start-send-btn" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="card-context-row" data-card-context-row>
+    <button class="card-context-toggle" data-card-context-toggle type="button" aria-pressed="false" onclick="toggleCardContext()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      <span data-card-context-label>Use current card</span><span class="context-status-dot"></span>
+    </button>
+    <div class="context-info-wrap">
+      <button class="context-info-btn" data-card-context-info type="button" aria-label="About current card context" aria-expanded="false" onclick="toggleCardContextInfo(this,event)">i</button>
+      <div class="context-info-popover" role="tooltip"><b>Current card context</b><br>When enabled, the text of the card currently open in Anki is sent in the background with each question and used by the AI. It stays hidden from the chat and is read fresh when you press Send. Your selected AI provider receives this text; with Ollama it stays on your computer.<br><br><span>Quick Actions always send the selected card text to your AI provider, even when this switch is off: they need it to explain the card or create a quiz. This switch only controls card context for questions you type yourself.</span></div>
+    </div>
+  </div>
+  <div class="start-hint">Type a question, or open an Anki card and use the quick action buttons above.</div>
+</div>
+
+<!-- Setup banner -->
+<div id="setup-banner">
+  No API key configured. Open Settings to get started.
+  <button onclick="openSettings()">Open Settings</button>
+</div>
+
+<!-- ── Chat messages (active state) ── -->
+<div id="chat"></div>
+
+<!-- ── Regular input (active state) ── -->
+<div id="input-wrap">
+  <div id="input-box">
+    <textarea id="user-input" rows="1" placeholder="Ask a question..."></textarea>
+    <button id="send-btn" disabled>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="input-meta-row">
+    <div id="disclaimer">AI can make mistakes &middot; Verify important information</div>
+    <div class="card-context-row" data-card-context-row>
+      <button class="card-context-toggle" data-card-context-toggle type="button" aria-pressed="false" onclick="toggleCardContext()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <span data-card-context-label>Use current card</span><span class="context-status-dot"></span>
+      </button>
+      <div class="context-info-wrap">
+        <button class="context-info-btn" data-card-context-info type="button" aria-label="About current card context" aria-expanded="false" onclick="toggleCardContextInfo(this,event)">i</button>
+        <div class="context-info-popover" role="tooltip"><b>Current card context</b><br>When enabled, the text of the card currently open in Anki is sent in the background with each question and used by the AI. It stays hidden from the chat and is read fresh when you press Send. Your selected AI provider receives this text; with Ollama it stays on your computer.<br><br><span>Quick Actions always send the selected card text to your AI provider, even when this switch is off: they need it to explain the card or create a quiz. This switch only controls card context for questions you type yourself.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── API-key help modal ── -->
+<div id="keyhelp-modal">
+  <div id="keyhelp-card">
+    <div class="kh-header">
+      <span class="kh-title" id="kh-title">Get an API Key</span>
+      <button class="kh-close" onclick="closeKeyHelp()">Close</button>
+    </div>
+    <div class="kh-intro" id="kh-intro"></div>
+    <div id="kh-steps"></div>
+    <div class="kh-note" id="kh-note"></div>
+    <button class="kh-open-btn" id="kh-open-btn"></button>
+  </div>
+</div>
+
+<!-- ── Chip manager modal ── -->
+<div id="chip-modal">
+  <div id="chip-modal-card">
+    <div class="cm-header">
+      <span class="cm-title">Quick Action Buttons</span>
+      <button class="cm-close" onclick="closeChipManager()">Close</button>
+    </div>
+    <div class="cm-section-label">Built-in</div>
+    <div id="cm-builtin-list"></div>
+    <div class="cm-section-label">Your Custom Buttons</div>
+    <div id="cm-custom-list"></div>
+    <div class="cm-section-label" id="cm-form-title">Add New Button</div>
+    <div class="cm-add-form">
+      <input class="cm-add-input" id="cm-new-label" placeholder="Button name (e.g. Simplify)" maxlength="30"/>
+      <textarea class="cm-add-textarea" id="cm-new-prompt"
+        placeholder="Your prompt. Use {content} where the card text should go.&#10;Example: Explain {content} as if I were a beginner."></textarea>
+      <div class="cm-hint" id="custom-prompt-hint">Use <code style="font-size:10px">{content}</code> where the card text should appear.</div>
+      <div class="cm-error" id="cm-error"></div>
+      <button class="cm-add-btn" id="cm-submit" onclick="addCustomChip()">Add Button</button>
+      <button class="cm-delete-btn" id="cm-cancel-edit" onclick="cancelCustomChipEdit()" hidden>Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Localisation ─────────────────────────────────────────────────────────────
+var TR = {};
+function tr(source) {
+  source = String(source == null ? '' : source);
+  return Object.prototype.hasOwnProperty.call(TR, source) ? TR[source] : source;
+}
+function translateStaticUI(root) {
+  root = root || document.body;
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      var p = node.parentElement;
+      if (!p || /^(SCRIPT|STYLE|TEMPLATE)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  var nodes = [], node;
+  while ((node = walker.nextNode())) nodes.push(node);
+  nodes.forEach(function(n) {
+    var raw = n.nodeValue;
+    var key = raw.replace(/\s+/g, ' ').trim();
+    var translated = tr(key);
+    if (translated !== key) {
+      n.nodeValue = (raw.match(/^\s*/) || [''])[0] + translated + (raw.match(/\s*$/) || [''])[0];
+    }
+  });
+  root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(function(el) {
+    ['placeholder','title','aria-label'].forEach(function(attr) {
+      if (!el.hasAttribute(attr)) return;
+      var raw = el.getAttribute(attr);
+      var value = tr(raw);
+      if (value !== raw) el.setAttribute(attr, value);
+    });
+  });
+}
+function localizeHelpBodies() {
+  var bodies = {
+    'help-api-body': "An API key is a password that lets Smart Study AI talk to an AI service on your behalf. You create one in the provider's dashboard, paste it here, and the add-on sends your questions directly to that service.",
+    'help-provider-body': 'OpenAI (gpt-5.4-mini) is a fast all-rounder. Google Gemini offers a capable free tier. Anthropic Claude is strong at nuanced explanations. OpenRouter provides many models with one key. Ollama runs locally without a key or usage fees.',
+    'help-ollama-body': 'Ollama runs open-source models directly on your computer. Nothing is sent to an online AI provider. Select Ollama, open the setup assistant, and install a model such as gemma2:2b.',
+    'help-privacy-body': 'Your API key is stored in your local Anki profile and is never uploaded by Smart Study. Questions go directly to the selected provider. Visible card text is included only when you use a Quick Action or enable current-card context. The chat assistant does not collect chat analytics, logs, or conversations.',
+    'help-billing-body': "Chat subscriptions and API access are separate products with separate billing. Google Gemini and some OpenRouter models offer free tiers; Ollama runs locally for free. API credit is managed in the selected provider's dashboard.",
+    'help-tips-body': 'Open a reviewer card before using Quick Actions. Enable current-card context for your own card questions. Manage button shortcuts in the Manage dialog. Choose Front & Back for richer context and adjust the chat font size in Settings.'
+  };
+  Object.keys(bodies).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = tr(bodies[id]);
+  });
+}
+
+// ── Bridge ────────────────────────────────────────────────────────────────────
+function sendToPython(action, data) {
+  console.log('PYCALL:' + action + ':' + JSON.stringify(data || {}));
+}
+
+// ── Model lists ───────────────────────────────────────────────────────────────
+var MODELS = {
+  deepseek:   ['deepseek-flash','deepseek-v4-pro'],
+  openai:     ['gpt-5.4-mini','gpt-5.5','gpt-5.4','gpt-4o-mini','gpt-4o'],
+  gemini:     ['gemini-3.6-flash','gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.1-pro-preview','gemini-2.5-flash'],
+  openrouter: [
+    'openai/gpt-5.4-mini','openai/gpt-5.5','google/gemini-3.5-flash',
+    'anthropic/claude-haiku-4-5','anthropic/claude-sonnet-5',
+    'meta-llama/llama-3.1-8b-instruct','mistralai/mistral-small-3.1-24b',
+    'meta-llama/llama-3.2-3b-instruct:free','meta-llama/llama-3.1-8b-instruct:free',
+    'deepseek/deepseek-chat-v3-0324:free','mistralai/mistral-7b-instruct:free'
+  ],
+  anthropic:  ['claude-sonnet-5','claude-haiku-4-5-20251001','claude-opus-4-8'],
+  ollama:     [],
+  llamaserver: []
+};
+
+// Retired model IDs → current equivalents, so a user's old saved selection
+// (e.g. gemini-1.5/2.0, which Google shut down) keeps working.
+var LEGACY_MODELS = {
+  'gemini-2.0-flash':'gemini-2.5-flash',
+  'gemini-2.0-flash-lite':'gemini-2.5-flash-lite',
+  'gemini-1.5-flash':'gemini-2.5-flash',
+  'gemini-1.5-pro':'gemini-2.5-pro',
+  'gemini-pro':'gemini-2.5-flash',
+  'gemini-3.1-flash':'gemini-3.5-flash',
+  'gemini-3.1-pro':'gemini-3.1-pro-preview',
+  'google/gemini-2.0-flash-001':'google/gemini-2.5-flash',
+  'claude-opus-4-6':'claude-opus-4-8'
+};
+
+// ── Built-in chips ────────────────────────────────────────────────────────────
+var BUILTIN_CHIPS = [
+  { id:'short',    label:'Short'    },
+  { id:'concise',  label:'Concise'  },
+  { id:'detailed', label:'Detailed' },
+  { id:'mcq',      label:'Quiz Me'  },
+  { id:'mnemonic', label:'Mnemonic' },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var busy         = false;
+var chipsEnabled = false;
+var cardContextEnabled   = false;
+var cardContextAvailable = false;
+var chipConfig   = {
+  builtin:   { short:true, concise:true, detailed:true, mcq:true, mnemonic:true },
+  shortcuts: { short:'', concise:'', detailed:'', mcq:'', mnemonic:'' },
+  custom:    []
+};
+
+// ── Streaming state ───────────────────────────────────────────────────────────
+var _streamBubble = null;
+var _streamRaw    = '';
+var _streamAnswer = null;   // answer sub-element (separate from "thinking")
+var _streamThink  = '';     // accumulated reasoning_content (reasoning models)
+var _thinkEl      = null;   // <details> disclosure holding the reasoning
+
+// ── Accent color ──────────────────────────────────────────────────────────────
+var ACCENT_PRESETS = ['#3b82f6','#6366f1','#8b5cf6','#ec4899','#10b981','#f59e0b','#ef4444'];
+
+function setFontSize(px) {
+  if (!px) return;
+  document.documentElement.style.setProperty('--chat-font-size', px);
+  var sel = document.getElementById('s-fontsize');
+  if (sel) sel.value = px;
+}
+
+function setAccentColor(color) {
+  if (!color || !/^#[0-9a-fA-F]{6}$/.test(color)) return;
+  var r = parseInt(color.slice(1,3),16);
+  var g = parseInt(color.slice(3,5),16);
+  var b = parseInt(color.slice(5,7),16);
+  var isDark = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+  // Full rgba strings — avoids rgba(var(--r),...) which some WebEngine builds reject
+  var op1 = isDark ? 0.20 : 0.13;
+  var op2 = isDark ? 0.13 : 0.09;
+  // Dark mode also declares defaults on body.dark. Apply the selected theme
+  // to both elements so that body's closer CSS variables cannot keep the
+  // violet fallback active after a theme change.
+  var targets = [document.documentElement];
+  if (document.body) targets.push(document.body);
+  targets.forEach(function(target) {
+    target.style.setProperty('--accent', color);
+    target.style.setProperty('--accent-glow',   'rgba('+r+','+g+','+b+','+op1+')');
+    target.style.setProperty('--accent-glow-2', 'rgba('+r+','+g+','+b+','+op2+')');
+    target.style.setProperty('--accent-border',  'rgba('+r+','+g+','+b+','+(isDark?0.28:0.18)+')');
+  });
+  // fg: white on dark accent, dark on light accent
+  var lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  targets.forEach(function(target) {
+    target.style.setProperty('--accent-fg', lum > 0.6 ? '#0d0d0d' : '#ffffff');
+  });
+}
+
+// ── Init (called from Python) ─────────────────────────────────────────────────
+function init(cfg) {
+  console.log('AI Assistant: init() provider=' + cfg.provider);
+  TR = cfg.translations || {};
+  if (cfg.isDark){ document.documentElement.classList.add('dark'); document.body.classList.add('dark'); }
+  else { document.documentElement.classList.remove('dark'); document.body.classList.remove('dark'); }
+  translateStaticUI(document.body);
+  localizeHelpBodies();
+  var llamaHint = document.getElementById('llama-endpoint-hint');
+  if (llamaHint) llamaHint.textContent = tr('Base URL of your llama.cpp server (the OpenAI-compatible /v1 path is added automatically).');
+  var promptInput = document.getElementById('cm-new-prompt');
+  if (promptInput) promptInput.placeholder = tr('Your prompt. Use {content} where the card text should go.\nExample: Explain {content} as if I were a beginner.');
+  var promptHint = document.getElementById('custom-prompt-hint');
+  if (promptHint) {
+    var hintText = tr('Use {content} where the card text should appear.');
+    var hintParts = hintText.split('{content}');
+    var hintCode = document.createElement('code');
+    hintCode.style.fontSize = '10px';
+    hintCode.textContent = '{content}';
+    promptHint.replaceChildren(
+      document.createTextNode(hintParts[0] || ''),
+      hintCode,
+      document.createTextNode(hintParts.slice(1).join('{content}'))
+    );
+  }
+
+  safeSet('s-provider', cfg.provider  || 'openai');
+  safeSet('s-apikey',   cfg.apiKey    || '');
+  safeSet('s-language', cfg.language  || 'English');
+  safeSet('s-source',   cfg.source    || 'Front Only');
+  document.getElementById('s-ollama-ep').value = cfg.ollamaEndpoint || 'http://localhost:11434';
+  document.getElementById('s-llama-ep').value  = cfg.llamaEndpoint  || 'http://localhost:8080';
+
+  // Accent color
+  var accent = cfg.accentColor || (cfg.isDark ? '#6366f1' : '#3b82f6');
+  setAccentColor(accent);
+
+  // Font size
+  setFontSize(cfg.fontSize || '13px');
+  safeSet('s-fontsize', cfg.fontSize || '13px');
+  safeSet('s-lineheight', String(cfg.lineHeight || 1.6));
+  safeSet('s-messagegap', String(cfg.messageGap || 12));
+  applyChatLayout(cfg);
+
+  cardContextEnabled = !!cfg.cardContextEnabled;
+  updateCardContextControls();
+
+  onProviderChange(false);
+  if (cfg.model) document.getElementById('s-model').value = LEGACY_MODELS[cfg.model] || cfg.model;
+
+  if (cfg.provider === 'ollama') {
+    setOllamaStatus(cfg.ollamaRunning ? 'running' : 'stopped', cfg.ollamaModels || []);
+  } else if (cfg.provider === 'llamaserver') {
+    sendToPython('check_llama', {});
+  }
+
+  if (cfg.chipsConfig) {
+    if (cfg.chipsConfig.builtin) {
+      Object.keys(cfg.chipsConfig.builtin).forEach(function(k) {
+        chipConfig.builtin[k] = cfg.chipsConfig.builtin[k];
+      });
+    }
+    if (cfg.chipsConfig.shortcuts) {
+      Object.keys(cfg.chipsConfig.shortcuts).forEach(function(k) {
+        chipConfig.shortcuts[k] = cfg.chipsConfig.shortcuts[k];
+      });
+    }
+    if (Array.isArray(cfg.chipsConfig.custom)) {
+      chipConfig.custom = cfg.chipsConfig.custom;
+    }
+  }
+  renderChips();
+
+  if (!cfg.isConfigured) {
+    document.getElementById('setup-banner').dataset.showOnActive = '1';
+  }
+  updateModelLabel();
+  console.log('AI Assistant: init() done');
+}
+
+// ── DOMContentLoaded ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('AI Assistant: DOMContentLoaded – signalling Python');
+  sendToPython('page_ready', {});
+
+  // Smart auto-scroll: stop following the stream when the user scrolls up.
+  initChatScrollTracking();
+
+  // Active-state input
+  var inp = document.getElementById('user-input');
+  inp.addEventListener('input', function() { autoResize(inp); updateSendBtn(); });
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); trySend(); }
+  });
+  document.getElementById('send-btn').addEventListener('click', trySend);
+
+  // Model picker: the datalist dropdown filters by the current text, so with
+  // a model already selected the user had to delete it to see the full list.
+  // Clear the field on focus (full list opens) and restore the previous value
+  // on blur if nothing new was picked or typed.
+  (function() {
+    var modelInp = document.getElementById('s-model');
+    if (!modelInp) return;
+    var prevModel = null;
+    modelInp.addEventListener('focus', function() {
+      if (modelInp.value) { prevModel = modelInp.value; modelInp.value = ''; }
+    });
+    modelInp.addEventListener('blur', function() {
+      if (!modelInp.value && prevModel) modelInp.value = prevModel;
+      prevModel = null;
+    });
+  })();
+
+  // Empty-state big input
+  var startInp = document.getElementById('start-user-input');
+  startInp.addEventListener('input', function() { autoResize(startInp); updateStartSendBtn(); });
+  startInp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); trySendFromEmpty(); }
+  });
+  document.getElementById('start-send-btn').addEventListener('click', trySendFromEmpty);
+
+  // Close modal on overlay click
+  document.getElementById('chip-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeChipManager();
+  });
+  document.getElementById('keyhelp-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeKeyHelp();
+  });
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest || !e.target.closest('.context-info-wrap')) {
+      closeCardContextInfo();
+    }
+  });
+
+  // Global keyboard shortcuts for chip buttons (only when not typing)
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (document.activeElement || {}).tagName || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!chipsEnabled || busy) return;
+    var key = e.key;
+    // Builtin chip shortcuts
+    var shorts = chipConfig.shortcuts || {};
+    for (var id in shorts) {
+      if (shorts[id] && shorts[id] === key) {
+        var chip = null;
+        for (var i = 0; i < BUILTIN_CHIPS.length; i++) {
+          if (BUILTIN_CHIPS[i].id === id) { chip = BUILTIN_CHIPS[i]; break; }
+        }
+        if (chip) {
+          e.preventDefault();
+          sendToPython('chip_action', { action: chip.id, label: chip.label });
+          return;
+        }
+      }
+    }
+    // Custom chip shortcuts
+    var customs = chipConfig.custom || [];
+    for (var j = 0; j < customs.length; j++) {
+      var cc = customs[j];
+      if (cc.shortcut && cc.shortcut === key) {
+        e.preventDefault();
+        sendToPython('chip_action', { action:'custom', label:cc.label, prompt:cc.prompt });
+        return;
+      }
+    }
+  });
+});
+
+// ── Layout transition ─────────────────────────────────────────────────────────
+function startChat() {
+  if (!document.body.classList.contains('empty')) return;
+  document.body.classList.remove('empty');
+  var banner = document.getElementById('setup-banner');
+  if (banner.dataset.showOnActive) {
+    banner.style.display = 'block';
+    delete banner.dataset.showOnActive;
+  }
+}
+
+// ── Chip rendering ────────────────────────────────────────────────────────────
+function renderChips() {
+  var bar = document.getElementById('chips-bar');
+  var mgr = document.getElementById('chip-manage-btn-top');
+  if (!bar || !mgr) return;
+
+  Array.from(bar.childNodes).forEach(function(n) {
+    if (n !== mgr) bar.removeChild(n);
+  });
+
+  BUILTIN_CHIPS.forEach(function(c) {
+    if (chipConfig.builtin[c.id] === false) return;
+    var btn = _makeChip(tr(c.label), function() {
+      if (!chipsEnabled || busy) return;
+      sendToPython('chip_action', { action: c.id, label: c.label });
+    });
+    bar.insertBefore(btn, mgr);
+  });
+
+  chipConfig.custom.forEach(function(c) {
+    var btn = _makeChip(c.label, function() {
+      if (!chipsEnabled || busy) return;
+      sendToPython('chip_action', { action:'custom', label:c.label, prompt:c.prompt });
+    });
+    bar.insertBefore(btn, mgr);
+  });
+
+  _applyChipState();
+}
+
+function _makeChip(label, handler) {
+  var btn = document.createElement('button');
+  btn.className   = 'chip';
+  btn.textContent = label;
+  btn.disabled    = !chipsEnabled;
+  btn.addEventListener('click', handler);
+  return btn;
+}
+
+function _applyChipState() {
+  document.querySelectorAll('#chips-bar .chip').forEach(function(b) {
+    b.disabled = !chipsEnabled;
+  });
+}
+
+function setChipsEnabled(enabled) {
+  chipsEnabled = enabled;
+  _applyChipState();
+}
+
+function setReviewState(enabled) {
+  cardContextAvailable = !!enabled;
+  setChipsEnabled(enabled);
+  updateCardContextControls();
+}
+
+function updateCardContextControls() {
+  document.querySelectorAll('[data-card-context-toggle]').forEach(function(btn) {
+    var active = cardContextEnabled && cardContextAvailable;
+    btn.classList.toggle('on', active);
+    btn.setAttribute('aria-pressed', cardContextEnabled ? 'true' : 'false');
+    // If the preference is already on, allow it to be switched off even after
+    // leaving review mode. Turning it on requires an actual card.
+    btn.disabled = busy || (!cardContextAvailable && !cardContextEnabled);
+    btn.title = cardContextAvailable
+      ? (cardContextEnabled ? tr('Current card context is on') : tr('Use the current Anki card as context'))
+      : (cardContextEnabled ? tr('Waiting for a card — click to turn off') : tr('Open a card in the reviewer first'));
+  });
+}
+
+function toggleCardContext() {
+  if (busy || (!cardContextAvailable && !cardContextEnabled)) return;
+  cardContextEnabled = !cardContextEnabled;
+  updateCardContextControls();
+  sendToPython('set_card_context', { enabled: cardContextEnabled });
+}
+
+function closeCardContextInfo() {
+  document.querySelectorAll('.context-info-popover.open').forEach(function(pop) {
+    pop.classList.remove('open');
+  });
+  document.querySelectorAll('[data-card-context-info]').forEach(function(btn) {
+    btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function toggleCardContextInfo(button, event) {
+  if (event) event.stopPropagation();
+  var popover = button.parentNode.querySelector('.context-info-popover');
+  var shouldOpen = !popover.classList.contains('open');
+  closeCardContextInfo();
+  if (shouldOpen) {
+    popover.classList.add('open');
+    button.setAttribute('aria-expanded', 'true');
+  }
+}
+
+// ── Chip manager ──────────────────────────────────────────────────────────────
+function openChipManager() {
+  document.getElementById('chip-modal').classList.add('open');
+  document.getElementById('cm-error').textContent = '';
+  _renderChipManager();
+}
+function closeChipManager() {
+  if(editingCustomChipId!==null)cancelCustomChipEdit();
+  document.getElementById('chip-modal').classList.remove('open');
+}
+
+function _renderChipManager() {
+  var bl = document.getElementById('cm-builtin-list');
+  bl.innerHTML = '';
+  BUILTIN_CHIPS.forEach(function(c) {
+    var on  = chipConfig.builtin[c.id] !== false;
+    var row = document.createElement('div');
+    row.className = 'cm-row';
+    var lbl = document.createElement('span');
+    lbl.className   = 'cm-chip-label';
+    lbl.style.flex  = '1';
+    lbl.textContent = tr(c.label);
+    // Shortcut input
+    var scLbl = document.createElement('span');
+    scLbl.className   = 'cm-shortcut-label';
+    scLbl.textContent = tr('Key');
+    var scInp = document.createElement('input');
+    scInp.type       = 'text';
+    scInp.className  = 'cm-shortcut-input';
+    scInp.maxLength  = 1;
+    scInp.value      = chipConfig.shortcuts[c.id] || '';
+    scInp.placeholder= '—';
+    scInp.title      = tr('Press this key to trigger “{label}” when not typing').replace('{label}', tr(c.label));
+    scInp.addEventListener('input', function() {
+      var k = scInp.value.trim().slice(-1); // keep last char
+      scInp.value = k;
+      if (!chipConfig.shortcuts) chipConfig.shortcuts = {};
+      chipConfig.shortcuts[c.id] = k;
+      sendToPython('save_chips', { config: chipConfig });
+    });
+    var btn = document.createElement('button');
+    btn.className   = 'cm-toggle-btn' + (on ? ' on' : '');
+    btn.textContent = on ? tr('On') : tr('Off');
+    btn.addEventListener('click', function() { toggleBuiltin(c.id); });
+    row.appendChild(lbl);
+    row.appendChild(scLbl); row.appendChild(scInp);
+    row.appendChild(btn);
+    bl.appendChild(row);
+  });
+
+  var cl = document.getElementById('cm-custom-list');
+  cl.innerHTML = '';
+  if (!chipConfig.custom.length) {
+    var ph = document.createElement('div');
+    ph.style.cssText = 'font-size:12px;color:var(--text-muted);padding:6px 0';
+    ph.textContent = tr('No custom buttons yet.');
+    cl.appendChild(ph);
+  } else {
+    chipConfig.custom.forEach(function(c) {
+      var row = document.createElement('div');
+      row.className = 'cm-row';
+      var info = document.createElement('div');
+      info.className = 'cm-custom-info';
+      var nm = document.createElement('div'); nm.className = 'cm-custom-name';
+      nm.textContent = c.label;
+      var pv = document.createElement('div'); pv.className = 'cm-custom-preview';
+      pv.textContent = c.prompt.length > 55 ? c.prompt.slice(0,55) + '...' : c.prompt;
+      info.appendChild(nm); info.appendChild(pv);
+      var scLbl = document.createElement('span');
+      scLbl.className   = 'cm-shortcut-label';
+      scLbl.textContent = tr('Key');
+      var scInp = document.createElement('input');
+      scInp.type       = 'text';
+      scInp.className  = 'cm-shortcut-input';
+      scInp.maxLength  = 1;
+      scInp.value      = c.shortcut || '';
+      scInp.placeholder= '—';
+      scInp.addEventListener('input', function() {
+        var k = scInp.value.trim().slice(-1);
+        scInp.value = k;
+        c.shortcut = k;
+        sendToPython('save_chips', { config: chipConfig });
+      });
+      var edit = document.createElement('button');edit.className='cm-delete-btn';edit.textContent=tr('Edit');edit.addEventListener('click',function(){editCustomChip(c.id);});
+      var del = document.createElement('button');
+      del.className   = 'cm-delete-btn';
+      del.textContent = tr('Delete');
+      del.addEventListener('click', function() { deleteCustomChip(c.id); });
+      row.appendChild(info);
+      row.appendChild(scLbl); row.appendChild(scInp);
+      row.appendChild(edit);row.appendChild(del);
+      cl.appendChild(row);
+    });
+  }
+}
+
+function toggleBuiltin(id) {
+  chipConfig.builtin[id] = !chipConfig.builtin[id];
+  sendToPython('save_chips', { config: chipConfig });
+  renderChips();
+  _renderChipManager();
+}
+
+function deleteCustomChip(id) {
+  if(editingCustomChipId===id)cancelCustomChipEdit();
+  chipConfig.custom = chipConfig.custom.filter(function(c) { return c.id !== id; });
+  sendToPython('save_chips', { config: chipConfig });
+  renderChips();
+  _renderChipManager();
+}
+
+var editingCustomChipId=null,customChipAddDraft=null;
+function editCustomChip(id){
+  var chip=chipConfig.custom.find(function(item){return item.id===id;});if(!chip)return;
+  if(editingCustomChipId===null)customChipAddDraft={label:document.getElementById('cm-new-label').value,prompt:document.getElementById('cm-new-prompt').value};
+  editingCustomChipId=id;document.getElementById('cm-new-label').value=chip.label;document.getElementById('cm-new-prompt').value=chip.prompt;
+  document.getElementById('cm-form-title').textContent=tr('Edit');document.getElementById('cm-submit').textContent=tr('Save');document.getElementById('cm-cancel-edit').hidden=false;document.getElementById('cm-error').textContent='';
+  document.getElementById('cm-new-label').focus();document.getElementById('cm-new-label').scrollIntoView({block:'nearest'});
+}
+function cancelCustomChipEdit(){
+  editingCustomChipId=null;document.getElementById('cm-new-label').value=customChipAddDraft?.label||'';document.getElementById('cm-new-prompt').value=customChipAddDraft?.prompt||'';customChipAddDraft=null;document.getElementById('cm-form-title').textContent=tr('Add New Button');document.getElementById('cm-submit').textContent=tr('Add Button');document.getElementById('cm-cancel-edit').hidden=true;document.getElementById('cm-error').textContent='';
+}
+function addCustomChip() {
+  var label  = document.getElementById('cm-new-label').value.trim();
+  var prompt = document.getElementById('cm-new-prompt').value.trim();
+  var errEl  = document.getElementById('cm-error');
+  if (!label)  { errEl.textContent = tr('Please enter a button name.'); return; }
+  if (!prompt) { errEl.textContent = tr('Please enter a prompt.'); return; }
+  if (prompt.indexOf('{content}') === -1) {
+    errEl.textContent = tr('Add {content} to your prompt (where the card text goes).'); return;
+  }
+  errEl.textContent = '';
+  if(editingCustomChipId!==null){
+    var index=chipConfig.custom.findIndex(function(item){return item.id===editingCustomChipId;});if(index<0){cancelCustomChipEdit();return;}
+    chipConfig.custom[index]=Object.assign({},chipConfig.custom[index],{label:label,prompt:document.getElementById('cm-new-prompt').value});
+  }else chipConfig.custom.push({ id: String(Date.now()), label: label, prompt: prompt });
+  cancelCustomChipEdit();
+  sendToPython('save_chips', { config: chipConfig });
+  renderChips();
+  _renderChipManager();
+}
+
+// ── API-key help (per-provider, written for non-technical users) ─────────────
+var KEY_HELP = {
+  deepseek: {
+    name: 'DeepSeek',
+    intro: 'Create a DeepSeek API key in the DeepSeek Platform.',
+    steps: [
+      'Sign in — or create an account if you don’t have one.',
+      'Go to “API Keys” and click “Create Key”.',
+      'Come back here and paste it into the API Key field, then press Save.'
+    ],
+    note: 'API usage is billed separately and requires an available balance.',
+    url: 'https://platform.deepseek.com/api_keys',
+    urlLabel: 'Open DeepSeek Platform'
+  },
+  openai: {
+    name: 'OpenAI',
+    intro: 'An API key is like a personal password that lets this add-on talk to ChatGPT’s technology directly. It takes about 2 minutes to create.',
+    steps: [
+      'Click the button below to open the OpenAI key page in your browser.',
+      'Sign in — or create a free account if you don’t have one.',
+      'Click “Create new secret key”, give it any name (e.g. “Anki”) and confirm.',
+      'Copy the key that appears (it starts with “sk-”) — you only see it once!',
+      'Come back here and paste it into the API Key field, then press Save.'
+    ],
+    note: 'You may need to add a small credit balance (e.g. $5) under “Billing” before the key works. Typical usage costs only a few cents per month. Note: a ChatGPT Plus subscription does NOT include API credit — they are separate products.',
+    url: 'https://platform.openai.com/api-keys',
+    urlLabel: 'Open OpenAI Key Page'
+  },
+  gemini: {
+    name: 'Google Gemini',
+    intro: 'Google offers a free tier for Gemini — you can create a key with your normal Google account, no payment details needed.',
+    steps: [
+      'Click the button below to open Google AI Studio in your browser.',
+      'Sign in with your Google account.',
+      'Click “Create API key” and confirm.',
+      'Copy the key that appears (it starts with “AIza”).',
+      'Come back here and paste it into the API Key field, then press Save.'
+    ],
+    note: 'The free tier is generous enough for everyday studying. No credit card required.',
+    url: 'https://aistudio.google.com/apikey',
+    urlLabel: 'Open Google AI Studio'
+  },
+  openrouter: {
+    name: 'OpenRouter',
+    intro: 'OpenRouter gives you access to many different AI models (OpenAI, Google, Meta …) with a single key — including some free models.',
+    steps: [
+      'Click the button below to open the OpenRouter key page in your browser.',
+      'Sign in — you can use a Google or GitHub account.',
+      'Click “Create Key”, give it any name and confirm.',
+      'Copy the key that appears (it starts with “sk-or-”).',
+      'Come back here and paste it into the API Key field, then press Save.'
+    ],
+    note: 'Models ending in “:free” cost nothing but are rate-limited. For faster answers, add a few dollars of credit and pick a paid model.',
+    url: 'https://openrouter.ai/keys',
+    urlLabel: 'Open OpenRouter Key Page'
+  },
+  anthropic: {
+    name: 'Anthropic Claude',
+    intro: 'Anthropic’s Claude models are great at clear, nuanced explanations. A key is created in the Anthropic Console.',
+    steps: [
+      'Click the button below to open the Anthropic Console in your browser.',
+      'Sign in — or create an account if you don’t have one.',
+      'Go to “API Keys” and click “Create Key”.',
+      'Copy the key that appears (it starts with “sk-ant-”) — you only see it once!',
+      'Come back here and paste it into the API Key field, then press Save.'
+    ],
+    note: 'You may need to add a small credit balance under “Plans & Billing” before the key works. Note: a Claude Pro subscription does NOT include API credit — they are separate products.',
+    url: 'https://console.anthropic.com/settings/keys',
+    urlLabel: 'Open Anthropic Console'
+  },
+  llamaserver: {
+    name: 'llama.cpp Server',
+    intro: 'A llama.cpp server usually runs locally and needs NO API key. Only fill the key field if you started your server with the --api-key option.',
+    steps: [
+      'Start your llama.cpp server (llama-server) on your computer or network.',
+      'Enter its address in the “Server Endpoint” field (default: http://localhost:8080).',
+      'Leave the API Key field empty unless your server requires one.',
+      'Press Save — the status line shows whether the server is reachable.'
+    ],
+    note: 'Everything stays on your own machine — free and private.',
+    url: '',
+    urlLabel: ''
+  }
+};
+
+function openKeyHelp() {
+  var prov = document.getElementById('s-provider').value;
+  var h = KEY_HELP[prov];
+  if (!h) return;
+  document.getElementById('kh-title').textContent = tr('Get a {provider} API Key').replace('{provider}', h.name);
+  document.getElementById('kh-intro').textContent = tr(h.intro);
+  var stepsEl = document.getElementById('kh-steps');
+  stepsEl.innerHTML = '';
+  h.steps.forEach(function(s, i) {
+    var row = document.createElement('div'); row.className = 'kh-step';
+    var num = document.createElement('div'); num.className = 'kh-step-num';
+    num.textContent = String(i + 1);
+    var txt = document.createElement('div'); txt.className = 'kh-step-text';
+    txt.textContent = tr(s);
+    row.appendChild(num); row.appendChild(txt);
+    stepsEl.appendChild(row);
+  });
+  document.getElementById('kh-note').textContent = h.note ? tr(h.note) : '';
+  document.getElementById('kh-note').style.display = h.note ? 'block' : 'none';
+  var btn = document.getElementById('kh-open-btn');
+  if (h.url) {
+    btn.style.display = 'block';
+    btn.textContent = tr(h.urlLabel);
+    btn.onclick = function() { sendToPython('open_url', { url: h.url }); };
+  } else {
+    btn.style.display = 'none';
+  }
+  document.getElementById('keyhelp-modal').classList.add('open');
+}
+function closeKeyHelp() {
+  document.getElementById('keyhelp-modal').classList.remove('open');
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+function onProviderChange(resetModel) {
+  if (resetModel === undefined) resetModel = true;
+  var prov     = document.getElementById('s-provider').value;
+  var isOllama = prov === 'ollama';
+  var isLlama  = prov === 'llamaserver';
+  // Local providers don't require an API key; llama.cpp may use an optional one.
+  document.getElementById('s-apikey-row').style.display    = isOllama ? 'none' : '';
+  document.getElementById('s-ollama-ep-row').style.display = isOllama ? '' : 'none';
+  document.getElementById('s-ollama-row').style.display    = isOllama ? '' : 'none';
+  document.getElementById('s-llama-ep-row').style.display  = isLlama  ? '' : 'none';
+  document.getElementById('s-llama-row').style.display     = isLlama  ? '' : 'none';
+  var apikey = document.getElementById('s-apikey');
+  apikey.placeholder = isLlama ? tr('Optional — only if server uses --api-key')
+                               : tr('Enter your API key...');
+  var khl = document.getElementById('s-keyhelp-link');
+  if (khl) khl.textContent = isLlama ? tr('Do I need an API key?') : tr('How do I get an API key?');
+  var inp = document.getElementById('s-model');
+  var dl  = document.getElementById('s-model-list');
+  dl.innerHTML = '';
+  if (isOllama) {
+    inp.placeholder = tr('Fetching models...');
+    sendToPython('check_ollama', {});
+  } else if (isLlama) {
+    inp.placeholder = tr('Model name (e.g. the model your server loaded)');
+    sendToPython('check_llama', {});
+  } else {
+    (MODELS[prov] || []).forEach(function(m) {
+      var o = document.createElement('option'); o.value = m; dl.appendChild(o);
+    });
+    if (resetModel && MODELS[prov] && MODELS[prov].length) inp.value = MODELS[prov][0];
+    inp.placeholder = tr('Select or type a model...');
+  }
+}
+
+function populateOllamaModels(models) {
+  var inp = document.getElementById('s-model');
+  var dl  = document.getElementById('s-model-list');
+  dl.innerHTML = '';
+  if (!models || !models.length) {
+    inp.placeholder = tr('No models installed — set up Ollama first');
+  } else {
+    models.forEach(function(m) { var o = document.createElement('option'); o.value = m; dl.appendChild(o); });
+    inp.placeholder = tr('Select or type a model...');
+    if (!inp.value) inp.value = models[0];
+  }
+}
+
+function setOllamaStatus(status, models) {
+  var el = document.getElementById('ollama-status-line');
+  if (status === 'running') {
+    el.innerHTML = '<span style="color:var(--success)">' + esc(tr('Running')) + '</span>';
+    if (models && models.length) populateOllamaModels(models);
+  } else {
+    el.innerHTML = '<span style="color:var(--error)">' + esc(tr('Not running')) + '</span>' +
+      ' &mdash; <a onclick="sendToPython(\'setup_ollama\',{})">' + esc(tr('Set up Ollama')) + '</a>';
+  }
+}
+
+function setLlamaStatus(status, models) {
+  var el = document.getElementById('llama-status-line');
+  if (!el) return;
+  if (status === 'running') {
+    el.innerHTML = '<span style="color:var(--success)">' + esc(tr('Reachable')) + '</span>';
+    // Offer the loaded model(s) as suggestions, but allow any custom name.
+    var inp = document.getElementById('s-model');
+    var dl  = document.getElementById('s-model-list');
+    dl.innerHTML = '';
+    if (models && models.length) {
+      models.forEach(function(m) { var o = document.createElement('option'); o.value = m; dl.appendChild(o); });
+      if (!inp.value) inp.value = models[0];
+    }
+  } else {
+    el.innerHTML = '<span style="color:var(--error)">' + esc(tr('Not reachable')) + '</span>' +
+      ' &mdash; ' + esc(tr('Check the endpoint and make sure the server is running.'));
+  }
+}
+
+function saveSettings() {
+  var data = {
+    provider:       document.getElementById('s-provider').value,
+    model:          document.getElementById('s-model').value.trim(),
+    apiKey:         document.getElementById('s-apikey').value.trim(),
+    language:       document.getElementById('s-language').value,
+    source:         document.getElementById('s-source').value,
+    ownPrompt:      '',
+    ollamaEndpoint: document.getElementById('s-ollama-ep').value.trim() || 'http://localhost:11434',
+    llamaEndpoint:  document.getElementById('s-llama-ep').value.trim() || 'http://localhost:8080',
+    fontSize:       document.getElementById('s-fontsize').value || '13px',
+    lineHeight: Number(document.getElementById('s-lineheight').value),
+    messageGap: Number(document.getElementById('s-messagegap').value)
+  };
+  setFontSize(data.fontSize);
+  applyChatLayout(data);
+  console.log('AI Assistant: save_settings provider=' + data.provider + ' model=' + data.model);
+  sendToPython('save_settings', data);
+  var banner    = document.getElementById('setup-banner');
+  var configured = (data.provider === 'ollama') || (data.provider === 'llamaserver') || !!data.apiKey;
+  if (configured) {
+    banner.style.display = 'none';
+    delete banner.dataset.showOnActive;
+  } else {
+    if (!document.body.classList.contains('empty')) {
+      banner.style.display = 'block';
+    } else {
+      banner.dataset.showOnActive = '1';
+    }
+  }
+  updateModelLabel();
+  closeSettings();
+}
+
+function updateModelLabel() {
+  var p = document.getElementById('s-provider').value;
+  var m = document.getElementById('s-model').value || '';
+  var names = {openai:'OpenAI',gemini:'Gemini',openrouter:'OpenRouter',deepseek:'DeepSeek',anthropic:'Anthropic',ollama:'Ollama',llamaserver:'llama.cpp'};
+  var mn = m.split('/').pop();
+  document.getElementById('model-label').textContent = (names[p] || p) + (mn ? ' · ' + mn : '');
+}
+
+var _settingsListenerActive = false;
+var _infoListenerActive     = false;
+
+function toggleSettings() {
+  var p = document.getElementById('settings-panel');
+  if (p.classList.contains('open')) closeSettings(); else openSettings();
+}
+function openSettings() {
+  closeInfo();
+  document.getElementById('settings-panel').classList.add('open');
+  if (!_settingsListenerActive) {
+    setTimeout(function() {
+      document.addEventListener('click', _outsideClick);
+      _settingsListenerActive = true;
+    }, 30);
+  }
+}
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+  document.removeEventListener('click', _outsideClick);
+  _settingsListenerActive = false;
+}
+function _outsideClick(e) {
+  var p = document.getElementById('settings-panel');
+  var b = document.getElementById('settings-btn');
+  if (!p.contains(e.target) && !b.contains(e.target)) closeSettings();
+}
+
+function toggleInfo() {
+  var p = document.getElementById('info-panel');
+  if (p.classList.contains('open')) closeInfo(); else openInfo();
+}
+function openInfo() {
+  closeSettings();
+  document.getElementById('info-panel').classList.add('open');
+  if (!_infoListenerActive) {
+    setTimeout(function() {
+      document.addEventListener('click', _outsideInfoClick);
+      _infoListenerActive = true;
+    }, 30);
+  }
+}
+function closeInfo() {
+  document.getElementById('info-panel').classList.remove('open');
+  document.removeEventListener('click', _outsideInfoClick);
+  _infoListenerActive = false;
+}
+function _outsideInfoClick(e) {
+  var p = document.getElementById('info-panel');
+  var b = document.getElementById('info-btn');
+  if (!p.contains(e.target) && !b.contains(e.target)) closeInfo();
+}
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+
+// Send from the empty-state big input
+function trySendFromEmpty() {
+  var inp  = document.getElementById('start-user-input');
+  var text = inp.value.trim();
+  if (!text || busy) return;
+  inp.value = '';
+  autoResize(inp);
+  startChat();
+  addMsg('user', text);
+  setBusy(true);
+  sendToPython('send_message', {
+    text: text,
+    useCardContext: cardContextEnabled && cardContextAvailable
+  });
+}
+
+// Send from the active-state regular input
+function trySend() {
+  var inp  = document.getElementById('user-input');
+  var text = inp.value.trim();
+  if (!text || busy) return;
+  startChat();
+  addMsg('user', text);
+  inp.value = '';
+  autoResize(inp);
+  setBusy(true);
+  sendToPython('send_message', {
+    text: text,
+    useCardContext: cardContextEnabled && cardContextAvailable
+  });
+}
+
+// ── Smart auto-scroll ─────────────────────────────────────────────────────────
+// Follow the stream only while the user is at (or near) the bottom. As soon
+// as they scroll up to read, stop yanking them down; scrolling back to the
+// bottom re-enables following automatically.
+var _autoFollow = true;
+
+function _chatNearBottom(chat) {
+  return (chat.scrollHeight - chat.scrollTop - chat.clientHeight) < 40;
+}
+
+function scrollChatToBottom(force) {
+  var chat = document.getElementById('chat');
+  if (!chat) return;
+  if (force) _autoFollow = true;
+  if (_autoFollow) chat.scrollTop = chat.scrollHeight;
+}
+
+function initChatScrollTracking() {
+  var chat = document.getElementById('chat');
+  if (!chat) return;
+  chat.addEventListener('scroll', function() {
+    // Programmatic scrolls land at the bottom, so this stays true for them;
+    // only a real user scroll away from the bottom disables following.
+    _autoFollow = _chatNearBottom(chat);
+  }, { passive: true });
+}
+
+var _copySequence = 0;
+var _copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>';
+function addCopyButton(row, text) {
+  if (!text || !text.trim() || row.querySelector('.message-copy')) return;
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'message-copy';
+  button.id = 'message-copy-' + (++_copySequence);
+  button.title = tr('Copy');
+  button.setAttribute('aria-label', tr('Copy'));
+  button.innerHTML = _copyIcon;
+  button.onclick = function() {
+    sendToPython('copy_response', {text: text, buttonId: button.id});
+  };
+  row.appendChild(button);
+}
+function responseCopied(buttonId, success) {
+  var button = document.getElementById(buttonId);
+  if (!button) return;
+  clearTimeout(button._copyReset);
+  button.title = tr(success ? 'Copied!' : 'Could not copy text');
+  button.setAttribute('aria-label', button.title);
+  button.innerHTML = success ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>' : _copyIcon;
+  button._copyReset = setTimeout(function() {
+    button.innerHTML = _copyIcon;
+    button.title = tr('Copy');
+    button.setAttribute('aria-label', button.title);
+  }, 1800);
+}
+
+function addMsg(role, rawText) {
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+  var bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = renderMarkdown(rawText);
+  row.appendChild(bub);
+  if (role !== 'user') addCopyButton(row, rawText);
+  chat.appendChild(row);
+  scrollChatToBottom(true);
+}
+
+// ── Streaming (called from Python) ────────────────────────────────────────────
+function startAIBubble() {
+  hideTyping();
+  startChat();
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.id        = 'streaming-row';
+  row.className = 'msg ai';
+  var bub = document.createElement('div');
+  bub.id        = 'streaming-bubble';
+  bub.className = 'bubble';
+  var ans = document.createElement('div');   // answer goes here, below any thinking block
+  ans.className = 'stream-answer';
+  bub.appendChild(ans);
+  row.appendChild(bub);
+  chat.appendChild(row);
+  _streamBubble = bub;
+  _streamAnswer = ans;
+  _streamRaw    = '';
+  _streamThink  = '';
+  _thinkEl      = null;
+  scrollChatToBottom(true);
+}
+
+// Reasoning models (e.g. Qwen3, DeepSeek-R1 via llama.cpp / OpenRouter) stream
+// their chain-of-thought separately in delta.reasoning_content. Show it in a
+// collapsible "Thinking" disclosure above the answer so the bubble isn't blank
+// while the model reasons, and so reasoning never pollutes the saved answer.
+function appendThinking(chunk) {
+  if (!_streamBubble) return;
+  if (!_thinkEl) {
+    _thinkEl = document.createElement('details');
+    _thinkEl.open = true;
+    _thinkEl.style.cssText = 'margin-bottom:6px;font-size:0.92em';
+    var sum = document.createElement('summary');
+    sum.textContent = tr('Thinking…');
+    sum.style.cssText = 'color:var(--text-muted);cursor:pointer;user-select:none';
+    var body = document.createElement('div');
+    body.style.cssText = 'color:var(--text-muted);white-space:pre-wrap;margin-top:4px;'
+      + 'padding-left:8px;border-left:2px solid var(--text-muted);opacity:0.85';
+    _thinkEl.appendChild(sum);
+    _thinkEl.appendChild(body);
+    _thinkEl._body = body;
+    _streamBubble.insertBefore(_thinkEl, _streamAnswer);
+  }
+  _streamThink += chunk;
+  _thinkEl._body.textContent = _streamThink;
+  scrollChatToBottom(false);
+}
+
+function appendChunk(chunk) {
+  if (!_streamBubble) return;
+  // First real answer token: collapse the thinking disclosure.
+  if (_thinkEl && _streamRaw === '') {
+    _thinkEl.open = false;
+    var s = _thinkEl.querySelector('summary');
+    if (s) s.textContent = tr('Thoughts');
+  }
+  _streamRaw += chunk;
+  _streamAnswer.innerHTML = renderMarkdown(_streamRaw);
+  scrollChatToBottom(false);
+}
+
+function finalizeResponse() {
+  if (_streamBubble) {
+    var row = document.getElementById('streaming-row');
+    if (row) row.removeAttribute('id');
+    _streamBubble.removeAttribute('id');
+    if (_streamAnswer) _streamAnswer.innerHTML = renderMarkdown(_streamRaw);
+    if (row) addCopyButton(row, _streamRaw);
+  }
+  _streamBubble = null;
+  _streamAnswer = null;
+  _streamRaw    = '';
+  _streamThink  = '';
+  _thinkEl      = null;
+  setBusy(false);
+  scrollChatToBottom(false);
+}
+
+function cancelStream() {
+  var row = document.getElementById('streaming-row');
+  if (row) row.remove();
+  _streamBubble = null;
+  _streamAnswer = null;
+  _streamRaw    = '';
+  _streamThink  = '';
+  _thinkEl      = null;
+  hideTyping();
+  setBusy(false);
+}
+
+function receiveErrorAsChat(text) {
+  hideTyping();
+  setBusy(false);
+  startChat();
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.className = 'msg ai';
+  var bub = document.createElement('div');
+  bub.className = 'bubble bubble--error';
+  row.appendChild(bub);
+  chat.appendChild(row);
+  scrollChatToBottom(true);
+  // Fast typewriter effect — batches chars so it's quick but still animated
+  var chars = text.split('');
+  var idx = 0;
+  function tick() {
+    if (idx >= chars.length) return;
+    var batch = Math.min(4, chars.length - idx);
+    bub.textContent = chars.slice(0, idx + batch).join('');
+    idx += batch;
+    scrollChatToBottom(false);
+    if (idx < chars.length) setTimeout(tick, 16);
+  }
+  setTimeout(tick, 60);
+}
+
+function receiveResponse(text, isError) {
+  if (isError) { receiveErrorAsChat(text); return; }
+  hideTyping();
+  setBusy(false);
+  startChat();
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.className = 'msg ai';
+  var bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = renderMarkdown(text);
+  row.appendChild(bub);
+  addCopyButton(row, text);
+  chat.appendChild(row);
+  scrollChatToBottom(true);
+}
+
+function receiveChipPrompt(label) {
+  startChat();
+  var chat = document.getElementById('chat');
+  var ind  = document.createElement('div');
+  ind.className   = 'chip-indicator';
+  ind.textContent = label;
+  chat.appendChild(ind);
+  setBusy(true);
+  showTyping();
+  scrollChatToBottom(true);
+}
+
+function showTyping() {
+  if (document.getElementById('typing-row')) return;
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.id        = 'typing-row';
+  row.className = 'msg ai';
+  var bub = document.createElement('div');
+  bub.className = 'typing-bubble';
+  bub.innerHTML = '<div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  row.appendChild(bub);
+  chat.appendChild(row);
+  scrollChatToBottom(true);
+}
+
+function hideTyping() {
+  var el = document.getElementById('typing-row');
+  if (el) el.remove();
+}
+
+function clearChat() {
+  var chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  _streamBubble = null;
+  _streamRaw    = '';
+  var startInp = document.getElementById('start-user-input');
+  startInp.value = '';
+  autoResize(startInp);
+  var activeInp = document.getElementById('user-input');
+  activeInp.value = '';
+  autoResize(activeInp);
+  document.getElementById('start-send-btn').disabled = true;
+  document.body.classList.add('empty');
+  setBusy(false);
+  sendToPython('clear_history', {});
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function setBusy(s) {
+  busy = s;
+  updateSendBtn();
+  updateStartSendBtn();
+  updateCardContextControls();
+}
+function updateSendBtn() {
+  var b = document.getElementById('send-btn');
+  var i = document.getElementById('user-input');
+  b.disabled = busy || !i.value.trim();
+}
+function updateStartSendBtn() {
+  var b = document.getElementById('start-send-btn');
+  var i = document.getElementById('start-user-input');
+  b.disabled = busy || !i.value.trim();
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+function safeSet(id, val) { var e = document.getElementById(id); if (e) e.value = val; }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Markdown renderer ─────────────────────────────────────────────────────────
+function renderMarkdown(raw) { return window.smartstudyRenderMarkdown(raw); }
+function applyChatLayout(cfg) {
+  const line = [1.35,1.6,1.85].includes(Number(cfg.lineHeight)) ? Number(cfg.lineHeight) : 1.6;
+  const gap = [6,12,20].includes(Number(cfg.messageGap)) ? Number(cfg.messageGap) : 12;
+  document.documentElement.style.setProperty('--chat-line-height', line);
+  document.documentElement.style.setProperty('--chat-message-gap', gap+'px');
+}
+function setSettingsTab(name) {
+  ['basic','layout'].forEach(key=>{
+    document.getElementById('ai-'+key+'-settings').hidden=key!==name;
+    const tab=document.getElementById('ai-'+key+'-tab');
+    tab.setAttribute('aria-selected', String(key===name));tab.tabIndex=key===name?0:-1;
+  });
+}
+document.querySelector('.ai-settings-tabs').addEventListener('keydown', event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const name=event.key==='Home'?'basic':event.key==='End'?'layout':document.getElementById('ai-basic-settings').hidden?'basic':'layout';
+  setSettingsTab(name);document.getElementById('ai-'+name+'-tab').focus();
+});
+
+</script>
+
+    <script>
+    /* ── SmartStudy global error reporter ─────────────────────────────────
+       Self-contained (inline styles, no page-CSS dependencies): invisible
+       until a JS error occurs, then shows a dismissible banner with the
+       real traceback so users can report actionable bugs instead of
+       "buttons are not working". Never throws itself. */
+    (function() {
+        if (window.__spReportError) return;
+        function isDark() {
+            try {
+                if (document.documentElement.classList.contains('nightMode') || document.body.classList.contains('nightMode')
+                    || document.documentElement.classList.contains('dark') || document.body.classList.contains('dark')) return true;
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            } catch (e) { return false; }
+        }
+        function ensureBanner() {
+            var b = document.getElementById('sp-error-banner');
+            if (b) return b;
+            if (!document.body) return null;
+            var dark = isDark();
+            b = document.createElement('div');
+            b.id = 'sp-error-banner';
+            b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
+                + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
+            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+                + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
+            var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
+                + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'
+                + (dark ? 'background:#404040;border:1px solid #555;' : 'background:#f5f5f5;border:1px solid #ccc;');
+            b.innerHTML = '<div style="font-weight:700;color:#dc3545;margin-bottom:4px;">' + esc(tr('Smart Study error')) + '</div>'
+                + '<div class="sp-eb-msg" style="margin-bottom:6px;word-break:break-word;"></div>'
+                + '<pre class="sp-eb-pre" style="' + preCss + '"></pre>'
+                + '<div><button type="button" data-spact="details" style="' + btnCss + '">' + esc(tr('Show details')) + '</button>'
+                + '<button type="button" data-spact="copy" style="' + btnCss + '">' + esc(tr('Copy error')) + '</button>'
+                + '<button type="button" data-spact="dismiss" style="' + btnCss + '">' + esc(tr('Dismiss')) + '</button></div>';
+            document.body.appendChild(b);
+            b.addEventListener('click', function(e) {
+                var act = e.target && e.target.getAttribute && e.target.getAttribute('data-spact');
+                if (act === 'dismiss') b.style.display = 'none';
+                if (act === 'details') {
+                    var pre = b.querySelector('.sp-eb-pre');
+                    var open = pre.style.display === 'block';
+                    pre.style.display = open ? 'none' : 'block';
+                    e.target.textContent = open ? tr('Show details') : tr('Hide details');
+                }
+                if (act === 'copy') {
+                    var text = b.querySelector('.sp-eb-msg').textContent + '\n\n' + b.querySelector('.sp-eb-pre').textContent;
+                    try { navigator.clipboard.writeText(text); e.target.textContent = tr('Copied!'); setTimeout(function() { e.target.textContent = tr('Copy error'); }, 2000); } catch (err) {}
+                }
+            });
+            return b;
+        }
+        window.__spReportError = function(err, context) {
+            try {
+                var msg = (err && err.message) ? err.message : String(err);
+                var stack = (err && err.stack) ? String(err.stack) : tr('(no stack trace available)');
+                console.error('[SmartStudy]' + (context ? ' [' + context + ']' : ''), err);
+                var show = function() {
+                    var b = ensureBanner();
+                    if (!b) return;
+                    b.querySelector('.sp-eb-msg').textContent = (context ? context + ': ' : '') + msg
+                        + ' — ' + tr('Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.');
+                    b.querySelector('.sp-eb-pre').textContent = stack;
+                    b.style.display = 'block';
+                };
+                if (document.body) show();
+                else document.addEventListener('DOMContentLoaded', show);
+            } catch (e) { try { console.error('[SmartStudy] error while reporting error', e, err); } catch (e2) {} }
+        };
+        window.addEventListener('error', function(e) {
+            if (e.error && (e.error.message || e.error.stack)) window.__spReportError(e.error, tr('Unexpected error'));
+            else console.warn('[SmartStudy] Background browser error:', e.message || e);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            if (e.reason && e.reason.smartstudyCritical === true) window.__spReportError(e.reason, tr('Unexpected error (async)'));
+            else console.warn('[SmartStudy] Background task rejected:', e.reason);
+            e.preventDefault();
+        });
+    })();
+    </script>
+</body>
+</html>

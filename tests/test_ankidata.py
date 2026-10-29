@@ -6,7 +6,7 @@ from datetime import timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pkg = types.ModuleType("lp")  # load the add-on folder as a package without __init__ (needs mw)
-pkg.__path__ = [os.path.join(ROOT, "addon")]
+pkg.__path__ = [os.path.join(ROOT, "addon", "plan")]
 sys.modules["lp"] = pkg
 
 from anki.collection import Collection  # noqa: E402

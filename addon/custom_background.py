@@ -1,0 +1,659 @@
+# -*- coding: utf-8 -*-
+"""Fast, profile-local custom background rendering for SmartStudy.
+
+The image is decoded once and painted by one native QWidget behind Anki's
+top/main/bottom web views. Normally Chromium receives only transparent
+backgrounds. An extra image copy is provided only for explicitly enabled glass.
+"""
+
+from __future__ import annotations
+
+import base64
+import json
+import os
+from typing import Optional
+
+from aqt import mw
+from aqt.qt import (
+    QColor, QEvent, QFileDialog, QGraphicsBlurEffect, QGraphicsPixmapItem,
+    QGraphicsScene, QImageReader, QPainter, QPixmap, QRectF, QSize, Qt, QTimer,
+    QWidget, QBuffer, QByteArray, QIODevice, QPoint,
+)
+from aqt.utils import showWarning
+
+from .locales import _
+
+MAX_FILE_BYTES = 20 * 1024 * 1024
+MAX_PIXELS = 40_000_000
+MAX_SOURCE_EDGE = 10_000
+MAX_STORED_WIDTH = 3840
+MAX_STORED_HEIGHT = 2160
+ACTIVE_STATES = {"deckBrowser", "overview"}
+
+_layer: Optional["BackgroundLayer"] = None
+_settings = {}
+_review_cache = (None, "")
+
+
+def _storage_dir() -> str:
+    profile = mw.pm.profileFolder() if mw and getattr(mw, "pm", None) else ""
+    return os.path.join(profile, "SmartStudy_Data", "custom_background")
+
+
+def image_path() -> str:
+    return os.path.join(_storage_dir(), "background.jpg")
+
+
+def _preview_path() -> str:
+    return os.path.join(_storage_dir(), "preview.jpg")
+
+
+def pending_image_path() -> str:
+    return os.path.join(_storage_dir(), "pending.jpg")
+
+
+def _preview_for(path: str) -> str:
+    return _preview_path() if path == image_path() else path + ".preview.jpg"
+
+
+def has_image() -> bool:
+    try:
+        return os.path.isfile(image_path()) and os.path.getsize(image_path()) > 0
+    except OSError:
+        return False
+
+
+def preview_data_uri() -> str:
+    return data_uri_for(image_path())
+
+
+def data_uri_for(path: str) -> str:
+    try:
+        if not path or not os.path.isfile(path):
+            return ""
+        candidate = _preview_for(path)
+        preview = candidate if os.path.isfile(candidate) else path
+        with open(preview, "rb") as handle:
+            return "data:image/jpeg;base64," + base64.b64encode(handle.read()).decode("ascii")
+    except Exception:
+        return ""
+
+
+def would_upscale_strongly(path: Optional[str] = None) -> bool:
+    """Return whether cover rendering needs substantial enlargement.
+
+    The check uses the current window's physical pixel size, so a portrait or
+    low-resolution image is judged against the display it will actually fill.
+    It is advisory only and never rejects an otherwise valid image.
+    """
+    candidate = path or image_path()
+    try:
+        reader = QImageReader(candidate)
+        reader.setAutoTransform(True)
+        size = reader.size()
+        parent = mw.centralWidget() if mw else None
+        if size.width() < 1 or size.height() < 1 or parent is None:
+            return False
+        dpr = max(1.0, float(parent.devicePixelRatioF()))
+        target_w = max(1.0, parent.width() * dpr)
+        target_h = max(1.0, parent.height() * dpr)
+        cover_scale = max(target_w / size.width(), target_h / size.height())
+        return cover_scale > 1.35
+    except Exception:
+        return False
+
+
+def import_image(parent=None, target_path: Optional[str] = None) -> bool:
+    """Ask for an image, then validate and store an optimized local JPEG."""
+    filename, _filter = QFileDialog.getOpenFileName(
+        parent,
+        _("Choose Background Image"),
+        "",
+        _("Images (*.jpg *.jpeg *.png *.webp)"),
+    )
+    if not filename:
+        return False
+    return import_image_file(filename, parent=parent, target_path=target_path)
+
+
+def import_image_file(
+    filename: str,
+    parent=None,
+    target_path: Optional[str] = None,
+) -> bool:
+    """Validate and optimize a known local image path.
+
+    Used by both the native file picker and bundled Starter Wallpapers, so
+    examples receive exactly the same safety and performance checks as user
+    images.
+    """
+    target = target_path or image_path()
+    try:
+        size_bytes = os.path.getsize(filename)
+        if size_bytes <= 0 or size_bytes > MAX_FILE_BYTES:
+            raise ValueError(_("The image must be smaller than 20 MB."))
+
+        reader = QImageReader(filename)
+        reader.setAutoTransform(True)
+        can_read = reader.canRead()
+        image_format = bytes(reader.format()).decode("ascii", "ignore").lower()
+        if not can_read or image_format not in ("jpg", "jpeg", "png", "webp"):
+            raise ValueError(_("Please choose a valid PNG, JPEG or WebP image."))
+        try:
+            if reader.supportsAnimation() and reader.imageCount() != 1:
+                raise ValueError(_("Animated images are not supported."))
+        except AttributeError:
+            pass
+        source_size = reader.size()
+        width, height = source_size.width(), source_size.height()
+        if width < 1 or height < 1:
+            raise ValueError(_("The image dimensions could not be read."))
+        if (width > MAX_SOURCE_EDGE or height > MAX_SOURCE_EDGE
+                or width * height > MAX_PIXELS):
+            raise ValueError(_("The image is too large. Use an image below 40 megapixels."))
+
+        scale = min(1.0, MAX_STORED_WIDTH / width, MAX_STORED_HEIGHT / height)
+        if scale < 1.0:
+            reader.setScaledSize(QSize(max(1, int(width * scale)), max(1, int(height * scale))))
+        image = reader.read()
+        if image.isNull():
+            raise ValueError(_("The image could not be decoded."))
+
+        os.makedirs(_storage_dir(), exist_ok=True)
+        temporary = target + ".tmp.jpg"
+        if not image.save(temporary, "JPEG", 88):
+            raise ValueError(_("The optimized background could not be saved."))
+        os.replace(temporary, target)
+        preview = image.scaled(
+            QSize(720, 405), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        preview.save(_preview_for(target), "JPEG", 78)
+        return True
+    except Exception as exc:
+        try:
+            temporary = target + ".tmp.jpg"
+            if os.path.exists(temporary):
+                os.remove(temporary)
+        except OSError:
+            pass
+        showWarning(str(exc), parent=parent)
+        return False
+
+
+def remove_image() -> None:
+    try:
+        for path in (image_path(), _preview_path()):
+            if os.path.exists(path):
+                os.remove(path)
+    except OSError as exc:
+        print(f"SmartStudy: could not remove custom background: {exc}")
+
+
+def discard_pending() -> None:
+    for path in (pending_image_path(), _preview_for(pending_image_path())):
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+        except OSError:
+            pass
+
+
+def commit_pending() -> bool:
+    pending = pending_image_path()
+    if not os.path.isfile(pending):
+        return False
+    os.replace(pending, image_path())
+    pending_preview = _preview_for(pending)
+    if os.path.isfile(pending_preview):
+        os.replace(pending_preview, _preview_path())
+    return True
+
+
+def _blur_pixmap(source: QPixmap, radius: int) -> QPixmap:
+    """Create one cached blurred pixmap; never blur during paint events."""
+    if source.isNull() or radius <= 0:
+        return source
+    # Blur a bounded working image. This one-time GPU/Qt operation stays fast
+    # even when the imported source came from a 4K display.
+    working = source
+    if max(source.width(), source.height()) > 2560:
+        working = source.scaled(
+            QSize(2560, 2560), Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+    scene = QGraphicsScene()
+    item = QGraphicsPixmapItem(working)
+    effect = QGraphicsBlurEffect()
+    effect.setBlurRadius(float(radius))
+    effect.setBlurHints(QGraphicsBlurEffect.BlurHint.QualityHint)
+    item.setGraphicsEffect(effect)
+    scene.addItem(item)
+    pad = max(2, radius * 2)
+    output = QPixmap(working.width() + pad * 2, working.height() + pad * 2)
+    output.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(output)
+    scene.render(
+        painter,
+        QRectF(0, 0, output.width(), output.height()),
+        QRectF(-pad, -pad, output.width(), output.height()),
+    )
+    painter.end()
+    return output.copy(pad, pad, working.width(), working.height())
+
+
+class BackgroundLayer(QWidget):
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self._pixmap = QPixmap()
+        self._overlay = 0
+        self._position = "center"
+        self._cache_key = None
+        self._glass_image_data = None
+        self._glass_geometry_timer = QTimer(self)
+        self._glass_geometry_timer.setSingleShot(True)
+        self._glass_geometry_timer.setInterval(60)
+        self._glass_geometry_timer.timeout.connect(self._sync_glass_geometry)
+        self.setObjectName("SmartStudyCustomBackgroundLayer")
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
+        parent.installEventFilter(self)
+        self.setGeometry(parent.rect())
+        self.lower()
+        self.hide()
+
+    def eventFilter(self, watched, event):
+        if watched is self.parentWidget() and event.type() in (
+            QEvent.Type.Resize, QEvent.Type.Show,
+        ):
+            self.setGeometry(watched.rect())
+            self.lower()
+        if event.type() in (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show) and _glass_active():
+            self._glass_geometry_timer.start()
+        return False
+
+    def _sync_glass_geometry(self):
+        if not _glass_active():
+            return
+        try:
+            geometry = _glass_geometry()
+            mw.web.eval("if(window.__smartstudySyncGlassBackdrop) window.__smartstudySyncGlassBackdrop(" + json.dumps(geometry) + ");")
+        except Exception as exc:
+            print(f"Glass wallpaper alignment failed: {exc}")
+
+    def glass_image_data(self):
+        if self._glass_image_data is None and not self._pixmap.isNull():
+            data = QByteArray()
+            buffer = QBuffer(data)
+            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+            saved = self._pixmap.save(buffer, "PNG")
+            buffer.close()
+            if saved:
+                self._glass_image_data = "data:image/png;base64," + base64.b64encode(bytes(data)).decode("ascii")
+        return self._glass_image_data
+
+    def load(self, blur_radius: int, overlay: int, position: str = "center") -> None:
+        blur_radius = max(0, min(30, int(blur_radius)))
+        try:
+            key = (image_path(), os.path.getmtime(image_path()), blur_radius)
+        except OSError:
+            key = None
+        if key != self._cache_key:
+            source = QPixmap(image_path()) if has_image() else QPixmap()
+            self._pixmap = _blur_pixmap(source, blur_radius)
+            self._cache_key = key
+            self._glass_image_data = None
+        self._overlay = max(0, min(70, int(overlay)))
+        self._position = position if position in ("top", "center", "bottom") else "center"
+        self.update()
+
+    def paintEvent(self, event):
+        if self._pixmap.isNull():
+            return
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+        target = self.rect()
+        source = self._pixmap.rect()
+        scale = max(target.width() / source.width(), target.height() / source.height())
+        visible_w = target.width() / scale
+        visible_h = target.height() / scale
+        sx = (source.width() - visible_w) / 2.0
+        if self._position == "top":
+            sy = 0.0
+        elif self._position == "bottom":
+            sy = source.height() - visible_h
+        else:
+            sy = (source.height() - visible_h) / 2.0
+        painter.drawPixmap(QRectF(target), self._pixmap, QRectF(sx, sy, visible_w, visible_h))
+        if self._overlay:
+            painter.fillRect(target, QColor(0, 0, 0, round(255 * self._overlay / 100)))
+        painter.end()
+
+
+
+def _bounded(value, default, maximum):
+    try:
+        return max(0, min(maximum, int(value)))
+    except (TypeError, ValueError, OverflowError):
+        return default
+
+
+def reviewer_background_css() -> str:
+    """Cache blur and theme wash together so template CSS cannot separate them."""
+    global _review_cache
+    if not (_settings.get("custom_background_enabled")
+            and _settings.get("custom_background_review_enabled") and has_image()):
+        return ""
+    from aqt.theme import theme_manager
+    blur = _bounded(_settings.get("custom_background_review_blur", 8), 8, 30)
+    intensity = _bounded(_settings.get("custom_background_review_intensity", 20), 20, 100)
+    path = image_path()
+    try:
+        stat = os.stat(path)
+        key = (path, stat.st_mtime_ns, stat.st_size, blur, intensity, bool(theme_manager.night_mode))
+        if _review_cache[0] != key:
+            pixmap = _blur_pixmap(QPixmap(path), blur)
+            if pixmap.isNull():
+                return ""
+            # A single image prevents card CSS (size, clip, attachment, etc.)
+            # from sizing the wash differently from the wallpaper.
+            painter = QPainter(pixmap)
+            wash = QColor("#202022" if theme_manager.night_mode else "#ffffff")
+            wash.setAlpha(round(255 * (1 - intensity / 100)))
+            painter.fillRect(pixmap.rect(), wash)
+            painter.end()
+            data = QByteArray()
+            buffer = QBuffer(data)
+            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+            saved = pixmap.save(buffer, "JPEG", 88)
+            buffer.close()
+            if not saved:
+                return ""
+            _review_cache = (key, "data:image/jpeg;base64," +
+                             base64.b64encode(bytes(data)).decode("ascii"))
+        position = _settings.get("custom_background_position", "center")
+        if position not in ("top", "center", "bottom"):
+            position = "center"
+        # Low specificity: card-template background images/shorthands win.
+        # Inner card panels, text, media, scripts and answer controls are untouched.
+        return ("body{background-image:url(" + json.dumps(_review_cache[1]) + ");"
+                "background-size:cover;background-position:center " + position +
+                ";background-repeat:no-repeat;background-attachment:fixed;}")
+    except (OSError, RuntimeError):
+        return ""
+
+
+def inject_reviewer_style(web_content) -> None:
+    web_content.head += '<style id="smartstudy-review-background">' + reviewer_background_css() + '</style>'
+
+
+def _sync_reviewer_background() -> None:
+    if not mw or getattr(mw, "state", "") != "review":
+        return
+    css = reviewer_background_css()
+    mw.web.eval("(function(){let s=document.getElementById('smartstudy-review-background');"
+                "if(!s){s=document.createElement('style');s.id='smartstudy-review-background';"
+                "document.head.appendChild(s);}const css=" + json.dumps(css) + ";if(s.textContent!==css)s.textContent=css;})();")
+
+
+def setup(settings: dict) -> None:
+    global _layer, _settings
+    _settings = dict(settings or {})
+    if not mw:
+        return
+    parent = mw.centralWidget()
+    if parent is None:
+        return
+    if _layer is None:
+        _layer = BackgroundLayer(parent)
+    if getattr(mw, "web", None) is not None:
+        mw.web.installEventFilter(_layer)
+    if _settings.get("custom_background_enabled", False) and has_image():
+        _layer.load(
+            int(_settings.get("custom_background_blur", 0) or 0),
+            int(_settings.get("custom_background_overlay", 0) or 0),
+            str(_settings.get("custom_background_position", "center") or "center"),
+        )
+    sync_state(getattr(mw, "state", ""))
+
+
+def _glass_active():
+    from .dashboard_appearance import surface_opacity
+    return bool(mw and getattr(mw, "state", "") == "deckBrowser"
+                and _settings.get("dashboard_surface_controls_expanded") is not False
+                and _settings.get("dashboard_glass_enabled") is True
+                and surface_opacity(_settings.get("dashboard_surface_opacity", 100)) < 100
+                and _settings.get("custom_background_enabled") and has_image())
+
+
+def _glass_geometry():
+    parent = mw.centralWidget()
+    origin = mw.web.mapTo(parent, QPoint(0, 0))
+    return {"width": parent.width(), "height": parent.height(),
+            "x": origin.x(), "y": origin.y(), "viewWidth": mw.web.width()}
+
+
+def inject_glass_backdrop(web_content):
+    if not _glass_active() or _layer is None:
+        return
+    image = _layer.glass_image_data()
+    if not image:
+        return
+    from .dashboard_appearance import glass_backdrop_html
+    web_content.body = glass_backdrop_html(image, _glass_geometry(), _layer._overlay, _layer._position) + web_content.body
+
+
+def canvas_script(active: bool, include_body: bool = True) -> str:
+    """Return JS that makes the document canvas deterministically transparent.
+
+    Inline ``!important`` properties are intentional here. Dark colour themes
+    can load after add-on styles and use equally specific selectors on html;
+    an inline property removes that stylesheet-order race on every platform.
+    """
+    enabled = "true" if active else "false"
+    body_expr = "document.body" if include_body else "null"
+    return (
+        "(function(){var on=" + enabled + ",nodes=[document.documentElement,"
+        + body_expr + "];for(var i=0;i<nodes.length;i++){var n=nodes[i];if(!n)continue;"
+        "n.classList.toggle(i===0?'smartstudy-custom-background-root':"
+        "'smartstudy-custom-background',on);"
+        "if(on){if(!n.__smartstudyCanvasStyle)n.__smartstudyCanvasStyle=['background','background-color','background-image'].map(k=>[k,n.style.getPropertyValue(k),n.style.getPropertyPriority(k)]);"
+        "n.style.setProperty('background','transparent','important');"
+        "n.style.setProperty('background-color','transparent','important');"
+        "n.style.setProperty('background-image','none','important');}else{"
+        "if(n.__smartstudyCanvasStyle){for(var entry of n.__smartstudyCanvasStyle){"
+        "if(entry[1])n.style.setProperty(entry[0],entry[1],entry[2]);else n.style.removeProperty(entry[0]);}"
+        "delete n.__smartstudyCanvasStyle;}}}})();"
+    )
+
+
+def _set_page_transparency(active: bool) -> None:
+    color = QColor(0, 0, 0, 0) if active else QColor(
+        "#2c2c2c" if mw and mw.pm.night_mode() else "#f5f5f5"
+    )
+    views = (
+        getattr(getattr(mw, "toolbar", None), "web", None),
+        getattr(mw, "web", None), getattr(mw, "bottomWeb", None),
+    )
+    js = canvas_script(active)
+    for view in views:
+        try:
+            if view is not None and view.page() is not None:
+                view.page().setBackgroundColor(color)
+                view.eval(js)
+        except Exception:
+            pass
+
+
+def sync_state(state: str) -> None:
+    enabled = bool(_settings.get("custom_background_enabled", False))
+    active = bool(enabled and has_image() and state in ACTIVE_STATES)
+    if _layer is not None:
+        _layer.setVisible(active)
+        if active:
+            _layer.lower()
+    _set_page_transparency(active)
+    _sync_reviewer_background()
+    # Anki can replace a WebEngine document shortly after its state hook. The
+    # delayed pass evaluates the *current* state, so a rapid jump into Review
+    # can never accidentally restore the dashboard background.
+    def resync_document() -> None:
+        current = getattr(mw, "state", "") if mw else ""
+        current_active = bool(
+            _settings.get("custom_background_enabled", False)
+            and has_image() and current in ACTIVE_STATES
+        )
+        _set_page_transparency(current_active)
+        _sync_reviewer_background()
+    try:
+        QTimer.singleShot(0, resync_document)
+        QTimer.singleShot(100, resync_document)
+    except Exception:
+        pass
+
+
+def inject_style(web_content, active: bool) -> None:
+    """Override only page canvases; retain SmartStudy widget/theme styling."""
+    if active:
+        # Applied while the head is parsed, before body classes or the first
+        # visible frame. This avoids Chromium briefly painting its black/default
+        # canvas while Anki swaps between dashboard documents.
+        web_content.head = (
+            "<script>" + canvas_script(True, include_body=False) + "</script>"
+            + web_content.head
+        )
+    web_content.head += """
+<style id="smartstudy-custom-background-style">
+html.smartstudy-custom-background-root,
+html.smartstudy-custom-background-root body,
+html.smartstudy-custom-background-root body.deckbrowser,
+html.smartstudy-custom-background-root body.overview,
+html.smartstudy-custom-background-root body:has(#custom-dashboard),
+html:has(body.smartstudy-custom-background),
+body.smartstudy-custom-background {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* The colour themes target the custom overview through #custom-dashboard.
+   That ID makes their rule more specific than the generic canvas reset above,
+   so explicitly beat it without changing any of the overview cards. */
+html:has(body.smartstudy-custom-background):has(#custom-dashboard),
+html:has(body.smartstudy-custom-background.overview),
+body.smartstudy-custom-background:has(#custom-dashboard),
+body.smartstudy-custom-background.overview,
+body.smartstudy-custom-background #overview-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background-attachment: initial !important;
+}
+body.smartstudy-custom-background.top-toolbar .header,
+body.smartstudy-custom-background.top-toolbar #header,
+body.smartstudy-custom-background.top-toolbar .toolbar,
+body.smartstudy-custom-background.top-toolbar .left-tray,
+body.smartstudy-custom-background.top-toolbar .right-tray,
+body.smartstudy-custom-background.top-toolbar center,
+body.smartstudy-custom-background.top-toolbar table,
+body.smartstudy-custom-background.bottom-toolbar #outer,
+body.smartstudy-custom-background.bottom-toolbar #header,
+body.smartstudy-custom-background.bottom-toolbar #inner,
+body.smartstudy-custom-background.bottom-toolbar #innertable,
+body.smartstudy-custom-background.bottom-toolbar center,
+body.smartstudy-custom-background.bottom-toolbar table {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+/* One stable solid toolbar surface instead of one coloured tile per button.
+   backdrop-filter is deliberately avoided: it creates separate GPU layers
+   and renders differently across Qt's macOS, Windows and Linux backends. */
+body.smartstudy-custom-background.top-toolbar .header .toolbar,
+body.smartstudy-custom-background.top-toolbar #header .toolbar,
+html:has(body.smartstudy-custom-background.top-toolbar) .header:has(a#decks) .toolbar,
+html:has(body.smartstudy-custom-background.top-toolbar) #header:has(a#decks) .toolbar {
+  background: #ffffff !important;
+  border: 1px solid rgba(20, 24, 32, 0.12) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 10px 10px !important;
+  box-shadow: 0 1px 4px rgba(18, 24, 32, 0.12) !important;
+  overflow: hidden !important;
+}
+body.nightMode.smartstudy-custom-background.top-toolbar .header .toolbar,
+body.nightMode.smartstudy-custom-background.top-toolbar #header .toolbar,
+html:has(body.nightMode.smartstudy-custom-background.top-toolbar) .header:has(a#decks) .toolbar,
+html:has(body.nightMode.smartstudy-custom-background.top-toolbar) #header:has(a#decks) .toolbar {
+  background: #2c2c2e !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.27) !important;
+}
+body.smartstudy-custom-background.top-toolbar a.hitem,
+html:has(body.smartstudy-custom-background.top-toolbar) .header:has(a#decks) a.hitem,
+html:has(body.smartstudy-custom-background.top-toolbar) #header:has(a#decks) a.hitem {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+body.smartstudy-custom-background.top-toolbar a.hitem:hover,
+html:has(body.smartstudy-custom-background.top-toolbar) .header:has(a#decks) a.hitem:hover,
+html:has(body.smartstudy-custom-background.top-toolbar) #header:has(a#decks) a.hitem:hover {
+  background: rgba(120, 128, 142, 0.12) !important;
+}
+body.nightMode.smartstudy-custom-background.top-toolbar a.hitem:hover,
+html:has(body.nightMode.smartstudy-custom-background.top-toolbar) .header:has(a#decks) a.hitem:hover,
+html:has(body.nightMode.smartstudy-custom-background.top-toolbar) #header:has(a#decks) a.hitem:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+</style>
+"""
+    studied_mode = str(
+        _settings.get("custom_background_studied_text", "dark") or "dark"
+    ).lower()
+    if studied_mode == "light":
+        studied_color = "#ffffff"
+        studied_shadow = "0 1px 3px rgba(0,0,0,0.58)"
+    else:
+        studied_color = "#1d1d1f"
+        studied_shadow = "0 1px 2px rgba(255,255,255,0.32)"
+    web_content.head += (
+        '<style id="smartstudy-custom-background-text-style">'
+        'body.smartstudy-custom-background.deckbrowser #studiedToday{'
+        f'color:{studied_color} !important;text-shadow:{studied_shadow} !important;'
+        '}</style>'
+    )
+    if active:
+        web_content.body = (
+            "<script>" + canvas_script(True) + "</script>"
+            + web_content.body
+        )
+
+
+def on_internal_page_styled(web) -> None:
+    """Keep Anki's TypeScript congratulations page on the normal canvas."""
+    try:
+        page = os.path.basename(web.page().url().path()).lower()
+        if page in ("congrats", "congrats.html"):
+            if _layer is not None:
+                _layer.hide()
+            _set_page_transparency(False)
+    except Exception:
+        pass
+
+
+def cleanup() -> None:
+    global _layer, _settings, _review_cache
+    _review_cache = (None, "")
+    _set_page_transparency(False)
+    if _layer is not None:
+        try:
+            parent = _layer.parentWidget()
+            if parent is not None:
+                parent.removeEventFilter(_layer)
+            _layer.deleteLater()
+        except RuntimeError:
+            pass
+    _layer = None
+    _settings = {}

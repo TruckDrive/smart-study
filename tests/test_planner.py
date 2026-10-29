@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import date
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "addon"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "addon", "plan"))
 import planner as P  # noqa: E402
 
 P.LANG = "de"  # the assertions check the German texts

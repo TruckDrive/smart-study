@@ -1,0 +1,2936 @@
+from __future__ import annotations
+from . import workspace_preferences
+
+import base64
+import html
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import threading
+from typing import Callable, Optional
+
+import aqt
+from anki.collection import AddNoteRequest
+from aqt import mw
+from aqt.operations import CollectionOp
+from aqt.qt import (
+    QApplication,
+    QDockWidget, Qt, QVBoxLayout, QHBoxLayout,
+    QWidget, QFileDialog, QUrl, QKeySequence, QShortcut,
+    QPushButton, QLabel, QTimer,
+)
+from aqt.webview import AnkiWebView, AnkiWebViewKind
+from aqt.utils import tooltip, showInfo, askUser
+
+try:
+    from .locales import _
+except ImportError:
+    def _(text):  # type: ignore
+        return text
+
+from . import embedded_window
+from .task_schedule import normalize_tasks
+
+ADDON_NAME_FOR_BRIDGE = "notion_mini"
+DB_FILENAME = "notebook.sqlite"
+DOCK_TITLE = "Notebook"
+HTML_DIR = "web_notebook"
+
+
+def _json_for_script(value, *, ensure_ascii: bool = True) -> str:
+    """Serialize data for an inline script without allowing </script> breaks."""
+    return json.dumps(value, ensure_ascii=ensure_ascii).replace("</", "<\\/")
+
+
+def _valid_pdf_id(value) -> str:
+    value = value if isinstance(value, str) else ""
+    return value if re.fullmatch(r"[A-Za-z0-9_-]{1,80}", value) else ""
+
+
+def _pdf_review_token(pdf_id: str, page: int) -> str:
+    payload = json.dumps(
+        {"id": pdf_id, "page": max(1, int(page or 1))},
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+
+
+def _pdf_source_html(filename: str, pages: list[int], pdf_id: str) -> str:
+    """Build a safe source label plus optional SmartStudy review links."""
+    source = f"{_('Source')}: {filename}"
+    if pages:
+        label = _("Page") if len(pages) == 1 else _("Pages")
+        source += f" — {label} {', '.join(str(page) for page in pages)}"
+
+    links = ""
+    pdf_id = _valid_pdf_id(pdf_id)
+    if pdf_id:
+        targets = pages or [1]
+        link_items = []
+        page_word = _("Page")
+        for page in targets:
+            token = _pdf_review_token(pdf_id, page)
+            label = _("Open PDF")
+            if pages:
+                label += f" · {page_word} {page}"
+            link_items.append(
+                '<a href="#" style="color:#4a86c5;text-decoration:none;'
+                'font-weight:600;margin-right:9px" '
+                'onclick="if(typeof pycmd===\'function\'){' 
+                f"pycmd('pycmd:smartstudy:pdf:{token}');"
+                '}return false;">'
+                f"{html.escape(label)}</a>"
+            )
+        links = '<div style="margin-top:4px">' + "".join(link_items) + "</div>"
+
+    return (
+        '<div style="margin-top:10px;color:#888;font-size:0.72em;'
+        'line-height:1.35;border-top:1px solid rgba(128,128,128,.2);'
+        'padding-top:5px">'
+        f"{html.escape(source)}{links}</div>"
+    )
+
+# ──────────────────────────────────────────────
+# HTML i18n injection
+# ──────────────────────────────────────────────
+
+def _build_i18n_script(tool_name: str) -> str:
+    """Return a <script> tag that sets window.__SMARTSTUDY_I18N__ for the current language.
+
+    Structured per-tool so each HTML file only gets the strings it uses.
+    The applyI18n() function embedded in each HTML file reads these on
+    DOMContentLoaded and applies them via data-i18n / data-i18n-placeholder.
+    """
+    STRINGS: dict = {
+        "notebook": {
+            "document_title":    _("Notebook"),
+            "resize_column": _("Resize column"),
+            "header_row": _("Header row"),
+            "row_up": _("Move row up"),
+            "row_down": _("Move row down"),
+            "column_left": _("Move column left"),
+            "column_right": _("Move column right"),
+            "align_left": _("Align left"),
+            "align_center": _("Align center"),
+            "align_right": _("Align right"),
+            "table_options": _("Table options"),
+            "merged_table": _("Merged cells are preserved. Reordering and resizing are available for regular tables."),
+            "resize_image": _("Resize image"),
+            "upload_image": _("Upload image"),
+            "image_upload_error": _("Image could not be added. Please try again."),
+            "inline_image": _("Inline"),
+            "move_image": _("Move image"),
+
+            "contents": _("Contents"),
+            "no_headings": _("No headings yet"),
+            "notebook_actions": _("Notebook actions"),
+            "templates": _("Templates"),
+            "save_template": _("Save as template"),
+            "template_name": _("Template name:"),
+            "use_template": _("Use template"),
+            "versions": _("Versions"),
+            "restore_copy": _("Restore as copy"),
+            "no_versions": _("No versions available"),
+            "loading_versions": _("Loading versions…"),
+            "versions_error": _("Could not load versions. Try again."),
+            "copy": _("Copy"),
+            "pre_update": _("Pre-update backup"),
+            "recovery": _("Recovery"),
+            "pages": _("Pages"),
+            "disease_profile": _("Disease profile"),
+            "template_definition": _("Definition"),
+            "template_mechanism": _("Mechanism"),
+            "template_symptoms": _("Symptoms"),
+            "template_diagnosis": _("Diagnosis"),
+            "template_treatment": _("Treatment"),
+            "export_notebook": _("Export Notebook"),
+            "retry": _("Retry"),
+
+            "search_placeholder": _("Search in this page..."),
+            "go_back": _("Go Back"),
+            "go_forward": _("Go Forward"),
+            "page_history": _("Page navigation"),
+            "new_subpage": _("New subpage"),
+            "subpages": _("Subpages"),
+            "move_under_page": _("Move under page"),
+            "top_level": _("Top level"),
+            "new_section": _("New section"),
+            "section_name": _("Section name:"),
+            "search_pages": _("Search pages…"),
+            "breadcrumb": _("Breadcrumb"),
+            "move_up": _("Move up"),
+            "move_down": _("Move down"),
+            "close":              _("Close"),
+            "new_page":           _("New Page"),
+            "apply":              _("Apply"),
+            "cancel":             _("Cancel"),
+            "delete":             _("Delete"),
+            "duplicate":          _("Duplicate"),
+            "convert":            _("Convert"),
+            "add_icon":           _("Add Icon"),
+            "remove_icon":        _("Remove Icon"),
+            "custom_icon_placeholder": _("Own icon or text…"),
+            "block_text":         _("Text"),
+            "block_h1":           _("Heading 1"),
+            "block_h2":           _("Heading 2"),
+            "block_h3": _("Heading 3"),
+            "protected_content": _("Original content preserved. This block contains content that cannot be safely edited here."),
+            "insert_block": _("Insert block"),
+            "block_actions": _("Block actions"),
+            "search_actions": _("Search actions…"),
+            "color": _("Color"),
+            "text_color": _("Text color"),
+            "background_color": _("Background"),
+            "strikethrough": _("Strikethrough"),
+            "bold": _("Bold"),
+            "italic": _("Italic"),
+            "underline": _("Underline"),
+            "inline_code": _("Inline code"),
+            "move_block": _("Move to page"),
+            "move_block_confirm": _("Move this block to another page?"),
+            "no_other_pages": _("Create another page first."),
+            "default_color": _("Default"),
+            "gray": _("Gray"),
+            "brown": _("Brown"),
+            "orange": _("Orange"),
+            "yellow": _("Yellow"),
+            "green": _("Green"),
+            "blue": _("Blue"),
+            "purple": _("Purple"),
+            "pink": _("Pink"),
+            "red": _("Red"),
+            "block_list":         _("List"),
+            "block_todo":         _("To-Do"),
+            "block_quote":        _("Quote"),
+            "block_callout":      _("Callout"),
+            "block_code":         _("Code"),
+            "block_toggle":       _("Toggle"),
+            "block_divider":      _("Divider"),
+            "block_table":        _("Table"),
+            "block_pagelink":     _("Link to page"),
+            "paste_tip":          _("Tip: Paste images (Ctrl+V) supported"),
+            "security_notice": _("For your safety, potentially unsafe HTML was kept as text or removed. It could otherwise run code. Normal text and safe links still work."),
+            "dismiss": _("Dismiss"),
+            "saved":              _("Saved"),
+            "saving":             _("Saving..."),
+            "save_failed":        _("Save failed — your changes are still open."),
+            "untitled":           _("Untitled"),
+            "delete_page_confirm":  _("Delete this page?"),
+            "delete_table_confirm": _("Delete table?"),
+            "table_add_row":      _("+ Row"),
+            "table_add_col":      _("+ Col"),
+            "placeholder_slash":        _("Type '/' for commands"),
+            "placeholder_callout":      _("Type something..."),
+            "placeholder_toggle":       _("Toggle title"),
+            "placeholder_toggle_body":  _("Add content here..."),
+            "pinned":               _("Pinned"),
+            "pin":                  _("Pin"),
+            "unpin":                _("Unpin"),
+            "new_folder":           _("New Folder"),
+            "folder_name_prompt":   _("Folder name:"),
+            "rename_folder":        _("Rename folder:"),
+            "delete_folder_confirm": _("Delete folder? Pages inside will be kept."),
+            "move_to_folder":       _("Move to folder"),
+            "no_folder":            _("No folder"),
+            "time_just_now":  _("just now"),
+            "time_m_ago":     _("m ago"),
+            "time_h_ago":     _("h ago"),
+            "time_d_ago":     _("d ago"),
+            "no_results":     _("No results for"),
+            "page_title_placeholder": _("Page Title"),
+            "page_picker_placeholder": _("Search or create a page…"),
+            "remove_cover": _("Remove cover"),
+            "new_page_named": _("New page: \"{title}\""),
+            "create_new_page": _("Create new page"),
+            "page_not_found": _("Page not found"),
+            "link_title": _("Link (Ctrl+K)"),
+            "cover_title": _("Cover for learning"),
+            "recover_covers_title": _("Cover all revealed terms again"),
+        },
+        "todo": {
+            'task_options': _('Task settings'),
+            'auto_cleanup': _('Remove completed one-time tasks on the next day'),
+            'cleanup_note': _('Off by default. Recurring tasks and old tasks without a completion date are kept.'),
+            'repeat_title': _('Repeat task'),
+            'repeat_none': _('No repeat'),
+            'repeat_daily': _('Daily'),
+            'repeat_weekly': _('Weekly'),
+            'repeat_days': _('Selected weekdays'),
+            'repeat_note': _('Weekly tasks repeat on the weekday you configure them. Missed tasks remain open without extra copies.'),
+            'choose_day': _('Choose at least one weekday.'),
+            'cancel': _('Cancel'),
+            'save_repeat': _('Save'),
+            'recurring_task': _('Recurring task'),
+
+            "edit":            _("Edit"),
+            "title":           _("Todo"),
+            "delete":          _("Delete"),
+            "filter_all":      _("All"),
+            "filter_open":     _("Open"),
+            "filter_done":     _("Done"),
+            "add_placeholder": _("Add a task\u2026"),
+            "add_btn":         _("+ Add"),
+            "tag_placeholder": _("Tag (optional)"),
+            "section_open":    _("Open"),
+            "section_done":    _("Done"),
+            "empty":           _("No tasks yet."),
+            "empty_sub":       _("Add one above!"),
+            "saved":           _("Saved"),
+            "save_failed":     _("Save failed — your changes are still open."),
+            "done_of":         _("{done} / {total} done"),
+        },
+        "pdf": {
+            "title":               _("PDF"),
+            "zoom_out":            _("Zoom out"),
+            "zoom_in":             _("Zoom in"),
+            "search_placeholder":  _("Search PDFs\u2026"),
+            "add_btn":             _("Add PDF"),
+            "back":                _("Back"),
+            "loading":             _("Loading PDF\u2026"),
+            "error_msg":           _("Could not render PDF."),
+            "open_sys":            _("Open in system viewer"),
+            "empty_msg":           _("No PDFs yet."),
+            "empty_sub":           _("Add one to get started."),
+            "saved":               _("Saved"),
+            "already_in_list":     _("Already in list"),
+            "pdf_added":           _("PDF added"),
+            "removed":             _("Removed"),
+            "moved_to_folder":     _("Moved to folder"),
+            "removed_from_folder": _("Removed from folder"),
+            "relink_btn":          _("Relink file"),
+            "relinked":            _("File relinked"),
+            "view_inline":         _("View inline"),
+            "move_to_folder":      _("Move to folder"),
+            "open_externally":     _("Open externally"),
+            "remove":              _("Remove"),
+            "notice_title":        _("PDF study viewer"),
+            "notice_body":         _("Select text in text-based PDFs to copy it or prepare an Anki card. Scanned PDFs require OCR."),
+            "copy_selection":      _("Copy"),
+            "card_front":          _("Card front"),
+            "card_back":           _("Card back"),
+            "open_in_anki":        _("Open in Anki"),
+            "clear_draft":         _("Clear"),
+            "front_saved":         _("Front saved"),
+            "back_saved":          _("Back saved"),
+            "draft_front":         _("Front"),
+            "draft_back":          _("Back side"),
+            "select_text_first":   _("Select some PDF text first."),
+            "discard_draft":       _("Discard the unfinished card draft?"),
+            'creator_type': _('Card type'),
+            'creator_basic': _('Basic (Front / Back)'),
+            'creator_reversed': _('Basic + Reversed'),
+            'creator_cloze': _('Cloze'),
+            'creator_new_cloze': _('New cloze'),
+            'creator_same_cloze': _('Same card'),
+            'creator_cloze_hint': _('Select text below, then add a cloze. Different numbers create separate cards; matching numbers hide together.'),
+            'creator_text': _('Text'),
+            'creator_extra': _('Extra'),
+            'creator_select_cloze': _('Select the text you want to hide first.'),
+            'creator_plain_cloze': _('Select plain text outside an existing cloze.'),
+            'creator_cloze_required': _('Add at least one cloze deletion, for example {{c1::answer}}.'),
+            'creator_reverse_required': _('Reversed cards need text on both sides.'),
+            "card_creator":        _("Card Creator"),
+            "creator_subtitle":    _("Build multiple cards while reading"),
+            "creator_sidebar_hint": _("Tip: Card Creator works best in fullscreen."),
+            "front_placeholder":   _("Question or prompt"),
+            "back_placeholder":    _("Answer or explanation"),
+            "add_card":            _("Add card"),
+            "update_card":         _("Update card"),
+            "new_card":            _("New card"),
+            "include_source":      _("Add PDF source to the back"),
+            "source_hint":         _("Adds the file name and selected page numbers in small text."),
+            "source_short":        _("Source"),
+            "selected_pages":      _("Selected pages"),
+            "select_pages_hint":   _("Click PDF pages to select them."),
+            "cards_ready":         _("{count} cards ready"),
+            "cards_label":         _("Cards"),
+            "deck_name":           _("Deck name"),
+            "deck_placeholder":    _("Choose an existing deck or enter a new name"),
+            "current_deck":        _("Current deck"),
+            "recent_decks":        _("Recent decks"),
+            "all_decks":           _("Decks"),
+            "no_matching_decks":   _("No matching decks. Enter a name to create one."),
+            "finish_session":      _("Create cards"),
+            "finish_cards":        _("Finish · Create {count} cards"),
+            "discard_session":     _("Discard session"),
+            "discard_session_confirm": _("Discard this unfinished Card Creator session?"),
+            "edit":                _("Edit"),
+            "remove_card":         _("Remove card"),
+            "creator_empty":       _("No cards collected yet."),
+            "creator_empty_sub":   _("Enter text manually or select text in the PDF."),
+            "front_required":      _("Enter a front side first."),
+            "deck_required":       _("Choose or enter a deck name."),
+            "creating_cards":      _("Creating cards…"),
+            "duplicate_card":      _("This card is already in the session."),
+            "card_too_long":       _("This card contains too much text."),
+            "too_many_cards":      _("This session already contains 500 cards."),
+            "close":               _("Close"),
+            "save_failed":         _("Save failed — your changes are still open."),
+            "folder_name_prompt":  _("Folder name:"),
+            "rename_folder":       _("Rename folder:"),
+            "all":                 _("All"),
+            "unfiled":             _("Unfiled"),
+            "new_folder":          _("New Folder"),
+            "no_folder":           _("No folder"),
+            "no_folders":          _("No folders yet."),
+            "empty_in_folder":     _("No PDFs in \"{folder}\" yet."),
+            "file_missing":        _("File missing"),
+            "delete_folder_named": _("Delete folder \"{name}\"? {count} PDF file(s) will become unfiled."),
+            "loading_short":       _("Loading…"),
+            "page_error":          _("Page {page}: {error}"),
+            "rendering_page":      _("Rendering page {page}…"),
+            "selected_text_copied": _("Selected text copied"),
+            "copy_text_failed":    _("Could not copy text"),
+            "cards_created":       _("Cards created"),
+            "cards_create_failed": _("Could not create cards"),
+        },
+    }
+    strings = dict(STRINGS.get(tool_name, {}))
+    strings.update({
+        "error_title": _("Smart Study error"),
+        "error_show": _("Show details"),
+        "error_hide": _("Hide details"),
+        "error_copy": _("Copy error"),
+        "error_copied": _("Copied!"),
+        "error_dismiss": _("Dismiss"),
+        "error_unexpected": _("Unexpected error"),
+        "error_unexpected_async": _("Unexpected error (async)"),
+        "error_safe": _("Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues."),
+        "error_no_stack": _("(no stack trace available)"),
+    })
+    strings_json = _json_for_script(strings, ensure_ascii=False)
+    return f'<script id="smartstudy-i18n">window.__SMARTSTUDY_I18N__={strings_json};</script>'
+MAX_PDF_INLINE_MB    = 30   # warn before loading PDFs larger than this
+MAX_PDF_HARD_MB      = 100  # avoid multi-hundred-MB reads/base64 copies
+MAX_PDF_CARD_CHARS   = 50_000
+MAX_PDF_COPY_CHARS   = 200_000
+MAX_PDF_BATCH_CARDS  = 500
+MAX_PDF_BATCH_CHARS  = 1_000_000
+MAX_PDF_DECK_SUGGESTIONS = 2_000
+MAX_FINAL_SAVE_ATTEMPTS = 3
+
+TOOL_FILES = {
+    "notebook": "index.html",
+    "todo":     "todo.html",
+    "pdf":      "pdf_viewer.html",
+}
+
+# ──────────────────────────────────────────────
+# PDF.js offline bundling
+# ──────────────────────────────────────────────
+
+PDFJS_VERSION = "3.11.174"
+_PDFJS_FILES  = ["pdf.min.js", "pdf.worker.min.js"]
+
+
+def _pdfjs_dir() -> str:
+    return os.path.join(addon_dir(), HTML_DIR, "pdfjs")
+
+
+def _ensure_pdfjs_async() -> None:
+    """Verify that the pinned, bundled PDF.js files are available."""
+    existing_dir = _pdfjs_dir()
+    if all(os.path.exists(os.path.join(existing_dir, name))
+           for name in _PDFJS_FILES):
+        return
+    print("SmartStudy: bundled PDF.js files are missing; PDF viewer disabled.")
+
+
+def _pdfjs_local_scripts() -> tuple[str, str]:
+    """Return (main_inline_tag, worker_code_json) if both local files are ready.
+
+    main_inline_tag  – a <script>…</script> block inlining pdf.min.js
+    worker_code_json – a JSON string of pdf.worker.min.js content, safe to embed
+                       inside a <script> tag (</ is escaped with a backslash)
+    Returns ('', '') if local files are not yet available.
+    """
+    d = _pdfjs_dir()
+    main_path   = os.path.join(d, "pdf.min.js")
+    worker_path = os.path.join(d, "pdf.worker.min.js")
+    if not (os.path.exists(main_path) and os.path.exists(worker_path)):
+        return "", ""
+    try:
+        with open(main_path, "r", encoding="utf-8") as fh:
+            main_js = fh.read()
+        with open(worker_path, "r", encoding="utf-8") as fh:
+            worker_js = fh.read()
+        # Escape </ so the content cannot prematurely close a <script> tag
+        safe_main   = main_js.replace("</", "<\\/")
+        worker_json = json.dumps(worker_js).replace("</", "<\\/")
+        return f"<script>{safe_main}</script>", worker_json
+    except Exception as exc:
+        print(f"SmartStudy: could not read PDF.js local files: {exc}")
+        return "", ""
+
+
+# ──────────────────────────────────────────────
+# Nav-Bar HTML (injected into every tool page)
+# ──────────────────────────────────────────────
+_NAV_STYLE = """
+<style id="smartstudy-nav-style">
+  #smartstudy-tool-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 42px;
+    padding: 0 10px;
+    background: var(--header-bg, #f2f2f2);
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+    flex-shrink: 0;
+    z-index: 200;
+  }
+  .snav-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text, #37352f);
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .snav-btn:hover {
+    background: var(--hover-bg, #efefef);
+  }
+  .snav-btn.snav-active {
+    background: var(--hover-bg, #efefef);
+    font-weight: 600;
+  }
+  .snav-btn svg {
+    width: 15px;
+    height: 15px;
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+  .snav-spacer { flex: 1; }
+  .snav-fs-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text, #37352f);
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .snav-fs-btn:hover { background: var(--hover-bg, #efefef); }
+  .snav-fs-btn svg { width: 15px; height: 15px; opacity: 0.65; }
+  .snav-settings-btn svg { width: 16px; height: 16px; opacity: 0.75; }
+  body.nightMode .snav-btn { color:#7e7e7e; }
+  body.nightMode .snav-btn.snav-active,
+  body.nightMode .snav-btn:hover { color:#ffffff; }
+
+</style>
+"""
+
+_NAV_ICONS = {
+    "notebook": """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>""",
+    "todo":     """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>""",
+    "pdf":      """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>""",
+}
+
+_NAV_LABELS = {
+    "notebook": "Notebook",
+    "todo":     "Todo",
+    "pdf":      "PDF",
+}
+
+
+_FS_ICON = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round" stroke-linejoin="round">'
+    '<polyline points="15 3 21 3 21 9"/>'
+    '<polyline points="9 21 3 21 3 15"/>'
+    '<line x1="21" y1="3" x2="14" y2="10"/>'
+    '<line x1="3" y1="21" x2="10" y2="14"/>'
+    '</svg>'
+)
+
+# Icon shown while IN fullscreen: arrows pointing inwards ("exit fullscreen").
+# Same glyph as the Mindmap tool so all features look identical.
+_FS_ICON_EXIT = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round" stroke-linejoin="round">'
+    '<polyline points="4 14 10 14 10 20"/>'
+    '<polyline points="20 10 14 10 14 4"/>'
+    '<line x1="10" y1="14" x2="3" y2="21"/>'
+    '<line x1="21" y1="3" x2="14" y2="10"/>'
+    '</svg>'
+)
+
+# Icon for "open in a separate window" (a window with a title bar)
+_WIN_ICON = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round" stroke-linejoin="round">'
+    '<rect x="3" y="3" width="18" height="18" rx="2"/>'
+    '<line x1="3" y1="9" x2="21" y2="9"/>'
+    '</svg>'
+)
+
+# Icon shown while the embedded view is active: the same window frame with a
+# small dash inside (matches the Mindmap tool's "close window" state).
+_WIN_ICON_CLOSE = (
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round" stroke-linejoin="round">'
+    '<rect x="3" y="3" width="18" height="18" rx="2"/>'
+    '<line x1="3" y1="9" x2="21" y2="9"/>'
+    '<line x1="9" y1="15" x2="15" y2="15"/>'
+    '</svg>'
+)
+
+
+def _build_nav_html(active_tool: str, fs_active: bool = False,
+                    win_active: bool = False) -> str:
+    buttons = ""
+    for key in ("notebook", "todo", "pdf"):
+        if not workspace_preferences.enabled("notebook")[key]:
+            continue
+        active_cls = " snav-active" if key == active_tool else ""
+        icon  = _NAV_ICONS[key]
+        label = _(_NAV_LABELS[key])
+        buttons += (
+            f'<button class="snav-btn{active_cls}" '
+            f'onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:switch:{key}\')">'
+            f'{icon}{label}</button>'
+        )
+    win_title = _("Close Window") if win_active else _("New Window")
+    fs_title  = _("Exit Fullscreen") if fs_active else _("Fullscreen")
+    win_icon  = _WIN_ICON_CLOSE if win_active else _WIN_ICON
+    fs_icon   = _FS_ICON_EXIT if fs_active else _FS_ICON
+    settings_icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l.7 2.4 2 .9L20 6l3 5-1.8 1.7.1 2.2 1.7 1.6-3 5-2.4-.6-1.9 1L15 24H9l-.7-3.1-1.9-1L4 21l-3-5 1.8-1.7-.1-2.2L1 10l3-5 2.4.6 1.9-1L9 3Z" transform="translate(1.2 -1) scale(.9)"/><circle cx="12" cy="11.5" r="3"/></svg>'
+    settings_title = _("Settings")
+    fs_btn = (
+        f'<span class="snav-spacer"></span>'
+        f'<button class="snav-fs-btn snav-settings-btn" title="{settings_title}" aria-label="{settings_title}" '
+        f'onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:settings\')">{settings_icon}</button>'
+        f'<button id="snav-win-btn" class="snav-fs-btn" title="{win_title}" '
+        f'onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:window\')">'
+        f'{win_icon}</button>'
+        f'<button id="snav-fs-btn" class="snav-fs-btn" title="{fs_title}" '
+        f'onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:fullscreen\')">'
+        f'{fs_icon}</button>'
+    )
+    return f'<div id="smartstudy-tool-nav">{buttons}{fs_btn}</div>'
+
+
+def _build_nav_toggle_script() -> str:
+    """JS helpers that swap the fullscreen / window icons at runtime.
+
+    Mirrors the Mindmap tool's __smartstudySetFullscreen / __smartstudySetWindow
+    contract so Python can toggle the button state without a page reload.
+    """
+    icons = {
+        "fs":       _FS_ICON,
+        "fsExit":   _FS_ICON_EXIT,
+        "win":      _WIN_ICON,
+        "winClose": _WIN_ICON_CLOSE,
+    }
+    return (
+        '<script id="smartstudy-nav-toggle">'
+        f'var __SNAV_ICONS__ = {json.dumps(icons)};'
+        'window.__smartstudySetFullscreen = function(active, t) {'
+        '  var btn = document.getElementById("snav-fs-btn");'
+        '  if (!btn) return;'
+        '  btn.innerHTML = active ? __SNAV_ICONS__.fsExit : __SNAV_ICONS__.fs;'
+        '  if (t) btn.title = active ? t.fullscreen_exit : t.fullscreen_enter;'
+        '};'
+        'window.__smartstudySetWindow = function(active, t) {'
+        '  var btn = document.getElementById("snav-win-btn");'
+        '  if (!btn) return;'
+        '  btn.innerHTML = active ? __SNAV_ICONS__.winClose : __SNAV_ICONS__.win;'
+        '  if (t) btn.title = active ? t.window_exit : t.window_open;'
+        '};'
+        '</script>'
+    )
+
+
+def _inject_nav(html: str, active_tool: str, fs_active: bool = False,
+                win_active: bool = False) -> str:
+    """Insert nav bar + style right after the opening <body> tag."""
+    nav_block = (_NAV_STYLE
+                 + _build_nav_html(active_tool, fs_active, win_active)
+                 + _build_nav_toggle_script())
+    # Match <body> or <body ...>
+    new_html = re.sub(r'(<body[^>]*>)', r'\1' + nav_block, html, count=1,
+                      flags=re.IGNORECASE)
+    if new_html == html:
+        # Fallback: prepend to html
+        new_html = nav_block + html
+    return new_html
+
+
+# ──────────────────────────────────────────────
+# Helpers to make body a flex column so the nav
+# bar sits above each tool without overlap.
+# ──────────────────────────────────────────────
+_BODY_COLUMN_STYLE = """
+<style id="smartstudy-body-column">
+  body { display: flex !important; flex-direction: column !important; }
+  #app { flex: 1 !important; min-height: 0 !important; }
+  /* Wide mode (embedded / fullscreen): the note column is capped at 800px
+     for the narrow sidebar. In a large window that leaves too much empty
+     space, so we widen it while still keeping comfortable side margins. */
+  body.smartstudy-wide .content-container {
+    max-width: none !important;
+    padding-left: 10% !important;
+    padding-right: 10% !important;
+  }
+  /* Wide mode: the top bars stay flush with the window edges (small fixed
+     padding), so the nav buttons sit fully left and the window/fullscreen
+     and sidebar buttons sit fully right. Only the note column below keeps
+     its comfortable side margins. */
+  body.smartstudy-wide #smartstudy-tool-nav {
+    padding: 0 10px;
+    height: 46px;
+  }
+  body.smartstudy-wide .header-bar {
+    padding: 0 15px;
+  }
+</style>
+"""
+
+
+def _inject_body_column(html: str) -> str:
+    """Ensure body is flex-column so the injected nav is a real row."""
+    new_html = re.sub(r'(<head[^>]*>)', r'\1' + _BODY_COLUMN_STYLE, html,
+                      count=1, flags=re.IGNORECASE)
+    if new_html == html:
+        new_html = _BODY_COLUMN_STYLE + html
+    return new_html
+
+
+def _add_wide_class(html: str) -> str:
+    """Tag <body> with 'smartstudy-wide' (used for embedded / fullscreen views).
+
+    Applied at load time so switching tools while already in a wide view keeps
+    the widened note column. Live toggling (without reload) is handled via JS.
+    """
+    def repl(match: "re.Match[str]") -> str:
+        tag = match.group(0)
+        m_cls = re.search(r'class=(["\'])(.*?)\1', tag, flags=re.IGNORECASE)
+        if m_cls:
+            quote = m_cls.group(1)
+            value = m_cls.group(2)
+            new_attr = f'class={quote}{value} smartstudy-wide{quote}'
+            return tag[:m_cls.start()] + new_attr + tag[m_cls.end():]
+        return tag[:-1] + ' class="smartstudy-wide">'
+
+    return re.sub(r'<body[^>]*>', repl, html, count=1, flags=re.IGNORECASE)
+
+
+def _apply_night_mode(html: str) -> str:
+    """Tell the page Anki's theme, exactly like the mindmap tool does.
+
+    The tool pages must not rely on ``prefers-color-scheme``: Chromium derives
+    that from the OS (on macOS Anki's dark switch flips the whole app's native
+    appearance, so it happened to match — on Windows it never follows Anki).
+    Instead we tag <html> with 'nightMode' — every tool's boot script already
+    copies that to <body>, where all dark CSS rules hook in — and expose an
+    explicit ``window.__SMARTSTUDY_NIGHT__`` flag for JS-side checks.
+    """
+    try:
+        night = bool(mw and mw.pm.night_mode())
+    except Exception:
+        night = False
+
+    # Pass the same user-selected accent as the other SmartStudy features.
+    # Validate before interpolating a color into the page's stylesheet.
+    accent_style = ""
+    try:
+        from .theme import palette
+        accent = palette(night).get("blue_accent", "")
+        if isinstance(accent, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", accent):
+            accent_style = ('<style id="smartstudy-primary-color">:root {'
+                            '--smartstudy-primary: ' + accent + ';}</style>')
+    except Exception:
+        pass
+
+    flag_tag = ('<script id="smartstudy-night">window.__SMARTSTUDY_NIGHT__='
+                + ("true" if night else "false") + ';</script>' + accent_style)
+    new_html = re.sub(r'(<head[^>]*>)', lambda m: m.group(1) + flag_tag, html,
+                      count=1, flags=re.IGNORECASE)
+    if new_html == html:
+        new_html = flag_tag + html
+    html = new_html
+    if not night:
+        return html
+
+    def repl(match: "re.Match[str]") -> str:
+        tag = match.group(0)
+        m_cls = re.search(r'class=(["\'])(.*?)\1', tag, flags=re.IGNORECASE)
+        if m_cls:
+            quote = m_cls.group(1)
+            value = m_cls.group(2)
+            new_attr = f'class={quote}{value} nightMode{quote}'
+            return tag[:m_cls.start()] + new_attr + tag[m_cls.end():]
+        return tag[:-1] + ' class="nightMode">'
+
+    return re.sub(r'<html[^>]*>', repl, html, count=1, flags=re.IGNORECASE)
+
+
+# ──────────────────────────────────────────────
+# Database helpers
+# ──────────────────────────────────────────────
+
+_dock: Optional[QDockWidget] = None
+
+
+def addon_dir() -> str:
+    return os.path.dirname(__file__)
+
+
+def db_path() -> str:
+    if mw.pm.profileFolder():
+        return os.path.join(mw.pm.profileFolder(), DB_FILENAME)
+    return os.path.join(addon_dir(), DB_FILENAME)
+
+
+def _ensure_db_at(path: str, timeout: float = 5.0) -> None:
+    con = sqlite3.connect(path, timeout=timeout)
+    try:
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                body TEXT NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+        """)
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS todos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                body TEXT NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+        """)
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS pdfs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                body TEXT NOT NULL,
+                updated_at INTEGER NOT NULL
+            )
+        """)
+        con.commit()
+    finally:
+        con.close()
+
+
+def ensure_db() -> None:
+    _ensure_db_at(db_path())
+
+
+# ── Snapshot persistence ───────────────────────
+
+def _snapshot_recovery_path(table: str, database_path: Optional[str] = None) -> str:
+    database_path = database_path or db_path()
+    return os.path.join(
+        os.path.dirname(database_path), f"smartstudy_{table}_recovery.json"
+    )
+
+
+def _write_snapshot_recovery(
+    table: str, body: str, database_path: Optional[str] = None
+) -> bool:
+    """Atomically preserve a valid snapshot when SQLite is temporarily unavailable."""
+    path = _snapshot_recovery_path(table, database_path)
+    tmp_path = f"{path}.tmp"
+    try:
+        data = json.loads(body)
+        # A new recovery of identical content is still a new save attempt. Its
+        # identity must never match a previously superseded recovery file.
+        payload = {"version": 1, "table": table, "body": data,
+                   "recovery_id": os.urandom(16).hex()}
+        with open(tmp_path, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_path, path)
+        return True
+    except Exception as exc:
+        print(f"Notebook {table} recovery save failed: {exc}")
+        try:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+        except OSError:
+            pass
+        return False
+
+
+def _read_snapshot_recovery(
+    table: str, database_path: Optional[str] = None
+) -> Optional[tuple[str, str]]:
+    """Read original recovery content and identity without consulting SQLite."""
+    try:
+        with open(
+            _snapshot_recovery_path(table, database_path), "r", encoding="utf-8"
+        ) as handle:
+            payload = json.load(handle)
+        if (
+            isinstance(payload, dict)
+            and payload.get("version") == 1
+            and payload.get("table") == table
+        ):
+            body = json.dumps(payload.get("body"), ensure_ascii=False, separators=(",", ":"))
+            if _valid_snapshot(table, body):
+                import hashlib
+                identity = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+                return body, hashlib.sha256(identity.encode("utf-8")).hexdigest()
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        # An unreadable file may contain the newest edit. Do not silently treat
+        # it as absent and load an older SQLite version instead.
+        raise SnapshotLoadError(table) from exc
+    except Exception as exc:
+        print(f"Notebook {table} recovery load failed: {exc}")
+    return None
+
+
+def _load_snapshot_recovery(
+    table: str, database_path: Optional[str] = None
+) -> Optional[str]:
+    """Use a recovery only if no committed transaction superseded its identity."""
+    database_path = database_path or db_path()
+    record = _read_snapshot_recovery(table, database_path)
+    if record is None:
+        return None
+    try:
+        os.stat(database_path)
+    except FileNotFoundError:
+        return record[0]
+    except OSError as exc:
+        raise SnapshotLoadError(table) from exc
+    from pathlib import Path
+    for mode in ("ro", "rw"):
+        con = None
+        try:
+            con = sqlite3.connect(Path(database_path).resolve().as_uri() + "?mode=" + mode, uri=True, timeout=1)
+            con.execute("BEGIN")
+            exists = con.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='snapshot_recovery_retired'"
+            ).fetchone()
+            if exists and con.execute(
+                "SELECT 1 FROM snapshot_recovery_retired WHERE snapshot_table=? AND recovery_hash=?",
+                (table, record[1]),
+            ).fetchone():
+                return None
+            return record[0]
+        except (sqlite3.Error, OSError, ValueError) as exc:
+            if mode == "ro" and (getattr(exc, "sqlite_errorcode", 0) & 255) == sqlite3.SQLITE_READONLY:
+                # A crash may leave a hot rollback journal. Let SQLite itself
+                # recover it on an existing-file rw connection; never remove a
+                # journal or manually rewrite data. Normal reads remain ro.
+                continue
+            # With an inaccessible ledger we cannot distinguish a pending new
+            # edit from a stale recovery. Keep both sources and fail closed.
+            raise SnapshotLoadError(table) from exc
+        finally:
+            if con is not None:
+                con.close()
+
+
+def _clear_snapshot_recovery(
+    table: str, committed_body: str, database_path: Optional[str] = None,
+    expected_identity: Optional[str] = None,
+) -> None:
+    """Best-effort removal of only the exact recovery retired by the commit."""
+    if expected_identity is None:
+        return
+    path = _snapshot_recovery_path(table, database_path)
+    try:
+        current = _read_snapshot_recovery(table, database_path)
+        if current is None or current[1] != expected_identity:
+            return  # Never clear a newer, independent recovery save.
+        os.remove(path)
+    except (OSError, SnapshotLoadError):
+        # The transaction already retired this identity. Its original bytes
+        # may stay locked on disk; no post-commit rewrite is needed or allowed.
+        pass
+
+class SnapshotLoadError(RuntimeError):
+    """Existing snapshots could not be read; never replace them with defaults."""
+
+
+def _load_latest_snapshot(
+    table: str, fallback: str, database_path: Optional[str] = None
+) -> str:
+    """Load one known snapshot table without leaking a SQLite connection."""
+    database_path = database_path or db_path()
+    recovery = _load_snapshot_recovery(table, database_path)
+    if recovery is not None:
+        return recovery
+    con: Optional[sqlite3.Connection] = None
+    try:
+        _ensure_db_at(database_path)
+        con = sqlite3.connect(database_path, timeout=5)
+        row = con.execute(
+            f"SELECT body FROM {table} ORDER BY updated_at DESC, id DESC LIMIT 1"
+        ).fetchone()
+        body = row[0] if row else fallback
+        if not _valid_snapshot(table, body):
+            raise ValueError("Invalid stored snapshot")
+        return body
+    except Exception as e:
+        print(f"Notebook {table} Load Error: {e}")
+        raise SnapshotLoadError(table) from e
+    finally:
+        if con is not None:
+            con.close()
+
+
+def _valid_snapshot(table: str, body: str) -> bool:
+    """Reject truncated/corrupt bridge payloads before they become the latest row."""
+    try:
+        data = json.loads(body)
+    except (TypeError, ValueError):
+        return False
+    if table == "notes":
+        return isinstance(data, list) or (
+            isinstance(data, dict) and (
+                isinstance(data.get("pages"), list)
+                or isinstance(data.get("blocks"), list)  # Legacy single-page notebooks.
+            )
+        )
+    if table == "todos":
+        return isinstance(data, list)
+    if table == "pdfs":
+        return isinstance(data, list) or (
+            isinstance(data, dict) and isinstance(data.get("pdfs"), list)
+        )
+    return False
+
+
+def _save_snapshot(
+    table: str,
+    body: str,
+    database_path: Optional[str] = None,
+    sqlite_timeout: float = 5.0,
+) -> bool:
+    """Transactionally store a validated snapshot and retain 20 recovery rows."""
+    if not _valid_snapshot(table, body):
+        print(f"Notebook {table} Save Error: invalid JSON snapshot rejected")
+        return False
+
+    con: Optional[sqlite3.Connection] = None
+    database_path = database_path or db_path()
+    try:
+        _ensure_db_at(database_path, timeout=sqlite_timeout)
+        con = sqlite3.connect(database_path, timeout=sqlite_timeout)
+        with con:
+            con.execute("BEGIN IMMEDIATE")
+            recovery_record = _read_snapshot_recovery(table, database_path)
+            if table == "notes":
+                # Non-rotating pre-update copies, before the normal 20-row pruning.
+                # This is additive: no schema changes and no rewriting existing rows.
+                for backup_name in ("pre-block-ui-v1", "pre-hierarchy-v1"):
+                    backup_path = database_path + f".{backup_name}.json"
+                    if not os.path.exists(backup_path):
+                        rows = con.execute("SELECT id, body, updated_at FROM notes ORDER BY id").fetchall()
+                        recovery = recovery_record[0] if recovery_record else None
+                        if rows or recovery is not None:
+                            tmp_backup = backup_path + ".tmp"
+                            with open(tmp_backup, "w", encoding="utf-8") as handle:
+                                json.dump({"version": 1, "table": "notes", "snapshots": rows, "recovery": recovery}, handle, ensure_ascii=False)
+                                handle.flush()
+                                os.fsync(handle.fileno())
+                            os.replace(tmp_backup, backup_path)
+            con.execute(
+                f"INSERT INTO {table}(body, updated_at) "
+                "VALUES(?, strftime('%s','now'))",
+                (body,),
+            )
+            if recovery_record is not None:
+                # Additive metadata only; never rewrite notebook content. The
+                # retirement and new snapshot commit or roll back together.
+                con.execute("""CREATE TABLE IF NOT EXISTS snapshot_recovery_retired (
+                    snapshot_table TEXT NOT NULL,
+                    recovery_hash TEXT NOT NULL,
+                    PRIMARY KEY (snapshot_table, recovery_hash)
+                )""")
+                con.execute(
+                    "INSERT OR IGNORE INTO snapshot_recovery_retired(snapshot_table,recovery_hash) VALUES (?,?)",
+                    (table, recovery_record[1]),
+                )
+            con.execute(
+                f"DELETE FROM {table} WHERE id NOT IN "
+                f"(SELECT id FROM {table} "
+                "ORDER BY updated_at DESC, id DESC LIMIT 20)"
+            )
+        if recovery_record is not None:
+            _clear_snapshot_recovery(table, body, database_path, recovery_record[1])
+        return True
+    except Exception as e:
+        print(f"Notebook {table} Save Error: {e}")
+        if _write_snapshot_recovery(table, body, database_path):
+            print(f"Notebook {table}: latest snapshot stored in recovery file")
+            return True
+        return False
+    finally:
+        if con is not None:
+            con.close()
+
+
+# ── Notes (Notebook) ──────────────────────────
+
+def load_latest_note(database_path: Optional[str] = None) -> str:
+    return _load_latest_snapshot("notes", "[]", database_path)
+
+
+def save_note(body: str) -> bool:
+    return _save_snapshot("notes", body)
+
+
+# ── Todos ─────────────────────────────────────
+
+def _todo_cleanup_enabled():
+    from . import addon_settings
+    return bool(addon_settings.get("todo_auto_cleanup", False))
+
+
+def _normalize_todo_body(body):
+    tasks = json.loads(body)
+    if not isinstance(tasks, list):
+        return body
+    return json.dumps(normalize_tasks(tasks, _todo_cleanup_enabled()))
+
+
+def load_todo_preview_snapshot(normalize=True) -> str:
+    """Read dashboard data without schema writes or long waits on a busy DB."""
+    from pathlib import Path
+    path = db_path()
+    recovery = _load_snapshot_recovery("todos", path)
+    if recovery is not None:
+        return _normalize_todo_body(recovery) if normalize else recovery
+    if not os.path.exists(path):
+        return "[]"
+    con = None
+    try:
+        con = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True, timeout=0.05)
+        row = con.execute("SELECT body FROM todos ORDER BY updated_at DESC, id DESC LIMIT 1").fetchone()
+        return (_normalize_todo_body(row[0]) if normalize else row[0]) if row else "[]"
+    except sqlite3.Error:
+        return "null"
+    finally:
+        if con is not None:
+            con.close()
+
+
+def load_latest_todos(database_path: Optional[str] = None) -> str:
+    return _normalize_todo_body(_load_latest_snapshot("todos", "[]", database_path))
+
+
+def save_todos(body: str) -> bool:
+    return _save_snapshot("todos", body)
+
+
+# ── PDFs ──────────────────────────────────────
+
+def load_pdf_list(database_path: Optional[str] = None) -> str:
+    return _load_latest_snapshot("pdfs", "[]", database_path)
+
+
+def load_pdf_list_enriched(database_path: Optional[str] = None) -> str:
+    """Like load_pdf_list() but adds a transient ``_exists`` bool to every entry.
+
+    Python checks os.path.isfile() for each stored path so the UI can show
+    a "missing file" indicator without a separate async bridge round-trip.
+    The ``_exists`` flag is stripped again by the save handler so it is never
+    persisted back to the database.
+    """
+    raw = load_pdf_list(database_path)
+    try:
+        data = json.loads(raw)
+        if isinstance(data, dict) and "pdfs" in data:
+            for entry in data["pdfs"]:
+                entry["_exists"] = os.path.isfile(entry.get("path", ""))
+        return json.dumps(data)
+    except Exception:
+        return raw
+
+
+def save_pdf_list(body: str) -> bool:
+    return _save_snapshot("pdfs", body)
+
+
+def _pdf_deck_names() -> list[str]:
+    """Return normal Anki decks for the Card Creator's searchable input."""
+    try:
+        if not mw or not getattr(mw, "col", None):
+            return []
+        names = {
+            item.name
+            for item in mw.col.decks.all_names_and_ids(include_filtered=False)
+            if getattr(item, "name", "")
+        }
+        # A datalist with tens of thousands of DOM options can noticeably stall
+        # a narrow WebView. Any omitted deck can still be entered manually.
+        return sorted(names, key=str.casefold)[:MAX_PDF_DECK_SUGGESTIONS]
+    except Exception as exc:
+        print(f"Notebook could not load deck names for PDF Card Creator: {exc}")
+        return []
+
+
+def _pdf_current_deck_name() -> str:
+    """Return the current normal deck as a quick Card Creator suggestion."""
+    try:
+        if not mw or not getattr(mw, "col", None):
+            return ""
+        deck = mw.col.decks.current()
+        if not isinstance(deck, dict) or deck.get("dyn"):
+            return ""
+        return str(deck.get("name", ""))
+    except Exception:
+        return ""
+
+
+# ── Serialized background writer ──────────────
+
+class _PendingSnapshotWrite:
+    def __init__(
+        self,
+        table: str,
+        body: str,
+        database_path: str,
+        callback: Callable[[bool], None],
+    ) -> None:
+        self.table = table
+        self.body = body
+        self.database_path = database_path
+        self.callbacks = [callback]
+
+
+class _NotebookBackgroundWriter:
+    """One lazy worker that serializes and coalesces our private SQLite writes.
+
+    An in-flight write is never replaced. Only a not-yet-started write for the
+    same profile and table is updated to the newest snapshot; every requester is
+    still notified once that newest durable snapshot has completed.
+    """
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._pending: dict[tuple[str, str], _PendingSnapshotWrite] = {}
+        self._thread: Optional[threading.Thread] = None
+
+    def is_idle(self) -> bool:
+        with self._lock:
+            return self._thread is None and not self._pending
+
+    def submit(
+        self,
+        table: str,
+        body: str,
+        database_path: str,
+        callback: Callable[[bool], None],
+    ) -> None:
+        if table not in {"notes", "todos", "pdfs"}:
+            self._deliver([callback], False)
+            return
+
+        key = (database_path, table)
+        with self._lock:
+            pending = self._pending.get(key)
+            if pending is None:
+                self._pending[key] = _PendingSnapshotWrite(
+                    table, body, database_path, callback
+                )
+            else:
+                # Coalesce only work the thread has not started yet. The callbacks
+                # remain in request order, matching the JavaScript save revisions.
+                pending.body = body
+                pending.callbacks.append(callback)
+            if self._thread is None or not self._thread.is_alive():
+                self._thread = threading.Thread(
+                    target=self._run,
+                    name="SmartStudyNotebookWriter",
+                    # A short-lived non-daemon worker is intentional: on a normal
+                    # Anki exit Python waits for an in-flight durable write instead
+                    # of terminating it halfway through. The thread exits as soon
+                    # as the queue is empty, so it never keeps an idle app alive.
+                    daemon=False,
+                )
+                self._thread.start()
+
+    def _run(self) -> None:
+        while True:
+            with self._lock:
+                if not self._pending:
+                    self._thread = None
+                    return
+                key = next(iter(self._pending))
+                job = self._pending.pop(key)
+
+            # This database is owned by the add-on, not by Anki's Collection.
+            # A fresh connection is created and closed entirely on this thread.
+            saved = _save_snapshot(
+                job.table,
+                job.body,
+                database_path=job.database_path,
+                sqlite_timeout=1.0,
+            )
+            self._deliver(job.callbacks, saved)
+
+    @staticmethod
+    def _deliver(callbacks: list[Callable[[bool], None]], saved: bool) -> None:
+        def on_main() -> None:
+            for callback in callbacks:
+                try:
+                    callback(saved)
+                except Exception as exc:
+                    print(f"Notebook background save callback failed: {exc}")
+
+        try:
+            if mw and getattr(mw, "taskman", None):
+                mw.taskman.run_on_main(on_main)
+            else:
+                print("Notebook background save completed without a main-thread dispatcher")
+        except Exception as exc:
+            # The durable write has already completed. During process shutdown Qt
+            # may no longer accept callbacks, so logging is safer than touching UI.
+            print(f"Notebook could not dispatch save result: {exc}")
+
+
+_background_writer = _NotebookBackgroundWriter()
+
+
+# ── Misc ──────────────────────────────────────
+
+def _list_notebook_versions(database_path: str) -> list[dict]:
+    """Read existing versions and immutable pre-update copies without modifying storage."""
+    versions: list[dict] = []
+    seen: set[str] = set()
+
+    def add(body, timestamp, source):
+        if isinstance(body, str) and body not in seen and _valid_snapshot("notes", body):
+            seen.add(body)
+            versions.append({"body": body, "timestamp": timestamp, "source": source})
+
+    if os.path.isfile(database_path):
+        # A read-only connection must never create a missing database or migrate it.
+        from pathlib import Path
+        con = None
+        try:
+            con = sqlite3.connect(Path(database_path).resolve().as_uri() + "?mode=ro", uri=True, timeout=2)
+            for body, timestamp in con.execute("SELECT body, updated_at FROM notes ORDER BY updated_at DESC, id DESC LIMIT 20"):
+                add(body, timestamp, "saved")
+        except sqlite3.Error:
+            # Independent recovery copies must remain available even when the
+            # database is damaged, locked or missing its notes table.
+            pass
+        finally:
+            if con is not None:
+                con.close()
+    for suffix in ("pre-block-ui-v1", "pre-hierarchy-v1"):
+        path = database_path + "." + suffix + ".json"
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as handle:
+                backup = json.load(handle)
+            for row in backup.get("snapshots", [])[:20]:
+                if isinstance(row, list) and len(row) >= 3:
+                    add(row[1], row[2], "pre-update")
+            add(backup.get("recovery"), 0, "pre-update")
+        except (OSError, ValueError, TypeError, AttributeError):
+            # One damaged backup must not hide other valid historical versions.
+            continue
+    # History/export includes superseded copies too. A broken database must not
+    # prevent independent recovery export, and an unreadable side file must not
+    # hide the database versions already collected above.
+    try:
+        recovery = _read_snapshot_recovery("notes", database_path)
+        add(recovery[0] if recovery else None, 0, "recovery")
+    except SnapshotLoadError:
+        pass
+    return versions
+
+
+def export_data():
+    try:
+        data = load_latest_note()
+    except SnapshotLoadError:
+        tooltip(_("Could not load your data. Nothing has been overwritten. Please try again."))
+        return
+    save_title  = _("Export Notebook")
+    save_filter = _("JSON (*.json)")
+    path, _filter = QFileDialog.getSaveFileName(
+        mw, save_title, "notebook_export.json", save_filter
+    )
+    if path:
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(data)
+            tooltip(_("Notebook exported successfully!"))
+        except Exception as e:
+            showInfo(_("Export failed: {}").format(e))
+
+
+def _open_file_externally(file_path: str) -> None:
+    """Open a file with the OS default application."""
+    try:
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", file_path])
+        elif sys.platform == "win32":
+            os.startfile(file_path)  # type: ignore[attr-defined]
+        else:
+            subprocess.Popen(["xdg-open", file_path])
+    except Exception as e:
+        showInfo(_("Could not open file: {}").format(e))
+
+
+# ──────────────────────────────────────────────
+# Fullscreen window
+# ──────────────────────────────────────────────
+
+class NotebookFullscreenWindow(QWidget):
+    """Standalone window that borrows the web view from the dock.
+
+    Two display modes:
+      * windowed=False – true OS fullscreen (showFullScreen), ESC closes it.
+      * windowed=True  – a normal, maximised window inside Anki with a title
+        bar that can be moved/resized; ESC is NOT bound so typing stays safe.
+    """
+
+    def __init__(self, panel: "NotebookPanel", web_view: AnkiWebView,
+                 parent=None, windowed: bool = False) -> None:
+        super().__init__(parent)
+        self.panel    = panel
+        self.web_view = web_view
+        self.windowed = windowed
+        self.setWindowTitle(_("Smart Study – Notebook"))
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(web_view)
+
+        # ESC closes only true fullscreen (a windowed view has a close button)
+        if not windowed:
+            esc = QShortcut(QKeySequence("Escape"), self)
+            esc.activated.connect(self.close)
+
+    def closeEvent(self, event) -> None:  # type: ignore[override]
+        self.panel.exit_fullscreen(self.web_view)
+        event.accept()
+
+
+# ──────────────────────────────────────────────
+# NotebookPanel  –  the main Qt widget
+# ──────────────────────────────────────────────
+
+class NotebookPanel(QWidget):
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self._layout = QVBoxLayout()
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self._layout)
+        self.web: Optional[AnkiWebView] = None
+        self.is_initialized    = False
+        self.current_tool      = "notebook"
+        self._database_path = db_path()
+        self._load_failed = False
+        self.is_in_fullscreen  = False
+        self.is_embedded       = False
+        self.fullscreen_window: Optional[NotebookFullscreenWindow] = None
+        self._current_pdf_path = ""
+        self._page_ready = False
+        self._flush_in_progress = False
+        self._pending_tool_switch: Optional[str] = None
+        self._pending_pdf_reference: Optional[tuple[str, int]] = None
+        self._unload_requested = False
+        self._unload_callbacks: list[Callable[[bool], None]] = []
+        # Store a reference to the parent dock for fullscreen toggling
+        self.parent_dock: Optional[QDockWidget] = (
+            parent if isinstance(parent, QDockWidget) else None
+        )
+
+    # ── Loading ───────────────────────────────
+
+    def load_content(self):
+        """Create the WebView and load current tool. Called when dock becomes visible."""
+        if self.web:
+            # A failed flush intentionally keeps the hidden WebView alive. Never
+            # overwrite that in-memory state with an older database snapshot.
+            return
+
+        self.web = AnkiWebView(kind=AnkiWebViewKind.DEFAULT)
+        self.web.set_bridge_command(self._on_bridge_cmd, self)
+        self.web.loadFinished.connect(self._on_load_finished)
+        self._layout.addWidget(self.web)
+
+        self._load_tool(self.current_tool)
+        self.is_initialized = True
+
+    def unload_content(
+        self, on_complete: Optional[Callable[[bool], None]] = None
+    ) -> None:
+        """Persist the live page, then destroy its WebView to free RAM."""
+        if self.is_in_fullscreen or self.is_embedded:
+            if on_complete:
+                on_complete(False)
+            return  # Don't unload while detached / embedded
+        if on_complete:
+            self._unload_callbacks.append(on_complete)
+        if not self.web:
+            self._finish_unload_callbacks(True)
+            return
+        if self._flush_in_progress:
+            self._unload_requested = True
+            return
+        self._unload_requested = False
+
+        web_ref = self.web
+
+        def after_flush(saved: bool) -> None:
+            if saved:
+                self._destroy_web_view(web_ref)
+            else:
+                # Keep the hidden page alive. When the user opens the dock again,
+                # load_content() returns to this exact unsaved in-memory state.
+                print("Notebook: WebView kept alive because its final save failed")
+            self._finish_unload_callbacks(saved)
+
+        self._flush_current_state(after_flush)
+
+    def _finish_unload_callbacks(self, saved: bool) -> None:
+        callbacks = self._unload_callbacks
+        self._unload_callbacks = []
+        for callback in callbacks:
+            try:
+                callback(saved)
+            except Exception as exc:
+                print(f"Notebook unload callback failed: {exc}")
+
+    def _on_load_finished(self, ok: bool) -> None:
+        self._page_ready = bool(ok) and not self._load_failed
+        if ok and self.current_tool == "todo":
+            self._consume_dashboard_completions()
+        if ok and self.current_tool == "pdf" and self._pending_pdf_reference:
+            QTimer.singleShot(0, self._consume_pending_pdf_reference)
+
+    def _consume_dashboard_completions(self):
+        pending = getattr(self, "_dashboard_completions", set())
+        if not pending or not self.web or self.current_tool != "todo" or not self._page_ready:
+            return
+        self._dashboard_completions = set()
+        self.web.eval("if(window.completeDashboardTasks) window.completeDashboardTasks(" + json.dumps(list(pending)) + ");")
+
+    def open_pdf_reference(self, file_path: str, page: int = 1) -> None:
+        """Open a library PDF from a review-card source link."""
+        self._pending_pdf_reference = (file_path, max(1, int(page or 1)))
+        if not self.web:
+            # Load the PDF tool directly. Loading the default Notebook first and
+            # immediately replacing it can produce an out-of-order loadFinished
+            # signal on slower WebEngine builds.
+            self.current_tool = "pdf"
+            self.load_content()
+            return
+        if self.current_tool == "pdf":
+            if self._page_ready:
+                self._consume_pending_pdf_reference()
+            return
+        self._pending_tool_switch = "pdf"
+        if not self._flush_in_progress:
+            self._flush_current_state(self._finish_tool_switch)
+
+    def _consume_pending_pdf_reference(self) -> None:
+        if not self._pending_pdf_reference or not self.web or not self._page_ready:
+            return
+        file_path, page = self._pending_pdf_reference
+        self._pending_pdf_reference = None
+        self._render_pdf_inline(file_path, initial_page=page)
+
+    def _destroy_web_view(self, web_ref: AnkiWebView) -> None:
+        if self.web is not web_ref:
+            return
+        self._current_pdf_path = ""
+        self._layout.removeWidget(web_ref)
+        # AnkiWebView registers itself on gui_hooks.theme_did_change in its
+        # __init__ and only deregisters in cleanup(). Without this call the
+        # dead hook raises "wrapped C/C++ object of type AnkiWebView has been
+        # deleted" on the next theme switch.
+        try:
+            web_ref.cleanup()
+        except Exception as exc:
+            print(f"Notebook: webview cleanup failed: {exc}")
+        web_ref.deleteLater()
+        self.web = None
+        self.is_initialized = False
+        self._page_ready = False
+
+    @staticmethod
+    def _strip_pdf_transient_flags(body: str) -> str:
+        try:
+            data = json.loads(body)
+            if isinstance(data, dict) and isinstance(data.get("pdfs"), list):
+                for entry in data["pdfs"]:
+                    if isinstance(entry, dict):
+                        entry.pop("_exists", None)
+            return json.dumps(data)
+        except Exception:
+            return body
+
+    def _queue_tool_snapshot(
+        self, tool: str, body: str, callback: Callable[[bool], None]
+    ) -> None:
+        if self._load_failed:
+            callback(False)
+            return
+        table = {"notebook": "notes", "todo": "todos", "pdf": "pdfs"}.get(tool)
+        if table is None:
+            callback(False)
+            return
+        if tool == "todo":
+            body = _normalize_todo_body(body)
+        if tool == "pdf":
+            body = self._strip_pdf_transient_flags(body)
+        try:
+            # This page always writes to the profile that originally opened it,
+            # including callbacks arriving after Anki has switched profiles.
+            database_path = self._database_path
+        except Exception as exc:
+            print(f"Notebook could not determine save path: {exc}")
+            callback(False)
+            return
+        _background_writer.submit(table, body, database_path, callback)
+
+    def _notify_save_result(self, tool: str, saved: bool) -> None:
+        if tool == "todo" and saved:
+            _refresh_dashboard_tasks()
+        if not self.web:
+            return
+        if tool == "notebook":
+            callback = "onSaved" if saved else "onSaveFailed"
+        elif tool == "todo":
+            callback = "onTodoSaved" if saved else "onTodoSaveFailed"
+        else:
+            callback = "onPdfSaved" if saved else "onPdfSaveFailed"
+        try:
+            self.web.eval(f"if(window.{callback}) window.{callback}();")
+        except Exception:
+            pass
+
+    def _flush_current_state(self, on_complete: Callable[[bool], None]) -> None:
+        """Ask the page for its current snapshot and persist it before teardown.
+
+        The snapshot is returned through runJavaScript's callback and written by
+        Python before a tool switch or WebView destruction. This avoids relying on
+        a last asynchronous bridge message surviving page teardown.
+        """
+        if not self.web or self._load_failed:
+            # The error page has no editable document and must never be saved.
+            on_complete(True)
+            return
+        if self._flush_in_progress:
+            return
+
+        self._flush_in_progress = True
+        web_ref = self.web
+        tool = self.current_tool
+        page_was_ready = self._page_ready
+        completed = False
+        save_attempts = 0
+
+        def finish(saved: bool) -> None:
+            nonlocal completed
+            if completed:
+                return
+            completed = True
+            self._flush_in_progress = False
+            on_complete(saved)
+            if self._unload_requested:
+                self._unload_requested = False
+                QTimer.singleShot(0, self.unload_content)
+
+        def receive_snapshot(result) -> None:
+            if self.web is not web_ref:
+                finish(True)
+                return
+            if result is None:
+                # A page still loading cannot contain user edits. Once loaded,
+                # however, a missing snapshot hook is unsafe and blocks teardown.
+                saved = not page_was_ready
+            elif isinstance(result, str):
+                persist_until_current(result)
+                return
+            else:
+                saved = False
+            finish(saved)
+
+        def persist_until_current(snapshot: str) -> None:
+            """Keep saving until no edit occurred during the background write."""
+            nonlocal save_attempts
+            if completed:
+                return
+            save_attempts += 1
+
+            def after_background_save(saved: bool) -> None:
+                if completed:
+                    return
+                if not saved:
+                    self._notify_save_result(tool, False)
+                    finish(False)
+                    return
+                if self.web is not web_ref:
+                    finish(True)
+                    return
+
+                def verify_snapshot(latest) -> None:
+                    if completed:
+                        return
+                    if not isinstance(latest, str):
+                        finish(False)
+                    elif latest == snapshot:
+                        finish(True)
+                    elif save_attempts >= MAX_FINAL_SAVE_ATTEMPTS:
+                        # Never spin indefinitely if a page keeps changing its
+                        # serialized state while we are trying to leave it. The
+                        # WebView stays open, so the user can retry without loss.
+                        print(
+                            "Notebook final save aborted after repeated live edits"
+                        )
+                        finish(False)
+                    else:
+                        # The page remained interactive while SQLite was writing.
+                        # Persist the newer state before allowing teardown/switch.
+                        persist_until_current(latest)
+
+                try:
+                    web_ref.evalWithCallback(verify_js, verify_snapshot)
+                except Exception as exc:
+                    print(f"Notebook final save verification failed: {exc}")
+                    finish(False)
+
+            self._queue_tool_snapshot(tool, snapshot, after_background_save)
+
+        js = (
+            "(typeof window.__smartstudySnapshotForUnload === 'function')"
+            " ? window.__smartstudySnapshotForUnload() : null"
+        )
+        # The unload hook is allowed to synchronize the live editor into the
+        # page state. Verification must be read-only: calling the unload hook a
+        # second time used to bump Notebook's updatedAt timestamp on every pass,
+        # causing thousands of writes and blocking navigation until timeout.
+        verify_js = (
+            "(typeof window.__smartstudySnapshotForVerification === 'function')"
+            " ? window.__smartstudySnapshotForVerification() : null"
+        )
+        try:
+            web_ref.evalWithCallback(js, receive_snapshot)
+            # A broken renderer must not leave the panel permanently locked.
+            # On timeout the WebView is retained, so no data is discarded.
+            QTimer.singleShot(20000, lambda: finish(False))
+        except Exception as exc:
+            print(f"Notebook final save request failed: {exc}")
+            finish(False)
+
+    def _apply_wide_mode(self, active: bool) -> None:
+        """Toggle the widened note column on the live page (no reload)."""
+        if not self.web:
+            return
+        action = "add" if active else "remove"
+        js = f"document.body && document.body.classList.{action}('smartstudy-wide');"
+        try:
+            self.web.eval(js)
+        except Exception:
+            pass
+
+    def _set_nav_toggle(self, active: bool, windowed: bool) -> None:
+        """Swap the fullscreen / window button icon inside the nav bar.
+
+        Same contract as the Mindmap tool: the page exposes
+        __smartstudySetFullscreen / __smartstudySetWindow (see
+        _build_nav_toggle_script) which swap the SVG and tooltip.
+        """
+        if not self.web:
+            return
+        titles = {
+            "fullscreen_enter": _("Fullscreen"),
+            "fullscreen_exit":  _("Exit Fullscreen"),
+            "window_open":      _("New Window"),
+            "window_exit":      _("Close Window"),
+        }
+        fn   = "__smartstudySetWindow" if windowed else "__smartstudySetFullscreen"
+        flag = "true" if active else "false"
+        js   = f"if(window.{fn}) {fn}({flag}, {json.dumps(titles)});"
+        try:
+            self.web.eval(js)
+        except Exception:
+            pass
+
+    def enter_fullscreen(self) -> None:
+        if not self.web or self.is_in_fullscreen or self.is_embedded:
+            return
+        self.is_in_fullscreen = True
+
+        # Detach web view from dock layout
+        self._layout.removeWidget(self.web)
+        self.web.setParent(None)  # type: ignore[arg-type]
+
+        # Hide the dock
+        if self.parent_dock:
+            self.parent_dock.hide()
+
+        # Show in standalone OS fullscreen window
+        self.fullscreen_window = NotebookFullscreenWindow(self, self.web)
+        self.fullscreen_window.showFullScreen()
+        # Widen the note column for the large view.
+        self._apply_wide_mode(True)
+        # Flip the fullscreen icon to the "exit" state (arrows pointing in).
+        self._set_nav_toggle(True, windowed=False)
+
+    def enter_window(self) -> None:
+        """Embed the web view directly into Anki's main content area."""
+        if not self.web or self.is_in_fullscreen or self.is_embedded:
+            return
+
+        # IMPORTANT: set the flag *before* hiding the dock. Hiding the dock
+        # fires visibilityChanged, whose handler would otherwise destroy the
+        # web view (RAM saving). The flag suppresses that teardown.
+        self.is_embedded = True
+
+        # Detach web view from dock layout and hide the dock.
+        self._layout.removeWidget(self.web)
+        self.web.setParent(None)  # type: ignore[arg-type]
+        if self.parent_dock:
+            self.parent_dock.hide()
+
+        ok = embedded_window.embed(self.web, self.exit_window, _("Notebook"),
+                                   show_header=False)
+        if not ok:
+            # Embedding failed – reattach to the dock and abort.
+            self.is_embedded = False
+            self._layout.addWidget(self.web)
+            if self.parent_dock:
+                self.parent_dock.show()
+                self.parent_dock.raise_()
+            return
+        # Widen the note column for the large embedded view.
+        self._apply_wide_mode(True)
+        # Flip the window icon to the "close" state (window with a dash).
+        self._set_nav_toggle(True, windowed=True)
+
+    def exit_window(self) -> None:
+        """Leave the embedded view and return the web view to the dock."""
+        if not self.is_embedded:
+            return
+        # Revert to the narrow (sidebar) column before handing the view back.
+        self._apply_wide_mode(False)
+        self._set_nav_toggle(False, windowed=True)
+        self.is_embedded = False
+        if self.web is not None:
+            self._layout.addWidget(self.web)  # reparents out of the container
+        embedded_window.restore()
+        if self.parent_dock:
+            self.parent_dock.show()
+            self.parent_dock.raise_()
+
+    def exit_fullscreen(self, web_view_ref: AnkiWebView) -> None:
+        self.is_in_fullscreen  = False
+        self.fullscreen_window = None
+
+        # Revert the widened column back to the narrow sidebar layout.
+        self.web = web_view_ref
+        self._apply_wide_mode(False)
+        self._set_nav_toggle(False, windowed=False)
+
+        # Reattach web view to dock panel
+        self._layout.addWidget(web_view_ref)
+
+        # Show the dock again
+        if self.parent_dock:
+            self.parent_dock.show()
+            self.parent_dock.raise_()
+
+    def _load_tool(self, tool_name: str) -> None:
+        self._load_failed = False
+        try:
+            self._load_tool_content(tool_name)
+        except SnapshotLoadError:
+            self._load_failed = True
+            self._page_ready = False
+            message = html.escape(_("Could not load your data. Nothing has been overwritten. Please try again."))
+            retry = html.escape(_("Try again"))
+            recovery_action = (
+                f'<p><button onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:export-recovery\')">'
+                + html.escape(_("Export Notebook")) + '</button></p>'
+                if self.current_tool == 'notebook' else ''
+            )
+            error_page = (
+                '<html><head><style>body{margin:0;background:#fff;color:#252525}'
+                'html.nightMode body{background:#2c2c2c;color:#fff}'
+                'button{font:inherit;padding:8px 12px;border:1px solid #7e7e7e;border-radius:8px;cursor:pointer}'
+                'html.nightMode button{background:#414141;color:#fff}</style></head>'
+                '<body><main style="padding:24px;font:14px system-ui">'
+                f'<p>{message}</p><button onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:retry-load\')">{retry}</button>'
+                + recovery_action +
+                '</main></body></html>'
+            )
+            self.web.setHtml(_inject_nav(_apply_night_mode(_inject_body_column(error_page)), self.current_tool,
+                                        fs_active=self.is_in_fullscreen, win_active=self.is_embedded))
+
+    def _load_tool_content(self, tool_name: str) -> None:
+        """Read the tool's HTML file, inject nav bar, and display it."""
+        if not self.web:
+            return
+        enabled = workspace_preferences.enabled("notebook")
+        if not enabled.get(tool_name):
+            tool_name = next(key for key, value in enabled.items() if value)
+        self._page_ready = False
+        tracker = getattr(self.parent_dock, "_smartstudy_width", None)
+        if tracker is not None:
+            tracker.select(tool_name)
+        self.current_tool = tool_name
+        file_name = TOOL_FILES.get(tool_name, "index.html")
+        html_path = os.path.join(addon_dir(), HTML_DIR, file_name)
+
+        if not os.path.exists(html_path):
+            self.web.setHtml(
+                f"<h2 style='font-family:sans-serif;padding:20px'>"
+                f"Error: {HTML_DIR}/{file_name} not found</h2>"
+            )
+            return
+
+        with open(html_path, "r", encoding="utf-8") as fh:
+            html = fh.read()
+
+        if tool_name == "todo":
+            with open(os.path.join(addon_dir(), HTML_DIR, "task_schedule.js"), encoding="utf-8") as source:
+                html = html.replace('<script src="task_schedule.js"></script>', '<script>' + source.read() + '</script>')
+        html = _inject_body_column(html)
+        html = _apply_night_mode(html)
+        html = _inject_nav(html, tool_name,
+                           fs_active=self.is_in_fullscreen,
+                           win_active=self.is_embedded)
+        if self.is_embedded or self.is_in_fullscreen:
+            html = _add_wide_class(html)
+
+        # ── Preload initial data to avoid a visual flash ──────────────
+        # Instead of loading the page with default state and then calling
+        # loadContent() 150 ms later (which causes a visible layout shift),
+        # we embed the data directly so the page can initialise correctly
+        # on first render.
+        if tool_name == "notebook":
+            preload_data = load_latest_note(self._database_path)
+            preload_js   = _json_for_script(preload_data)
+            preload_tag  = f'<script id="smartstudy-preload">window.__SMARTSTUDY_PRELOAD__={preload_js};</script>'
+            # Use a lambda replacement so that JSON backslash-escapes (e.g. \u, \n)
+            # inside preload_tag are never interpreted as regex replacement tokens.
+            html = re.sub(r'</head>', lambda m: preload_tag + m.group(0), html,
+                          count=1, flags=re.IGNORECASE)
+        elif tool_name == "todo":
+            preload_data = load_latest_todos(self._database_path)
+            preload_js   = _json_for_script(preload_data)
+            preload_tag  = (
+                f'<script id="smartstudy-preload">'
+                f'window.__SMARTSTUDY_TODO_PRELOAD__={preload_js};'
+                f'window.__SMARTSTUDY_TODO_AUTO_CLEANUP__={json.dumps(_todo_cleanup_enabled())};'
+                f'</script>'
+            )
+            html = re.sub(r'</head>', lambda m: preload_tag + m.group(0), html,
+                          count=1, flags=re.IGNORECASE)
+        elif tool_name == "pdf":
+            preload_data = load_pdf_list_enriched(self._database_path)
+            preload_js   = _json_for_script(preload_data)
+            deck_names_js = _json_for_script(_pdf_deck_names(), ensure_ascii=False)
+            current_deck_js = _json_for_script(
+                _pdf_current_deck_name(), ensure_ascii=False
+            )
+
+            # Try to use locally cached PDF.js (offline support + avoids cross-origin
+            # worker restriction that can occur with setHtml() pages).
+            pdfjs_main_tag, worker_json = _pdfjs_local_scripts()
+            _CDN_TAG = '<script id="smartstudy-pdfjs-placeholder"></script>'
+            # Never execute a network-fetched library in this privileged local
+            # WebView. Release packages must contain the pinned local files.
+            html = html.replace(_CDN_TAG, pdfjs_main_tag, 1)
+            if pdfjs_main_tag:
+                preload_tag = (
+                    f'<script id="smartstudy-preload">'
+                    f'window.__SMARTSTUDY_PDF_PRELOAD__={preload_js};'
+                    f'window.__SMARTSTUDY_DECKS__={deck_names_js};'
+                    f'window.__SMARTSTUDY_CURRENT_DECK__={current_deck_js};'
+                    f'window.__PDFJS_WORKER_CODE__={worker_json};'
+                    f'</script>'
+                )
+            else:
+                preload_tag = (
+                    f'<script id="smartstudy-preload">'
+                    f'window.__SMARTSTUDY_PDF_PRELOAD__={preload_js};'
+                    f'window.__SMARTSTUDY_DECKS__={deck_names_js};'
+                    f'window.__SMARTSTUDY_CURRENT_DECK__={current_deck_js};'
+                    f'</script>'
+                )
+            html = re.sub(r'</head>', lambda m: preload_tag + m.group(0), html,
+                          count=1, flags=re.IGNORECASE)
+
+        # ── Inject i18n translations ──────────────────────────────────
+        i18n_tag = _build_i18n_script(tool_name)
+        html = re.sub(r'</head>', lambda m: i18n_tag + m.group(0), html,
+                      count=1, flags=re.IGNORECASE)
+
+        self.web.setHtml(html)
+
+    def _reload_current_tool(self) -> None:
+        """Re-fetch data for whichever tool is visible."""
+        if self.current_tool == "notebook":
+            self.reload_from_db()
+        elif self.current_tool == "todo":
+            self._reload_todos()
+        elif self.current_tool == "pdf":
+            self._reload_pdfs()
+
+    # ── Data reload helpers ───────────────────
+
+    def reload_from_db(self) -> None:
+        if not self.web:
+            return
+        try:
+            body = load_latest_note(self._database_path)
+        except SnapshotLoadError:
+            tooltip(_("Could not load your data. Nothing has been overwritten. Please try again."))
+            return
+        json_str = json.dumps(body)
+        self.web.eval(f"if(window.loadContent) window.loadContent({json_str});")
+
+    def _reload_todos(self) -> None:
+        if not self.web:
+            return
+        try:
+            body = load_latest_todos(self._database_path)
+        except SnapshotLoadError:
+            tooltip(_("Could not load your data. Nothing has been overwritten. Please try again."))
+            return
+        json_str = json.dumps(body)
+        self.web.eval(f"if(window.loadTodos) window.loadTodos({json_str});")
+
+    def _reload_pdfs(self) -> None:
+        if not self.web:
+            return
+        try:
+            body = load_pdf_list_enriched(self._database_path)
+        except SnapshotLoadError:
+            tooltip(_("Could not load your data. Nothing has been overwritten. Please try again."))
+            return
+        json_str = json.dumps(body)
+        self.web.eval(f"if(window.loadPdfs) window.loadPdfs({json_str});")
+
+    def _export_notebook_recovery(self) -> None:
+        """Export a chosen valid version without loading or replacing the notebook."""
+        from aqt.qt import QInputDialog
+        database_path = self._database_path
+
+        def completed(future):
+            if db_path() != database_path:
+                return
+            try:
+                versions = future.result()
+                if not versions:
+                    tooltip(_("No versions available"))
+                    return
+                choices = [f'{index + 1} · ' + _({
+                    'saved': 'Versions', 'pre-update': 'Pre-update backup',
+                    'recovery': 'Recovery',
+                }[version['source']]) for index, version in enumerate(versions)]
+                choice, accepted = QInputDialog.getItem(
+                    mw, _("Export Notebook"), _("Versions"), choices, 0, False
+                )
+                if not accepted or choice not in choices or db_path() != database_path:
+                    return
+                body = versions[choices.index(choice)]['body']
+                path, _filter = QFileDialog.getSaveFileName(
+                    mw, _("Export Notebook"), "notebook_recovery_export.json", "JSON (*.json)"
+                )
+                if not path or db_path() != database_path:
+                    return
+                # Exclusive creation also prevents overwriting a database,
+                # recovery source or any other existing user file by mistake.
+                with open(path, 'x', encoding='utf-8') as handle:
+                    handle.write(body)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                tooltip(_("Notebook exported successfully!"))
+            except Exception as exc:
+                showInfo(_("Export failed: {}").format(exc))
+
+        mw.taskman.run_in_background(lambda: _list_notebook_versions(database_path), completed)
+
+    # ── Bridge command handler ────────────────
+
+    def _on_bridge_cmd(self, cmd: str) -> None:
+        prefix = f"{ADDON_NAME_FOR_BRIDGE}:"
+        if not cmd.startswith(prefix):
+            return
+        payload = cmd[len(prefix):]
+        if db_path() != self._database_path:
+            return
+        if payload == "retry-load":
+            if self._load_failed:
+                self._load_tool(self.current_tool)
+            return
+        if payload == "export-recovery" and self._load_failed and self.current_tool == "notebook":
+            self._export_notebook_recovery()
+            return
+        if self._load_failed and not payload.startswith("switch:") and payload not in ("window", "fullscreen"):
+            return
+
+        if payload == "settings":
+            self.web.eval(workspace_preferences.popup_script('notebook'))
+            return
+        if payload.startswith("settings-save:"):
+            def saved(ok):
+                if not ok:
+                    self.web.eval(workspace_preferences.popup_error(_('Could not save the current page. Please try again.')))
+                    return
+                try:
+                    workspace_preferences.save_command('notebook', payload)
+                    QTimer.singleShot(0, lambda: self._load_tool(self.current_tool))
+                except Exception as error:
+                    self.web.eval(workspace_preferences.popup_error(error))
+            self._flush_current_state(saved)
+            return
+
+        # ── Tab switching ──────────────────────
+        if payload.startswith("switch:"):
+            tool = payload[len("switch:"):]
+            if tool in TOOL_FILES:
+                if tool == self.current_tool:
+                    return
+                # Keep the latest click while a final save is running. Previously
+                # a second click was silently discarded, making tabs feel broken
+                # on slower computers.
+                self._pending_tool_switch = tool
+                if not self._flush_in_progress:
+                    self._flush_current_state(self._finish_tool_switch)
+            return
+
+        # ── Fullscreen ────────────────────────
+        if payload == "fullscreen":
+            if self.is_in_fullscreen:
+                if self.fullscreen_window:
+                    self.fullscreen_window.close()  # triggers exit_fullscreen via closeEvent
+            else:
+                self.enter_fullscreen()
+            return
+
+        # ── Embedded view (inside the Anki main window) ──
+        if payload == "window":
+            if self.is_embedded:
+                self.exit_window()
+            elif not self.is_in_fullscreen:
+                self.enter_window()
+            return
+
+        if payload == "versions" and self.current_tool == "notebook":
+            web_ref = self.web
+            database_path = self._database_path
+
+            def completed(future):
+                if self.web is not web_ref or self.current_tool != "notebook" or db_path() != database_path:
+                    return
+                try:
+                    result = {"versions": future.result()}
+                except Exception as exc:
+                    print(f"Notebook version read failed: {exc}")
+                    result = {"error": True, "versions": []}
+                web_ref.eval("if(window.onNotebookVersions) window.onNotebookVersions(" + json.dumps(result) + ");")
+
+            mw.taskman.run_in_background(lambda: _list_notebook_versions(database_path), completed)
+            return
+
+        # ── Notebook commands ──────────────────
+        if payload == "load":
+            self.reload_from_db()
+        elif payload.startswith("save:"):
+            body = payload[len("save:"):]
+            self._queue_tool_snapshot(
+                "notebook", body,
+                lambda saved: self._notify_save_result("notebook", saved),
+            )
+        elif payload == "export":
+            self._flush_current_state(
+                lambda saved: export_data() if saved else None
+            )
+
+        # ── Todo commands ──────────────────────
+        elif payload.startswith("todo:cleanup:"):
+            from . import addon_settings, save_addon_settings
+            addon_settings["todo_auto_cleanup"] = payload.endswith(":1")
+            save_addon_settings()
+        elif payload == "todo:load":
+            self._reload_todos()
+        elif payload.startswith("todo:save:"):
+            body = payload[len("todo:save:"):]
+            self._queue_tool_snapshot(
+                "todo", body,
+                lambda saved: self._notify_save_result("todo", saved),
+            )
+
+        # ── PDF commands ───────────────────────
+        elif payload == "pdf:load":
+            self._reload_pdfs()
+        elif payload.startswith("pdf:save:"):
+            body = payload[len("pdf:save:"):]
+            self._queue_tool_snapshot(
+                "pdf", body,
+                lambda saved: self._notify_save_result("pdf", saved),
+            )
+        elif payload == "pdf:add":
+            self._add_pdf_dialog()
+        elif payload.startswith("pdf:open:"):
+            file_path = payload[len("pdf:open:"):]
+            _open_file_externally(file_path)
+        elif payload.startswith("pdf:render:"):
+            file_path = payload[len("pdf:render:"):]
+            self._render_pdf_inline(file_path)
+        elif payload.startswith("pdf:copy-selection:"):
+            body = payload[len("pdf:copy-selection:"):]
+            self._copy_pdf_selection(body)
+        elif payload.startswith("pdf:create-card:"):
+            body = payload[len("pdf:create-card:"):]
+            self._open_pdf_card_draft(body)
+        elif payload.startswith("pdf:create-batch:"):
+            body = payload[len("pdf:create-batch:"):]
+            self._create_pdf_card_batch(body)
+        elif payload == "pdf:back":
+            self._current_pdf_path = ""
+            self._load_tool("pdf")
+        elif payload.startswith("pdf:relink:"):
+            pdf_id = payload[len("pdf:relink:"):]
+            self._relink_pdf_dialog(pdf_id)
+
+    def _finish_tool_switch(self, saved: bool) -> None:
+        """Open the latest requested tool after the current page is durable."""
+        target = self._pending_tool_switch
+        self._pending_tool_switch = None
+        if saved and target and target != self.current_tool:
+            self._load_tool(target)
+        elif saved and self.current_tool == "todo":
+            self._consume_dashboard_completions()
+        elif not saved:
+            self._dashboard_completions = set()
+
+    def _add_pdf_dialog(self) -> None:
+        """Open a file-chooser and pass the chosen path back to JavaScript."""
+        dialog_title  = _("Select PDF")
+        dialog_filter = _("PDF Files (*.pdf)")
+        path, _filter = QFileDialog.getOpenFileName(
+            mw, dialog_title, "", dialog_filter
+        )
+        if path and self.web:
+            json_path = json.dumps(path)
+            self.web.eval(f"if(window.onPdfAdded) window.onPdfAdded({json_path});")
+
+    def _relink_pdf_dialog(self, pdf_id: str) -> None:
+        """Let the user pick a new file path for a missing PDF entry."""
+        dialog_title  = _("Relink PDF")
+        dialog_filter = _("PDF Files (*.pdf)")
+        path, _filter = QFileDialog.getOpenFileName(
+            mw, dialog_title, "", dialog_filter
+        )
+        if path and self.web:
+            id_json   = json.dumps(pdf_id)
+            path_json = json.dumps(path)
+            self.web.eval(
+                f"if(window.onPdfRelinked) window.onPdfRelinked({id_json}, {path_json});"
+            )
+
+    def _render_pdf_inline(self, file_path: str, initial_page: int = 1) -> None:
+        """Render a PDF inline via PDF.js running inside pdf_viewer.html."""
+        if not self.web:
+            return
+
+        # ── File existence check ──────────────────────────────────────
+        if not os.path.isfile(file_path):
+            name_json = json.dumps(os.path.basename(file_path))
+            err_json  = json.dumps(
+                _("File not found – it may have been moved or deleted:\n{}").format(file_path)
+            )
+            # Show the viewer panel with an inline error instead of a blocking popup
+            self.web.eval(
+                f"if(window.showViewer) window.showViewer({name_json}, '');"
+                f"if(window.showViewerError) window.showViewerError({err_json});"
+            )
+            return
+
+        # ── File size guard ───────────────────────────────────────────
+        file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
+        if file_size_mb > MAX_PDF_HARD_MB:
+            showInfo(_(
+                "This PDF is {size:.1f} MB and is too large for the inline viewer. "
+                "Open it in the system PDF viewer instead."
+            ).format(size=file_size_mb), parent=self)
+            return
+        if file_size_mb > MAX_PDF_INLINE_MB:
+            msg = _(
+                "This PDF is {size:.1f} MB. Loading it into the sidebar may be slow "
+                "or use a lot of memory.\n\nContinue anyway?"
+            ).format(size=file_size_mb)
+            if not askUser(msg):
+                return
+
+        self._current_pdf_path = file_path
+
+        # ── Read + encode ─────────────────────────────────────────────
+        try:
+            with open(file_path, "rb") as fh:
+                pdf_bytes = fh.read()
+        except Exception as exc:
+            err_json  = json.dumps(_("Could not read PDF: {}").format(exc))
+            name_json = json.dumps(os.path.basename(file_path))
+            self.web.eval(
+                f"if(window.showViewer) window.showViewer({name_json}, '');"
+                f"if(window.showViewerError) window.showViewerError({err_json});"
+            )
+            return
+
+        b64       = base64.b64encode(pdf_bytes).decode("ascii")
+        name_json = json.dumps(os.path.basename(file_path))
+        path_json = json.dumps(file_path)
+
+        # Pass data via window globals – avoids issues with very large eval strings.
+        self.web.eval(
+            f"window.__PDF_B64__={json.dumps(b64)};"
+            f"window.__PDF_NAME__={name_json};"
+            f"window.__PDF_PATH__={path_json};"
+            f"window.__PDF_INITIAL_PAGE__={max(1, int(initial_page or 1))};"
+            f"if(window.renderFromGlobals) window.renderFromGlobals();"
+        )
+
+    def _notify_pdf_action(self, callback: str, success: bool, message: str) -> None:
+        """Return a PDF action result to the currently visible WebView."""
+        if not self.web:
+            return
+        callback_json = json.dumps(callback)
+        message_json = json.dumps(message, ensure_ascii=False)
+        try:
+            self.web.eval(
+                f"if(typeof window[{callback_json}]==='function') "
+                f"window[{callback_json}]({json.dumps(success)}, {message_json});"
+            )
+        except Exception:
+            pass
+
+    @staticmethod
+    def _decode_pdf_action_payload(body: str) -> dict:
+        data = json.loads(body)
+        if not isinstance(data, dict):
+            raise ValueError("PDF action payload must be an object")
+        return data
+
+    def _copy_pdf_selection(self, body: str) -> None:
+        """Copy selected PDF text through Qt's cross-platform clipboard."""
+        try:
+            data = self._decode_pdf_action_payload(body)
+            text = data.get("text", "")
+            if not isinstance(text, str):
+                raise ValueError("Selected PDF text must be a string")
+            text = text.strip()
+            if not text:
+                raise ValueError("Selected PDF text is empty")
+            if len(text) > MAX_PDF_COPY_CHARS:
+                self._notify_pdf_action(
+                    "onPdfSelectionCopied",
+                    False,
+                    _("The selected text is too long to copy at once."),
+                )
+                return
+            QApplication.clipboard().setText(text)
+        except Exception as exc:
+            print(f"Notebook PDF copy failed: {exc}")
+            self._notify_pdf_action(
+                "onPdfSelectionCopied",
+                False,
+                _("Could not copy the selected text."),
+            )
+            return
+
+        self._notify_pdf_action(
+            "onPdfSelectionCopied", True, _("Selected text copied")
+        )
+
+    @staticmethod
+    def _pdf_text_to_html(text: str) -> str:
+        """Convert untrusted plain PDF text into safe Anki field HTML."""
+        normalized = text.replace("\x00", "").replace("\r\n", "\n").replace("\r", "\n")
+        return html.escape(normalized).replace("\n", "<br>")
+
+    def _open_pdf_card_draft(self, body: str) -> None:
+        """Open Anki's Add Cards window with a safe, unsaved PDF draft."""
+        callback = "onPdfCardDraftOpened"
+        try:
+            data = self._decode_pdf_action_payload(body)
+            front = data.get("front", "")
+            back = data.get("back", "")
+            if not isinstance(front, str) or not isinstance(back, str):
+                raise ValueError("PDF card fields must be strings")
+            front = front.strip()
+            back = back.strip()
+            if not front:
+                self._notify_pdf_action(
+                    callback, False, _("Select text for the card front first.")
+                )
+                return
+            if len(front) + len(back) > MAX_PDF_CARD_CHARS:
+                self._notify_pdf_action(
+                    callback,
+                    False,
+                    _("The selected text is too long for a card."),
+                )
+                return
+
+            pages_raw = data.get("pages", [])
+            pages: list[int] = []
+            if isinstance(pages_raw, list):
+                for value in pages_raw:
+                    try:
+                        page = int(value)
+                    except (TypeError, ValueError):
+                        continue
+                    if 1 <= page <= 1_000_000 and page not in pages:
+                        pages.append(page)
+            pages.sort()
+
+            # Opening an existing Add Cards window is safe: its reopen() method
+            # leaves non-empty fields untouched. Check again before set_note(),
+            # because set_note() itself would replace the current draft.
+            add_cards = aqt.dialogs.open("AddCards", mw)
+            editor = getattr(add_cards, "editor", None)
+            existing_note = getattr(editor, "note", None) if editor else None
+            existing_tags = getattr(existing_note, "tags", []) if existing_note else []
+            if editor is None or not editor.fieldsAreBlank() or bool(existing_tags):
+                self._notify_pdf_action(
+                    callback,
+                    False,
+                    _(
+                        "The Add Cards window already contains an unfinished note. "
+                        "Finish or clear it, then try again."
+                    ),
+                )
+                return
+
+            # Respect the notetype and deck already selected in a blank Add
+            # Cards window. On a newly opened window these are Anki's defaults.
+            notetype = existing_note.note_type() if existing_note else None
+            deck_chooser = getattr(add_cards, "deck_chooser", None)
+            deck_id = getattr(deck_chooser, "selected_deck_id", None)
+            if not notetype or deck_id is None:
+                reviewer = getattr(mw, "reviewer", None)
+                defaults = mw.col.defaults_for_adding(
+                    current_review_card=getattr(reviewer, "card", None)
+                )
+                if not notetype:
+                    notetype = mw.col.models.get(defaults.notetype_id)
+                if deck_id is None:
+                    deck_id = defaults.deck_id
+            if not notetype:
+                raise RuntimeError("Anki did not provide a default note type")
+            note = mw.col.new_note(notetype)
+            if not note.fields:
+                raise RuntimeError("The default note type has no fields")
+
+            filename = os.path.basename(self._current_pdf_path) or _("PDF")
+            source = "{}: {}".format(_("Source"), filename)
+            if pages:
+                page_label = _("Page") if len(pages) == 1 else _("Pages")
+                source += f" — {page_label} {', '.join(str(page) for page in pages)}"
+            source_html = (
+                '<div style="margin-top:12px;color:#777;font-size:0.85em">'
+                f"{html.escape(source)}</div>"
+            )
+
+            front_html = self._pdf_text_to_html(front)
+            back_html = self._pdf_text_to_html(back)
+            note.fields[0] = front_html
+            if len(note.fields) >= 2:
+                note.fields[1] = back_html + source_html
+            else:
+                extra = back_html + source_html
+                if extra:
+                    note.fields[0] += "<hr>" + extra
+
+            add_cards.set_note(note, deck_id)
+            add_cards.show()
+            add_cards.raise_()
+            add_cards.activateWindow()
+        except Exception as exc:
+            print(f"Notebook PDF card draft failed: {exc}")
+            self._notify_pdf_action(
+                callback,
+                False,
+                _("Could not open the card draft in Anki."),
+            )
+            return
+
+        self._notify_pdf_action(
+            callback, True, _("Card draft opened in Anki")
+        )
+
+    def _create_pdf_card_batch(self, body: str) -> None:
+        """Validate and create one undoable deck/card batch from the PDF UI."""
+        callback = "onPdfCardBatchCreated"
+        try:
+            data = self._decode_pdf_action_payload(body)
+            deck_name = data.get("deckName", "")
+            pdf_id = _valid_pdf_id(data.get("pdfId", ""))
+            raw_cards = data.get("cards", [])
+            if not isinstance(deck_name, str) or not isinstance(raw_cards, list):
+                raise ValueError("Invalid PDF card batch payload")
+            deck_name = deck_name.strip()
+            if (
+                not deck_name
+                or len(deck_name) > 250
+                or any(char in deck_name for char in ("\x00", "\n", "\r"))
+            ):
+                self._notify_pdf_action(
+                    callback, False, _("Choose or enter a valid deck name.")
+                )
+                return
+            if not raw_cards:
+                self._notify_pdf_action(
+                    callback, False, _("Add at least one card first.")
+                )
+                return
+            if len(raw_cards) > MAX_PDF_BATCH_CARDS:
+                self._notify_pdf_action(
+                    callback,
+                    False,
+                    _("A PDF Card Creator session can contain at most {count} cards.").format(
+                        count=MAX_PDF_BATCH_CARDS
+                    ),
+                )
+                return
+
+            cards: list[dict] = []
+            total_chars = 0
+            for raw_card in raw_cards:
+                if not isinstance(raw_card, dict):
+                    raise ValueError("PDF card entry must be an object")
+                front = raw_card.get("front", "")
+                back = raw_card.get("back", "")
+                if not isinstance(front, str) or not isinstance(back, str):
+                    raise ValueError("PDF card fields must be strings")
+                front = front.strip()
+                back = back.strip()
+                from .pdf_card_types import validate, card_count
+                kind = raw_card.get('type', 'basic')
+                try:
+                    validate(kind, front, back)
+                except ValueError as error:
+                    self._notify_pdf_action(callback, False, _(str(error)))
+                    return
+                if not front:
+                    self._notify_pdf_action(
+                        callback, False, _("Every card needs a front side.")
+                    )
+                    return
+                if len(front) + len(back) > MAX_PDF_CARD_CHARS:
+                    self._notify_pdf_action(
+                        callback, False, _("One of the PDF cards is too long.")
+                    )
+                    return
+                total_chars += len(front) + len(back)
+
+                pages: list[int] = []
+                pages_raw = raw_card.get("pages", [])
+                if isinstance(pages_raw, list):
+                    for value in pages_raw:
+                        try:
+                            page = int(value)
+                        except (TypeError, ValueError):
+                            continue
+                        if 1 <= page <= 1_000_000 and page not in pages:
+                            pages.append(page)
+                pages.sort()
+                cards.append(
+                    {
+                        "type": kind,
+                        "front": front,
+                        "back": back,
+                        "pages": pages,
+                        "include_source": raw_card.get("includeSource") is True,
+                    }
+                )
+
+            if sum(card_count(card) for card in cards) > MAX_PDF_BATCH_CARDS:
+                self._notify_pdf_action(callback, False, _("A PDF Card Creator session can contain at most {count} cards.").format(count=MAX_PDF_BATCH_CARDS))
+                return
+            if total_chars > MAX_PDF_BATCH_CHARS:
+                self._notify_pdf_action(
+                    callback,
+                    False,
+                    _("This Card Creator session contains too much text."),
+                )
+                return
+
+            source_filename = os.path.basename(self._current_pdf_path) or _("PDF")
+            undo_label = _("Create PDF cards")
+            success_message = _("Created {count} cards in “{deck}”.").format(
+                count=sum(card_count(c) for c in cards), deck=deck_name
+            )
+        except Exception as exc:
+            print(f"Notebook PDF card batch validation failed: {exc}")
+            self._notify_pdf_action(
+                callback, False, _("Could not create the PDF cards.")
+            )
+            return
+
+        def create_batch(col):
+            from .pdf_card_types import resolve
+            undo_entry = col.add_custom_undo_entry(undo_label)
+            try:
+                types = {kind: resolve(col, kind) for kind in dict.fromkeys(card['type'] for card in cards)}
+                notes = []
+                for card in cards:
+                    note = col.new_note(types[card['type']])
+                    note.fields[0] = NotebookPanel._pdf_text_to_html(card['front'])
+                    back_html = NotebookPanel._pdf_text_to_html(card['back'])
+                    if card['include_source']:
+                        back_html += _pdf_source_html(source_filename, card['pages'], pdf_id)
+                    note.fields[1] = back_html
+                    notes.append(note)
+                deck_result = col.decks.add_normal_deck_with_name(deck_name)
+                deck_id = deck_result.id
+                changes = col.add_notes(
+                    [AddNoteRequest(note=note, deck_id=deck_id) for note in notes]
+                )
+            except Exception:
+                # Group and revert any operations that completed before the
+                # failure (for example, a newly-created empty deck).
+                try:
+                    col.merge_undo_entries(undo_entry)
+                    col.undo()
+                except Exception as rollback_exc:
+                    print(f"Notebook PDF card batch rollback failed: {rollback_exc}")
+                raise
+
+            try:
+                return col.merge_undo_entries(undo_entry)
+            except Exception as merge_exc:
+                # The cards already exist at this point. Report success instead
+                # of encouraging a retry that would create duplicates; only the
+                # convenience of a single undo step is lost.
+                print(f"Notebook PDF card batch undo grouping failed: {merge_exc}")
+                return changes
+
+        def on_success(_changes) -> None:
+            self._notify_pdf_action(callback, True, success_message)
+
+        def on_failure(exc: Exception) -> None:
+            print(f"Notebook PDF card batch failed: {exc}")
+            self._notify_pdf_action(
+                callback, False, _("Could not create the PDF cards.")
+            )
+
+        CollectionOp(parent=mw, op=create_batch).success(on_success).failure(
+            on_failure
+        ).run_in_background(initiator=self)
+
+
+def open_pdf_review_link(token: str) -> bool:
+    """Resolve an opaque card link against this profile's PDF library."""
+    try:
+        if not isinstance(token, str) or len(token) > 512:
+            raise ValueError("Invalid PDF link")
+        padded = token + "=" * (-len(token) % 4)
+        payload = json.loads(
+            base64.urlsafe_b64decode(padded.encode("ascii")).decode("utf-8")
+        )
+        if not isinstance(payload, dict):
+            raise ValueError("Invalid PDF link payload")
+        pdf_id = _valid_pdf_id(payload.get("id", ""))
+        page = max(1, min(1_000_000, int(payload.get("page", 1) or 1)))
+        if not pdf_id:
+            raise ValueError("Invalid PDF id")
+
+        raw = json.loads(load_pdf_list())
+        entries = raw if isinstance(raw, list) else raw.get("pdfs", []) if isinstance(raw, dict) else []
+        entry = next(
+            (
+                item for item in entries
+                if isinstance(item, dict) and item.get("id") == pdf_id
+            ),
+            None,
+        )
+        path = entry.get("path", "") if entry else ""
+        if (
+            not isinstance(path, str)
+            or not path.lower().endswith(".pdf")
+            or not os.path.isfile(path)
+        ):
+            showInfo(
+                _("This linked PDF is not available on this device. Open the PDF library to relink it."),
+                parent=mw,
+            )
+            return True
+
+        dock = _ensure_dock()
+        panel = dock.widget()
+        if not isinstance(panel, NotebookPanel):
+            raise RuntimeError("Notebook panel is unavailable")
+        panel.open_pdf_reference(path, page)
+        dock.show()
+        dock.raise_()
+        return True
+    except Exception as exc:
+        print(f"Notebook PDF review link failed: {exc}")
+        showInfo(_("Could not open the linked PDF."), parent=mw)
+        return True
+
+
+# ──────────────────────────────────────────────
+# Dock management
+# ──────────────────────────────────────────────
+
+def _ensure_dock() -> QDockWidget:
+    global _dock
+
+    if _dock is not None:
+        return _dock
+
+    dock_name = "IntegratedNotebookSidebarDock_SmartStudy_v1"
+    _dock = QDockWidget(_(DOCK_TITLE), mw)
+    _dock.setObjectName(dock_name)
+    _dock.setAllowedAreas(
+        Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+    )
+
+    empty_title_bar = QWidget()
+    _dock.setTitleBarWidget(empty_title_bar)
+
+    panel = NotebookPanel(_dock)
+    _dock.setWidget(panel)
+    _dock.setMinimumWidth(320)
+
+    _dock.visibilityChanged.connect(_on_visibility_changed)
+
+    from .sidebar_widths import attach
+    attach(mw, _dock, panel.current_tool,
+           lambda: panel.is_in_fullscreen or panel.is_embedded)
+    mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, _dock)
+    return _dock
+
+
+def _on_visibility_changed(visible: bool):
+    _sync_notebook_launcher()
+    global _dock
+    if not _dock:
+        return
+    panel = _dock.widget()
+    if isinstance(panel, NotebookPanel):
+        if visible:
+            panel.load_content()
+        else:
+            panel.unload_content()
+
+
+# ── Integration Functions (called from __init__.py) ──
+
+_task_maintenance_timer = None
+_task_maintenance_day = None
+
+
+def _maintain_task_calendar():
+    global _task_maintenance_day
+    from datetime import date
+    if not mw or not mw.pm or not mw.col:
+        return
+    day = (db_path(), date.today().isoformat())
+    if day == _task_maintenance_day:
+        return
+    panel = _dock.widget() if _dock is not None else None
+    if isinstance(panel, NotebookPanel) and (panel._flush_in_progress or (panel.web and panel.current_tool == "todo")):
+        return  # The live manager applies the same rules and saves its own state.
+    if not _background_writer.is_idle():
+        return
+    try:
+        raw = load_todo_preview_snapshot(normalize=False)
+        if not isinstance(json.loads(raw), list):
+            return
+        normalized = _normalize_todo_body(raw)
+        if json.loads(raw) != json.loads(normalized):
+            if not _save_snapshot("todos", normalized, database_path=day[0], sqlite_timeout=0):
+                return
+        _task_maintenance_day = day
+        _refresh_dashboard_tasks()
+    except Exception as exc:
+        print(f"Task calendar maintenance failed: {exc}")
+
+
+def setup_task_calendar():
+    global _task_maintenance_timer, _task_maintenance_day
+    _task_maintenance_day = None
+    if _task_maintenance_timer is None:
+        _task_maintenance_timer = QTimer(mw)
+        _task_maintenance_timer.setInterval(60000)
+        _task_maintenance_timer.timeout.connect(_maintain_task_calendar)
+    _task_maintenance_timer.start()
+    QTimer.singleShot(0, _maintain_task_calendar)
+
+
+def setup_notebook_sidebar():
+    # Verify the pinned offline dependency; never download executable JS at runtime.
+    _ensure_pdfjs_async()
+
+
+def _sync_notebook_launcher():
+    try:
+        import importlib
+        launcher = getattr(importlib.import_module(__package__), "sidebar_widget_instance", None)
+        if launcher is not None:
+            launcher.sync_dock_button("IntegratedNotebookSidebarDock_SmartStudy_v1")
+    except Exception as exc:
+        print(f"Notebook launcher sync failed: {exc}")
+
+
+def toggle_todo_sidebar():
+    panel = _dock.widget() if _dock is not None else None
+    if isinstance(panel, NotebookPanel) and panel.current_tool == "todo" and (
+        _dock.isVisible() or panel.is_in_fullscreen or panel.is_embedded
+    ):
+        if panel.fullscreen_window:
+            panel.fullscreen_window.close()
+        if panel.is_embedded:
+            panel.exit_window()
+        _dock.hide()
+        _sync_notebook_launcher()
+    else:
+        open_todo_sidebar()
+
+
+def _refresh_dashboard_tasks():
+    if not mw or mw.state != "deckBrowser":
+        return
+    try:
+        from . import addon_settings, daily_widgets
+        if addon_settings.get("daily_widget_content", "facts") == "tasks":
+            preview = daily_widgets.generate_todo_widget()
+            mw.deckBrowser.web.eval("document.querySelectorAll('.sp-todo-widget').forEach(el => {const t=document.createElement('template');t.innerHTML=" + json.dumps(preview) + ";el.replaceWith(t.content.querySelector('.sp-todo-widget'));});")
+    except Exception as exc:
+        print(f"Task preview refresh failed: {exc}")
+
+def complete_dashboard_task(task_id: str, _profile_path=None, _attempt=0):
+    """Complete against live editor state, or the latest durable snapshot.
+
+    Never create/show a dock. Deferred calls recheck both profile and editor
+    state, and wait for outstanding snapshot writes before reading from disk.
+    """
+    if not task_id or len(task_id) > 256 or not mw or not mw.pm:
+        return
+    path = db_path()
+    if _profile_path is not None and path != _profile_path:
+        return
+    panel = _dock.widget() if _dock is not None else None
+
+    def retry():
+        if _attempt < 50:
+            QTimer.singleShot(100, lambda: complete_dashboard_task(task_id, path, _attempt + 1))
+        else:
+            tooltip(_("Task could not be saved. Please try again."))
+
+    # Flushes can still enqueue a snapshot after their JS callback returns.
+    if isinstance(panel, NotebookPanel) and panel._flush_in_progress:
+        retry()
+        return
+    if isinstance(panel, NotebookPanel) and panel.web and panel.current_tool == "todo":
+        if not panel._page_ready:
+            retry()
+            return
+        pending = getattr(panel, "_dashboard_completions", set())
+        pending.add(task_id)
+        panel._dashboard_completions = pending
+        panel._consume_dashboard_completions()
+        return
+    if not _background_writer.is_idle():
+        retry()
+        return
+    try:
+        tasks = json.loads(load_todo_preview_snapshot())
+        if not isinstance(tasks, list):
+            retry()
+            return
+        changed = False
+        for item in tasks:
+            if isinstance(item, dict) and str(item.get("id")) == task_id and not item.get("done"):
+                item["done"] = True
+                from datetime import date
+                item["completed_on"] = date.today().isoformat()
+                changed = True
+        # This main-thread operation cannot interleave with opening/editing the
+        # manager. Use the existing transactional save and recovery fallback,
+        # without waiting on database locks or creating any additional WebView.
+        if changed and not _save_snapshot("todos", _normalize_todo_body(json.dumps(tasks)), database_path=path, sqlite_timeout=0):
+            tooltip(_("Task could not be saved. Please try again."))
+            return
+        _refresh_dashboard_tasks()
+    except Exception as exc:
+        print(f"Dashboard task completion failed: {exc}")
+        tooltip(_("Task could not be saved. Please try again."))
+
+
+def open_todo_sidebar():
+    dock = _ensure_dock()
+    panel = dock.widget()
+    if isinstance(panel, NotebookPanel) and not panel.web:
+        panel.current_tool = "todo"
+    dock.show()
+    dock.raise_()
+    if isinstance(panel, NotebookPanel):
+        panel.load_content()
+        panel._on_bridge_cmd(f"{ADDON_NAME_FOR_BRIDGE}:switch:todo")
+        if panel.fullscreen_window:
+            panel.fullscreen_window.raise_()
+    _sync_notebook_launcher()
+
+
+def toggle_notebook_dock():
+    dock = _ensure_dock()
+    if dock.isVisible():
+        dock.hide()
+    else:
+        dock.show()
+        dock.raise_()
+
+
+def cleanup_notebook_sidebar():
+    if _task_maintenance_timer is not None:
+        _task_maintenance_timer.stop()
+    global _dock
+    if not _dock:
+        return
+
+    dock_ref = _dock
+    # Detach the global immediately. If a new profile opens while the old
+    # profile's final background write is finishing, it must get a fresh dock
+    # rather than reusing a panel bound to the previous profile.
+    _dock = None
+    panel = dock_ref.widget()
+
+    def dispose(saved: bool) -> None:
+        global _dock
+        if not saved:
+            return
+        try:
+            mw.removeDockWidget(dock_ref)
+        except Exception:
+            pass
+        dock_ref.deleteLater()
+
+    if isinstance(panel, NotebookPanel):
+        if panel.fullscreen_window:
+            panel.fullscreen_window.close()
+        if panel.is_embedded:
+            panel.exit_window()
+        panel.unload_content(dispose)
+    else:
+        dispose(True)

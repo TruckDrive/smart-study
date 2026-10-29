@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
-# Builds dist/smart_study_plan.ankiaddon from addon/ (without personal plans and meta.json).
-# Before every release: bump VERSION in addon/__init__.py.
+# Builds dist/smart_study.ankiaddon from addon/ (without personal plans, caches and meta.json).
+# Before every release: bump ADDON_VERSION in addon/constants.py and human_version in addon/manifest.json.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$ROOT/dist"
 cd "$ROOT/addon"
-python -I - "$ROOT/dist/smart_study_plan.ankiaddon" <<'PY'
-import glob, json, sys, zipfile
-files = sorted(glob.glob("*.py") + glob.glob("web/*"))
+python -I - "$ROOT/dist/smart_study.ankiaddon" <<'PY'
+import os, sys, zipfile
+skip_dirs = {"__pycache__", "user_files"}
+files = []
+for root, dirs, names in os.walk("."):
+    dirs[:] = sorted(d for d in dirs if d not in skip_dirs)
+    for n in sorted(names):
+        if n == "meta.json" or n.endswith((".pyc", ".tmp")):
+            continue
+        files.append(os.path.normpath(os.path.join(root, n)))
 with zipfile.ZipFile(sys.argv[1], "w", zipfile.ZIP_DEFLATED) as z:
     for f in files:
         z.write(f)
-    # used when installing from the file (AnkiWeb ignores it)
-    z.writestr("manifest.json", json.dumps({"package": "smart_study_plan", "name": "Smart Study Plan"}))
 print(f"{sys.argv[1]}: {len(files)} files")
 PY
-grep -o 'VERSION = "[^"]*"' __init__.py
+grep -o 'ADDON_VERSION = "[^"]*"' constants.py

@@ -15,7 +15,7 @@ from anki.collection import Collection  # noqa: E402
 def device(name, base, col):
     """A copy of the add-on with its own user_files, as on a second computer."""
     folder = os.path.join(base, name)
-    shutil.copytree(os.path.join(ROOT, "addon"), folder, ignore=shutil.ignore_patterns("__pycache__", "user_files"))
+    shutil.copytree(os.path.join(ROOT, "addon", "plan"), folder, ignore=shutil.ignore_patterns("__pycache__", "user_files"))
     pkg = types.ModuleType(name)
     pkg.__path__ = [folder]
     sys.modules[name] = pkg

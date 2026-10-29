@@ -1,4 +1,4 @@
-// Smart Study Plan UI. Data comes from Python via pycmd("lp:{cmd,args}").
+// Smart Study UI. Data comes from Python via pycmd("lp:{cmd,args}").
 (() => {
 "use strict";
 
@@ -127,7 +127,7 @@ function render() {
 function renderHome(root) {
   const d = S.data;
   root.append(h("div", { class: "top" },
-    h("div", null, h("h1", null, "Smart Study Plan"), h("p", { class: "sub" }, L("Pläne bis zur Prüfung – Anki hakt sich selbst ab.", "Study plans up to your exam – Anki checks itself off."))),
+    h("div", null, h("h1", null, "Smart Study"), h("p", { class: "sub" }, L("Pläne bis zur Prüfung – Anki hakt sich selbst ab.", "Study plans up to your exam – Anki checks itself off."))),
     h("button", { class: "primary", onclick: () => newPlan() }, L("+ Neuer Plan", "+ New plan"))));
 
   const tiles = h("div", { class: "tiles" },
@@ -142,7 +142,7 @@ function renderHome(root) {
   if (arch.length) {
     root.append(h("details", null, h("summary", null, `${L("Archiv", "Archive")} (${arch.length})`), h("div", { class: "plans" }, arch.map(planCard))));
   }
-  root.append(h("p", { class: "muted small", style: "margin-top:30px" }, `Smart Study Plan ${d.version} · ${L("Pläne liegen im Add-on-Ordner unter user_files/plans.", "Plans are stored in the add-on folder under user_files/plans.")}`));
+  root.append(h("p", { class: "muted small", style: "margin-top:30px" }, `Smart Study ${d.version} · ${L("Pläne liegen im Add-on-Ordner unter user_files/plans.", "Plans are stored in the add-on folder under user_files/plans.")}`));
 }
 function planCard(p) {
   const left = p.exam ? daysBetween(S.data.today, p.exam) : null, [dn, tot] = p.progress;

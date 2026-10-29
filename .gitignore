@@ -1,4 +1,5 @@
 __pycache__/
 addon/meta.json
 addon/user_files/
+addon/plan/user_files/
 dist/
