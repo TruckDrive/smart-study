@@ -18,7 +18,7 @@ from . import ankidata, planner, store
 from .planner import tr
 
 NAME = "Smart Study Plan"
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
 mw.addonManager.setWebExports(MODULE, r"web/.*\.(js|css)")
@@ -382,7 +382,10 @@ def _changed(*_):
 
 
 def _toolbar(links, toolbar):
-    links.append(toolbar.create_link("lernplan", "Study Plan", open_window, tip=tr(f"{NAME} öffnen", f"Open {NAME}"), id="lernplan"))
+    link = toolbar.create_link("lernplan", "Study Plan", open_window, tip=tr(f"{NAME} öffnen", f"Open {NAME}"), id="lernplan")
+    # Anki adds "sync" before this hook runs; keep it as the rightmost link
+    i = next((i for i, x in enumerate(links) if 'id="sync"' in x), len(links))
+    links.insert(i, link)
 
 
 def _profile_closing():

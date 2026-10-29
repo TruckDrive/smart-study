@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- The "Study Plan" link sits left of "sync", so sync stays the rightmost link in the top bar
+
 ## 0.3.0 – 2026-10-27
 
 - **Plans sync between your devices.** They are kept in the Anki collection as well, so the normal AnkiWeb sync takes them to your laptop. Of two copies of a plan, the newer one wins; deleted plans are deleted everywhere. Your pace and settings (`profile.json`) sync too
