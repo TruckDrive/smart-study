@@ -97,8 +97,7 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 
 Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
 
-https://ankiweb.net/shared/info/1726163334?cb=1793289135943
-
+](https://ankiweb.net/shared/info/1726163334)
 **From a release**: download `smart_study.ankiaddon` from the [latest release](https://github.com/TruckDrive/smart-study/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
 
 **From source**:
