@@ -91,7 +91,7 @@ MUSIC_FILES = [
 ADDON_NAME_POMODORO = "Pomodoro_Integrated"
 CONFIG_KEY_POMODORO = f"addon_{ADDON_NAME_POMODORO}_config"
 CONFIG_KEY_POMODORO_STATS = f"addon_{ADDON_NAME_POMODORO}_stats"
-DEFAULT_POMODORO_CONFIG = { "work_minutes": 25, "short_break_minutes": 5, "long_break_minutes": 15, "pomodoros_before_long_break": 4, "sound_work_end": "bells.wav", "sound_break_end": "type.wav", "auto_start_next": False }
+DEFAULT_POMODORO_CONFIG = { "work_minutes": 25, "short_break_minutes": 5, "long_break_minutes": 15, "pomodoros_before_long_break": 4, "sound_work_end": "bells.wav", "sound_break_end": "chime.wav", "auto_start_next": False }
 DEFAULT_POMODORO_STATS = { "total_pomodoros": 0, "total_focus_minutes": 0, "best_streak": 0, "daily_data": {} }
 STATE_IDLE = 0; STATE_WORK = 1; STATE_SHORT_BREAK = 2; STATE_LONG_BREAK = 3; STATE_PAUSED = 4
 

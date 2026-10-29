@@ -22,7 +22,7 @@ def resolve(col, kind):
     for model in col.models.all():
         if signature(model) == wanted:
             return model
-    base = 'SmartStudy PDF — ' + {'basic': 'Basic', 'reversed': 'Basic + Reversed', 'cloze': 'Cloze'}[kind]
+    base = 'Smart Study PDF — ' + {'basic': 'Basic', 'reversed': 'Basic + Reversed', 'cloze': 'Cloze'}[kind]
     name, suffix = base, 2
     while col.models.by_name(name):
         name = f'{base} ({suffix})'

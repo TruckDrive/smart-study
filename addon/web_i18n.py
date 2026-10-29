@@ -78,7 +78,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "Last 7 Days", "Last 30 Days", "Sidebar Visibility",
         "Show the launcher always, or hide it while you review.",
         "Always Show", "Hide while Reviewing", "Source code, issues and contributions.",
-        "Open", "Join the community on r/SmartStudyAnki.", "Join",
+        "Open", "Join",
         "Enjoying Smart Study and got 5 seconds?",
         "Leaving a thumbs up on AnkiWeb supports development the most. Thank you so much!",
         "Rate on AnkiWeb",

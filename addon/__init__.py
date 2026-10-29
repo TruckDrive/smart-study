@@ -1651,7 +1651,7 @@ def _add_menus():
     m = mw.form.menuTools.addMenu("Smart Study")
     _smartstudy_tools_menu = m
     m.addAction(_("Settings..."), show_settings_dialog)
-    m.addAction(_("Study Plan..."), show_configuration_dialog)
+    m.addAction(_("Study Plan") + "...", show_configuration_dialog)
     m.addSeparator()
     m.addAction(_("Toggle Gamification Sidebar"), toggle_gamification_sidebar)
     from . import developer_console

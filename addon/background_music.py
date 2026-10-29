@@ -76,18 +76,14 @@ UI_HTML_FILENAME = "music_player.html"
 SC_HTML_FILENAME = "soundcloud_player.html"
 
 # --- SoundCloud streaming config ---------------------------------------------
-DEFAULT_SC_URL = "https://soundcloud.com/smartstudy/sets/focus"
+DEFAULT_SC_URL = "https://soundcloud.com/chillhopdotcom/sets/lofihiphop"
 SC_STATIONS = [
     ("Lo-Fi Focus", DEFAULT_SC_URL),
-    ("Meditation",  "https://soundcloud.com/smartstudy/sets/delta"),
-    ("Brainwaves", "https://soundcloud.com/smartstudy/sets/brainwaves"),
+    ("Lofi Girl",   "https://soundcloud.com/lofi_girl"),
+    ("Jazzy Lo-Fi", "https://soundcloud.com/chill-playlister/sets/chillhop-radio-jazzy-lofi-hip"),
 ]
 SC_STATION_URLS = frozenset(url for _label, url in SC_STATIONS)
-LEGACY_SC_URLS = {
-    "https://soundcloud.com/chillhopdotcom/sets/lofihiphop",
-    "https://soundcloud.com/lofi_girl",
-    "https://soundcloud.com/chill-playlister/sets/chillhop-radio-jazzy-lofi-hip",
-}
+LEGACY_SC_URLS: frozenset = frozenset()
 CK_SC_URL = "smartstudy_music_sc_url"
 CK_SC_CUSTOM_URLS = "smartstudy_music_sc_custom_urls"
 MAX_SC_CUSTOM_URLS = 30
@@ -803,7 +799,7 @@ class MiniMusicPlayer(QDialog):
         sources = (
             "Could not load the SoundCloud player.", "Check your internet connection.",
             "SoundCloud could not load this URL", "Widget API failed to load",
-            "SmartStudy error", "Show details", "Hide details", "Copy error",
+            "Smart Study error", "Show details", "Hide details", "Copy error",
             "Copied!", "Dismiss", "Unexpected error", "Unexpected error (async)",
             "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
             "(no stack trace available)",

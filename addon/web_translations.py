@@ -92,12 +92,6 @@ WEB_TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "fr": "Code source, signalements et contributions.", "vi": "Mã nguồn, lỗi và đóng góp.",
         "zh": "源代码、问题与贡献。", "hi": "सोर्स कोड, समस्याएँ और योगदान।",
     },
-    "Join the community on r/SmartStudyAnki.": {
-        "de": "Tritt der Community auf r/SmartStudyAnki bei.", "es": "Únete a la comunidad en r/SmartStudyAnki.",
-        "ko": "r/SmartStudyAnki 커뮤니티에 참여하세요.", "pt": "Participe da comunidade em r/SmartStudyAnki.",
-        "fr": "Rejoignez la communauté sur r/SmartStudyAnki.", "vi": "Tham gia cộng đồng tại r/SmartStudyAnki.",
-        "zh": "加入 r/SmartStudyAnki 社区。", "hi": "r/SmartStudyAnki समुदाय से जुड़ें।",
-    },
     "Join": {
         "de": "Beitreten", "es": "Unirse", "ko": "참여", "pt": "Participar",
         "fr": "Rejoindre", "vi": "Tham gia", "zh": "加入", "hi": "जुड़ें",
