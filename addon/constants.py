@@ -7,7 +7,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "2.1.0"
+ADDON_VERSION = "2.1.1"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 

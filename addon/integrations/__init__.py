@@ -35,7 +35,7 @@ STATE_PATH = os.path.join(STORE_DIR, "state.json")
 class Integration:
     key: str
     title: str
-    summary: str
+    short: str
     credit: str
     # Folder names a separately installed copy can have (AnkiWeb id, GitHub name).
     standalone: List[str] = field(default_factory=list)
@@ -46,7 +46,7 @@ INTEGRATIONS: List[Integration] = [
     Integration(
         key="select2clip",
         title="Copy selections with pictures as an image",
-        summary="When you select part of a card that contains pictures (with the mouse, Ctrl+A or Shift+arrows), the selection is copied as one image. Paste it into ChatGPT, Claude or a chat with Ctrl+V and the pictures come along – pasting normally only keeps the text. Selections without pictures are not changed.",
+        short="Select part of a card with pictures – it is copied as one image, so ChatGPT or Claude get the pictures when you paste.",
         credit="Smart Study",
         standalone=["select2clip"],
         default=True,
@@ -54,7 +54,7 @@ INTEGRATIONS: List[Integration] = [
     Integration(
         key="heatmap",
         title="Review heatmap",
-        summary="A calendar of your reviews with your streak on the deck list, the deck overview and the statistics.",
+        short="Your reviews and streak as a calendar on the deck list.",
         credit='Based on the Anki add-on <a href="https://github.com/glutanimate/review-heatmap/">Review Heatmap</a> by Glutanimate. <a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate\'s work.</a> AGPL-3.0, modified for Smart Study.',
         standalone=["1771074083", "review_heatmap", "review-heatmap", "1722241614", "723520343"],
         default=True,
@@ -62,7 +62,7 @@ INTEGRATIONS: List[Integration] = [
     Integration(
         key="progress_bar",
         title="Progress bar",
-        summary="A bar at the top of the reviewer that shows how much of today's reviews is done.",
+        short="Shows how much of today's reviews is done.",
         credit='Based on <a href="https://ankiweb.net/shared/info/1708250053">Progress bar (Fork for 23)</a> by Shigeyuki and earlier authors (Glutanimate, liuzikai, SebastienGllmt, BluMist and others). AGPL-3.0, modified for Smart Study.',
         standalone=["1708250053", "2091361802"],
         default=True,
@@ -70,7 +70,7 @@ INTEGRATIONS: List[Integration] = [
     Integration(
         key="contanki",
         title="Controller support",
-        summary="Study with a gamepad, e.g. the 8BitDo Zero 2. Buttons can be set for every screen. If a controller cannot be recognised reliably, you are asked once which one it is.",
+        short="Study with a gamepad, e.g. the 8BitDo Zero 2.",
         credit='Based on <a href="https://github.com/roxgib/anki-contanki">Contanki</a> by Sam Bradshaw. AGPL-3.0, modified for Smart Study (controller detection).',
         standalone=["1898790263", "contanki", "anki-contanki"],
         default=True,
@@ -78,7 +78,7 @@ INTEGRATIONS: List[Integration] = [
     Integration(
         key="lifedrain",
         title="Life Drain",
-        summary="A life bar that drains while you think about a card and refills when you answer – keeps you from lingering on one card.",
+        short="A life bar that drains while you think about a card.",
         credit='Based on <a href="https://github.com/Yutsuten/anki-lifedrain">Life Drain</a> by Yutsuten. AGPL-3.0, modified for Smart Study.',
         standalone=["715575551", "lifedrain", "anki-lifedrain"],
         default=False,

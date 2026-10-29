@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 – 2026-10-29
+
+- The windows for built-in add-ons, already installed add-ons, updates and the restart question now use the Smart Study look (title, grouped rows, switches, pill buttons) with shorter texts
+
 ## 2.1.0 – 2026-10-29
 
 - **Built-in add-ons** – no separate installs needed, each can be switched off under *Tools → Smart Study → Built-in add-ons…*:

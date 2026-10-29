@@ -9,13 +9,10 @@ from __future__ import annotations
 
 from typing import Callable, Dict, List
 
-from aqt import mw
-from aqt.qt import (QCheckBox, QDialog, QDialogButtonBox, QFrame, QLabel,
-                    QScrollArea, QVBoxLayout, QWidget, Qt)
-
 from .changelog import CHANGELOG
-from .integrations import is_enabled, load_state, save_state
+from .integrations import BY_KEY, is_enabled, load_state, save_state
 from .integrations.strings import tr
+from .integrations.ui import Dialog, Toggle, ask_restart
 
 
 def _version_tuple(version: str):
@@ -27,65 +24,45 @@ def entries_since(last_seen: str) -> List[dict]:
     return [e for e in CHANGELOG if _version_tuple(e["version"]) > seen]
 
 
-class WhatsNewDialog(QDialog):
+class WhatsNewDialog(Dialog):
     def __init__(self, entries: List[dict], parent=None):
-        super().__init__(parent or mw)
-        self.setWindowTitle(tr("What's new in Smart Study"))
-        self.resize(600, 560)
+        super().__init__(tr("What's new in Smart Study {version}").format(version=entries[0]["version"]),
+                         tr("Keep what you like – everything with a switch can be turned off right here."),
+                         parent)
         self.state = load_state()
-        self.switches: Dict[str, QCheckBox] = {}
+        self.toggles: Dict[str, Toggle] = {}
 
-        layout = QVBoxLayout(self)
-        intro = QLabel(tr("Smart Study was updated. Here is what changed – where something new was switched on, you can keep it or switch it off right here."))
-        intro.setWordWrap(True)
-        layout.addWidget(intro)
+        features = [i for e in entries for i in e["items"] if i.get("integration")]
+        others = [i for e in entries for i in e["items"] if not i.get("integration")]
+        if features:
+            self.section(tr("Built-in add-ons"))
+            group = self.group()
+            for item in features:
+                key = item["integration"]
+                if key in self.toggles:
+                    continue
+                toggle = Toggle(is_enabled(key, self.state))
+                self.toggles[key] = toggle
+                group.add_row(tr(BY_KEY[key].title), tr(BY_KEY[key].short), toggle)
+        if others:
+            self.section(tr("Also new"))
+            group = self.group()
+            for item in others:
+                group.add_row("", tr(item["text"]))
 
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        body = QWidget()
-        rows = QVBoxLayout(body)
-        for entry in entries:
-            heading = QLabel(f"<b>{entry['version']}</b> · {entry.get('date', '')}")
-            rows.addWidget(heading)
-            for item in entry["items"]:
-                key = item.get("integration")
-                text = f"<b>{tr(item['tag'])}:</b> {tr(item['text'])}"
-                if key and key not in self.switches:
-                    box = QCheckBox()
-                    box.setChecked(is_enabled(key, self.state))
-                    box.setText(tr("Keep switched on") if box.isChecked() else tr("Switch on"))
-                    label = QLabel(text)
-                    label.setWordWrap(True)
-                    rows.addWidget(label)
-                    rows.addWidget(box)
-                    self.switches[key] = box
-                else:
-                    label = QLabel("• " + text)
-                    label.setWordWrap(True)
-                    label.setTextFormat(Qt.TextFormat.RichText)
-                    rows.addWidget(label)
-            rows.addSpacing(10)
-        rows.addStretch(1)
-        scroll.setWidget(body)
-        layout.addWidget(scroll, 1)
-
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
-        buttons.accepted.connect(self.accept)
-        layout.addWidget(buttons)
+        self.button(tr("Done"), primary=True, slot=self.accept)
+        self.finish()
 
     def accept(self) -> None:
         changed = False
-        for key, box in self.switches.items():
-            if box.isChecked() != is_enabled(key, self.state):
-                self.state["enabled"][key] = box.isChecked()
+        for key, toggle in self.toggles.items():
+            if toggle.isChecked() != is_enabled(key, self.state):
+                self.state["enabled"][key] = toggle.isChecked()
                 changed = True
         save_state(self.state)
         super().accept()
         if changed:
-            from aqt.utils import askUser
-            if askUser(tr("The change takes effect after restarting Anki. Close Anki now?"), parent=mw):
-                mw.close()
+            ask_restart()
 
 
 def show_if_updated(settings: dict, save: Callable[[], None], current: str) -> None:
@@ -98,5 +75,6 @@ def show_if_updated(settings: dict, save: Callable[[], None], current: str) -> N
     if not settings.get("onboarding_completed"):
         return  # first start: the setup wizard introduces everything
     entries = entries_since(last_seen or "2.0.1")
-    if entries:
+    # Only worth a window when something new arrived, not for fixes alone.
+    if any(i.get("tag") in ("New", "Highlight") for e in entries for i in e["items"]):
         WhatsNewDialog(entries).exec()
