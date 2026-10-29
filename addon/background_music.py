@@ -805,7 +805,7 @@ class MiniMusicPlayer(QDialog):
             "SoundCloud could not load this URL", "Widget API failed to load",
             "SmartStudy error", "Show details", "Hide details", "Copy error",
             "Copied!", "Dismiss", "Unexpected error", "Unexpected error (async)",
-            "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.",
+            "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
             "(no stack trace available)",
         )
         payload = {source: _(source) for source in sources}

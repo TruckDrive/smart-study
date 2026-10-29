@@ -83,12 +83,12 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 
 Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
 
-**From a release**: download `smart_study.ankiaddon` from the [latest release](https://github.com/TruckDrive/SmartStudy/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
+**From a release**: download `smart_study.ankiaddon` from the [latest release](https://github.com/TruckDrive/smart-study/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
 
 **From source**:
 ```sh
-git clone https://github.com/TruckDrive/SmartStudy.git
-ln -s "$PWD/SmartStudy/addon" ~/.local/share/Anki2/addons21/smart_study   # Linux; on macOS/Windows copy the folder
+git clone https://github.com/TruckDrive/smart-study.git
+ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Linux; on macOS/Windows copy the folder
 ```
 
 **Updating from an older version** (0.x): uninstall it first, otherwise Anki shows two **Study Plan** links. Your plans come back by themselves through the Anki collection.

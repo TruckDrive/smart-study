@@ -145,7 +145,7 @@ if _QT_AVAILABLE:
             error_sources = (
                 "Smart Study error", "Show details", "Hide details", "Copy error",
                 "Copied!", "Dismiss", "Unexpected error", "Unexpected error (async)",
-                "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.",
+                "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
                 "(no stack trace available)",
             )
             errors = {

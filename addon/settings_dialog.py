@@ -1016,13 +1016,13 @@ class SettingsDialog(QDialog):
         self.visual_theme_combo.setCurrentIndex(idx if idx != -1 else max(0, self.visual_theme_combo.findData("medical_theme.css")))
 
     def open_ankiweb_link(self):
-        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/SmartStudy"))
+        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/smart-study"))
 
     def open_changelog(self):
-        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/SmartStudy/blob/main/CHANGELOG.md"))
+        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/smart-study/blob/main/CHANGELOG.md"))
 
     def open_news(self):
-        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/SmartStudy/issues"))
+        QDesktopServices.openUrl(QUrl("https://github.com/TruckDrive/smart-study/issues"))
 
     def get_new_settings(self) -> Dict:
         settings = {

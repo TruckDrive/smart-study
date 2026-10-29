@@ -4314,8 +4314,8 @@
   "\n        <body style='font-family: sans-serif; padding: 20px; color: #333; background-color: #f9f9f9;'>\n            <h2 style='color: #d32f2f;'>Invalid URL</h2>\n            <p>The URL you tried to open seems to be invalid or is not a standard web URL (http/https).</p>\n            <p>Attempted URL: <code>{url_str}</code></p>\n        </body>": {
     "pl": "<body style='font-family: sans-serif; padding: 20px; color: #333; background-color: #f9f9f9;'><h2 style='color: #d32f2f;'>Nieprawidłowy adres URL</h2><p>Podany adres jest nieprawidłowy lub nie jest adresem internetowym (http/https).</p><p>Podany adres: <code>{url_str}</code></p></body>"
   },
-  "\n<h2>Troubleshooting & Manual Removal</h2>\n<p>If you are unable to activate the addon or close Anki, you can manually remove Smart Study to regain access.</p>\n\n<b>Follow these steps:</b>\n<ol>\n    <li>Close this window and click the \"Quit Anki\" button in the activation dialog. If that fails, force-quit Anki (e.g., via Activity Monitor on Mac or Task Manager on Windows).</li>\n    <li>Open Anki while holding down the <b>Shift key</b>. This will temporarily disable all addons.</li>\n    <li>Go to <b>Tools > Add-ons</b> from the Anki menu.</li>\n    <li>Select \"Smart Study\" from the list.</li>\n    <li>Click the \"Delete\" button on the right side.</li>\n    <li>Restart Anki normally.</li>\n</ol>\n\n<p>If you believe your key is valid but not working, or for any other issues, please contact us:</p>\n<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>\n": {
-    "pl": "<h2>Rozwiązywanie problemów i ręczne usuwanie</h2><p>Jeśli nie możesz aktywować dodatku lub zamknąć Anki, usuń Smart Study ręcznie, aby odzyskać dostęp.</p><b>Wykonaj te kroki:</b><ol><li>Zamknij to okno i kliknij „Zamknij Anki” w oknie aktywacji. Jeśli to nie działa, wymuś zamknięcie Anki (np. w Monitorze aktywności na Macu lub Menedżerze zadań w Windows).</li><li>Uruchom Anki, przytrzymując <b>Shift</b>. To tymczasowo wyłączy dodatki.</li><li>W menu Anki wybierz <b>Narzędzia > Dodatki</b>.</li><li>Wybierz „Smart Study” z listy.</li><li>Kliknij „Usuń” po prawej.</li><li>Uruchom Anki ponownie w zwykły sposób.</li></ol><p>Jeśli klucz jest ważny, ale nie działa, lub masz inne problemy, napisz do nas:</p><p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>"
+  "\n<h2>Troubleshooting & Manual Removal</h2>\n<p>If you are unable to activate the addon or close Anki, you can manually remove Smart Study to regain access.</p>\n\n<b>Follow these steps:</b>\n<ol>\n    <li>Close this window and click the \"Quit Anki\" button in the activation dialog. If that fails, force-quit Anki (e.g., via Activity Monitor on Mac or Task Manager on Windows).</li>\n    <li>Open Anki while holding down the <b>Shift key</b>. This will temporarily disable all addons.</li>\n    <li>Go to <b>Tools > Add-ons</b> from the Anki menu.</li>\n    <li>Select \"Smart Study\" from the list.</li>\n    <li>Click the \"Delete\" button on the right side.</li>\n    <li>Restart Anki normally.</li>\n</ol>\n\n<p>If you believe your key is valid but not working, or for any other issues, please contact us:</p>\n<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>\n": {
+    "pl": "<h2>Rozwiązywanie problemów i ręczne usuwanie</h2><p>Jeśli nie możesz aktywować dodatku lub zamknąć Anki, usuń Smart Study ręcznie, aby odzyskać dostęp.</p><b>Wykonaj te kroki:</b><ol><li>Zamknij to okno i kliknij „Zamknij Anki” w oknie aktywacji. Jeśli to nie działa, wymuś zamknięcie Anki (np. w Monitorze aktywności na Macu lub Menedżerze zadań w Windows).</li><li>Uruchom Anki, przytrzymując <b>Shift</b>. To tymczasowo wyłączy dodatki.</li><li>W menu Anki wybierz <b>Narzędzia > Dodatki</b>.</li><li>Wybierz „Smart Study” z listy.</li><li>Kliknij „Usuń” po prawej.</li><li>Uruchom Anki ponownie w zwykły sposób.</li></ol><p>Jeśli klucz jest ważny, ale nie działa, lub masz inne problemy, napisz do nas:</p><p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>"
   },
   "\nNext: Long Break!": {
     "pl": "\nDalej: długa przerwa!"
@@ -5108,8 +5108,8 @@
   "Consistency period": {
     "pl": "Okres regularności"
   },
-  "Contact github.com/TruckDrive/SmartStudy/issues if you have issues with your license key.": {
-    "pl": "W razie problemów z kluczem licencji napisz na github.com/TruckDrive/SmartStudy/issues."
+  "Contact github.com/TruckDrive/smart-study/issues if you have issues with your license key.": {
+    "pl": "W razie problemów z kluczem licencji napisz na github.com/TruckDrive/smart-study/issues."
   },
   "Content to include": {
     "pl": "Treść do uwzględnienia"
@@ -7707,8 +7707,8 @@
   "This linked PDF is not available on this device. Open the PDF library to relink it.": {
     "pl": "Powiązany PDF jest niedostępny na tym urządzeniu. Otwórz bibliotekę PDF, aby połączyć go ponownie."
   },
-  "This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/SmartStudy/issues.": {
-    "pl": "Mogą wystąpić nietypowe kolory, problemy z układem lub inne błędy wizualne. Spróbuj tymczasowo wyłączyć ten dodatek. Jeśli potrzebujesz pomocy lub zauważysz konflikty, napisz na github.com/TruckDrive/SmartStudy/issues."
+  "This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/smart-study/issues.": {
+    "pl": "Mogą wystąpić nietypowe kolory, problemy z układem lub inne błędy wizualne. Spróbuj tymczasowo wyłączyć ten dodatek. Jeśli potrzebujesz pomocy lub zauważysz konflikty, napisz na github.com/TruckDrive/smart-study/issues."
   },
   "This mind map was corrupted and has been removed. A backup was kept in storage.": {
     "pl": "Ta mapa była uszkodzona i została usunięta. Zachowano kopię zapasową w pamięci."
@@ -8061,8 +8061,8 @@
   "Your daily study plan.": {
     "pl": "Twój dzienny plan nauki."
   },
-  "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.": {
-    "pl": "Dane są bezpieczne. Zrób zrzut szczegółów i wyślij na github.com/TruckDrive/SmartStudy/issues."
+  "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.": {
+    "pl": "Dane są bezpieczne. Zrób zrzut szczegółów i wyślij na github.com/TruckDrive/smart-study/issues."
   },
   "Your gut contains its own complex 'brain,' the enteric nervous system. This extensive network boasts over 100 million neurons, managing digestion largely independently.": {
     "pl": "Jelita mają własny złożony „mózg” — jelitowy układ nerwowy. Ponad 100 milionów neuronów zarządza trawieniem w dużej mierze samodzielnie."

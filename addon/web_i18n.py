@@ -17,7 +17,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
     "errors": (
         "Smart Study error", "Show details", "Hide details", "Copy error",
         "Copied!", "Dismiss", "Unexpected error", "Unexpected error (async)",
-        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.",
+        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
         "(no stack trace available)",
     ),
     "settings": (
@@ -68,7 +68,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "Announcements, tips and updates from Smart Study.",
         "Known Add-on Conflict",
         "The following add-on is known to potentially cause UI-related issues when used together with Smart Study:",
-        "This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/SmartStudy/issues.",
+        "This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/smart-study/issues.",
         "Language, daily facts, the statistics range and when the sidebar is shown.",
         "Language", "Interface language. “Auto” follows your Anki language.",
         "Auto", "Daily Fact Topic",
@@ -137,7 +137,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "A heartfelt thank you to everyone who supports Smart Study. This space is reserved for you.",
         "Smart Study error", "Show details", "Hide details", "Copy error",
         "Copied!", "Dismiss", "Unexpected error", "Unexpected error (async)",
-        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.",
+        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
         "(no stack trace available)",
         "July 2026", "May 2026",
         "New: redesigned Settings with a cleaner, category-based layout.",
@@ -232,7 +232,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "Everything stays on your own machine — free and private.",
         "Smart Study error", "Show details", "Hide details", "Copy error", "Copied!",
         "Dismiss", "Unexpected error", "Unexpected error (async)",
-        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues.",
+        "Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues.",
         "(no stack trace available)",
     ),
 }

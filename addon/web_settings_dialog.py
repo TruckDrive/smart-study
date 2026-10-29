@@ -107,7 +107,7 @@ def _safe_counter_color(value: Any, fallback: str) -> str:
 
 # Home/news banner. Only the bundled image is shown; no remote image or config is fetched.
 HOME_BANNER_URL = ""
-HOME_BANNER_LINK = "https://github.com/TruckDrive/SmartStudy"
+HOME_BANNER_LINK = "https://github.com/TruckDrive/smart-study"
 NEWS_BANNER_FALLBACK_FILENAME = "news-banner.png"
 EXAMPLE_WALLPAPER_DIR = "example_wallpapers"
 EXAMPLE_WALLPAPERS = (

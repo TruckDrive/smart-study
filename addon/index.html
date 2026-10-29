@@ -909,7 +909,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                     var b = ensureBanner();
                     b.querySelector('.mm-eb-msg').textContent =
                         (context ? context + ': ' : '') + msg
-                        + ' — ' + mm('error_safe', 'Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/SmartStudy/issues.');
+                        + ' — ' + mm('error_safe', 'Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/smart-study/issues.');
                     b.querySelector('pre').textContent = stack;
                     b.classList.add('visible');
                 } catch (e) { console.error('[MindMap] error while reporting error', e, err); }

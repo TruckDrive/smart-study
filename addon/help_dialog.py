@@ -23,7 +23,7 @@ HELP_TEXT = """
 </ol>
 
 <p>If you believe your key is valid but not working, or for any other issues, please contact us:</p>
-<p><a href='https://github.com/TruckDrive/SmartStudy/issues'>https://github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
 """
 
 class HelpDialog(QDialog):

@@ -2226,7 +2226,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>If you believe your key is valid but not working, or for any other issues, please contact us:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """: {
         "de": """
 <h2>Fehlerbehebung &amp; Manuelle Entfernung</h2>
@@ -2243,7 +2243,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>Falls du glaubst, dass dein Schlüssel gültig ist, aber nicht funktioniert, oder bei anderen Problemen, kontaktiere uns bitte:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "es": """
 <h2>Solución de problemas y eliminación manual</h2>
@@ -2260,7 +2260,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>Si crees que tu clave es válida pero no funciona, o para cualquier otro problema, contáctanos:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "ko": """
 <h2>문제 해결 및 수동 제거</h2>
@@ -2277,7 +2277,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>키가 유효하지만 작동하지 않는다고 생각되거나 다른 문제가 있으면 문의하세요:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "pt": """
 <h2>Solução de Problemas e Remoção Manual</h2>
@@ -2294,7 +2294,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>Se acreditar que sua chave é válida mas não está funcionando, ou para quaisquer outros problemas, entre em contato:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "fr": """
 <h2>Dépannage et suppression manuelle</h2>
@@ -2311,7 +2311,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>Si vous pensez que votre clé est valide mais ne fonctionne pas, ou pour tout autre problème, contactez-nous :</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "vi": """
 <h2>Khắc phục sự cố và Gỡ cài đặt thủ công</h2>
@@ -2328,7 +2328,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>Nếu bạn cho rằng khóa của mình hợp lệ nhưng không hoạt động, hoặc có vấn đề khác, hãy liên hệ:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "zh": """
 <h2>故障排除与手动卸载</h2>
@@ -2345,7 +2345,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>如果您认为密钥有效但无法使用，或遇到其他问题，请联系我们：</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
         "hi": """
 <h2>समस्या निवारण और मैन्युअल निष्कासन</h2>
@@ -2362,7 +2362,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 </ol>
 
 <p>यदि आपको लगता है कि आपकी कुंजी वैध है लेकिन काम नहीं कर रही, या किसी अन्य समस्या के लिए, हमसे संपर्क करें:</p>
-<p><a href='mailto:github.com/TruckDrive/SmartStudy/issues'>github.com/TruckDrive/SmartStudy/issues</a></p>
+<p><a href='mailto:github.com/TruckDrive/smart-study/issues'>github.com/TruckDrive/smart-study/issues</a></p>
 """,
     },
 
@@ -3740,15 +3740,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "帮助",
         "hi": "सहायता",
     },
-    "Contact github.com/TruckDrive/SmartStudy/issues if you have issues with your license key.": {
-        "de": "Wende Dich an github.com/TruckDrive/SmartStudy/issues, falls Du Probleme mit Deinem Lizenzschlüssel hast.",
-        "es": "Contacta con github.com/TruckDrive/SmartStudy/issues si tienes problemas con tu clave de licencia.",
-        "ko": "라이선스 키 문제가 있으면 github.com/TruckDrive/SmartStudy/issues으로 연락하세요.",
-        "pt": "Entre em contato com github.com/TruckDrive/SmartStudy/issues se tiver problemas com sua chave de licença.",
-        "fr": "Contactez github.com/TruckDrive/SmartStudy/issues si vous avez des problèmes avec votre clé de licence.",
-        "vi": "Liên hệ github.com/TruckDrive/SmartStudy/issues nếu bạn có vấn đề với khóa giấy phép.",
-        "zh": "如果您的许可证密钥有问题，请联系 github.com/TruckDrive/SmartStudy/issues。",
-        "hi": "यदि आपकी लाइसेंस कुंजी में समस्या है तो github.com/TruckDrive/SmartStudy/issues से संपर्क करें।",
+    "Contact github.com/TruckDrive/smart-study/issues if you have issues with your license key.": {
+        "de": "Wende Dich an github.com/TruckDrive/smart-study/issues, falls Du Probleme mit Deinem Lizenzschlüssel hast.",
+        "es": "Contacta con github.com/TruckDrive/smart-study/issues si tienes problemas con tu clave de licencia.",
+        "ko": "라이선스 키 문제가 있으면 github.com/TruckDrive/smart-study/issues으로 연락하세요.",
+        "pt": "Entre em contato com github.com/TruckDrive/smart-study/issues se tiver problemas com sua chave de licença.",
+        "fr": "Contactez github.com/TruckDrive/smart-study/issues si vous avez des problèmes avec votre clé de licence.",
+        "vi": "Liên hệ github.com/TruckDrive/smart-study/issues nếu bạn có vấn đề với khóa giấy phép.",
+        "zh": "如果您的许可证密钥有问题，请联系 github.com/TruckDrive/smart-study/issues。",
+        "hi": "यदि आपकी लाइसेंस कुंजी में समस्या है तो github.com/TruckDrive/smart-study/issues से संपर्क करें।",
     },
     "Manage Your License Key": {
         "de": "Lizenzschlüssel verwalten",

@@ -1440,16 +1440,16 @@
     "hi": "बड़ा दस्तावेज़: संपादन धीमा हो सकता है। बैकअप निर्यात करें और छोटे मानचित्रों में बाँटने पर विचार करें।",
     "pl": "Duży dokument: edycja może zwolnić. Wyeksportuj kopię zapasową i rozważ podział na mniejsze mapy."
   },
-  "Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/SmartStudy/issues.": {
-    "de": "Lass dieses Fenster offen und exportiere deine Änderungen. Sende die Fehlerdetails an github.com/TruckDrive/SmartStudy/issues.",
-    "es": "Mantén esta ventana abierta y exporta los cambios. Envía los detalles a github.com/TruckDrive/SmartStudy/issues.",
-    "ko": "창을 열어 두고 변경 사항을 내보내세요. 오류 세부 정보: github.com/TruckDrive/SmartStudy/issues.",
-    "pt": "Mantenha esta janela aberta e exporte as alterações. Envie os detalhes para github.com/TruckDrive/SmartStudy/issues.",
-    "fr": "Gardez cette fenêtre ouverte et exportez vos modifications. Envoyez les détails à github.com/TruckDrive/SmartStudy/issues.",
-    "vi": "Giữ cửa sổ mở và xuất thay đổi. Gửi chi tiết lỗi tới github.com/TruckDrive/SmartStudy/issues.",
-    "zh": "请保持窗口打开并导出更改。将错误详情发送至 github.com/TruckDrive/SmartStudy/issues。",
-    "hi": "विंडो खुली रखें और बदलाव निर्यात करें। त्रुटि विवरण github.com/TruckDrive/SmartStudy/issues पर भेजें।",
-    "pl": "Nie zamykaj okna i wyeksportuj zmiany. Wyślij szczegóły błędu na github.com/TruckDrive/SmartStudy/issues."
+  "Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/smart-study/issues.": {
+    "de": "Lass dieses Fenster offen und exportiere deine Änderungen. Sende die Fehlerdetails an github.com/TruckDrive/smart-study/issues.",
+    "es": "Mantén esta ventana abierta y exporta los cambios. Envía los detalles a github.com/TruckDrive/smart-study/issues.",
+    "ko": "창을 열어 두고 변경 사항을 내보내세요. 오류 세부 정보: github.com/TruckDrive/smart-study/issues.",
+    "pt": "Mantenha esta janela aberta e exporte as alterações. Envie os detalhes para github.com/TruckDrive/smart-study/issues.",
+    "fr": "Gardez cette fenêtre ouverte et exportez vos modifications. Envoyez les détails à github.com/TruckDrive/smart-study/issues.",
+    "vi": "Giữ cửa sổ mở và xuất thay đổi. Gửi chi tiết lỗi tới github.com/TruckDrive/smart-study/issues.",
+    "zh": "请保持窗口打开并导出更改。将错误详情发送至 github.com/TruckDrive/smart-study/issues。",
+    "hi": "विंडो खुली रखें और बदलाव निर्यात करें। त्रुटि विवरण github.com/TruckDrive/smart-study/issues पर भेजें।",
+    "pl": "Nie zamykaj okna i wyeksportuj zmiany. Wyślij szczegóły błędu na github.com/TruckDrive/smart-study/issues."
   },
   "Link to Anki": {
     "de": "Mit Anki verknüpfen",

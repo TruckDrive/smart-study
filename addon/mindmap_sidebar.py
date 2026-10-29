@@ -230,7 +230,7 @@ def _build_mindmap_i18n() -> dict:
         "error_dismiss":    _("Dismiss"),
         "error_unexpected": _("Unexpected error"),
         "error_unexpected_async": _("Unexpected error (async)"),
-        "error_safe":       _("Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/SmartStudy/issues."),
+        "error_safe":       _("Please keep this window open and export your changes. Send the error details to github.com/TruckDrive/smart-study/issues."),
         "error_no_stack":   _("(no stack trace available)"),
         "info_basic":       _("Basic Controls"),
         "info_pan":         _("Pan View: Click and drag on the empty background."),

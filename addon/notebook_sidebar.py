@@ -398,7 +398,7 @@ def _build_i18n_script(tool_name: str) -> str:
         "error_dismiss": _("Dismiss"),
         "error_unexpected": _("Unexpected error"),
         "error_unexpected_async": _("Unexpected error (async)"),
-        "error_safe": _("Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/SmartStudy/issues."),
+        "error_safe": _("Your data is safe. Please screenshot the details and send them to github.com/TruckDrive/smart-study/issues."),
         "error_no_stack": _("(no stack trace available)"),
     })
     strings_json = _json_for_script(strings, ensure_ascii=False)
