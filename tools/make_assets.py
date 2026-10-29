@@ -379,23 +379,24 @@ def pixel_buddy(cell, color, eye=(43, 26, 20, 255)):
 
 
 def make_orange_wallpaper():
-    """Warm cream with orange glow and the pixel buddy at the side, away from the deck list."""
+    """Very dark blue with a faint glow, and the orange pixel buddy at the side, away from the deck list."""
     size = (1672, 941)
-    glow = Image.new("RGB", size, (240, 238, 230))
+    glow = Image.new("RGB", size, (7, 11, 24))
     d = ImageDraw.Draw(glow)
-    for (cx, cy, r), color in zip(((180, 160, 520), (620, 900, 430), (40, 760, 360), (1060, -120, 380)),
-                                  ((217, 119, 87), (232, 160, 127), (201, 100, 66), (246, 205, 180))):
+    for (cx, cy, r), color in zip(((1380, 760, 420), (300, 120, 380)), ((22, 34, 66), (13, 20, 42))):
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
-    im = glow.filter(ImageFilter.GaussianBlur(200)).convert("RGBA")
-    buddy = pixel_buddy(22, (217, 119, 87, 255))
-    shadow = Image.new("RGBA", buddy.size, (0, 0, 0, 0))
-    shadow.paste((120, 60, 40, 70), mask=buddy.split()[3])
-    x, y = size[0] - buddy.width - 70, size[1] - buddy.height - 90
-    im.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(10)), (x + 6, y + 14))
+    im = glow.filter(ImageFilter.GaussianBlur(220)).convert("RGBA")
+    buddy = pixel_buddy(22, (217, 119, 87, 255), eye=(7, 11, 24, 255))
+    pad = 200  # room for the blur, so the glow has no edge
+    halo = Image.new("RGBA", (buddy.width + 2 * pad, buddy.height + 2 * pad), (217, 119, 87, 0))
+    halo.paste((217, 119, 87, 70), (pad, pad), mask=buddy.split()[3])
+    halo = halo.filter(ImageFilter.GaussianBlur(70))
+    x, y = size[0] - buddy.width - 90, size[1] - buddy.height - 100
+    im.alpha_composite(halo, (x - pad, y - pad))
     im.alpha_composite(buddy, (x, y))
     out = os.path.join(MEDIA, "example_wallpapers")
     os.makedirs(out, exist_ok=True)
-    im.convert("RGB").save(os.path.join(out, "smartstudy_orange_pixel.webp"), quality=88)
+    im.convert("RGB").save(os.path.join(out, "smartstudy_orange_pixel.webp"), quality=90)
 
 
 # ── onboarding ────────────────────────────────────────────────────────────────

@@ -120,7 +120,7 @@ EXAMPLE_WALLPAPERS = (
     ("abstract", "smartstudy_starter_abstract.webp", "Abstract Wallpaper",
      "A colorful abstract wallpaper suitable for either mode."),
     ("orange", "smartstudy_orange_pixel.webp", "Orange Pixel Wallpaper",
-     "Warm orange with a little pixel buddy at the side. Goes well with the Orange colour."),
+     "Very dark blue with a little orange pixel buddy at the side. Goes well with the Orange colour."),
 )
 _EXAMPLE_PREVIEW_CACHE: Dict[tuple, str] = {}
 
