@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1
+
+- Only one workspace tool is open at a time: opening one closes the others
+- Workspace screenshots in the README
+
 ## 2.0.0 – 2026-10-29
 
 - **Smart Study is now one complete extension**: the study planner plus a workspace with notebook, PDF viewer, mind maps, Pomodoro, music, AI assistant, website sidebar, gamification, statistics and deadlines

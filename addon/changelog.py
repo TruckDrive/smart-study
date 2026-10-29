@@ -3,7 +3,15 @@
 
 CHANGELOG = [
     {
-        "version": "2.0.0",
+        "version": "2.0.1",
+        "date": "October 29, 2026",
+        "items": [
+            {"tag": "Changed", "text": "Only one workspace tool is open at a time: opening the notebook, mind map, AI assistant, website or gamification sidebar closes the others."},
+            {"tag": "New", "text": "Workspace screenshots and an updated README on GitHub."},
+        ],
+    },
+    {
+        "version": "2.0.1",
         "date": "October 29, 2026",
         "items": [
             {"tag": "Highlight", "text": "Smart Study combines the study planner and the workspace in one extension."},
