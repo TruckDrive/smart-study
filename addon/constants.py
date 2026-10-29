@@ -7,7 +7,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "2.2.0"
+ADDON_VERSION = "2.3.0"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 
@@ -128,7 +128,7 @@ ADDON_NAME_AI_ASSISTANT = "AI_Assistant_Sidebar"
 
 # --- Color Theme ---
 # Stores the user's chosen primary colour-theme for the addon UI.
-# Valid values: "ocean" (default), "orchid", "forest", "deluge", "horizon", "dusty", "custom"
+# Valid values: "ocean" (default), "orchid", "forest", "deluge", "horizon", "dusty", "orange", "custom"
 CONFIG_KEY_ACTIVE_COLOR_THEME = f"addon_{addon_package_name}_active_color_theme"
 DEFAULT_ACTIVE_COLOR_THEME = "ocean"
 

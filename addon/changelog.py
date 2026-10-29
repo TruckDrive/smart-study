@@ -7,6 +7,16 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.3.0",
+        "date": "October 29, 2026",
+        "items": [
+            {"tag": "New", "text": "Same add-ons on all your devices: your AnkiWeb add-ons sync with AnkiWeb, and other devices offer to install what is missing."},
+            {"tag": "New", "text": "Settings → Add-ons: install an add-on by entering its AnkiWeb code."},
+            {"tag": "New", "text": "New color Orange and the Orange Pixel Wallpaper with a little pixel buddy."},
+            {"tag": "Changed", "text": "The old “Study Plan” decks are now called “Smart Study system data”."},
+        ],
+    },
+    {
         "version": "2.2.0",
         "date": "October 29, 2026",
         "items": [

@@ -21,8 +21,10 @@ from typing import Any, Dict, Optional
 CONF_KEY = "smartstudy_settings"
 # Local stamp of the settings copy that was last pushed or pulled.
 STAMP_KEY = "_synced_at"
-# Per device: "What's new" was seen here, the launcher was opened here.
-LOCAL_KEYS = {STAMP_KEY, "last_seen_version", "launcher_sidebar_open"}
+# Per device: "What's new" was seen here, the launcher was opened here, and
+# the add-on sync choices of this device (see addon_sync.py).
+LOCAL_KEYS = {STAMP_KEY, "last_seen_version", "launcher_sidebar_open",
+              "addon_sync_enabled", "addon_sync_asked", "addon_sync_known", "addon_sync_skipped"}
 
 
 def _col():

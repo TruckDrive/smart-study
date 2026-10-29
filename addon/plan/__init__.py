@@ -407,6 +407,19 @@ def _store_plans(*_):
 
 
 gui_hooks.sync_will_start.append(_store_plans)
+
+
+def _rename_legacy_decks(*_):
+    """Old "Study Plan" / "Lernplan" filtered decks get one clear name (also after a sync)."""
+    try:
+        if mw.col and ankidata.rename_legacy_decks(mw.col) and mw.state == "deckBrowser":
+            mw.deckBrowser.refresh()
+    except Exception:
+        traceback.print_exc()
+
+
+gui_hooks.profile_did_open.append(_rename_legacy_decks)
+gui_hooks.sync_did_finish.append(_rename_legacy_decks)
 gui_hooks.profile_did_open.append(_store_plans)
 gui_hooks.operation_did_execute.append(lambda changes, handler: _changed())
 gui_hooks.profile_will_close.append(_profile_closing)

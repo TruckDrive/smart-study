@@ -81,6 +81,7 @@ _PRESET_ACCENTS = {
     "deluge":  ("#7961A9", "#65508D"),
     "horizon": ("#6183A9", "#4B6683"),
     "dusty":   ("#5A9491", "#4E8280"),
+    "orange":  ("#D97757", "#B85C3F"),
 }
 _THEME_LOGOS = {
     "ocean":   "logo.svg",
@@ -89,6 +90,7 @@ _THEME_LOGOS = {
     "deluge":  "logo_deluge.svg",
     "horizon": "logo_horizon.svg",
     "dusty":   "logo_dusty.svg",
+    "orange":  "logo_orange.svg",
 }
 
 _COUNTER_COLOR_DEFAULTS = {
@@ -117,6 +119,8 @@ EXAMPLE_WALLPAPERS = (
      "A dark wallpaper designed for Dark Mode."),
     ("abstract", "smartstudy_starter_abstract.webp", "Abstract Wallpaper",
      "A colorful abstract wallpaper suitable for either mode."),
+    ("orange", "smartstudy_orange_pixel.webp", "Orange Pixel Wallpaper",
+     "Warm orange with a little pixel buddy at the side. Goes well with the Orange colour."),
 )
 _EXAMPLE_PREVIEW_CACHE: Dict[tuple, str] = {}
 
@@ -233,6 +237,9 @@ if _QT_AVAILABLE:
             self.integration_switches = {
                 k.split(":", 1)[1]: bool(s.pop(k)) for k in list(s) if k.startswith("integration:")
             }
+            # Switching add-on sync here counts as the answer to the start-up question.
+            if "addon_sync_enabled" in s and s["addon_sync_enabled"] != bool(self.current_config.get("addon_sync_enabled")):
+                s["addon_sync_asked"] = True
             from .deck_overview_options import normalize
             s.update(normalize(s))
             # custom colours are managed natively (see _edit_theme), not in JS.
@@ -282,6 +289,8 @@ if _QT_AVAILABLE:
                     self._select_example_background(payload)
                 elif action == "removeBackground":
                     self._remove_background()
+                elif action == "installAddon":
+                    QTimer.singleShot(0, lambda code=payload: self._install_addon(code))
                 elif action == "openIntegrations":
                     QTimer.singleShot(0, self._open_integrations)
                 elif action == "openUrl":
@@ -316,6 +325,45 @@ if _QT_AVAILABLE:
                     "more": tr("Options & credits…"),
                 },
             }
+
+        def _addon_sync_payload(self) -> Dict[str, Any]:
+            try:
+                from . import addon_sync
+                from .integrations.strings import tr
+            except Exception:
+                return {}
+            installed = addon_sync.installed_addons()
+            shared = addon_sync._remote() or {}
+            return {
+                "enabled": bool(self.current_config.get(addon_sync.ENABLED)),
+                "shared": [{"id": k, "name": v, "installed": k in installed}
+                           for k, v in sorted(shared.items(), key=lambda item: item[1].lower())],
+                "labels": {
+                    "section": tr("Sync add-ons"),
+                    "toggle": tr("Same add-ons on all devices"),
+                    "toggleDesc": tr("Your AnkiWeb add-ons travel with the AnkiWeb sync; other devices offer to install what is missing."),
+                    "install": tr("Install an add-on"),
+                    "installDesc": tr("Enter the code from the add-on's AnkiWeb page."),
+                    "placeholder": tr("Code"),
+                    "installButton": tr("Install"),
+                    "code": tr("Code"),
+                    "installed": tr("Installed"),
+                    "notInstalled": tr("Not on this device"),
+                    "note": tr("New add-ons work after restarting Anki."),
+                },
+            }
+
+        def _install_addon(self, code: str):
+            try:
+                from . import addon_sync
+                code = addon_sync.valid_code(code)
+                if not code:
+                    return
+                import sys
+                package = sys.modules[__name__.rsplit(".", 1)[0]]
+                addon_sync.install([code], package.addon_settings, package.save_addon_settings, parent=self)
+            except Exception as e:
+                print(f"WebSettings: add-on install failed: {e}")
 
         def _open_integrations(self):
             """Opens the full window (options, credits) and shows its result here."""
@@ -743,6 +791,7 @@ if _QT_AVAILABLE:
                 "aboutLogo": self._png_uri("logo_about.png"),
                 "customBackground": self._custom_background_payload(),
                 "integrations": self._integrations_payload(),
+                "addonSync": self._addon_sync_payload(),
                 "config": conf,
             }
 

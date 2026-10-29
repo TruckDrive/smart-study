@@ -60,6 +60,7 @@ _PRESETS: Dict[str, Dict[str, str]] = {
     "deluge":  {"blue": "#7961A9", "blue_hover": "#6D5798",  "blue_pressed": "#65508D", "blue_bright": "#987AD2"},
     "horizon": {"blue": "#6183A9", "blue_hover": "#59799D",  "blue_pressed": "#4B6683", "blue_bright": "#7FABDC"},
     "dusty":   {"blue": "#5A9491", "blue_hover": "#528885",  "blue_pressed": "#4E8280", "blue_bright": "#7CCDC9"},
+    "orange":  {"blue": "#D97757", "blue_hover": "#CC6C4D",  "blue_pressed": "#B85C3F", "blue_bright": "#F0A285"},
 }
 
 _PRESET_DISPLAY = [
@@ -69,6 +70,7 @@ _PRESET_DISPLAY = [
     ("deluge",  "Deluge",  "#7961A9", "#65508D"),
     ("horizon", "Horizon", "#6183A9", "#4B6683"),
     ("dusty",   "Dusty",   "#5A9491", "#4E8280"),
+    ("orange",  "Orange",  "#D97757", "#B85C3F"),
 ]
 
 

@@ -28,6 +28,7 @@ BRAND = "#0071d3"  # logo_utils.py recolours exactly this value to the active th
 THEMES = {  # light-mode accents from theme.py, in onboarding order
     "ocean": "#0071D3", "horizon": "#6183A9", "forest": "#619971",
     "dusty": "#5A9491", "deluge": "#7961A9", "orchid": "#E95ACC",
+    "orange": "#D97757",
 }
 TMP = tempfile.mkdtemp()
 random.seed(7)
@@ -350,6 +351,53 @@ def make_wallpapers():
         os.path.join(out, "smartstudy_starter_abstract.webp"), quality=86)
 
 
+# Pixel buddy: 1 = body, 2 = eye. Rows top to bottom.
+PIXEL_BUDDY = [
+    "..1111111111..",
+    "..1111111111..",
+    "..1121111211..",
+    "11112111121111",
+    "11111111111111",
+    "..1111111111..",
+    "..1111111111..",
+    "..1.1....1.1..",
+    "..1.1....1.1..",
+]
+
+
+def pixel_buddy(cell, color, eye=(43, 26, 20, 255)):
+    """The pixel buddy as an RGBA image, `cell` pixels per grid square."""
+    w, h = len(PIXEL_BUDDY[0]) * cell, len(PIXEL_BUDDY) * cell
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    for y, row in enumerate(PIXEL_BUDDY):
+        for x, c in enumerate(row):
+            if c in "12":
+                d.rectangle([x * cell, y * cell, (x + 1) * cell - 1, (y + 1) * cell - 1],
+                            fill=color if c == "1" else eye)
+    return im
+
+
+def make_orange_wallpaper():
+    """Warm cream with orange glow and the pixel buddy at the side, away from the deck list."""
+    size = (1672, 941)
+    glow = Image.new("RGB", size, (240, 238, 230))
+    d = ImageDraw.Draw(glow)
+    for (cx, cy, r), color in zip(((180, 160, 520), (620, 900, 430), (40, 760, 360), (1060, -120, 380)),
+                                  ((217, 119, 87), (232, 160, 127), (201, 100, 66), (246, 205, 180))):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
+    im = glow.filter(ImageFilter.GaussianBlur(200)).convert("RGBA")
+    buddy = pixel_buddy(22, (217, 119, 87, 255))
+    shadow = Image.new("RGBA", buddy.size, (0, 0, 0, 0))
+    shadow.paste((120, 60, 40, 70), mask=buddy.split()[3])
+    x, y = size[0] - buddy.width - 70, size[1] - buddy.height - 90
+    im.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(10)), (x + 6, y + 14))
+    im.alpha_composite(buddy, (x, y))
+    out = os.path.join(MEDIA, "example_wallpapers")
+    os.makedirs(out, exist_ok=True)
+    im.convert("RGB").save(os.path.join(out, "smartstudy_orange_pixel.webp"), quality=88)
+
+
 # ── onboarding ────────────────────────────────────────────────────────────────
 
 def panel_svg(w, h, main, chips, a="#4FACFE", b=BRAND):
@@ -517,6 +565,7 @@ if __name__ == "__main__":
     make_covers()
     make_banner()
     make_wallpapers()
+    make_orange_wallpaper()
     make_onboarding()
     make_alerts()
     make_ambience()

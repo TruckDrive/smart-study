@@ -501,6 +501,7 @@ class SettingsDialog(QDialog):
             ("deluge",  _("Deluge"),  "#7961A9", "#65508D"),
             ("horizon", _("Horizon"), "#6183A9", "#4B6683"),
             ("dusty",   _("Dusty"),   "#5A9491", "#4E8280"),
+            ("orange",  _("Orange"),  "#D97757", "#B85C3F"),
         ]
         self._theme_presets = {k: (bg, pr) for k, _name, bg, pr in _preset_defs}
 

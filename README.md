@@ -8,6 +8,13 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 *An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
 
+## What's new in 2.3
+
+- **Same add-ons on all your devices**: Smart Study asks once whether to sync your AnkiWeb add-ons; other devices then offer to install what is missing
+- **Install add-ons by code** under *Settings → Add-ons*
+- **New color Orange** and the **Orange Pixel Wallpaper** example background
+- The leftover "Study Plan" decks from early versions are now called **Smart Study system data**
+
 ## What's new in 2.2
 
 - **Settings sync between your devices**: Smart Study's settings and the switches for the built-in add-ons are kept in the Anki collection, so your normal AnkiWeb sync takes them to your other computers (like the study plans). Of two copies, the newer one wins

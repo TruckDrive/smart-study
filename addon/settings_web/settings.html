@@ -197,6 +197,9 @@
   #solidBackgroundControls input[type=color]{width:44px;height:30px;padding:2px;border:1px solid var(--group-border);border-radius:6px;cursor:pointer;}
   #solidBackgroundControls output{font-size:12px;color:var(--muted);min-width:65px;}
   select.field{display:none;}
+  .code-input{background:var(--field-bg);color:var(--text);border:1px solid transparent;border-radius:8px;
+    padding:7px 12px;font-size:13.5px;font-family:inherit;width:130px;outline:none;}
+  .code-input:focus{border-color:var(--accent);}
   .dd-btn{appearance:none;-webkit-appearance:none;background:var(--field-bg);color:var(--text);
     border:1px solid transparent;border-radius:8px;padding:7px 30px 7px 12px;font-size:13.5px;font-weight:500;cursor:pointer;
     outline:none;min-width:170px;text-align:left;font-family:inherit;line-height:1.35;
@@ -637,6 +640,11 @@
           <div class="group" id="integrationGroup"></div>
           <p class="rd" id="addonsNote" style="margin:12px 4px 12px;"></p>
           <button type="button" class="btn btn-grey" id="addonsMore" onclick="bridge('openIntegrations')">Options & credits…</button>
+          <div id="addonSyncBlock" hidden>
+            <div class="group-label" id="addonSyncLabel" style="margin-top:24px">Sync add-ons</div>
+            <div class="group" id="addonSyncGroup"></div>
+            <p class="rd" id="addonSyncNote" style="margin:12px 4px 0;"></p>
+          </div>
         </section>
 
         <!-- CHANGELOG -->
@@ -707,6 +715,7 @@
     ['deluge','Deluge','#7961A9','#65508D'],
     ['horizon','Horizon','#6183A9','#4B6683'],
     ['dusty','Dusty','#5A9491','#4E8280'],
+    ['orange','Orange','#D97757','#B85C3F'],
   ];
   var DASH = [
     ['dashboard_wide_deck_list','Wide Deck List','Match the deck list width to the widgets. Turn off for a compact deck list.'],
@@ -805,6 +814,34 @@
     document.getElementById('integrationGroup').innerHTML = info.items.map(function(item){
       return toggleRow('integration:'+item.key, item.title, item.desc, !!item.on, false);
     }).join('');
+  };
+
+  // AnkiWeb add-ons: install by code, keep the same ones on every device (addon_sync.py).
+  window.setAddonSync = function(info){
+    if(!info || !info.labels){ return; }
+    var l = info.labels;
+    document.getElementById('addonSyncBlock').hidden = false;
+    document.getElementById('addonSyncLabel').textContent = l.section;
+    document.getElementById('addonSyncNote').textContent = l.note;
+    var rows = toggleRow('addon_sync_enabled', l.toggle, l.toggleDesc, !!info.enabled, false);
+    rows += '<div class="row"><div class="rl"><div class="rt">'+esc(l.install)+'</div><div class="rd">'+esc(l.installDesc)+'</div></div>'+
+      '<div class="rc"><input class="code-input" id="addonCode" inputmode="numeric" placeholder="'+esc(l.placeholder)+'">'+
+      '<button type="button" class="btn btn-primary" id="addonInstall" style="margin-left:8px">'+esc(l.installButton)+'</button></div></div>';
+    (info.shared||[]).forEach(function(a){
+      rows += '<div class="row"><div class="rl"><div class="rt">'+esc(a.name)+'</div><div class="rd">'+esc(l.code+' '+a.id)+'</div></div>'+
+        '<div class="rc"><span class="rd">'+esc(a.installed ? l.installed : l.notInstalled)+'</span></div></div>';
+    });
+    var group = document.getElementById('addonSyncGroup');
+    group.innerHTML = rows;
+    var input = document.getElementById('addonCode');
+    var go = function(){
+      var code = (input.value||'').trim();
+      if(!/^[0-9]{1,12}$/.test(code)){ input.focus(); input.style.borderColor='#E60012'; return; }
+      input.style.borderColor=''; input.value='';
+      bridge('installAddon', code);
+    };
+    document.getElementById('addonInstall').addEventListener('click', go);
+    input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); go(); } });
   };
 
   window.setSidebarShortcut = function(data){
@@ -1158,6 +1195,7 @@
       renderDeckOverviewSettings(data.deckOverview);
       renderToggles('sideGroup', SIDE, cfg, true);
       setIntegrations(data.integrations);
+      setAddonSync(data.addonSync);
       var minimalToggle = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
       if(minimalToggle) minimalToggle.addEventListener('change', syncMinimalDashboardControls);
       syncMinimalDashboardControls();

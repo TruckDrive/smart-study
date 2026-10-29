@@ -316,3 +316,43 @@ def maintenance(col, plan, on):
                 col.decks.save(d)
         m.update(on=False, previous={})
     return m
+
+
+# Versions before 0.2 kept their filtered decks under "Lernplan" or "Study Plan".
+LEGACY_PARENTS = ("Study Plan", "Lernplan")
+SYSTEM_DECK = "Smart Study system data"
+
+
+def rename_legacy_decks(col):
+    """Moves the old filtered decks under one clearly named deck.
+
+    Only touches a legacy parent that holds no cards itself and whose subdecks
+    are all filtered decks, so a deck the user named "Study Plan" stays as it is.
+    Returns True if something was renamed.
+    """
+    changed = False
+    for name in LEGACY_PARENTS:
+        did = col.decks.id_for_name(name)
+        if not did:
+            continue
+        children = col.decks.children(did)
+        if col.decks.is_filtered(did) or col.db.scalar("SELECT count() FROM cards WHERE did=? OR odid=?", did, did):
+            continue
+        if not all(col.decks.is_filtered(cid) for _, cid in children):
+            continue
+        target = col.decks.id_for_name(SYSTEM_DECK)
+        if not target:
+            col.decks.rename(did, SYSTEM_DECK)
+            changed = True
+            continue
+        # Both legacy parents exist: move the filtered decks over, then drop the empty parent.
+        for child_name, cid in children:
+            leaf = child_name.split("::")[-1]
+            new_name, n = f"{SYSTEM_DECK}::{leaf}", 2
+            while col.decks.id_for_name(new_name):
+                new_name, n = f"{SYSTEM_DECK}::{leaf} ({n})", n + 1
+            col.decks.rename(cid, new_name)
+        if not col.decks.children(did):
+            col.decks.remove([did])
+        changed = True
+    return changed

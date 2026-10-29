@@ -500,6 +500,7 @@ class SidebarWidget(QWidget):
             "deluge":  "logo_deluge.svg",
             "horizon": "logo_horizon.svg",
             "dusty":   "logo_dusty.svg",
+            "orange":  "logo_orange.svg",
         }
         try:
             from .theme import get_active_theme

@@ -258,6 +258,24 @@ COLOR_THEMES: dict = {
             "blue_accent":  "#7CCDC9",
         },
     },
+    "orange": {
+        False: {
+            "blue":         "#D97757",
+            "blue_hover":   "#CC6C4D",
+            "blue_pressed": "#B85C3F",
+            "blue_border":  "none",
+            "blue_bright":  "#F0A285",
+            "blue_accent":  "#D97757",
+        },
+        True: {
+            "blue":         "#D97757",
+            "blue_hover":   "#CC6C4D",
+            "blue_pressed": "#B85C3F",
+            "blue_border":  "1px solid #8A4630",
+            "blue_bright":  "#F0A285",
+            "blue_accent":  "#F0A285",
+        },
+    },
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

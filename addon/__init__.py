@@ -5,7 +5,7 @@ from __future__ import annotations
 import os, sys, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
-from . import settings_sync
+from . import settings_sync, addon_sync
 
 # --- Import Sub-Modules ---
 try:
@@ -148,7 +148,7 @@ def get_default_settings() -> Dict[str, Any]:
         "stats_show_new_cards": True,
         "sidebar_shortcuts": {},
         "language": "auto",  # UI language: "auto", "en", "de", "es"
-        "active_color_theme": "ocean",   # Colour theme: "ocean","orchid","forest","deluge","horizon","dusty","custom"
+        "active_color_theme": "ocean",   # Colour theme: "ocean","orchid","forest","deluge","horizon","dusty","orange","custom"
         "custom_theme_colors": {},       # Used when active_color_theme == "custom"
         "custom_bg_light": "#f5f5f7",    # Custom solid background (light mode)
         "custom_bg_dark":  "#1f1f21",    # Custom solid background (dark mode)
@@ -587,6 +587,15 @@ def run_onboarding_if_needed():
         whats_new.show_if_updated(addon_settings, save_addon_settings, constants.ADDON_VERSION)
     except Exception:
         traceback.print_exc()
+    if addon_settings.get("onboarding_completed", False):
+        try:
+            # Asked once per device, on the first start and after this update.
+            if addon_settings.get(addon_sync.ASKED):
+                addon_sync.check(addon_settings, save_addon_settings)
+            else:
+                addon_sync.ask_if_needed(addon_settings, save_addon_settings)
+        except Exception:
+            traceback.print_exc()
 
 def _apply_saved_settings(new_settings, message=None):
     """Persist the returned settings and refresh every affected piece of UI.
@@ -845,6 +854,8 @@ def show_settings_dialog(initial_page=None, initial_section=None):
             if switches and integrations is not None and integrations.set_enabled(switches):
                 from .integrations.ui import ask_restart
                 ask_restart()
+            if settings.get(addon_sync.ENABLED):
+                addon_sync.check(addon_settings, save_addon_settings)
             if mw and mw.state == "overview":
                 mw.overview.refresh()
     except Exception:
@@ -997,6 +1008,10 @@ def _pull_synced_settings() -> Dict[str, Any]:
 def on_sync_finished(*_args) -> None:
     """Invalidate dashboard snapshots after reviews arrive through AnkiWeb."""
     changed = _pull_synced_settings()
+    try:
+        addon_sync.check(addon_settings, save_addon_settings)
+    except Exception:
+        traceback.print_exc()
     if changed:
         _apply_saved_settings(changed, message=integrations.tr("Settings updated from your other device.") if integrations else None)
     try:

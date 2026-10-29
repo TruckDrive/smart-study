@@ -54,6 +54,9 @@ image" only writes to the local clipboard.
   add-ons are also mirrored into the collection configuration
   (`smartstudy_settings`), so AnkiWeb sync takes them to your other devices.
   They contain no API keys, history or personal content.
+- If you switch on add-on sync, the AnkiWeb codes and names of your installed
+  add-ons are kept in the collection configuration (`smartstudy_addons`).
+  Missing add-ons are downloaded from AnkiWeb only after you confirm.
 - A migration removes API keys and website history from the older
   collection-synced locations when the corresponding feature is first opened.
 
