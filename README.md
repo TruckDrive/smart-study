@@ -2,11 +2,21 @@
 
 **One Anki extension for your whole study workflow: study plans up to your exam, plus a full workspace with notebook, PDF viewer, mind maps, focus timer, music, AI assistant and motivation, all inside Anki.**
 
-You tell Smart Study what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
+## Install
 
-![Plan view](screenshots/plan.png)
+Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
 
-*An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
+**From AnkiWeb** (recommended): in Anki open *Tools → Add-ons → Get Add-ons…*, enter the code **`1726163334`** and restart Anki. Add-on page: https://ankiweb.net/shared/info/1726163334
+
+**From a release**: download `smart_study.ankiaddon` from the [latest release](https://github.com/TruckDrive/smart-study/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
+
+**From source**:
+```sh
+git clone https://github.com/TruckDrive/smart-study.git
+ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Linux; on macOS/Windows copy the folder
+```
+
+**Updating from an older version** (0.x): uninstall it first, otherwise Anki shows two **Study Plan** links. Your plans come back by themselves through the Anki collection.
 
 ## What's new in 2.3
 
@@ -47,6 +57,14 @@ Smart Study 2.0 turns the study planner into **one** complete Anki extension:
 - **The launcher no longer covers Anki.** The left icon bar starts below Anki's top toolbar
 
 Full list: [CHANGELOG.md](CHANGELOG.md).
+
+## About
+
+You tell Smart Study what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
+
+![Plan view](screenshots/plan.png)
+
+*An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
 
 ## Features
 
@@ -139,22 +157,6 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 **Study plan window**: all your plans, streak and activity at a glance
 
 ![Study plan window](screenshots/workspace-study-plan.png)
-
-## Install
-
-Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
-
-https://ankiweb.net/shared/info/1726163334
-
-**From a release**: download `smart_study.ankiaddon` from the [latest release](https://github.com/TruckDrive/smart-study/releases/latest) and open it with Anki (or *Tools → Add-ons → Install from file…*), then restart Anki.
-
-**From source**:
-```sh
-git clone https://github.com/TruckDrive/smart-study.git
-ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Linux; on macOS/Windows copy the folder
-```
-
-**Updating from an older version** (0.x): uninstall it first, otherwise Anki shows two **Study Plan** links. Your plans come back by themselves through the Anki collection.
 
 ## Usage
 
