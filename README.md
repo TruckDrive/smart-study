@@ -8,6 +8,19 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 *An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
 
+## What's new in 2.1
+
+- **Built-in add-ons**: copy selections with pictures as an image, review heatmap, progress bar, controller support and Life Drain come with Smart Study. Switch each one on or off under *Tools → Smart Study → Built-in add-ons…* (see [Built-in add-ons](#built-in-add-ons))
+- **Already installed one of them?** Smart Study asks once whether to keep yours or use the built-in one, and takes over your settings
+- **AI assistant with your own account**: ChatGPT, Claude and Gemini as tabs next to the API chat – no API key needed
+- **Streaming**: YouTube Music in a sidebar; Spotify opens in its app
+- **"What's new" after updates**, with a switch next to everything that was switched on
+- **Fix**: searching in the website sidebar no longer crashes Anki
+
+| Built-in add-ons | After an update |
+|---|---|
+| ![Built-in add-ons](screenshots/builtin-addons.png) | ![What's new](screenshots/whats-new.png) |
+
 ## What's new in 2.0
 
 Smart Study 2.0 turns the study planner into **one** complete Anki extension:
@@ -54,12 +67,36 @@ Full list: [CHANGELOG.md](CHANGELOG.md).
 - **Notebook** with nested pages, task lists and a built-in **PDF viewer** (PDF.js bundled, nothing loaded from a CDN), plus a PDF card creator for basic, reversed and cloze cards
 - **Mind maps** and FreeMap diagrams with images, icons and links to Anki cards
 - **Pomodoro and session timers** with study-time analytics by deck
-- **Music player** for local audio, optional SoundCloud
-- **AI assistant** (optional): OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
+- **Music player** for local audio, optional SoundCloud, plus a Streaming sidebar with YouTube Music (Spotify opens in its app)
+- **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
 - **Website sidebar** for your own study sites
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - **Dashboard**: statistics, deadlines and countdowns, daily facts, custom deck overview
 - Light and dark mode, color themes, custom backgrounds, ten interface languages
+
+### Built-in add-ons
+
+| Add-on | What it does | Default |
+|---|---|---|
+| **Copy selections with pictures as an image** | Select part of a card with pictures (mouse, Ctrl+A, Shift+arrows): it is copied as one image, so ChatGPT, Claude or a chat get the pictures when you paste. Text-only selections are not touched | on |
+| **Review heatmap** | Calendar of your reviews and your streak on the deck list, deck overview and statistics | on |
+| **Progress bar** | How much of today's reviews is done, at the top of the reviewer | on |
+| **Controller support** | Study with a gamepad such as the 8BitDo Zero 2; buttons for every screen. If a controller cannot be recognised reliably (e.g. any X-Input pad on Windows), you are asked once which one it is | on |
+| **Life Drain** | A life bar that drains while you think and refills when you answer | off |
+
+Changes take effect after restarting Anki. Settings are kept in `user_files/integrations/` (the heatmap and Life Drain also in the collection, like the originals), so updates do not reset them.
+
+| Review heatmap on the deck list | Progress bar while studying |
+|---|---|
+| ![Review heatmap](screenshots/heatmap.png) | ![Progress bar](screenshots/reviewer-bars.png) |
+
+| AI assistant with your own ChatGPT/Claude/Gemini account | Controller that cannot be told apart |
+|---|---|
+| ![AI websites](screenshots/ai-accounts.png) | ![Which controller?](screenshots/controller-ask.png) |
+
+**Good to know**
+- Google does not allow signing in inside apps such as Anki (“This browser or app may not be secure”). Sign in to ChatGPT and Claude with your e-mail address; Gemini and YouTube Music also work without signing in.
+- Spotify's web player needs the Widevine copy protection, which Anki's built-in browser does not include, so Spotify plays in its own app or your normal browser.
 
 ## Screenshots
 
@@ -123,7 +160,7 @@ Plans are stored as JSON under `plan/user_files/plans/` in the add-on folder and
 
 ## Privacy
 
-Smart Study sends nothing on its own: no analytics, no remote banner, no update pings. Online connections happen only when you use a feature that needs them: the AI assistant (to the provider you picked), the website sidebar, SoundCloud, or a link you click. Details: [PRIVACY.md](PRIVACY.md).
+Smart Study sends nothing on its own: no analytics, no remote banner, no update pings. Online connections happen only when you use a feature that needs them: the AI assistant (to the provider or website you picked), the website sidebar, SoundCloud, YouTube Music, or a link you click. Details: [PRIVACY.md](PRIVACY.md).
 
 ## Development
 
@@ -141,5 +178,14 @@ python -I tests/test_store.py <empty dir>     # plan sync between two devices
 ## License
 
 [GNU AGPL v3](LICENSE).
+
+### Credits for the built-in add-ons
+
+All bundled add-ons are licensed under the GNU AGPL v3 and were modified for Smart Study (config storage, loading as part of Smart Study, and for Contanki the controller detection). Their license files are kept in `addon/integrations/<name>/`.
+
+- Based on the Anki add-on [Review Heatmap](https://github.com/glutanimate/review-heatmap/) by Glutanimate. [Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
+- Progress bar: based on [Progress bar (Fork for 23)](https://ankiweb.net/shared/info/1708250053) by Shigeyuki, with earlier work by Glutanimate, liuzikai, SebastienGllmt, BluMist and others
+- Controller support: based on [Contanki](https://github.com/roxgib/anki-contanki) by Sam Bradshaw
+- Life Drain: based on [Life Drain](https://github.com/Yutsuten/anki-lifedrain) by Yutsuten
 
 Parts of the workspace code are used under the MIT License; that notice is kept in [`addon/LICENSE-MIT.txt`](addon/LICENSE-MIT.txt). Bundled third-party libraries are listed in [`addon/THIRD_PARTY_NOTICES.md`](addon/THIRD_PARTY_NOTICES.md). The Lucide icons are under the ISC License (`addon/web_roadmap/icons/LICENSE.txt`).

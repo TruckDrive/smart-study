@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0 – 2026-10-29
+
+- **Built-in add-ons** – no separate installs needed, each can be switched off under *Tools → Smart Study → Built-in add-ons…*:
+  - **Copy selections with pictures as an image** (new, on by default): select part of a card with pictures and paste it into ChatGPT or Claude with the pictures
+  - **Review heatmap**, based on [Review Heatmap](https://github.com/glutanimate/review-heatmap/) by Glutanimate
+  - **Progress bar**, based on [Progress bar (Fork for 23)](https://ankiweb.net/shared/info/1708250053) by Shigeyuki and earlier authors
+  - **Controller support**, based on [Contanki](https://github.com/roxgib/anki-contanki) by Sam Bradshaw, with reworked detection: controllers that were connected before Anki started are found, 8BitDo Zero pads use the right button layout, and if a controller cannot be told apart (e.g. the 8BitDo Zero 2 in X-Input mode on Windows) you are asked once which one it is
+  - **Life Drain**, based on [Life Drain](https://github.com/Yutsuten/anki-lifedrain) by Yutsuten (off by default)
+- If one of these add-ons is also installed separately, Smart Study asks once which copy to keep; your settings are taken over
+- **"What's new" window** after an update, with switches to keep or turn off what was switched on
+- **AI assistant**: ChatGPT, Claude and Gemini tabs – use your own account instead of an API key
+- **Music**: a Streaming sidebar with YouTube Music; the Spotify tab opens the Spotify app (Spotify's web player needs Widevine, which Anki's browser does not have)
+- **Fix**: the website sidebar crashed Anki when searching (back/forward buttons were wired to Qt actions that crash on update)
+- **Fix**: `build.sh` left out `theme/user_files`, the bundled theme styles
+
 ## 2.0.1
 
 - Only one workspace tool is open at a time: opening one closes the others
