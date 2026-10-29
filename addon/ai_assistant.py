@@ -151,6 +151,7 @@ CK_FONT_SIZE  = _PFX + "font_size"
 CK_LINE_HEIGHT = _PFX + "line_height"
 CK_MESSAGE_GAP = _PFX + "message_gap"
 CK_CARD_CONTEXT = _PFX + "card_context_enabled"
+CK_WEB_SITE   = _PFX + "web_site"   # "api" or a website from AI_SITES
 
 _DEFAULT_CHIPS: Dict[str, Any] = {
     "builtin":   {"short": True, "concise": True, "detailed": True,
@@ -163,6 +164,19 @@ _DEFAULT_CHIPS: Dict[str, Any] = {
 _dock:            Optional[Any] = None
 _webview:         Optional[Any] = None
 _profile:         Optional[Any] = None
+_sites_panel:     Optional[Any] = None
+
+# Websites usable with the user's own account instead of an API key.
+AI_SITES = [
+    ("chatgpt", "ChatGPT", "https://chatgpt.com/"),
+    ("claude", "Claude", "https://claude.ai/new"),
+    ("gemini", "Gemini", "https://gemini.google.com/app"),
+]
+try:
+    from .integrations.strings import tr as _web_tr
+except Exception:  # pragma: no cover
+    def _web_tr(text: str) -> str:
+        return text
 _hooks_connected: bool          = False
 _conversation:    List[Dict[str, str]] = []
 _dispatcher:      Optional[Any] = None   # set up in _setup_sidebar()
@@ -1698,7 +1712,16 @@ def _setup_sidebar() -> bool:
         _dock.setTitleBarWidget(QWidget())
         _dock.setMinimumWidth(340)
         _webview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        _dock.setWidget(_webview)
+        # Tabs: the API chat, or ChatGPT/Claude/Gemini with your own account.
+        global _sites_panel
+        from .web_accounts import AccountSitesPanel
+        _sites_panel = AccountSitesPanel(
+            [("api", _web_tr("API chat"), _webview)] + AI_SITES,
+            hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in."),
+            remember=lambda key: _cfg_set(CK_WEB_SITE, key),
+        )
+        _sites_panel.show_site(_cfg_get(CK_WEB_SITE, "api") or "api")
+        _dock.setWidget(_sites_panel)
         _dock.setVisible(False)
         from .sidebar_widths import attach
         attach(mw, _dock, "ai")
@@ -1820,6 +1843,12 @@ def cleanup_ai_assistant_sidebar() -> None:
             except Exception:
                 pass
         _hooks_connected = False
+
+    global _sites_panel
+    if _sites_panel:
+        try: _sites_panel.cleanup()
+        except Exception: pass
+        _sites_panel = None
 
     if _webview:
         try: _webview.setUrl(QUrl("about:blank"))

@@ -578,6 +578,11 @@ def run_onboarding_if_needed():
             addon_settings["onboarding_completed"] = True
             save_addon_settings()
             tooltip(_("Smart Study is ready!"))
+    try:
+        from . import whats_new
+        whats_new.show_if_updated(addon_settings, save_addon_settings, constants.ADDON_VERSION)
+    except Exception:
+        traceback.print_exc()
 
 def _apply_saved_settings(new_settings):
     """Persist the returned settings and refresh every affected piece of UI.
@@ -1241,6 +1246,12 @@ def on_profile_close():
     cleanup_music_player(); cleanup_ai_assistant_sidebar()
     cleanup_mindmap_sidebar(); cleanup_notebook_sidebar()
     try:
+        from . import music_accounts, web_accounts
+        music_accounts.cleanup_music_accounts()
+        web_accounts.forget_profiles()  # after the views using them are gone
+    except Exception:
+        pass
+    try:
         custom_background.cleanup()
     except Exception:
         pass
@@ -1652,6 +1663,8 @@ def _add_menus():
     _smartstudy_tools_menu = m
     m.addAction(_("Settings..."), show_settings_dialog)
     m.addAction(_("Study Plan") + "...", show_configuration_dialog)
+    if integrations is not None:
+        m.addAction(integrations.tr("Built-in add-ons") + "...", integrations.open_settings)
     m.addSeparator()
     m.addAction(_("Toggle Gamification Sidebar"), toggle_gamification_sidebar)
     from . import developer_console
@@ -1668,6 +1681,18 @@ def on_gamification_collection_change(changes, _handler=None):
     gamification_manager._streak_cache = None
     if gamification_sidebar and gamification_sidebar.isVisible():
         gamification_sidebar.update_display()
+
+
+# --- Built-in add-ons (integrations/ sub-package) ---
+# Loaded while Anki starts, like separately installed add-ons.
+try:
+    from . import integrations
+    if mw:
+        integrations.load_all()
+except Exception as exc:
+    integrations = None
+    print(f"Smart Study: built-in add-ons unavailable: {exc}")
+    traceback.print_exc()
 
 
 # --- Study plan (plan/ sub-package) ---
@@ -1692,7 +1717,7 @@ if modules_loaded and mw and gui_hooks:
         gui_hooks.top_toolbar_did_init_links.append(
             _add_launcher_toggle_to_top_toolbar
         )
-    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css))$") # theme css, notebook, media and study plan files
+    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|integrations/[^/]+/web/.+)$") # theme css, notebook, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
     if hasattr(gui_hooks, "webview_did_inject_style_into_page"):
         gui_hooks.webview_did_inject_style_into_page.append(

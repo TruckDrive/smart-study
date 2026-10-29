@@ -73,6 +73,12 @@ except ImportError:
 
 # --- Files -------------------------------------------------------------------
 UI_HTML_FILENAME = "music_player.html"
+try:
+    from .integrations.strings import tr as _account_tr
+except Exception:  # pragma: no cover
+    def _account_tr(text):
+        return text
+
 SC_HTML_FILENAME = "soundcloud_player.html"
 
 # --- SoundCloud streaming config ---------------------------------------------
@@ -877,6 +883,8 @@ class MiniMusicPlayer(QDialog):
                 "volume": _("Volume"),
                 "scHint": _("Player loads below"),
                 "scUnavailable": _("Requires QtWebEngine (not available in this Anki build)."),
+                "account": _account_tr("Streaming"),
+                "accountHint": _account_tr("YouTube Music or Spotify"),
             },
             "tracks": [{"id": t["id"], "title": t["title"], "cover": t["cover"]}
                        for t in self._builtin_tracks()],
@@ -929,6 +937,15 @@ class MiniMusicPlayer(QDialog):
             self._delete_user_track(data.get("id"))
         elif a == "mode":
             self._set_mode(data.get("m") or "local")
+        elif a == "accounts":
+            # Own-account music lives in a sidebar; stop ours so both don't play.
+            if self.is_playing():
+                self.pause_with_fade()
+            if self._mode == "soundcloud":
+                self._sc_js("scPause();")
+            self.hide()
+            from .music_accounts import toggle_music_accounts
+            toggle_music_accounts()
         elif a == "sc":
             cmd = data.get("cmd")
             if cmd == "toggle": self._sc_js("scToggle();")
