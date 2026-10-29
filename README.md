@@ -4,6 +4,8 @@
 
 You tell Smart Study Plan what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest.
 
+Install: https://ankiweb.net/shared/info/1726163334
+
 ![Plan view](screenshots/plan.png)
 
 *An Anki add-on. No AI and no account: the scheduler runs locally on your computer. The interface is in English and German and follows Anki's language.*
