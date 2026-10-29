@@ -28,6 +28,18 @@ def _take_over_config(key: str, folder: str) -> None:
         manager(key).writeConfig(key, conf)
 
 
+def _take_over_files(key: str, folder: str) -> None:
+    """Copies a separate Contanki's profiles now; its folder may be deleted next."""
+    if key != "contanki":
+        return
+    import shutil
+    from ._shim import STORE_DIR
+    target = os.path.join(STORE_DIR, "contanki")
+    source = os.path.join(mw.addonManager.addonsFolder(folder), "user_files")
+    if os.path.isdir(source) and not os.path.isdir(os.path.join(target, "profiles")):
+        shutil.copytree(source, target, dirs_exist_ok=True)
+
+
 def _forget_controllers() -> None:
     from .contanki.controller import CHOICES_FILE
     try:
@@ -103,30 +115,40 @@ class ConflictDialog(Dialog):
                          tr("Smart Study now includes these add-ons. Only one copy can run – keep the built-in one or yours?"),
                          parent)
         self.choices: Dict[str, Segments] = {}
+        self.delete_old = False
         group = self.group()
         for key in keys:
             segments = Segments([tr("Built-in"), tr("Keep mine")], 0)
             self.choices[key] = segments
             group.add_row(tr(BY_KEY[key].title), tr(BY_KEY[key].short), segments)
-        self.note(tr("Your settings are kept either way. “Built-in” switches your separate add-on off. Change it any time under Tools → Smart Study → Built-in add-ons."))
-        self.button(tr("Continue"), primary=True, slot=self.accept)
+        self.note(tr("Your settings are taken over. “Take over” switches your separate add-ons off, “Take over & delete old ones” moves them to the trash. Change it any time under Tools → Smart Study → Built-in add-ons."))
+        self.button(tr("Take over"), slot=self.accept)
+        self.button(tr("Take over & delete old ones"), primary=True, slot=self._accept_and_delete)
         self.finish()
+
+    def _accept_and_delete(self) -> None:
+        self.delete_old = True
+        self.accept()
 
     def accept(self) -> None:
         state = load_state()
-        switched_off = False
+        changed = False
         for key, segments in self.choices.items():
             if segments.value() == 0:
                 folder = standalone_folder(key)
                 if folder:
                     _take_over_config(key, folder)
-                    mw.addonManager.toggleEnabled(folder, enable=False)
-                    switched_off = True
+                    _take_over_files(key, folder)
+                    if self.delete_old:
+                        mw.addonManager.deleteAddon(folder)  # to the trash
+                    else:
+                        mw.addonManager.toggleEnabled(folder, enable=False)
+                    changed = True
                 state["choice"][key] = "builtin"
                 state["enabled"][key] = True
             else:
                 state["choice"][key] = "standalone"
         save_state(state)
         super().accept()
-        if switched_off:
+        if changed:
             ask_restart()

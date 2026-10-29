@@ -207,7 +207,7 @@ class Dialog(QDialog):
         self.body.addWidget(label(text, "ssNote", rich="<a " in text))
 
     def button(self, text: str, primary: bool = False, slot=None) -> QPushButton:
-        button = QPushButton(text)
+        button = QPushButton(text.replace("&", "&&"))  # no shortcut mnemonics
         button.setObjectName("ssPrimary" if primary else "ssSecondary")
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         if slot:

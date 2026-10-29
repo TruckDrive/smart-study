@@ -52,7 +52,7 @@ DE: Dict[str, str] = {
     "AI assistant: use ChatGPT, Claude or Gemini with your own account, without an API key.": "KI-Assistent: ChatGPT, Claude oder Gemini mit deinem eigenen Account nutzen, ohne API-Schlüssel.",
     "Music: YouTube Music in a sidebar; Spotify opens in its app.": "Musik: YouTube Music in einer Seitenleiste; Spotify öffnet sich in der App.",
     "The website sidebar no longer crashes Anki when you search.": "Die Website-Seitenleiste lässt Anki beim Suchen nicht mehr abstürzen.",
-    "The windows for built-in add-ons, already installed add-ons and updates have the Smart Study look: clear groups, switches and short texts.": "Die Fenster für eingebaute Add-ons, bereits installierte Add-ons und Updates haben jetzt den Smart-Study-Look: klare Gruppen, Schalter und kurze Texte.",
+    "The windows for built-in add-ons, already installed add-ons and updates have the Smart Study look: clear groups, switches and short texts. Separately installed copies can be deleted right there (“Take over & delete old ones”).": "Die Fenster für eingebaute Add-ons, bereits installierte Add-ons und Updates haben jetzt den Smart-Study-Look: klare Gruppen, Schalter und kurze Texte. Separat installierte Versionen lassen sich dort direkt löschen („Übernehmen & alte löschen“).",
     "New": "Neu",
     "Fix": "Behoben",
     "Changed": "Geändert",
@@ -72,8 +72,6 @@ DE: Dict[str, str] = {
     "Smart Study now includes these add-ons. Only one copy can run – keep the built-in one or yours?": "Smart Study enthält jetzt diese Add-ons. Es kann nur eine Version laufen – eingebaute nutzen oder deine behalten?",
     "Built-in": "Eingebaut",
     "Keep mine": "Meins behalten",
-    "Your settings are kept either way. “Built-in” switches your separate add-on off. Change it any time under Tools → Smart Study → Built-in add-ons.": "Deine Einstellungen bleiben in beiden Fällen erhalten. „Eingebaut“ deaktiviert dein separates Add-on. Jederzeit änderbar unter Extras → Smart Study → Eingebaute Add-ons.",
-    "Continue": "Weiter",
     "Restart Anki": "Anki neu starten",
     "The change takes effect after restarting Anki.": "Die Änderung wirkt nach einem Neustart von Anki.",
     "Later": "Später",
@@ -82,6 +80,9 @@ DE: Dict[str, str] = {
     "Keep what you like – everything with a switch can be turned off right here.": "Behalte, was dir gefällt – alles mit Schalter kannst du hier direkt ausschalten.",
     "Also new": "Außerdem neu",
     "Done": "Fertig",
+    "Your settings are taken over. “Take over” switches your separate add-ons off, “Take over & delete old ones” moves them to the trash. Change it any time under Tools → Smart Study → Built-in add-ons.": "Deine Einstellungen werden übernommen. „Übernehmen“ deaktiviert deine separaten Add-ons, „Übernehmen & alte löschen“ verschiebt sie in den Papierkorb. Jederzeit änderbar unter Extras → Smart Study → Eingebaute Add-ons.",
+    "Take over": "Übernehmen",
+    "Take over & delete old ones": "Übernehmen & alte löschen",
 }
 
 

@@ -3,6 +3,7 @@
 ## 2.1.1 – 2026-10-29
 
 - The windows for built-in add-ons, already installed add-ons, updates and the restart question now use the Smart Study look (title, grouped rows, switches, pill buttons) with shorter texts
+- “Already installed” offers **Take over & delete old ones** next to **Take over**: the separate copies go to the trash instead of only being switched off (Contanki profiles are copied first)
 
 ## 2.1.0 – 2026-10-29
 

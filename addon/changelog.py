@@ -10,7 +10,7 @@ CHANGELOG = [
         "version": "2.1.1",
         "date": "October 29, 2026",
         "items": [
-            {"tag": "Changed", "text": "The windows for built-in add-ons, already installed add-ons and updates have the Smart Study look: clear groups, switches and short texts."},
+            {"tag": "Changed", "text": "The windows for built-in add-ons, already installed add-ons and updates have the Smart Study look: clear groups, switches and short texts. Separately installed copies can be deleted right there (“Take over & delete old ones”)."},
         ],
     },
     {
