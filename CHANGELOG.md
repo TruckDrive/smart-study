@@ -2,7 +2,7 @@
 
 ## 2.3.0 – 2026-10-29
 
-- **Same add-ons on all your devices**: Smart Study asks once per device (on the first start and after this update) whether to sync your AnkiWeb add-ons. Your add-on list then travels with the AnkiWeb sync (`smartstudy_addons` in the collection), and on your other devices Smart Study offers to install what is missing. An add-on removed on one device leaves the list; add-ons you switch off in the offer are not offered again on that device
+- **Same add-ons on all your devices**: Smart Study asks once per device (on the first start and after this update) whether to sync your AnkiWeb add-ons. Your add-on list then travels with the AnkiWeb sync (`smartstudy_addons` in the collection), and on your other devices Smart Study offers to install what is missing. An add-on removed on one device leaves the list; add-ons you switch off in the offer are not offered again on that device, and **Don't ask again** turns add-on sync off on that device
 - **Install add-ons by code**: *Settings → Add-ons* has a field for an AnkiWeb add-on code; it is downloaded and installed right away
 - **New color: Orange**, and the example wallpaper **Orange Pixel Wallpaper** with a little pixel buddy at the side
 - **Your own text color** for the "Studied … today" line on a custom background (*Settings → Appearance → Studied Text → Custom*), so it stays readable on any wallpaper

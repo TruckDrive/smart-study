@@ -171,10 +171,19 @@ def _offer_dialog_class():
                 toggle = Toggle(True)
                 self.toggles[aid] = toggle
                 group.add_row(name, tr("Code {code}").format(code=aid), toggle)
-            self.note(tr("Switched off add-ons are not offered again on this device."))
+            self.note(tr("Switched off add-ons are not offered again on this device. "
+                         "“Don't ask again” turns add-on sync off here; turn it back on under Settings → Add-ons."))
+            self.button(tr("Don't ask again"), slot=self._never)
             self.button(tr("Not now"), slot=self.reject)
             self.button(tr("Install"), primary=True, slot=self.accept)
             self.finish()
+
+        def _never(self) -> None:
+            """Stops add-on sync on this device; the question at start-up stays answered."""
+            self.settings[ENABLED] = False
+            self.settings[ASKED] = True
+            self.save()
+            self.reject()
 
         def accept(self) -> None:
             chosen = [aid for aid, t in self.toggles.items() if t.isChecked()]

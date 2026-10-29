@@ -96,6 +96,8 @@ DE: Dict[str, str] = {
     "Code {code}": "Code {code}",
     "Switched off add-ons are not offered again on this device.": "Ausgeschaltete Add-ons werden auf diesem Gerät nicht mehr angeboten.",
     "Not now": "Jetzt nicht",
+    "Don't ask again": "Nicht mehr fragen",
+    "Switched off add-ons are not offered again on this device. “Don't ask again” turns add-on sync off here; turn it back on under Settings → Add-ons.": "Ausgeschaltete Add-ons werden auf diesem Gerät nicht mehr angeboten. „Nicht mehr fragen“ schaltet den Add-on-Sync hier aus; wieder einschalten unter Einstellungen → Add-ons.",
     "Install": "Installieren",
     "Same add-ons on all devices": "Gleiche Add-ons auf allen Geräten",
     "Your AnkiWeb add-ons travel with the AnkiWeb sync; other devices offer to install what is missing.": "Deine AnkiWeb-Add-ons reisen mit dem AnkiWeb-Sync mit; andere Geräte bieten an, Fehlendes zu installieren.",
