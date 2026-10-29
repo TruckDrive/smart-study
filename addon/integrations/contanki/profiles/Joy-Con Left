@@ -1,0 +1,146 @@
+{
+    "name": "Joy-Con Left",
+    "size": [
+        9,
+        2
+    ],
+    "quick_select": {
+        "actions": {
+            "deckBrowser": [
+                "Undo",
+                "Redo",
+                "Sync",
+                "Fullscreen",
+                "Quit"
+            ],
+            "overview": [
+                "Undo",
+                "Redo",
+                "Sync",
+                "Fullscreen",
+                "Quit"
+            ],
+            "review": [
+                "Undo",
+                "Redo",
+                "Fullscreen",
+                "Suspend Card",
+                "Suspend Note",
+                "Bury Card",
+                "Bury Note",
+                "Card Info"
+            ]
+        },
+        "Select with Stick": true,
+        "Select with D-Pad": true,
+        "Do Action on Release": true,
+        "Do Action on Stick Press": true,
+        "Do Action on Stick Flick": false
+    },
+    "bindings": {
+        "all": {
+            "0": "",
+            "1": "Enter",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "8": "Undo",
+            "9": "",
+            "100": "Back",
+            "101": "Forward",
+            "6": "",
+            "7": "",
+            "12": "Sync"
+        },
+        "review": {
+            "0": "",
+            "1": "Flip Card",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "",
+            "6": "",
+            "7": "",
+            "103": "Replay Audio",
+            "102": "Flag"
+        },
+        "question": {
+            "0": "",
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "",
+            "6": "",
+            "7": ""
+        },
+        "answer": {
+            "0": "Easy",
+            "1": "Enter",
+            "2": "Again",
+            "3": "Hard",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "",
+            "6": "",
+            "7": ""
+        },
+        "deckBrowser": {
+            "0": "Next Deck",
+            "1": "",
+            "2": "",
+            "3": "Previous Deck",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "Expand/Collapse",
+            "102": "Previous Deck",
+            "103": "Next Deck",
+            "6": "",
+            "7": ""
+        },
+        "overview": {
+            "0": "Rebuild",
+            "1": "",
+            "2": "Empty",
+            "3": "Statistics",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "",
+            "6": "",
+            "7": ""
+        },
+        "dialog": {
+            "0": "Secondary Click",
+            "1": "Select",
+            "2": "",
+            "3": "Select Next",
+            "4": "Escape",
+            "5": "",
+            "8": "",
+            "9": "",
+            "6": "",
+            "7": "",
+            "102": "Scroll Up",
+            "103": "Scroll Down",
+            "11": "Select",
+            "12": "Escape"
+        }
+    },
+    "controller": "Joy-Con Left",
+    "axes_bindings": {
+        "0": "Buttons",
+        "1": "Buttons"
+    },
+    "invert_axis": {
+        "0": false,
+        "1": false
+    }
+}

@@ -7,10 +7,12 @@ mkdir -p "$ROOT/dist"
 cd "$ROOT/addon"
 python -I - "$ROOT/dist/smart_study.ankiaddon" <<'PY'
 import os, sys, zipfile
-skip_dirs = {"__pycache__", "user_files"}
+# Personal data lives in these user_files folders; theme/user_files holds the
+# bundled theme CSS and must be shipped.
+skip_paths = {"./user_files", "./plan/user_files"}
 files = []
 for root, dirs, names in os.walk("."):
-    dirs[:] = sorted(d for d in dirs if d not in skip_dirs)
+    dirs[:] = sorted(d for d in dirs if d != "__pycache__" and os.path.join(root, d) not in skip_paths)
     for n in sorted(names):
         if n == "meta.json" or n.endswith((".pyc", ".tmp")):
             continue

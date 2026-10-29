@@ -214,6 +214,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
   <div class="seg">
     <button id="seg-local" class="on">Local</button>
     <button id="seg-sc">SoundCloud</button>
+    <button id="seg-account">Streaming</button>
   </div>
 
   <!-- ── LOCAL ─────────────────────────────── -->
@@ -526,6 +527,8 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
 
       el('seg-local').textContent = D.labels.local || 'Local';
       el('seg-sc').textContent = 'SoundCloud';
+      el('seg-account').textContent = D.labels.account || 'Streaming';
+      el('seg-account').title = D.labels.accountHint || '';
       el('tr-sub').textContent = D.labels.subtitle || 'Focus Music';
       el('lbl-sounds').textContent = D.labels.sounds || 'Sounds';
       el('lbl-mytracks').textContent = D.labels.myTracks || 'My Tracks';
@@ -566,6 +569,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
 
   /* ── wiring ── */
   el('seg-local').addEventListener('click', function(){ setMode('local'); send({a:'mode', m:'local'}); });
+  el('seg-account').addEventListener('click', function(){ send({a:'accounts'}); });
   el('seg-sc').addEventListener('click', function(){ if(!this.disabled){ setMode('sc'); send({a:'mode', m:'soundcloud'}); } });
   el('btn-play').addEventListener('click', function(){ send({a: _playing ? 'pause' : 'play'}); });
   el('btn-prev').addEventListener('click', function(){ send({a:'step', d:-1}); });

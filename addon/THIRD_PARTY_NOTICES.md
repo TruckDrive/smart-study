@@ -4,6 +4,26 @@ SmartStudy distributes the following third-party JavaScript libraries. These
 notices apply only to those libraries and do not change SmartStudy's own
 license or its asset-license exception.
 
+## Bundled Anki add-ons (`integrations/`)
+
+These add-ons are distributed as modified copies under the GNU Affero General
+Public License v3; each folder keeps its original license file.
+
+- `integrations/heatmap/` – Based on the Anki add-on
+  [Review Heatmap](https://github.com/glutanimate/review-heatmap/) by
+  Glutanimate. [Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
+  Licensed under the AGPL v3 with the additional terms in
+  `integrations/heatmap/LICENSE.txt`. Modified: config storage and paths.
+- `integrations/progress_bar/` – Progress bar (Fork for 23) by Shigeyuki
+  (2024–2026), based on work by nest0r/Ja-Dark, SebastienGllmt, Glutanimate,
+  liuzikai, BluMist and others. Modified: config storage, no change-log
+  popups, Tools menu or achievement module.
+- `integrations/contanki/` – Contanki by Sam Bradshaw
+  (<https://github.com/roxgib/anki-contanki>). Modified: config and user
+  files location, controller scanning and identification.
+- `integrations/lifedrain/` – Life Drain 2.9.0 by Yutsuten
+  (<https://github.com/Yutsuten/anki-lifedrain>). Modified: config storage.
+
 ## PDF.js 3.11.174
 
 Files: `web_notebook/pdfjs/pdf.min.js`, `web_notebook/pdfjs/pdf.worker.min.js`

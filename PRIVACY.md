@@ -1,6 +1,6 @@
 # Smart Study privacy and data behavior
 
-This document describes Smart Study 2.0. Smart Study is a local Anki Desktop
+This document describes Smart Study 2.1. Smart Study is a local Anki Desktop
 add-on with several optional online tools.
 
 ## Automatic behavior
@@ -20,10 +20,26 @@ add-on with several optional online tools.
   llama.cpp can be used locally.
 - **Website sidebar:** loads websites selected by the user. “Search in Sidebar”
   sends the selected search phrase to Google after the user chooses the action.
+- **AI websites (ChatGPT, Claude, Gemini):** the tabs in the AI assistant load
+  these websites like a normal browser. What you type there goes to that
+  website under its own privacy policy. Sign-ins and cookies are kept in
+  `SmartStudy_Data/web_profiles/accounts` of the Anki profile.
+- **YouTube Music:** the Streaming sidebar loads music.youtube.com (same
+  browser storage as above). The Spotify tab only opens the Spotify app or
+  open.spotify.com in your normal browser.
 - **SoundCloud:** loads SoundCloud's player, media, cookies, and artwork when
   SoundCloud mode is used.
 - **External links:** support, community, API-key, and download links open only
   after a user action.
+
+## Built-in add-ons
+
+The bundled add-ons (copy selection as image, review heatmap, progress bar,
+controller support, Life Drain) work offline. Their settings are stored in
+`user_files/integrations/` inside the Smart Study add-on folder (kept on
+updates); the heatmap and Life Drain also keep their settings in the Anki
+collection, as the original add-ons do. "Copy selections with pictures as an
+image" only writes to the local clipboard.
 
 ## Local and synced storage
 
