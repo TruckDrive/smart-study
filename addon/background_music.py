@@ -680,7 +680,7 @@ class MiniMusicPlayer(QDialog):
                 continue
             cover = _get_image_path(img)
             out.append({
-                "id": fname, "title": title, "file": path,
+                "id": fname, "title": _(title), "file": path,
                 "cover": QUrl.fromLocalFile(cover).toString() if cover else "",
                 "cover_path": cover,
             })
@@ -738,6 +738,7 @@ class MiniMusicPlayer(QDialog):
             _set_web_attr(s, "PlaybackRequiresUserGesture", False)
             html_path = os.path.join(constants.addon_path, UI_HTML_FILENAME)
             if os.path.isfile(html_path):
+                from . import rtl; rtl.prepare_view(self.ui_view)
                 self.ui_view.setUrl(QUrl.fromLocalFile(html_path))
             lay.addWidget(self.ui_view, 1)
         else:

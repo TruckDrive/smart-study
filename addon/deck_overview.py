@@ -204,8 +204,8 @@ def get_style():
     .progress-label {{ font-size: 13px; color: var(--text-sub); font-weight: 500; margin-bottom: 10px; }}
     .progress-stack {{ width: 100%; margin-bottom: 30px; display: flex; flex-direction: column; gap: 7px; }}
     .progress-row {{ display: flex; align-items: center; gap: 10px; }}
-    .progress-row-label {{ font-size: 12px; color: var(--text-sub); font-weight: 500; width: 46px; text-align: right; flex-shrink: 0; }}
-    .progress-row-pct {{ font-size: 12px; color: var(--text-sub); font-weight: 600; width: 30px; text-align: right; flex-shrink: 0; }}
+    .progress-row-label {{ font-size: 12px; color: var(--text-sub); font-weight: 500; width: 46px; text-align: end; flex-shrink: 0; }}
+    .progress-row-pct {{ font-size: 12px; color: var(--text-sub); font-weight: 600; width: 30px; text-align: end; flex-shrink: 0; }}
     .progress-outer {{ flex: 1; background: var(--progress-bg); border: 1px solid var(--progress-border); border-radius: 20px; padding: 3px; box-sizing: border-box; }}
     .progress-inner {{ width: 100%; height: 10px; border-radius: 8px; overflow: hidden; }}
     .progress-bar-fill {{ height: 100%; width: 0%; border-radius: 8px; transition: width 1s cubic-bezier(0.22, 1, 0.36, 1); }}

@@ -1,6 +1,6 @@
 /* Match the dashboard statistics controls; retain the original hero grid. */
 .hero {position:relative;--hero-control-inset:16px;}
-.hero-actions {position:absolute;top:var(--hero-control-inset);right:var(--hero-control-inset);display:flex;align-items:center;gap:7px;}
+.hero-actions {position:absolute;top:var(--hero-control-inset);inset-inline-end:var(--hero-control-inset);display:flex;align-items:center;gap:7px;}
 .hero-actions .stats-control-btn {width:20px;height:20px;min-height:0;padding:0;border:0;border-radius:50%;display:grid;place-items:center;font-family:inherit;font-size:12px;font-weight:600;line-height:1;color:var(--stats-control-color,#86868B);background:var(--stats-control-bg,#E5E5EA);cursor:pointer;user-select:none;opacity:.8;transition:opacity .2s ease;}
 html.dark .hero-actions .stats-control-btn {color:var(--stats-control-color,#AAAAAA);background:var(--stats-control-bg,#404040);}
 .hero-actions .stats-control-btn:hover {opacity:1;}

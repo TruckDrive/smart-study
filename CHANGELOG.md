@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.4.0 – 2026-10-30
+
+- **Persian (فارسی)**: all of Smart Study is available in Persian, with a right-to-left layout in its windows, pages and dashboard widgets. Choose it under *Settings → General → Language*, in the first-start window, or leave it on *Auto* with Anki set to Persian
+- **Anki itself in Persian**: five broken lines in Anki's Persian file make Anki reject all of it, so it shows English with a right-to-left layout. Smart Study applies a repaired copy and adds the messages that file lacks. Text produced inside Anki's backend stays English, and the repair turns itself off once Anki's own file works. Choosing Persian in Smart Study offers to switch Anki too
+- **AI assistant**: Persian as a response language
+- **Study plan**: Persian on top of German and English. Plans made earlier keep their language until you replan
+
 ## 2.3.0 – 2026-10-29
 
 - **Same add-ons on all your devices**: Smart Study asks once per device (on the first start and after this update) whether to sync your AnkiWeb add-ons. Your add-on list then travels with the AnkiWeb sync (`smartstudy_addons` in the collection), and on your other devices Smart Study offers to install what is missing. An add-on removed on one device leaves the list; add-ons you switch off in the offer are not offered again on that device, and **Don't ask again** turns add-on sync off on that device

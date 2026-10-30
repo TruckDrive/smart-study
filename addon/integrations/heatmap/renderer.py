@@ -52,8 +52,10 @@ from .web_content import (
     HTML_HEATMAP,
     HTML_INFO_NODATA,
     HTML_MAIN_ELEMENT,
+    HTML_PHRASES,
     HTML_STREAK,
 )
+from ..strings import HEATMAP_FA_WEB, fa_active, fa_html, fa_tr
 
 if TYPE_CHECKING:
     from .libaddon.anki.configmanager import ConfigManager
@@ -158,7 +160,9 @@ class HeatmapRenderer:
             limhist=limhist, limfcst=limfcst, current_deck_only=current_deck_only
         )
         if report is None:
-            return HTML_MAIN_ELEMENT.format(content=HTML_INFO_NODATA, classes="")
+            return HTML_MAIN_ELEMENT.format(
+                content=fa_html(HTML_INFO_NODATA, HTML_PHRASES), classes=""
+            )
 
         dynamic_legend = self._dynamic_legend(report.stats.activity_daily_avg.value)
         stats_legend = self._stats_legend(dynamic_legend)
@@ -248,7 +252,10 @@ class HeatmapRenderer:
             "whole": not current_deck_only,
         }
 
-        return HTML_HEATMAP.format(
+        if fa_active():
+            options["fa"] = HEATMAP_FA_WEB
+
+        return fa_html(HTML_HEATMAP, HTML_PHRASES).format(
             options=json.dumps(options), data=json.dumps(report.activity)
         )
 
@@ -279,7 +286,7 @@ class HeatmapRenderer:
             format_dict["class_" + name] = css_class
             format_dict["text_" + name] = label
 
-        return HTML_STREAK.format(**format_dict)
+        return fa_html(HTML_STREAK, HTML_PHRASES).format(**format_dict)
 
     def _get_dynamic_levels(self, dynamic_legend) -> List[Tuple[int, str]]:
         return list(zip(dynamic_legend, self._css_colors))
@@ -300,6 +307,8 @@ class HeatmapRenderer:
 
     @staticmethod
     def _maybe_pluralize(count: float, term: str) -> str:
+        if fa_active():
+            return "{} {}".format(str(count), fa_tr(term))
         return "{} {}{}".format(str(count), term, "s" if abs(count) > 1 else "")
 
     def _save_current_perf(self, activity_report: ActivityReport):

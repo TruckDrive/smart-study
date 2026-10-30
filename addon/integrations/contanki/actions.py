@@ -9,6 +9,8 @@ from typing import Any, Callable
 from aqt import mw, Qt
 from aqt.utils import tooltip
 
+from ..strings import fa_tr
+
 try:
     from anki.utils import is_mac
 except ImportError:
@@ -61,7 +63,7 @@ def check_filter(func: Callable) -> Callable:
         if mw.col.decks.is_filtered(mw.col.decks.get_current_id()):
             func(*args, **kwargs)
         else:
-            tooltip("This action can only be done on filtered decks")
+            tooltip(fa_tr("This action can only be done on filtered decks"))
 
     return wrapper
 

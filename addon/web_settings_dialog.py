@@ -225,6 +225,7 @@ if _QT_AVAILABLE:
             except Exception:
                 pass
 
+            from . import rtl; rtl.prepare_view(self._view)
             self._view.setUrl(QUrl.fromLocalFile(html))
 
         # -- public API ------------------------------------------------------

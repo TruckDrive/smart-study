@@ -124,6 +124,7 @@ LANG_SUFFIX: Dict[str, str] = {
     "Chinese (Simplified)": "in Simplified Chinese",
     "Korean":               "in Korean",
     "Polish":               "in Polish",
+    "Persian":              "in Persian",
 }
 DEFAULT_OWN_PROMPT = "Explain the key aspects of {content} in simple terms."
 MAX_CARD_CONTEXT_CHARS = 12000
@@ -1695,6 +1696,7 @@ def _setup_sidebar() -> bool:
 
         # page_ready signal from JS will trigger _inject_init()
         # (no fixed-delay injection needed)
+        from . import rtl; rtl.prepare_view(_webview)
         _webview.setUrl(QUrl.fromLocalFile(html_path))
         print(f"AI Assistant: loading {html_path}")
 

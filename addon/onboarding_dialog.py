@@ -153,7 +153,7 @@ if _QT_AVAILABLE:
                     source: translate_for_language(source, lang)
                     for source in error_sources
                 }
-                for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl")
+                for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa")
             }
             theme_sources = ("Ocean", "Horizon", "Forest", "Dusty", "Deluge", "Orchid")
             themes = {
@@ -161,7 +161,7 @@ if _QT_AVAILABLE:
                     translate_for_language(source, lang)
                     for source in theme_sources
                 ]
-                for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl")
+                for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa")
             }
             try:
                 dark = bool(self.parent() and self.parent().pm and self.parent().pm.night_mode())

@@ -38,6 +38,12 @@ except ImportError:
 # _() would freeze the translations at module-import time and break the
 # live-update contract for the fact widget.
 try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
+try:
     from .locales import _
 except ImportError:
     def _(text): return text  # safety fallback
@@ -202,10 +208,10 @@ COUNTRY_FACTS = [
 
 # --- Hilfsfunktionen ---
 def get_base_widget_style() -> str:
-    return "background-color: var(--stat-bg); border-radius:12px; text-align: left;"
+    return "background-color: var(--stat-bg); border-radius:12px; text-align: start;"
 
 def get_widget_title_style(margin_bottom="8px") -> str:
-    return f"font-size:1.1em; font-weight:bold; color: var(--text-color); margin:0 0 {margin_bottom} 0; text-align: left;"
+    return f"font-size:1.1em; font-weight:bold; color: var(--text-color); margin:0 0 {margin_bottom} 0; text-align: start;"
 
 def adjust_hex_color(hex_color: str, amount: int) -> str:
     hex_color = hex_color.lstrip('#')
@@ -593,7 +599,7 @@ def generate_learning_plan_widget(plan_data: List[Dict]) -> str:
 
             rows_content += f'''
             <div id="{row_id}" class="plan-row-item" style="{current_row_style}" {data_attributes} onclick="{onclick_handler}">
-                <span style="flex-grow: 1; margin-right: 10px; pointer-events: none;">{subject_safe}</span>
+                <span style="flex-grow: 1; margin-inline-end: 10px; pointer-events: none;">{subject_safe}</span>
                 <span class="time-display" style="font-weight:bold; white-space: nowrap; pointer-events: none;">{time_display_text}</span>
             </div>
             '''
@@ -634,7 +640,7 @@ def generate_fact_widget(fact_theme: str = "Medical", display_index=None) -> str
 
     base_style = get_base_widget_style()
     title_style = get_widget_title_style(margin_bottom="8px")
-    text_style = "font-size:0.9em; color: var(--text-color); margin:0; line-height:1.4; text-align: left;"
+    text_style = "font-size:0.9em; color: var(--text-color); margin:0; line-height:1.4; text-align: start;"
     img_style = "max-width: 130px; max-height: 90px; border-radius: 8px; object-fit: cover; flex-shrink: 0; display: block;"
 
     fact_text = _("No daily facts available.")
@@ -711,7 +717,7 @@ def generate_fact_widget(fact_theme: str = "Medical", display_index=None) -> str
     widget_html = f'''
     <div class="daily-widget fact-widget" style="{widget_outer_style}">
       <div class="fact-widget-content" style="{widget_inner_style}">
-        <div class="fact-widget-text" style="flex: 1; text-align: left;">
+        <div class="fact-widget-text" style="flex: 1; text-align: start;">
             <h5 style="{title_style}">{fact_title}</h5>
             <p style="{text_style}">{fact_text}</p>
         </div>
@@ -745,9 +751,9 @@ def generate_todo_widget() -> str:
         rows = f'<li class="sp-task-empty">{esc(message)}</li>'
     count = '' if failed else f'<span class="sp-task-count" title="{esc(_("Open tasks"))}" aria-label="{esc(_("Open tasks"))}: {len(tasks)}">{len(tasks)}</span><span class="sp-task-count sp-task-completed" title="{esc(_("Completed tasks"))}" aria-label="{esc(_("Completed tasks"))}: {completed_count}">{completed_count}</span>'
     return f'''<style>
-    .sp-todo-widget {{box-sizing:border-box;min-width:0;width:100%;max-width:100%;flex:1 1 300px;padding:12px 16px 16px;background:var(--stat-bg,var(--sp-min-surface));color:var(--text-color,var(--sp-min-text));border:1px solid var(--stat-border,var(--sp-min-border));border-radius:12px;text-align:left;}}
+    .sp-todo-widget {{box-sizing:border-box;min-width:0;width:100%;max-width:100%;flex:1 1 300px;padding:12px 16px 16px;background:var(--stat-bg,var(--sp-min-surface));color:var(--text-color,var(--sp-min-text));border:1px solid var(--stat-border,var(--sp-min-border));border-radius:12px;text-align:start;}}
     .sp-task-heading {{display:flex;align-items:center;gap:8px;margin:0 0 12px;flex-wrap:wrap;}}
-    .sp-task-heading h5 {{margin:0 auto 0 0;font-size:1.1em;}}
+    .sp-task-heading h5 {{margin-block:0;margin-inline:0 auto;font-size:1.1em;}}
     .sp-task-manager {{font:inherit;font-size:10px;line-height:1.2;min-height:0;background:transparent;color:inherit;border:1px solid var(--stat-border,var(--sp-min-border));border-radius:5px;padding:2px 5px;cursor:pointer;}}
     .sp-task-completed {{color:var(--plan-date-color,var(--sp-min-accent));}}
     .sp-task-count {{font-size:12px;font-weight:500;border:1px solid currentColor;border-radius:12px;padding:1px 7px;}}
@@ -765,7 +771,7 @@ def generate_todo_widget() -> str:
     .sp-task-label {{min-width:0;white-space:normal;overflow-wrap:anywhere;}}
     .sp-min-plan-fact-row.sp-min-tasks-row {{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;}}
     @media(max-width:650px) {{.sp-min-plan-fact-row.sp-min-tasks-row {{grid-template-columns:minmax(0,1fr);}}}}
-    </style><div class="daily-widget sp-todo-widget">
+    </style><div class="daily-widget sp-todo-widget"{dir_attribute()}>
     <div class="sp-task-heading"><h5>{esc(_('Tasks'))}</h5><button type="button" class="sp-task-manager" onclick="event.stopPropagation();pycmd('pycmd:smartstudy:todo_viewer')">{esc(_('Open Manager'))}</button>{count}</div>
     <ul>{rows}</ul></div>''' 
 
@@ -817,7 +823,7 @@ def generate_daily_widgets_html(
             font-size: 0.82em;
             font-weight: 500;
             line-height: 1.35;
-            text-align: left;
+            text-align: start;
         }}
         #daily-widgets-container.single-widget .daily-widget {{
             flex: 1 1 100% !important;
@@ -868,15 +874,15 @@ def generate_daily_widgets_html(
             width: auto;
             justify-content: flex-start !important;
             gap: 22px;
-            padding: 15px 0 15px 15px !important;
+            padding-block:15px !important;padding-inline:15px 0 !important;
         }}
         #daily-widgets-container.single-widget .plan-widget-is-single .plan-widget-content {{
             flex: 0 1 320px;
             width: min(320px, 42%);
-            padding: 11px 15px 11px 0 !important;
+            padding-block:11px !important;padding-inline:0 15px !important;
         }}
         #daily-widgets-container.single-widget .plan-widget-is-single .plan-widget-date {{
-            margin-left: 0;
+            margin-inline-start: 0;
         }}
         #daily-widgets-container.single-widget .plan-widget-is-single .plan-row-item {{
             width: 100%;
@@ -971,6 +977,6 @@ def generate_daily_widgets_html(
     """
     enabled_widget_count = int(show_study_plan) + int(show_daily_fact)
     container_class = "single-widget" if enabled_widget_count == 1 else ""
-    container_html = f'''<div id="daily-widgets-container" class="{container_class}" style="{container_style}">{plan_widget_html}{fact_widget_html}</div>'''
+    container_html = f'''<div id="daily-widgets-container"{dir_attribute()} class="{container_class}" style="{container_style}">{plan_widget_html}{fact_widget_html}</div>'''
 
     return css_styles + container_html

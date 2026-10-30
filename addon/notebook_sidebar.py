@@ -1979,6 +1979,7 @@ class NotebookPanel(QWidget):
         html = re.sub(r'</head>', lambda m: i18n_tag + m.group(0), html,
                       count=1, flags=re.IGNORECASE)
 
+        from . import rtl; rtl.prepare_view(self.web)
         self.web.setHtml(html)
 
     def _reload_current_tool(self) -> None:

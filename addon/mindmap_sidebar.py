@@ -529,6 +529,7 @@ class MindmapPanel(QWidget):
         self._prepare_roadmap_boot()
         html_path = self._tool_path()
         if os.path.exists(html_path):
+            from . import rtl; rtl.prepare_view(self.web_view)
             self.web_view.setUrl(QUrl.fromLocalFile(html_path))
         else:
             self.web_view.setHtml(f"<h3>Error: {constants.MINDMAP_HTML_FILENAME} not found.</h3>")
@@ -737,6 +738,7 @@ class MindmapPanel(QWidget):
             self.current_tool = target
             self._page_ready = False
             self._prepare_roadmap_boot()
+            from . import rtl; rtl.prepare_view(self.web_view)
             self.web_view.setUrl(QUrl.fromLocalFile(self._tool_path()))
         self._persist_active(done)
 
@@ -1099,6 +1101,7 @@ def refresh_workspace_settings():
             scripts.insert(script)
             panel._page_ready = False
             panel._prepare_roadmap_boot()
+            from . import rtl; rtl.prepare_view(panel.web_view)
             panel.web_view.setUrl(QUrl.fromLocalFile(panel._tool_path()))
         QTimer.singleShot(0, reload_page)
     panel._persist_active(saved)

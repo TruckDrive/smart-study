@@ -18,6 +18,12 @@ ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Lin
 
 **Updating from an older version** (0.x): uninstall it first, otherwise Anki shows two **Study Plan** links. Your plans come back by themselves through the Anki collection.
 
+## What's new in 2.4
+
+- **Persian (فارسی)**: all of Smart Study in Persian, right to left, including the study plan and the built-in add-ons
+- **Anki itself in Persian**: Smart Study repairs Anki's Persian translation, which otherwise falls back to English (text from Anki's backend stays English)
+- **AI assistant** can answer in Persian
+
 ## What's new in 2.3
 
 - **Same add-ons on all your devices**: Smart Study asks once whether to sync your AnkiWeb add-ons; other devices then offer to install what is missing
@@ -104,7 +110,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Website sidebar** for your own study sites
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - **Dashboard**: statistics, deadlines and countdowns, daily facts, custom deck overview
-- Light and dark mode, color themes, custom backgrounds, ten interface languages
+- Light and dark mode, color themes, custom backgrounds, eleven interface languages
 
 ### Built-in add-ons
 

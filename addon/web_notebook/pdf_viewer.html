@@ -354,7 +354,7 @@
       display: inline-flex; align-items: center; gap: 3px;
       font-size: 10px; font-weight: 600; color: var(--danger);
       background: rgba(224,62,62,0.10); border-radius: 4px;
-      padding: 1px 5px; margin-left: 4px;
+      padding: 1px 5px; margin-inline-start: 4px;
     }
 
     /* ── PDF.js text layer (transparent spans for text selection) ── */
@@ -482,7 +482,7 @@
     }
     .deck-menu-option {
       width: 100%; padding: 7px 8px; border: none; border-radius: 6px;
-      background: transparent; color: var(--text); text-align: left;
+      background: transparent; color: var(--text); text-align: start;
       font: 500 11px/1.25 var(--font); cursor: pointer;
     }
     .deck-menu-option:hover, .deck-menu-option.active { background: var(--hover-bg); }
@@ -554,7 +554,7 @@
       order: 2;
       flex: 0 0 clamp(300px, 34vw, 390px);
       width: clamp(300px, 34vw, 390px); max-width: 44%; max-height: none;
-      border-bottom: none; border-left: 1px solid var(--border);
+      border-bottom: none; border-inline-start: 1px solid var(--border);
     }
     body.smartstudy-wide #creator-sidebar-hint { display: none; }
 
@@ -581,7 +581,7 @@
     @media (max-width: 430px) {
       #creator-launch .creator-launch-text { display: none; }
       #zoom-label { display: none; }
-      #viewer-toolbar { padding-left: 6px; padding-right: 6px; gap: 4px; }
+      #viewer-toolbar { padding-inline-start: 6px; padding-inline-end: 6px; gap: 4px; }
     }
   </style>
 <style id="smartstudy-keyboard-focus">
@@ -590,6 +590,11 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
   outline: 2px solid var(--accent, var(--primary-color, #0071d3));
   outline-offset: 2px;
 }
+/* RTL */
+/* Pages and pdf.js text layers are placed by coordinates: keep them LTR. */
+    [dir=rtl] #canvas-wrap { direction: ltr; }
+    [dir=rtl] #viewer-loading, [dir=rtl] #viewer-error { direction: rtl; }
+    [dir=rtl] #viewer-toolbar > .vtb-btn:first-child svg { transform: scaleX(-1); }
 </style>
 </head>
 <body>
@@ -1028,7 +1033,7 @@ function toggleMoveDropdown(event, pdfId) {
   const pdf=state.pdfs.find(p=>p.id===pdfId); if(!pdf) return;
   const rect=event.currentTarget.getBoundingClientRect();
   const menu=document.createElement('div'); menu.className='move-dropdown';
-  menu.style.top=(rect.bottom+4)+'px'; menu.style.right=(document.body.clientWidth-rect.right)+'px';
+  menu.style.top=(rect.bottom+4)+'px'; if(document.documentElement.dir==='rtl') menu.style.left=Math.max(8,rect.left)+'px'; else menu.style.right=(document.body.clientWidth-rect.right)+'px';
   const fSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
   let items=`<div class="move-dropdown-item${!pdf.folderId?' active':''}" onclick="movePdfToFolder(${jsArg(pdfId)},null)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px">
@@ -2375,10 +2380,10 @@ if (window.__SMARTSTUDY_PDF_PRELOAD__ !== undefined) {
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
-            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+            var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
                 + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'

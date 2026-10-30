@@ -77,7 +77,7 @@
             const r = button.getBoundingClientRect();
             menu.style.minWidth = Math.max(r.width, 160) + 'px';
             menu.style.maxWidth = Math.max(160, innerWidth - 16) + 'px';
-            menu.style.left = Math.max(8, Math.min(r.left, innerWidth-menu.offsetWidth-8)) + 'px';
+            menu.style.left = Math.max(8, Math.min(document.documentElement.dir === 'rtl' ? r.right-menu.offsetWidth : r.left, innerWidth-menu.offsetWidth-8)) + 'px';
             menu.style.top = (r.bottom + 4) + 'px';
             menu.style.maxHeight = Math.max(80, Math.min(300, innerHeight-r.bottom-12)) + 'px';
             button.setAttribute('aria-expanded','true');

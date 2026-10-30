@@ -5,7 +5,7 @@ from __future__ import annotations
 import os, sys, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
-from . import settings_sync, addon_sync
+from . import settings_sync, addon_sync, rtl, anki_persian
 
 # --- Import Sub-Modules ---
 try:
@@ -484,12 +484,13 @@ def _apply_onboarding_result(result: dict):
         return
 
     # ── Language ──────────────────────────────────────────────────────────────
-    valid_langs = {"auto", "en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl"}
+    valid_langs = {"auto", "en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa"}
     lang = result.get("lang", "en")
     if lang not in valid_langs:
         lang = "en"
     addon_settings["language"] = lang
     locales.USER_LANG = lang
+    rtl.offer_anki_language("")
 
     # ── Colour theme ──────────────────────────────────────────────────────────
     try:
@@ -603,6 +604,7 @@ def _apply_saved_settings(new_settings, message=None):
     Shared by the HTML settings dialog and the native fallback."""
     if not new_settings.get("workspace_mindmap_tab", True) and not new_settings.get("workspace_roadmap_tab", True):
         new_settings["workspace_mindmap_tab"] = True
+    previous_language = addon_settings.get("language", "auto")
     addon_settings.update(new_settings); save_addon_settings()
 
     # Enabling the compact dashboard may require plan/deadline managers even
@@ -623,6 +625,7 @@ def _apply_saved_settings(new_settings, message=None):
 
     # Apply new language setting live so subsequent UI uses it immediately.
     locales.USER_LANG = addon_settings.get("language", "auto")
+    rtl.offer_anki_language(previous_language)
     # Apply colour theme immediately so all widgets reflect the change.
     try:
         from .theme import set_active_theme, set_custom_theme_colors
@@ -1756,6 +1759,8 @@ except Exception as exc:
 if modules_loaded and mw and gui_hooks:
     if hasattr(gui_hooks, "operation_did_execute"):
         gui_hooks.operation_did_execute.append(on_gamification_collection_change)
+    rtl.install()
+    anki_persian.apply()
     gui_hooks.profile_did_open.append(on_profile_open)
     gui_hooks.profile_will_close.append(on_profile_close)
     gui_hooks.deck_browser_will_render_content.append(render_all_deck_browser_widgets)

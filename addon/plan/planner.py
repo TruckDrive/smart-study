@@ -14,11 +14,13 @@ PREP_DAYS = 7  # preparation for a lab session starts this many days before it
 REVIEW_MIN = 0.4  # minutes per review until real timings are available
 REVIEW_STEPS = (1, 3, 7, 14, 30)  # rough: a new card comes back on these days after first study
 BACKLOG_DAYS = 4  # overdue reviews are spread over this many days
-LANG = "en"  # set from Anki's interface language in __init__.py
+LANG = "en"  # "de", "en" or "fa"; set from the language setting in __init__.py
 
 
-def tr(de, en):
-    return de if LANG == "de" else en
+def tr(de, en, fa=None):
+    if LANG == "de":
+        return de
+    return fa if LANG == "fa" and fa is not None else en
 
 
 def d2s(d):
@@ -172,7 +174,7 @@ def milestones(plan):
     """Milestones (e.g. partial tests) by date; the exam itself always comes last."""
     ms = sorted((m for m in plan.get("milestones", []) if m.get("date") and m["date"] < plan["exam"]),
                 key=lambda m: m["date"])
-    return ms + [{"id": None, "name": tr("Prüfung", "Exam"), "date": plan["exam"], "time": plan.get("examTime", ""),
+    return ms + [{"id": None, "name": tr("Prüfung", "Exam", "امتحان"), "date": plan["exam"], "time": plan.get("examTime", ""),
                   "final": True}]
 
 
@@ -314,7 +316,8 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
     start = max(today, s2d(plan["start"]))
     if start > exam:
         plan["notes"] = [tr("Die Prüfung ist schon vorbei – nichts mehr zu verteilen.",
-                            "The exam is already over – nothing left to schedule.")]
+                            "The exam is already over – nothing left to schedule.",
+                            "امتحان تمام شده است – چیزی برای برنامه‌ریزی نمانده.")]
         return plan["notes"]
     srcs = {s["id"]: s for s in plan.get("sources", [])}
     topics = {t["id"]: t for t in plan.get("topics", [])}
@@ -384,17 +387,21 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
         def fill(units, content, cap, m):
             budget_total = sum(cap)
             work = sum(u["n"] * u["cost"] for u in units)
-            label = tr("zur Prüfung", "the exam") if m.get("final") else tr(f"zu „{m['name']}“", f"“{m['name']}”")
+            label = tr("zur Prüfung", "the exam", "امتحان") if m.get("final") else tr(f"zu „{m['name']}“", f"“{m['name']}”", f"«{m['name']}»")
             if m.get("prep") and work > budget_total * 1.02:
                 notes.append(tr(f"Vor dem Präpsaal „{m['name']}“ ist die Vorbereitung knapp ({round(work / 60, 1)} h Lesen/Videos, "
                                 f"{round(budget_total / 60, 1)} h Zeit).",
                                 f"Preparation for the lab session “{m['name']}” is tight ({round(work / 60, 1)} h reading/videos, "
-                                f"{round(budget_total / 60, 1)} h available)."))
+                                f"{round(budget_total / 60, 1)} h available).",
+                                f"آماده‌سازی برای جلسهٔ عملی «{m['name']}» فشرده است ({round(work / 60, 1)} ساعت خواندن/ویدیو، "
+                                f"{round(budget_total / 60, 1)} ساعت زمان)."))
             elif work > budget_total * 1.02:
                 notes.append(tr(f"Bis {label} ist der Plan zu voll: {round((work - budget_total) / 60, 1)} h mehr Stoff als Lernzeit "
                                 "(Wiederholungen schon abgezogen). Mehr Zeit pro Tag eintragen oder Stoff streichen.",
                                 f"The plan up to {label} is too full: {round((work - budget_total) / 60, 1)} h more material than "
-                                "study time (reviews already subtracted). Add more time per day or cut material."))
+                                "study time (reviews already subtracted). Add more time per day or cut material.",
+                                f"برنامه تا {label} بیش از حد پر است: {round((work - budget_total) / 60, 1)} ساعت مطلب بیشتر از زمان مطالعه "
+                                "(مرورها از قبل کم شده‌اند). زمان بیشتری در روز وارد کنید یا از مطالب کم کنید."))
             scale = work / budget_total if budget_total else 0
             budget_ = [c * scale for c in cap]
             st = {"i": 0, "rem": budget_[0] if budget_ else 0}
@@ -413,11 +420,11 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                 day = d2s(content[st["i"]])
                 it = {"id": new_id(), "kind": u["kind"], "topic": u["topic"], "source": u["source"], "min": round(k * u["cost"])}
                 if multi:
-                    it["for"] = tr("Prüfung", "exam") if m.get("final") else m["name"]
+                    it["for"] = tr("Prüfung", "exam", "امتحان") if m.get("final") else m["name"]
                 if u["kind"] == "pages":
                     a = u["from"]
                     it["pages"] = [a, a + k - 1]
-                    p = tr("S.", "p.") if k == 1 else tr("S.", "pp.")
+                    p = tr("S.", "p.", "ص.") if k == 1 else tr("S.", "pp.", "ص.")
                     rng = f"{p} {a}" if k == 1 else f"{p} {a}–{a + k - 1}"
                     it["text"] = f"{rng}" + (f" · {tname}" if tname else "")
                     u["from"] += k
@@ -433,8 +440,8 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                     seen_so_far[u["query"]] = base + k
                     it["cards"] = k
                     it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
-                    it["text"] = tr(f"{k} neue Karten", f"{k} new cards") + (
-                        f" · {tname}" if tname else tr(" · übrige Karten", " · remaining cards"))
+                    it["text"] = tr(f"{k} neue Karten", f"{k} new cards", f"{k} کارت جدید") + (
+                        f" · {tname}" if tname else tr(" · übrige Karten", " · remaining cards", " · کارت‌های باقی‌مانده"))
                     new_per_day[(day, u["source"])] = new_per_day.get((day, u["source"]), 0) + k
                     until = m["date"] if plan.get("onceOnly") else plan["exam"]
                     returns[(day, until)] = returns.get((day, until), 0) + k
@@ -485,7 +492,8 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                 reserve_map[d2s(d)] = reserve_items(plan, k, len(reserve)) if m.get("final") else [
                     {"id": new_id(), "kind": "note", "text": tr(
                         f"Wiederholen für „{m['name']}“: Themen dieser Etappe laut erklären, Schwachstellen anschauen, nichts Neues.",
-                        f"Review for “{m['name']}”: explain this milestone's topics out loud, look at weak spots, nothing new.")}]
+                        f"Review for “{m['name']}”: explain this milestone's topics out loud, look at weak spots, nothing new.",
+                        f"مرور برای «{m['name']}»: موضوع‌های این مرحله را با صدای بلند توضیح دهید، نقاط ضعف را ببینید، چیز جدیدی نخوانید.")}]
             for k in range(pj, j):  # lab sessions in this window first
                 pm, pdl = ms_open[k], s2d(ms_open[k]["date"])
                 # Prepare in the week before (not scattered over weeks, not all on the day before)
@@ -498,18 +506,21 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
             if groups[j] and not content:
                 if j + 1 < len(ms_open):
                     notes.append(tr(f"Vor „{m['name']}“ ist keine Lernzeit mehr – der Stoff dafür rutscht in die nächste Etappe.",
-                                    f"There is no study time left before “{m['name']}” – its material moves to the next milestone."))
+                                    f"There is no study time left before “{m['name']}” – its material moves to the next milestone.",
+                                    f"تا «{m['name']}» زمان مطالعه‌ای نمانده است – مطالب آن به مرحلهٔ بعد منتقل می‌شود."))
                     groups[j + 1][0:0] = groups[j]
                 else:
                     notes.append(tr("Bis zur Prüfung ist keine Lernzeit mehr eingetragen.",
-                                    "There is no study time left before the exam."))
+                                    "There is no study time left before the exam.",
+                                    "تا امتحان زمان مطالعه‌ای ثبت نشده است."))
             elif groups[j]:
                 fill(groups[j], content, caps(content), m)
             prev = deadline
         lim = {s["id"]: s.get("maxNew") for s in anki_sources(plan)}
         if any(lim.get(sid) and n > int(lim[sid]) for (_, sid), n in new_per_day.items()):
             notes.append(tr("Das Tageslimit für neue Karten reicht nicht; am letzten Lerntag vor einem Termin liegen mehr neue Karten.",
-                            "The daily limit for new cards is too low; the last study day before a date gets extra new cards."))
+                            "The daily limit for new cards is too low; the last study day before a date gets extra new cards.",
+                            "سقف روزانهٔ کارت جدید کافی نیست؛ در آخرین روز مطالعه پیش از هر مهلت، کارت جدید بیشتری قرار می‌گیرد."))
         return generated, reserve_map, returns, notes
 
     # Spread overdue reviews so they take at most half of the free time.
@@ -528,7 +539,9 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
         notes.append(tr(f"An {len(full)} Tag(en) brauchen die Wiederholungen allein schon mehr Zeit als frei ist "
                         f"(z. B. {full[0].strftime('%d.%m.')}). Weniger neue Karten oder mehr Lernzeit.",
                         f"On {len(full)} day(s) the reviews alone need more time than is available "
-                        f"(e.g. {full[0].strftime('%d.%m.')}). Fewer new cards or more study time."))
+                        f"(e.g. {full[0].strftime('%d.%m.')}). Fewer new cards or more study time.",
+                        f"در {len(full)} روز، مرورها به‌تنهایی بیشتر از زمان آزاد وقت می‌گیرند "
+                        f"(مثلاً {full[0].strftime('%d.%m.')}). کارت جدید کمتر یا زمان مطالعهٔ بیشتر در نظر بگیرید."))
 
     # Assemble the days: reviews first, then the material
     by_date = {m["date"]: m for m in ms_open}
@@ -538,20 +551,22 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
         gen = reserve_map.get(s) or generated.get(s, [])
         m = by_date.get(s)
         if m and m.get("prep"):
-            when = tr(f" ab {m['time']}", f" from {m['time']}") if m.get("time") else ""
-            gen = [{"id": new_id(), "kind": "note", "text": tr(f"Präpsaal{when}: {m['name']}", f"Lab session{when}: {m['name']}")}] + gen
+            when = tr(f" ab {m['time']}", f" from {m['time']}", f" از ساعت {m['time']}") if m.get("time") else ""
+            gen = [{"id": new_id(), "kind": "note", "text": tr(f"Präpsaal{when}: {m['name']}", f"Lab session{when}: {m['name']}", f"جلسهٔ عملی{when}: {m['name']}")}] + gen
         elif m:
-            when = tr(f" um {m['time']}", f" at {m['time']}") if m.get("time") else ""
+            when = tr(f" um {m['time']}", f" at {m['time']}", f" ساعت {m['time']}") if m.get("time") else ""
             gen = [{"id": new_id(), "kind": "note", "text": tr(f"Prüfung{when}: nur leicht wiederholen, vorher etwas essen.",
-                                                               f"Exam{when}: only light review, eat something before.")
+                                                               f"Exam{when}: only light review, eat something before.",
+                                                               f"امتحان{when}: فقط مرور سبک، و پیش از آن چیزی بخورید.")
                     if m.get("final") else tr(f"{m['name']}{when}: vorher kurz wiederholen. Viel Erfolg!",
-                                              f"{m['name']}{when}: quick review beforehand. Good luck!")}]
+                                              f"{m['name']}{when}: quick review beforehand. Good luck!",
+                                              f"{m['name']}{when}: پیش از آن مرور کوتاهی داشته باشید. موفق باشید!")}]
         if has_anki and (room(d) > 0 or m) and not any(x.get("kind") == "reviews" for x in items):
             n = round(rev.get(s, 0))
             gen.insert(0, {"id": new_id(), "kind": "reviews", "auto": {"type": "reviews"}, "reviews": n,
                            "min": round(n * rev_min),
-                           "text": tr(f"Wiederholungen (ca. {n})", f"Reviews (about {n})") if n
-                           else tr("Fällige Wiederholungen", "Due reviews")})
+                           "text": tr(f"Wiederholungen (ca. {n})", f"Reviews (about {n})", f"مرور (حدود {n})") if n
+                           else tr("Fällige Wiederholungen", "Due reviews", "مرورهای موعدرسیده")})
         days[s]["items"] = items + [g for g in gen if not any(x.get("kind") == g["kind"] and g["kind"] in NO_CHECK
                                                               for x in items)]
     plan["days"] = [days[k] for k in sorted(days)]
@@ -567,14 +582,17 @@ def reserve_items(plan, ix, n):
     if kind == "weakround":
         return [{"id": new_id(), "kind": "weakround", "min": 60, "text": tr(
             "Schwachstellen-Runde: die schwächsten Themen gezielt wiederholen",
-            "Weak spots round: go over your weakest topics")}]
+            "Weak spots round: go over your weakest topics",
+            "دور نقاط ضعف: ضعیف‌ترین موضوع‌ها را هدفمند مرور کنید")}]
     if kind == "sim":
         return [{"id": new_id(), "kind": "sim", "min": 60, "text": tr(
             "Probeprüfung: gemischte Karten auf Zeit + zufällige Themen frei erklären",
-            "Mock exam: mixed cards against the clock + explain random topics freely")}]
+            "Mock exam: mixed cards against the clock + explain random topics freely",
+            "امتحان آزمایشی: کارت‌های ترکیبی با زمان محدود + توضیح آزاد موضوع‌های تصادفی")}]
     return [{"id": new_id(), "kind": "note", "text": tr(
         "Letzter Tag: nur wiederholen, Schwachstellen kurz anschauen, nichts Neues. Früh schlafen.",
-        "Last day: only review, glance at weak spots, nothing new. Go to bed early.")}]
+        "Last day: only review, glance at weak spots, nothing new. Go to bed early.",
+        "روز آخر: فقط مرور، نگاهی کوتاه به نقاط ضعف، چیز جدیدی نخوانید. زود بخوابید.")}]
 
 
 def evaluate(plan, st):
@@ -587,10 +605,10 @@ def evaluate(plan, st):
         if a["type"] == "reviews":
             n = st["rated"].get(day["d"], 0)
             if day["d"] < st["today"]:
-                out[it["id"]] = {"done": n > 0, "text": tr("erledigt", "done") if n else tr("nicht gemacht", "not done")}
+                out[it["id"]] = {"done": n > 0, "text": tr("erledigt", "done", "انجام شد") if n else tr("nicht gemacht", "not done", "انجام نشد")}
             elif day["d"] == st["today"]:
-                out[it["id"]] = {"done": st["due"] == 0, "text": tr("alles erledigt", "all done") if st["due"] == 0
-                                 else tr(f"noch {st['due']} fällig", f"{st['due']} still due")}
+                out[it["id"]] = {"done": st["due"] == 0, "text": tr("alles erledigt", "all done", "همه انجام شد") if st["due"] == 0
+                                 else tr(f"noch {st['due']} fällig", f"{st['due']} still due", f"{st['due']} مورد مانده")}
         elif a["type"] == "seen":
             c = st["counts"].get(a["query"])
             if not c or not c["total"]:  # no cards: deck deleted/renamed, not "finished"
@@ -826,14 +844,16 @@ def weak_items(plan, weak, limit=5):
         for sid, r in t.get("pages", {}).items():
             if r and sid in srcs:
                 parts.append(tr(f"{srcs[sid]['name']} S. {r[0]}–{r[1]} nochmal lesen",
-                                f"reread {srcs[sid]['name']} pp. {r[0]}–{r[1]}"))
+                                f"reread {srcs[sid]['name']} pp. {r[0]}–{r[1]}",
+                                f"خواندن دوبارهٔ {srcs[sid]['name']} ص. {r[0]}–{r[1]}"))
         for sid, vs in t.get("videos", {}).items():
             names = [v["name"] for v in srcs.get(sid, {}).get("videos", []) if v["id"] in vs]
             if names:
-                parts.append(tr(", ".join(names[:2]) + " nochmal anschauen", "rewatch " + ", ".join(names[:2])))
-        parts.append(tr(f"{w['cards']} schwache Karten wiederholen", f"review {w['cards']} weak cards"))
+                parts.append(tr(", ".join(names[:2]) + " nochmal anschauen", "rewatch " + ", ".join(names[:2]),
+                                "دیدن دوبارهٔ " + "، ".join(names[:2])))
+        parts.append(tr(f"{w['cards']} schwache Karten wiederholen", f"review {w['cards']} weak cards", f"مرور {w['cards']} کارت ضعیف"))
         items.append({"id": new_id(), "kind": "weak", "topic": t["id"], "min": 30,
-                      "text": tr(f"{t['name']}: {w['agains']} Fehler → ", f"{t['name']}: {w['agains']} mistakes → ")
+                      "text": tr(f"{t['name']}: {w['agains']} Fehler → ", f"{t['name']}: {w['agains']} mistakes → ", f"{t['name']}: {w['agains']} اشتباه ← ")
                       + " + ".join(parts)})
     return items
 
@@ -849,7 +869,7 @@ def review_stats(plan, ev):
             continue
         planned += 1
         name = srcs[it["source"]]["name"] if it.get("source") in srcs else (
-            tr("Eigene Punkte", "Custom items") if it.get("custom") else tr("Sonstiges", "Other"))
+            tr("Eigene Punkte", "Custom items", "موارد شخصی") if it.get("custom") else tr("Sonstiges", "Other", "سایر"))
         p = per.setdefault(name, {"planned": 0, "done": 0, "min": 0, "late": 0})
         p["planned"] += 1
         stamp = plan.get("done", {}).get(it["id"]) or plan.get("autoDone", {}).get(it["id"])

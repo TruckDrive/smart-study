@@ -214,3 +214,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Anki Persian translation
+
+`anki_fa.ftl` is based on the Persian translation shipped with Anki
+(https://github.com/ankitects/anki-core-i18n, BSD-3-Clause, by the Anki
+translators), with its syntax errors repaired and missing messages added.

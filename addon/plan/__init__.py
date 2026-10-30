@@ -17,11 +17,22 @@ from aqt.webview import AnkiWebView
 from . import ankidata, planner, store
 from .planner import tr
 from ..constants import ADDON_VERSION as VERSION
+from ..locales import _current_lang
 
 NAME = "Smart Study"
 MODULE = __name__
 FOLDER = MODULE.split(".")[0]
-planner.LANG = "de" if (current_lang or "").startswith("de") else "en"
+
+
+def _sync_lang():
+    """Follows the add-on's language setting, which is only loaded at profile open."""
+    if _current_lang() == "fa":
+        planner.LANG = "fa"
+    else:
+        planner.LANG = "de" if (current_lang or "").startswith("de") else "en"
+
+
+_sync_lang()
 
 
 def today():
@@ -58,7 +69,8 @@ def open_pdf(path, page):
     path = os.path.expanduser(path)
     if not os.path.isfile(path):
         raise ValueError(tr("PDF nicht gefunden – unter Bearbeiten → Quellen die Datei wählen.",
-                            "PDF not found – choose the file under Edit → Sources."))
+                            "PDF not found – choose the file under Edit → Sources.",
+                            "فایل PDF پیدا نشد – از ویرایش ← منابع فایل را انتخاب کنید."))
     page = max(1, page)
     for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-i", str(page)])):
         if shutil.which(prog):
@@ -238,7 +250,7 @@ def handle(cmd, a):
         return True
     if cmd == "openLink":
         if not str(a["url"]).startswith(("http://", "https://", "file://")):
-            raise ValueError(tr("nur Web-Links oder Dateien", "only web links or files"))
+            raise ValueError(tr("nur Web-Links oder Dateien", "only web links or files", "فقط لینک وب یا فایل"))
         openLink(a["url"])
         return True
     if cmd == "studyItem":
@@ -256,8 +268,8 @@ def handle(cmd, a):
         src = next(s for s in plan["sources"] if s["id"] == it["source"])
         return open_pdf(src.get("file", ""), int(it["pages"][0]) + int(src.get("pageOffset") or 0))
     if cmd == "pickFile":
-        path, _ = QFileDialog.getOpenFileName(_win, tr("Datei wählen", "Choose file"), os.path.expanduser("~"),
-                                              tr("PDF (*.pdf);;Alle Dateien (*)", "PDF (*.pdf);;All files (*)"))
+        path, _ = QFileDialog.getOpenFileName(_win, tr("Datei wählen", "Choose file", "انتخاب فایل"), os.path.expanduser("~"),
+                                              tr("PDF (*.pdf);;Alle Dateien (*)", "PDF (*.pdf);;All files (*)", "PDF (*.pdf);;همهٔ فایل‌ها (*)"))
         return path or None
     if cmd == "study":
         col.decks.select(a["did"])
@@ -315,6 +327,7 @@ def handle(cmd, a):
 
 class StudyPlanWindow(QDialog):
     def __init__(self):
+        _sync_lang()
         super().__init__(None, Qt.WindowType.Window)
         self.setWindowTitle(NAME)
         self.setMinimumSize(420, 500)
@@ -381,7 +394,9 @@ def _changed(*_):
 
 
 def _toolbar(links, toolbar):
-    link = toolbar.create_link("lernplan", "Study Plan", open_window, tip=tr(f"{NAME} öffnen", f"Open {NAME}"), id="lernplan")
+    _sync_lang()
+    link = toolbar.create_link("lernplan", tr("Study Plan", "Study Plan", "برنامهٔ مطالعه"), open_window,
+                               tip=tr(f"{NAME} öffnen", f"Open {NAME}", f"باز کردن {NAME}"), id="lernplan")
     # Anki adds "sync" before this hook runs; keep it as the rightmost link
     i = next((i for i, x in enumerate(links) if 'id="sync"' in x), len(links))
     links.insert(i, link)

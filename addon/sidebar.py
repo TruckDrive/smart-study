@@ -234,6 +234,7 @@ class GamificationSidebar(QDockWidget):
             pass
 
         self._view.loadFinished.connect(self._on_load_finished)
+        from . import rtl; rtl.prepare_view(self._view)
         self._view.setUrl(QUrl.fromLocalFile(_HTML_PATH))
         self.setWidget(self._view)
 

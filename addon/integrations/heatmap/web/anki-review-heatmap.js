@@ -2206,8 +2206,13 @@ document.head.appendChild(__vite_style__);
           calMaxDate = tempDate;
         }
       }
+      const fa = this.options.fa;
+      if (fa) {
+        d3.time.format = d3.locale(fa.locale).timeFormat;
+      }
       let heatmap = new CalHeatMap();
       heatmap.init({
+        ...(fa ? { subDomainDateFormat: fa.dateFormat } : {}),
         domain: this.options.domain,
         subDomain: this.options.subdomain,
         range: this.options.range,
@@ -2230,6 +2235,12 @@ document.head.appendChild(__vite_style__);
           let count = formatData.count;
           if (count !== void 0 && count.startsWith("-")) {
             count = count.substring(1);
+          }
+          if (fa) {
+            const isDue = isEmpty ? Date.now() < cellData.t : cellData.v < 0;
+            return isEmpty
+              ? `${fa.on} ${formatData.date} ${isDue ? fa.noDue : fa.noReviews}`
+              : `<b>${count}</b> ${fa.card} <b>${isDue ? fa.due : fa.reviewed}</b> ${fa.on} ${formatData.date}`;
           }
           if (isEmpty) {
             tooltip = `<b>No</b> ${Date.now() < cellData.t ? "cards due" : "reviews"} on ${formatData.date}`;

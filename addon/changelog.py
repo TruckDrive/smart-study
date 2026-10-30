@@ -7,6 +7,15 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.4.0",
+        "date": "October 30, 2026",
+        "items": [
+            {"tag": "New", "text": "Persian (فارسی): all of Smart Study in Persian, with a right-to-left layout."},
+            {"tag": "New", "text": "Anki itself in Persian: Smart Study repairs Anki's Persian translation, which otherwise shows English."},
+            {"tag": "New", "text": "The AI assistant can answer in Persian."},
+        ],
+    },
+    {
         "version": "2.3.0",
         "date": "October 29, 2026",
         "items": [

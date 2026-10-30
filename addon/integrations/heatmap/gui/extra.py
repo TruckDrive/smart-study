@@ -38,6 +38,8 @@ import time
 from random import randrange
 from typing import Dict, Optional
 
+from ...strings import fa_tr
+
 from aqt import mw
 from aqt.qt import (
     QBasicTimer,
@@ -207,24 +209,24 @@ class Snanki(QDialog):
     def scoreText(self, event: QPaintEvent, painter: QPainter):
         painter.setPen(QColor("#ffffff"))
         painter.setFont(QFont("Decorative", 10))
-        painter.drawText(4, 17, "LIVES: " + str(self.lives))
-        painter.drawText(120, 17, "SCORE: " + str(self.score))
-        painter.drawText(230, 17, "BEST: " + str(self.highscore))
+        painter.drawText(4, 17, fa_tr("LIVES: ") + str(self.lives))
+        painter.drawText(120, 17, fa_tr("SCORE: ") + str(self.score))
+        painter.drawText(230, 17, fa_tr("BEST: ") + str(self.highscore))
 
     def gameOver(self, event: QPaintEvent, painter: QPainter):
         info = ""
         if self.score > self.highscore:
             self.lives += 1
             self.highscore = self.score
-            info = "\n\nNew high score! 1 life replenished."
+            info = fa_tr("\n\nNew high score! 1 life replenished.")
         font_size = 10 if not is_mac else 12
         painter.setPen(QColor(0, 34, 3))
         painter.setFont(QFont("Decorative", font_size))
         if self.lives > 0:
-            msg = "GAME OVER{}\n\nPress space to play again".format(info)
+            msg = fa_tr("GAME OVER{}\n\nPress space to play again").format(info)
         else:
             self.setCursor(Qt.CursorShape.PointingHandCursor)
-            msg = (
+            msg = fa_tr(
                 "GAME OVER\n\nYou're out of lives for today,\n"
                 "but tomorrow is another day :)\n\n"
                 "Tip: Get more lives by\nkeeping up with your reviews!\n\n"
@@ -332,9 +334,11 @@ def invoke_snanki(parent: Optional[QWidget] = None):
 
     if done_today < goal:
         tooltip(
-            "Psst! You've stumbled on a secret.<br>"
-            "Return when you've done at least<br>"
-            "{} cards for the day :)".format(goal)
+            fa_tr(
+                "Psst! You've stumbled on a secret.<br>"
+                "Return when you've done at least<br>"
+                "{} cards for the day :)"
+            ).format(goal)
         )
         return
 
@@ -353,8 +357,10 @@ def invoke_snanki(parent: Optional[QWidget] = None):
         # same day
         if not livesleft:
             tooltip(
-                "No more Snanki rounds left for today,<br>"
-                "but feel free to check back tomorrow :) !"
+                fa_tr(
+                    "No more Snanki rounds left for today,<br>"
+                    "but feel free to check back tomorrow :) !"
+                )
             )
             return
         else:

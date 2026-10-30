@@ -28,6 +28,7 @@ Supported values for :data:`USER_LANG`:
 * ``"zh"``   – 中文
 * ``"hi"``   – हिन्दी
 * ``"pl"``   – Polski
+* ``"fa"``   – فارسی (right-to-left; its strings live in translations_fa.json)
 
 
 Adding / editing translations
@@ -46,6 +47,7 @@ from pathlib import Path
 # Supplemental catalog for newer features; loaded locally once.
 SUPPLEMENTAL_TRANSLATIONS = json.loads(Path(__file__).with_name("translation_catalog.json").read_text(encoding="utf-8"))
 WORKSPACE_TRANSLATIONS = json.loads(Path(__file__).with_name("workspace_translations.json").read_text(encoding="utf-8"))
+PERSIAN_TRANSLATIONS = json.loads(Path(__file__).with_name("translations_fa.json").read_text(encoding="utf-8"))
 
 try:
     from .web_translations import WEB_TRANSLATIONS
@@ -56,7 +58,7 @@ except ImportError:
 # --------------------------------------------------------------------- #
 # Active language
 # --------------------------------------------------------------------- #
-# Valid values: "auto", "en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl".
+# Valid values: "auto", "en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa".
 # Defaults to "auto" until ``on_profile_open()`` overwrites it from the
 # user's settings.
 USER_LANG: str = "auto"
@@ -69,7 +71,7 @@ def _detect_anki_lang() -> str:
     """Best-effort detection of Anki's current UI language.
 
     Returns one of ``"en"``, ``"de"``, ``"es"``, ``"ko"``, ``"pt"``,
-    ``"fr"``, ``"vi"``, ``"zh"``, ``"hi"``, ``"pl"``. Unknown Anki locales fall
+    ``"fr"``, ``"vi"``, ``"zh"``, ``"hi"``, ``"pl"``, ``"fa"``. Unknown Anki locales fall
     back to English.
     """
     raw = ""
@@ -114,6 +116,8 @@ def _detect_anki_lang() -> str:
         return "hi"
     if raw.startswith("pl"):
         return "pl"
+    if raw.startswith("fa"):
+        return "fa"
     return "en"
 
 
@@ -122,9 +126,14 @@ def _current_lang() -> str:
     lang = USER_LANG
     if lang == "auto":
         return _detect_anki_lang()
-    if lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl"):
+    if lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa"):
         return lang
     return "en"
+
+
+def is_rtl() -> bool:
+    """True when the active language is written right to left."""
+    return _current_lang() == "fa"
 
 
 # --------------------------------------------------------------------- #
@@ -143,6 +152,8 @@ def translate_for_language(text: str, lang: str) -> str:
     """Translate without changing the active language (e.g. during onboarding)."""
     if lang == "en":
         return text
+    if lang == "fa":
+        return PERSIAN_TRANSLATIONS.get(text) or text
     for catalog in (TRANSLATIONS, WEB_TRANSLATIONS, SUPPLEMENTAL_TRANSLATIONS, WORKSPACE_TRANSLATIONS):
         translated = catalog.get(text, {}).get(lang)
         if translated:

@@ -19,6 +19,12 @@ except ImportError:
     _FONT_FAMILY = "sans-serif"
 
 try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
+try:
     from .locales import _
 except ImportError:
     def _(text):  # type: ignore
@@ -419,7 +425,7 @@ def render_widget_html_internal(stats, visibility=None):
             border-radius: 12px;
             /* extra right padding nudges the stats slightly left and leaves
                room for the info button; outer box dimensions are unchanged */
-            padding: 16px 42px 16px 16px;
+            padding-block:16px;padding-inline:16px 42px;
             margin: -15px auto 20px;
             max-width: {WIDGET_MAX_WIDTH};
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -434,11 +440,11 @@ def render_widget_html_internal(stats, visibility=None):
             display: flex;
             flex-direction: column;
             gap: 8px;
-            text-align: left;
+            text-align: start;
         }}
         .stat-block + .stat-block {{
-            border-left: 1px solid var(--stat-border);
-            padding-left: 16px;
+            border-inline-start: 1px solid var(--stat-border);
+            padding-inline-start: 16px;
         }}
         .circle-group {{
             flex-direction: row;
@@ -525,7 +531,7 @@ def render_widget_html_internal(stats, visibility=None):
         .stats-widget-controls {{
             position: absolute;
             top: 12px;
-            right: 12px;
+            inset-inline-end:12px;
             display: flex;
             flex-direction: column;
             gap: 7px;
@@ -552,18 +558,18 @@ def render_widget_html_internal(stats, visibility=None):
         .stats-control-btn svg {{ width: 12px; height: 12px; display: block; }}
         @media (max-width: 720px) {{
             .stats-widget-container {{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }}
-            .stat-block + .stat-block {{ border-left: 0; padding-left: 0; }}
+            .stat-block + .stat-block {{ border-inline-start: 0; padding-inline-start: 0; }}
             .stat-block {{ border-top: 1px solid var(--stat-border); padding-top: 12px; }}
             .stats-widget-controls + .stat-block {{ border-top: 0; padding-top: 0; }}
         }}
         @media (max-width: 470px) {{
-            .stats-widget-container {{ grid-template-columns: minmax(0, 1fr); padding-right: 42px; }}
+            .stats-widget-container {{ grid-template-columns: minmax(0, 1fr); padding-inline-end: 42px; }}
         }}
     </style>
     """
 
     html = f"""
-    <div class="stats-widget-container">
+    <div class="stats-widget-container"{dir_attribute()}>
         <div class="stats-widget-controls">
             <div class="stats-control-btn" title="{tooltip_settings}" onclick="pycmd('pycmd:smartstudy:stats_settings')" aria-label="{tooltip_settings}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.97 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3v-4h.08A1.7 1.7 0 0 0 4.6 8.97a1.7 1.7 0 0 0-.34-1.88l-.06-.06L7.03 4.2l.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 10 3.04V3h4v.08a1.7 1.7 0 0 0 1.03 1.52 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.96 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15z"></path></svg>

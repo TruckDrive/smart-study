@@ -8,6 +8,7 @@ from collections import defaultdict
 
 from aqt import gui_hooks
 from .._shim import manager as _ct_factory
+from ..strings import fa_tr
 _ct_manager = _ct_factory('contanki')  # Smart Study: own config store
 from aqt.qt import QAction, QInputDialog, QTimer, qconnect
 from aqt.utils import current_window, tooltip
@@ -76,7 +77,7 @@ class Contanki(AnkiWebView):
     def __init__(self, parent):
         super().__init__(parent=parent)
         _ct_manager.setConfigAction(__name__, self.on_config)
-        self.menu_item = QAction("Controller Options", mw)
+        self.menu_item = QAction(fa_tr("Controller Options"), mw)
         qconnect(self.menu_item.triggered, self.on_config)
         gui_hooks.webview_did_receive_js_message.append(self.on_receive_message)
         gui_hooks.profile_will_close.append(self.suspend)
@@ -395,7 +396,7 @@ class Contanki(AnkiWebView):
 
         if self.profile is None:
             dbg(f"Error: get_profile returned None for {profile}")
-            tooltip(f"Error: Unable to load profile {profile}")
+            tooltip(fa_tr("Error: Unable to load profile {profile}").format(profile=profile))
             return
 
         self.len_buttons, self.len_axes = buttons, axes
@@ -406,7 +407,7 @@ class Contanki(AnkiWebView):
         mw.form.menuTools.addAction(self.menu_item)
         self.update_debug_info()
         self.connected = True
-        tooltip(f"{controller} Connected")
+        tooltip(fa_tr("{controller} Connected").format(controller=controller))
         if is_ambiguous_id(controller_id) and controller_id not in load_controller_choices():
             # Smart Study: many pads share this ID (e.g. the 8BitDo Zero 2 in
             # X-Input mode on Windows), so ask once instead of guessing.
@@ -451,7 +452,7 @@ class Contanki(AnkiWebView):
         self.controllers = list()
         self.reset_controller()
         self.update_debug_info()
-        tooltip("Controller Disconnected")
+        tooltip(fa_tr("Controller Disconnected"))
         self.connected = False
 
     def reset_controller(self) -> None:
@@ -490,7 +491,9 @@ class Contanki(AnkiWebView):
             for controller in self.controllers:
                 mw.form.menuTools.addAction(controller)
             tooltip(
-                f"{len(self.controllers)} controllers detected - select from the Tools menu."
+                fa_tr("{count} controllers detected - select from the Tools menu.").format(
+                    count=len(self.controllers)
+                )
             )
         if to_connect is not None:
             self.change_controller(to_connect, None)

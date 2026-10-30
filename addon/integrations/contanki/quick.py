@@ -14,6 +14,7 @@ from aqt import mw as _mw
 from .funcs import get_config
 from .utils import State
 from .icons import get_button_icon
+from ..strings import fa_tr
 from .actions import button_actions
 from .controller import Controller
 
@@ -294,9 +295,9 @@ class QuickSelectButton(QLabel):
     large_font.setPointSize(20)
 
     def __init__(self, parent, action: str, is_large=False):
-        super().__init__(action.replace(" ", "\n"), parent)
+        super().__init__(fa_tr(action).replace(" ", "\n"), parent)
         self.action = action
-        self._height, self._width = QuickSelectMenu.get_size(action)
+        self._height, self._width = QuickSelectMenu.get_size(fa_tr(action))
         self.setFont(self.large_font if is_large else self.standard_font)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 

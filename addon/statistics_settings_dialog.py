@@ -55,6 +55,7 @@ class StatisticsSettingsDialog(QDialog):
         self._view = QWebEngineView(self)
         self._page = _StatisticsSettingsPage(self._view)
         self._view.setPage(self._page)
+        from . import rtl; rtl.prepare_view(self._view)
         self._page.message.connect(self._on_message)
         self._view.loadFinished.connect(self._on_load_finished)
         layout.addWidget(self._view)

@@ -836,6 +836,7 @@ if _web_ok:
                 pass
             self._page.message.connect(self._on_message)
             lay.addWidget(self._view)
+            from . import rtl; rtl.prepare_view(self._view)
             self._view.setUrl(QUrl.fromLocalFile(html))
 
         def is_available(self) -> bool:

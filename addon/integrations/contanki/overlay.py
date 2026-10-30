@@ -14,6 +14,7 @@ from aqt.qt import (
     QFont,
 )
 
+from ..strings import fa_tr
 from .funcs import get_config, get_state
 from .utils import State
 from .profile import Profile
@@ -166,6 +167,7 @@ class OverlayItem(QWidget):
         """Shows the button, refreshing it in the process."""
         self.hide()
         if text := self.profile.get(state, self.button):
+            text = fa_tr(text)
             if self.width() - 300 < len(text) * 8:
                 text = text.replace(" ", "\n")
             self.action.setText(text)

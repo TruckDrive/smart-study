@@ -3,19 +3,25 @@ from .activity_chart import render_activity_chart
 from html import escape
 import re
 
+try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
 EXTRA_CSS = '''<style>html:has(#overview-wrapper),body:has(#overview-wrapper){margin:0!important;padding:0!important;}
 #overview-wrapper{box-sizing:border-box;padding:24px 12px;min-height:100vh;}
 #overview-wrapper #custom-dashboard{margin:0;}
 #custom-dashboard * {box-sizing:border-box;}
 #custom-dashboard .white-box {position:relative;}
 #custom-dashboard .deck-header h1 {overflow-wrap:anywhere;}
-#custom-dashboard .deck-controls {position:absolute;right:14px;top:14px;}
+#custom-dashboard .deck-controls {position:absolute;inset-inline-end:14px;top:14px;}
 #custom-dashboard .deck-control {width:24px;height:24px;border:0;border-radius:50%;background:var(--progress-bg);color:var(--text-sub);padding:0;cursor:pointer;display:grid;place-items:center;}
 #custom-dashboard .deck-control {appearance:none;box-shadow:none;line-height:1;min-width:0;min-height:0;}
 #custom-dashboard .deck-control svg {width:14px;height:14px;display:block;margin:0;}
 #custom-dashboard button:focus-visible {outline:2px solid var(--accent-color);outline-offset:3px;}
 #custom-dashboard .widget {font:inherit;}
-#custom-dashboard .progress-row-label {width:92px;text-align:left;}
+#custom-dashboard .progress-row-label {width:92px;text-align:start;}
 #custom-dashboard .diff-container {padding:0;flex:0 0 86px;width:86px;height:86px;align-self:center;}
 #custom-dashboard .diff-container.unrated img {opacity:.45;}
 #custom-dashboard .focus-summary {display:flex;align-items:center;justify-content:center;gap:28px;width:100%;}
@@ -25,7 +31,7 @@ EXTRA_CSS = '''<style>html:has(#overview-wrapper),body:has(#overview-wrapper){ma
 #custom-dashboard .today-counts {display:grid;gap:13px;min-width:110px;}
 #custom-dashboard .today-counts div {display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:12px;color:var(--text-sub);}
 #custom-dashboard .today-counts strong {font-size:14px;font-weight:600;color:var(--text-main);}
-#custom-dashboard .today-counts span::before {content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px;background:var(--count-color);}
+#custom-dashboard .today-counts span::before {content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-inline-end:7px;background:var(--count-color);}
 #custom-dashboard .today-counts .new {--count-color:#4a9eff;}
 #custom-dashboard .today-counts .learn {--count-color:#e05c5c;}
 #custom-dashboard .today-counts .due {--count-color:#4caf6e;}
@@ -42,13 +48,14 @@ EXTRA_CSS = '''<style>html:has(#overview-wrapper),body:has(#overview-wrapper){ma
 #custom-dashboard.layout-overview .progress-stack {margin-bottom:18px;}
 #custom-dashboard.layout-overview .hint-text {margin-top:10px;}
 #custom-dashboard.layout-overview .button-container {margin-top:18px;}
-#custom-dashboard .history-panel {margin:14px 0 0;width:100%;text-align:left;}
+#custom-dashboard .history-panel {margin:14px 0 0;width:100%;text-align:start;}
 #custom-dashboard .history-panel h2 {font-size:13px;font-weight:500;color:var(--text-sub);margin:0 0 8px;}
 #custom-dashboard .history-plot {position:relative;height:76px;}
 #custom-dashboard .history-today {position:absolute;width:5px;height:5px;transform:translate(-50%,-50%);border-radius:50%;background:var(--accent-color);pointer-events:none;}
 #custom-dashboard .history-line {width:100%;height:76px;display:block;overflow:visible;}
 #custom-dashboard .history-empty {font-size:12px;color:var(--text-sub);margin:8px 0 0;}
 #custom-dashboard .history-caption {display:flex;justify-content:space-between;color:var(--text-sub);font-size:11px;margin-top:8px;}
+[dir=rtl] #custom-dashboard .history-caption {direction:ltr;}
 #custom-dashboard .widget,#custom-dashboard .diff-container,#custom-dashboard .start-btn {
  background:var(--surface-color)!important;border:1px solid color-mix(in srgb,var(--text-sub) 60%,var(--surface-color))!important;
  color:var(--text-main)!important;box-shadow:none!important;transform:none!important;
@@ -136,5 +143,5 @@ def render_dashboard(title, s, options, t, media):
     actions = f'<div class="button-container">{brainstorm}<button class="btn start-btn" onclick="pycmd(\'start_study\')">{label("Start Study")}</button></div>'
     if layout == 'focus':
         box = f'<div class="white-box">{controls}{header}{content}{actions}</div>'
-        return f'<div id="overview-wrapper"><div id="custom-dashboard" class="layout-focus">{box}</div></div>'
-    return f'<div id="overview-wrapper"><div id="custom-dashboard" class="layout-{layout}"{title_style}>{header}<div class="white-box">{controls}{content}{cloud_html}</div>{actions}</div></div>'
+        return f'<div id="overview-wrapper"{dir_attribute()}><div id="custom-dashboard" class="layout-focus">{box}</div></div>'
+    return f'<div id="overview-wrapper"{dir_attribute()}><div id="custom-dashboard" class="layout-{layout}"{title_style}>{header}<div class="white-box">{controls}{content}{cloud_html}</div>{actions}</div></div>'

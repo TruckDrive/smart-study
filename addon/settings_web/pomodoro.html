@@ -61,7 +61,7 @@
   .switch{position:relative;display:inline-block;width:40px;height:24px;flex-shrink:0;}
   .switch input{opacity:0;width:0;height:0;}
   .slider{position:absolute;inset:0;background:var(--switch-off);border-radius:24px;transition:background .2s;cursor:pointer;}
-  .slider::before{content:"";position:absolute;height:20px;width:20px;left:2px;top:2px;background:#fff;
+  .slider::before{content:"";position:absolute;height:20px;width:20px;inset-inline-start:2px;top:2px;background:#fff;
     border-radius:50%;transition:transform .2s cubic-bezier(.4,1.3,.5,1);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
   .switch input:checked + .slider{background:var(--accent);}
   .switch input:checked + .slider::before{transform:translateX(16px);}
@@ -156,6 +156,8 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
   outline: 2px solid var(--accent, var(--primary-color, #0071d3));
   outline-offset: 2px;
 }
+/* RTL */
+[dir=rtl] .switch input:checked + .slider::before{transform:translateX(-16px);}
 </style>
 </head>
 <body>
@@ -407,8 +409,9 @@ document.addEventListener('DOMContentLoaded', function(){
     tab.onclick=function(){selectTab(tab.id.replace('tab-',''));};
     tab.onkeydown=function(e){
       var tabs=Array.from(document.querySelectorAll('[role="tab"]')), index=tabs.indexOf(tab);
-      if(e.key==='ArrowRight') index=(index+1)%tabs.length;
-      else if(e.key==='ArrowLeft') index=(index+tabs.length-1)%tabs.length;
+      var forward=document.documentElement.dir==='rtl'?'ArrowLeft':'ArrowRight', backward=document.documentElement.dir==='rtl'?'ArrowRight':'ArrowLeft';
+      if(e.key===forward) index=(index+1)%tabs.length;
+      else if(e.key===backward) index=(index+tabs.length-1)%tabs.length;
       else if(e.key==='Home') index=0;else if(e.key==='End') index=tabs.length-1;else return;
       e.preventDefault();tabs[index].click();tabs[index].focus();
     };
@@ -470,10 +473,10 @@ document.addEventListener('DOMContentLoaded', function(){
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
-            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+            var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
                 + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'

@@ -215,14 +215,14 @@
         #new-map-btn {
             padding: 5px 11px; font-size: 0.82em; font-weight: 500;
             color: var(--button-text); background-color: var(--button-bg);
-            margin-left: 0;
+            margin-inline-start: 0;
         }
         #new-map-btn, #new-map-btn:hover { box-shadow: none !important; }
         #fullscreen-btn { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
 
         .button {
             background-color: var(--button-bg); color: var(--primary-color); border: 1px solid var(--input-border); padding: 8px 14px;
-            border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 5px;
+            border-radius: 8px; cursor: pointer; font-weight: 600; margin-inline-start: 5px;
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
             font-size: 0.88em;
         }
@@ -248,7 +248,7 @@
             font-size: 13px;
             padding: 6px 12px;
             border-radius: 6px;
-            margin-left: 4px;
+            margin-inline-start: 4px;
         }
         .header .button:hover { background: var(--snav-hover); box-shadow: none; }
         .header .button:active { transform: scale(0.97); }
@@ -274,7 +274,7 @@
         .hamburger-menu {
             position: relative;
             display: inline-block;
-            margin-left: 5px;
+            margin-inline-start: 5px;
         }
         .hamburger-btn {
             color: var(--button-text);
@@ -283,7 +283,7 @@
         .hamburger-dropdown {
             display: none;
             position: absolute;
-            right: 0;
+            inset-inline-end:0;
             top: calc(100% + 8px);
             background: var(--modal-bg);
             border: 1px solid var(--header-border);
@@ -304,7 +304,7 @@
             align-items: center;
             gap: 11px;
             width: 100%;
-            text-align: left;
+            text-align: start;
             background: none;
             border: none;
             padding: 10px 14px;
@@ -336,31 +336,31 @@
         .modal-content { max-height: 90vh; display: flex; flex-direction: column; }
 
         #modal-ai-helper-content {
-            text-align: left; font-size: 0.9em; line-height: 1.5; overflow-y: auto; padding-right: 15px; flex-grow: 1;
+            text-align: start; font-size: 0.9em; line-height: 1.5; overflow-y: auto; padding-inline-end: 15px; flex-grow: 1;
         }
         #modal-ai-helper-content h3 { margin-top: 15px; margin-bottom: 5px; color: var(--text-color); }
         #modal-ai-helper-content p, #modal-ai-helper-content ul { margin-top: 0; }
-        #modal-ai-helper-content ul { padding-left: 20px; }
+        #modal-ai-helper-content ul { padding-inline-start: 20px; }
         #ai-prompt-area, #ai-json-input, #json-textarea {
             width: 100%; font-family: monospace; font-size: 0.9em; box-sizing: border-box; margin-top: 5px; border: 1px solid var(--input-border); border-radius: 4px; background-color: var(--input-bg); color: var(--text-color);
         }
         #ai-prompt-area { height: 180px; }
         #ai-json-input { height: 150px; }
         
-        #modal-info-content { text-align: left; font-size: 0.9em; line-height: 1.5; max-height: 70vh; overflow-y: auto; }
+        #modal-info-content { text-align: start; font-size: 0.9em; line-height: 1.5; max-height: 70vh; overflow-y: auto; }
         #modal-info-content h3 { margin-top: 15px; margin-bottom: 5px; color: var(--text-color); }
         #modal-info-content p, #modal-info-content ul { margin-top: 0; }
-        #modal-info-content ul { padding-left: 20px; }
+        #modal-info-content ul { padding-inline-start: 20px; }
         #modal-info-content strong { color: var(--danger-color); }
 
         .map-switcher .button { padding: 5px 11px; font-size: 0.82em; font-weight: 500; color: var(--button-text); background-color: var(--button-bg); }
         
-        #center-view-btn { position: fixed; bottom: 58px; right: 20px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: var(--button-text); background-color: var(--button-bg); transition: opacity 0.3s ease, box-shadow 0.2s; border-radius: 10px; font-weight: 400; }
+        #center-view-btn { position: fixed; bottom: 58px; inset-inline-end:20px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: var(--button-text); background-color: var(--button-bg); transition: opacity 0.3s ease, box-shadow 0.2s; border-radius: 10px; font-weight: 400; }
         #center-view-btn:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.22); }
-        .zoom-controls { position: fixed; bottom: 58px; left: 20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.3s ease; }
+        .zoom-controls { position: fixed; bottom: 58px; inset-inline-start:20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.3s ease; }
         .zoom-btn { width: 42px; height: 42px; font-size: 22px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: var(--button-text); background-color: var(--button-bg); margin: 0; border-radius: 10px; }
         .zoom-btn:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.22); }
-        .history-controls { position: fixed; bottom: 228px; left: 20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.3s ease; }
+        .history-controls { position: fixed; bottom: 228px; inset-inline-start:20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.3s ease; }
         .history-btn { width: 34px; height: 34px; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: var(--button-text); background-color: var(--button-bg); margin: 0; border-radius: 8px; }
         .history-btn:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.22); }
 
@@ -410,12 +410,12 @@
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-content h2 { margin-top: 0; color: var(--text-color); font-size: 1.2em; }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; flex-shrink: 0; }
-        .modal-buttons .button { margin-left: 0; padding: 9px 20px; border-radius: 9px; font-size: 0.9em; }
+        .modal-buttons .button { margin-inline-start: 0; padding: 9px 20px; border-radius: 9px; font-size: 0.9em; }
         .modal-input { width: 100%; padding: 10px 13px; box-sizing: border-box; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); border-radius: 9px; margin-bottom: 20px; font-family: inherit; font-size: 0.95em; }
         .modal-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,113,211,0.15); }
         #json-textarea { width: 100%; height: 200px; resize: vertical; box-sizing: border-box; border-radius: 9px; padding: 10px; font-size: 0.88em; }
         #ai-prompt-area, #ai-json-input { border-radius: 9px; padding: 10px; }
-        #modal-error { color: var(--danger-color); margin-top: 10px; text-align: left; font-size: 0.9em; display: none; }
+        #modal-error { color: var(--danger-color); margin-top: 10px; text-align: start; font-size: 0.9em; display: none; }
 
         .context-menu { position: absolute; display: none; background: var(--modal-bg); color: var(--text-color); border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.18); z-index: 1001; padding: 8px; min-width: 160px; border: 1px solid var(--header-border); }
         .context-menu-section { margin-bottom: 8px; }
@@ -475,7 +475,7 @@
             resize: none;
             z-index: 200;
             box-sizing: border-box;
-            text-align: left;
+            text-align: start;
             overflow: hidden;
             line-height: 1.35;
         }
@@ -574,22 +574,22 @@
         }
         .mm-toast {
             background: var(--modal-bg); color: var(--text-color);
-            border: 1px solid var(--header-border); border-left: 4px solid var(--primary-color);
+            border: 1px solid var(--header-border); border-inline-start: 4px solid var(--primary-color);
             border-radius: 10px; padding: 10px 16px; font-size: 0.86em;
             box-shadow: 0 6px 24px rgba(0,0,0,0.2); pointer-events: auto;
-            max-width: 520px; text-align: left; opacity: 0; transform: translateY(-6px);
+            max-width: 520px; text-align: start; opacity: 0; transform: translateY(-6px);
             transition: opacity 0.25s ease, transform 0.25s ease;
         }
         .mm-toast.show { opacity: 1; transform: translateY(0); }
-        .mm-toast.warning { border-left-color: #ffc107; }
-        .mm-toast.error { border-left-color: var(--danger-color); }
-        .mm-toast.success { border-left-color: var(--success-color); }
+        .mm-toast.warning { border-inline-start-color: #ffc107; }
+        .mm-toast.error { border-inline-start-color: var(--danger-color); }
+        .mm-toast.success { border-inline-start-color: var(--success-color); }
         #mm-error-banner {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 5000;
             background: var(--modal-bg); color: var(--text-color);
             border-top: 2px solid var(--danger-color);
             box-shadow: 0 -6px 24px rgba(0,0,0,0.25);
-            padding: 12px 18px; font-size: 0.85em; display: none; text-align: left;
+            padding: 12px 18px; font-size: 0.85em; display: none; text-align: start;
         }
         #mm-error-banner.visible { display: block; }
         #mm-error-banner .mm-eb-title { font-weight: 700; color: var(--danger-color); margin-bottom: 4px; }
@@ -598,7 +598,7 @@
             background: var(--input-bg); border: 1px solid var(--input-border);
             border-radius: 6px; padding: 8px; max-height: 140px; overflow: auto;
             font-size: 0.85em; white-space: pre-wrap; word-break: break-word;
-            display: none; margin: 0 0 8px 0; text-align: left;
+            display: none; margin: 0 0 8px 0; text-align: start;
         }
         #mm-error-banner.expanded pre { display: block; }
         #mm-error-banner .mm-eb-actions { display: flex; gap: 8px; }
@@ -625,9 +625,9 @@
 #context-menu .node-menu-toggle[aria-pressed=true]{background:var(--primary-color);border-color:var(--primary-color);color:white}
 #context-menu input[type=color]{box-sizing:border-box;width:32px;height:32px;padding:4px;border:1px solid var(--workspace-border,var(--header-border,#ccc));border-radius:7px;background:var(--workspace-button,var(--button-bg,#fff))}
 #context-menu input[type=color]::-webkit-color-swatch-wrapper{padding:0}#context-menu input[type=color]::-webkit-color-swatch{border:0;border-radius:3px}
-#context-menu .node-menu-reset{display:block;margin:8px 0 0 auto;padding:2px 0;min-height:24px;border:0;background:transparent;color:var(--workspace-muted,var(--text-muted,#666));font-size:12px}
+#context-menu .node-menu-reset{display:block;margin-block:8px 0;margin-inline:auto 0;padding:2px 0;min-height:24px;border:0;background:transparent;color:var(--workspace-muted,var(--text-muted,#666));font-size:12px}
 #context-menu .node-menu-action-row{display:flex;gap:4px}
-#context-menu .node-menu-action{display:flex;gap:9px;align-items:center;text-align:left;min-height:34px;padding:6px 8px;border:0;border-radius:7px;background:transparent;width:100%}
+#context-menu .node-menu-action{display:flex;gap:9px;align-items:center;text-align:start;min-height:34px;padding:6px 8px;border:0;border-radius:7px;background:transparent;width:100%}
 #context-menu .node-menu-action svg{flex:none}
 #context-menu .node-menu-remove{display:grid;place-items:center;flex:0 0 32px;padding:0;border:0;border-radius:7px;background:transparent}
 #context-menu .node-menu-action:hover,#context-menu .node-menu-remove:hover,#context-menu .node-menu-toggle:hover{background:var(--workspace-hover,var(--button-hover,#eee))}
@@ -653,7 +653,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
 .tour-invitation h3 {font-size:14px;margin:0 0 8px;}
 .tour-intro-summary {margin:0 0 20px;}
 .tour-intro-steps {margin-bottom:20px;}
-.tour-intro-steps ul {padding-left:20px;margin:0;}
+.tour-intro-steps ul {padding-inline-start:20px;margin:0;}
 .tour-intro-steps li + li {margin-top:6px;}
 .tour-intro-note {padding:12px 14px;border:1px solid var(--header-border);border-radius:8px;background:var(--button-bg);}
 .tour-intro-note p {font-size:13px;margin:0;}
@@ -675,6 +675,9 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
 .tutorial-practice .drag-handle {opacity:1;}
 .tutorial-practice .mindmap-container {min-height:80px;}
 @media(max-height:500px) {#tour-guide {max-height:38vh;overflow:auto;padding:6px 10px;}}
+/* RTL */
+[dir=rtl] .mindmap-container #mindmap-viewport, [dir=rtl] #selection-rect { direction: ltr; }
+[dir=rtl] .history-btn { transform: scaleX(-1); }
 </style>
 
 <link rel="stylesheet" href="web_roadmap/tool_nav.css">
@@ -1399,7 +1402,7 @@ ${mm('ai_prompt_generate', 'Generate the mind map JSON now.')}`;
                 modal.aiHelperContent.innerHTML = `
                     <p>${mm('ai_step1', 'Step 1: Customize and Copy the Prompt')}</p>
                     <textarea id="ai-prompt-area"></textarea>
-                    <button class="button" id="copy-prompt-btn" style="margin-left: 0; margin-top: 5px;">${mm('copy_prompt', 'Copy Prompt')}</button>
+                    <button class="button" id="copy-prompt-btn" style="margin-inline-start: 0; margin-top: 5px;">${mm('copy_prompt', 'Copy Prompt')}</button>
                     <h3>${mm('ai_step2', 'Step 2: Paste the AI-Generated JSON')}</h3>
                     <textarea id="ai-json-input" placeholder="${mm('paste_json', 'Paste JSON here...')}"></textarea>
                 `;

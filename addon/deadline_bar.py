@@ -21,6 +21,12 @@ def get_addon_config_dir_path() -> Optional[str]:
     return os.path.dirname(__file__)
 
 try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
+try:
     from .locales import _
 except ImportError:
     def _(text):  # type: ignore
@@ -363,7 +369,7 @@ class DeadlineManager:
                 background-color: var(--progress-bg);
                 border-radius: 6px;
                 overflow: hidden;
-                text-align: left;
+                text-align: start;
             }}
             .deadline-progress-fill {{
                 height: 100%;
@@ -395,7 +401,7 @@ class DeadlineManager:
         # "html" would shadow the imported html module for the whole function
         # and break the html.escape() calls above (UnboundLocalError).
         bar_html = f"""
-        <div class="deadline-bar-container" title="{tooltip_text}">
+        <div class="deadline-bar-container"{dir_attribute()} title="{tooltip_text}">
             <span class="deadline-title-label">{title}</span>
             {nav_html}
             <div class="deadline-progress-bg">

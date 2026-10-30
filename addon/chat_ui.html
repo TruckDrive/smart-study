@@ -53,7 +53,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .hbtn:hover{color:var(--text);background:var(--surface)}
 
 /* ── Settings panel ── */
-#settings-panel{display:none;position:absolute;top:calc(100% + 4px);right:8px;
+#settings-panel{display:none;position:absolute;top:calc(100% + 4px);inset-inline-end:8px;
   background:var(--bg);border:1px solid var(--border);border-radius:14px;
   padding:14px;width:260px;z-index:300;box-shadow:0 6px 28px rgba(0,0,0,.15);
   max-height:calc(100vh - 80px);overflow-y:auto}
@@ -85,7 +85,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 
 /* ── Info panel ── */
-#info-panel{display:none;position:absolute;top:calc(100% + 4px);right:8px;
+#info-panel{display:none;position:absolute;top:calc(100% + 4px);inset-inline-end:8px;
   background:var(--bg);border:1px solid var(--border);border-radius:14px;
   padding:16px;width:290px;z-index:300;box-shadow:0 6px 28px rgba(0,0,0,.15);
   max-height:calc(100vh - 80px);overflow-y:auto}
@@ -104,7 +104,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
   border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;
   scrollbar-width:none;position:relative;z-index:1}
 #chips-bar::-webkit-scrollbar{display:none}
-#chips-bar .chip-manage-btn{margin-left:auto}
+#chips-bar .chip-manage-btn{margin-inline-start:auto}
 
 /* ── Chips shared styles ── */
 .chip{display:inline-flex;align-items:center;background:var(--chip-bg);
@@ -154,7 +154,7 @@ body.empty #start-center{display:flex}
 /* ── Empty state prominent input ── */
 #start-input-box{width:100%;display:flex;align-items:center;gap:8px;
   background:var(--bg);border:1px solid var(--border);border-radius:22px;
-  padding:12px 10px 12px 18px;transition:border-color .15s,box-shadow .15s;
+  padding-block:12px;padding-inline:18px 10px;transition:border-color .15s,box-shadow .15s;
   box-shadow:var(--shadow-start);margin-top:22px}
 #start-input-box:focus-within{border-color:var(--accent);
   box-shadow:0 4px 28px var(--accent-glow)}
@@ -175,7 +175,7 @@ body.empty #start-center{display:flex}
 #start-center .card-context-row{width:100%}
 .card-context-toggle{display:inline-flex;align-items:center;gap:6px;min-height:27px;
   background:transparent;color:var(--text-muted);border:1px solid var(--border);
-  border-radius:14px;padding:4px 9px 4px 7px;font:inherit;font-size:10.5px;font-weight:550;
+  border-radius:14px;padding-block:4px;padding-inline:7px 9px;font:inherit;font-size:10.5px;font-weight:550;
   cursor:pointer;white-space:nowrap;transition:color .14s,border-color .14s,background .14s,opacity .14s}
 .card-context-toggle svg{width:13px;height:13px;flex-shrink:0}
 .card-context-toggle:hover:not(:disabled){color:var(--text);border-color:var(--text-muted)}
@@ -191,10 +191,10 @@ body.empty #start-center{display:flex}
   border:0;background:transparent;color:var(--text-faint);border-radius:50%;font:inherit;
   font-size:11px;font-weight:700;cursor:pointer;transition:color .12s,background .12s}
 .context-info-btn:hover,.context-info-btn[aria-expanded="true"]{color:var(--accent);background:var(--accent-glow)}
-.context-info-popover{display:none;position:absolute;right:0;bottom:calc(100% + 7px);
+.context-info-popover{display:none;position:absolute;inset-inline-end:0;bottom:calc(100% + 7px);
   width:280px;max-width:calc(100vw - 28px);max-height:calc(100vh - 80px);overflow-y:auto;padding:10px 11px;background:var(--bg);
   border:1px solid var(--border);border-radius:10px;box-shadow:0 7px 25px rgba(0,0,0,.14);
-  color:var(--text-muted);font-size:10.5px;font-weight:400;line-height:1.5;text-align:left;z-index:40}
+  color:var(--text-muted);font-size:10.5px;font-weight:400;line-height:1.5;text-align:start;z-index:40}
 .context-info-popover.open{display:block}
 .context-info-popover b{color:var(--text);font-weight:600}
 
@@ -222,7 +222,7 @@ body.empty #start-center{display:flex}
   background:var(--surface);border:1px solid var(--border);color:var(--text);
   border-radius:6px;padding:3px 4px;outline:none;flex-shrink:0}
 .cm-shortcut-input:focus{border-color:var(--accent)}
-.cm-shortcut-label{font-size:10px;color:var(--text-muted);margin-right:2px;flex-shrink:0}
+.cm-shortcut-label{font-size:10px;color:var(--text-muted);margin-inline-end:2px;flex-shrink:0}
 .cm-toggle-btn{font-size:11px;font-family:inherit;padding:3px 10px;border-radius:20px;
   border:1px solid var(--border);cursor:pointer;color:var(--text-muted);
   background:none;flex-shrink:0;transition:all .12s}
@@ -305,8 +305,8 @@ body:not(.empty) #chat{display:flex}
 .msg.ai{align-items:flex-start}
 .bubble{max-width:88%;padding:9px 13px;border-radius:18px;
   font-size:var(--chat-font-size,13px);line-height:var(--chat-line-height,1.6);word-break:break-word}
-.msg.user .bubble{background:var(--user-bubble);border-bottom-right-radius:5px}
-.msg.ai   .bubble{background:var(--ai-bubble);border-bottom-left-radius:5px;
+.msg.user .bubble{background:var(--user-bubble);border-end-end-radius:5px}
+.msg.ai   .bubble{background:var(--ai-bubble);border-end-start-radius:5px;
   border:1px solid var(--accent-border,rgba(59,130,246,.18))}
 .bubble code{background:var(--code-bg);padding:1px 5px;border-radius:4px;
   font-size:11.5px;font-family:"SF Mono","Consolas","Fira Code",monospace}
@@ -315,11 +315,11 @@ body:not(.empty) #chat{display:flex}
   font-size:11.5px;font-family:"SF Mono","Consolas","Fira Code",monospace;
   white-space:pre-wrap;word-break:break-all}
 .bubble pre code{background:none;padding:0;font-size:inherit}
-.bubble ul,.bubble ol{padding-left:18px;margin:4px 0}
+.bubble ul,.bubble ol{padding-inline-start:18px;margin:4px 0}
 .bubble li{margin:2px 0}
 .bubble strong{font-weight:600}
 .message-copy{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
-  margin:3px 0 0 5px;padding:0;border:0;border-radius:7px;background:transparent;
+  margin-block:3px 0;margin-inline:5px 0;padding:0;border:0;border-radius:7px;background:transparent;
   color:var(--text-muted);cursor:pointer;transition:background .12s,color .12s}
 .message-copy:hover{background:var(--surface);color:var(--text)}
 .message-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -338,7 +338,7 @@ html.dark .msg.ai .bubble.bubble--error, body.dark .msg.ai .bubble.bubble--error
 
 /* ── Typing indicator ── */
 .typing-bubble{background:var(--ai-bubble);border-radius:18px;
-  border-bottom-left-radius:5px;padding:8px 14px;display:inline-block}
+  border-end-start-radius:5px;padding:8px 14px;display:inline-block}
 .typing-dots{display:flex;gap:4px;align-items:center}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);
   animation:bop .9s ease-in-out infinite}
@@ -350,7 +350,7 @@ html.dark .msg.ai .bubble.bubble--error, body.dark .msg.ai .bubble.bubble--error
 #input-wrap{display:none;padding:6px 14px 4px;flex-shrink:0;position:relative;z-index:1}
 body:not(.empty) #input-wrap{display:block}
 #input-box{display:flex;align-items:center;gap:8px;background:var(--input-bg);
-  border:1px solid var(--border);border-radius:18px;padding:8px 8px 8px 14px;
+  border:1px solid var(--border);border-radius:18px;padding-block:8px;padding-inline:14px 8px;
   transition:border-color .15s}
 #input-box:focus-within{border-color:var(--accent)}
 #user-input{flex:1;background:none;border:none;outline:none;color:var(--text);
@@ -366,7 +366,7 @@ body:not(.empty) #input-wrap{display:block}
 .input-meta-row{display:flex;align-items:center;justify-content:space-between;
   gap:8px;margin-top:5px;padding:0 3px;min-height:27px}
 #input-wrap .card-context-row{margin-top:0;padding:0;flex:0 0 auto}
-#disclaimer{flex:1 1 auto;min-width:0;text-align:left;font-size:9.5px;
+#disclaimer{flex:1 1 auto;min-width:0;text-align:start;font-size:9.5px;
   line-height:1.3;color:var(--text-faint);user-select:none}
 </style>
 <script>
@@ -383,6 +383,8 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
   outline: 2px solid var(--accent, var(--primary-color, #0071d3));
   outline-offset: 2px;
 }
+/* RTL */
+[dir=rtl] .bubble,[dir=rtl] .bubble :is(p,li,h1,h2,h3,h4,h5,h6,blockquote){unicode-bidi:plaintext}
 </style>
 </head>
 <body class="empty">
@@ -476,6 +478,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
           <option value="Chinese (Simplified)">Chinese (Simplified)</option>
           <option value="Korean">Korean</option>
           <option value="Polish">Polish</option>
+          <option value="Persian">Persian</option>
         </select>
       </div>
       <div class="s-row">
@@ -1673,7 +1676,7 @@ function appendThinking(chunk) {
     sum.style.cssText = 'color:var(--text-muted);cursor:pointer;user-select:none';
     var body = document.createElement('div');
     body.style.cssText = 'color:var(--text-muted);white-space:pre-wrap;margin-top:4px;'
-      + 'padding-left:8px;border-left:2px solid var(--text-muted);opacity:0.85';
+      + 'padding-inline-start:8px;border-inline-start:2px solid var(--text-muted);opacity:0.85';
     _thinkEl.appendChild(sum);
     _thinkEl.appendChild(body);
     _thinkEl._body = body;
@@ -1891,10 +1894,10 @@ document.querySelector('.ai-settings-tabs').addEventListener('keydown', event=>{
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
-            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+            var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
                 + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'

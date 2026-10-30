@@ -8,6 +8,7 @@ import time
 from typing import Any, Optional
 
 from .locales import _
+from .rtl import dir_attribute
 from .theme import palette
 from . import statistics_widget
 
@@ -211,7 +212,7 @@ def render_minimal_dashboard_sections(
       }}
       .sp-min-box {{
         width: min(760px, calc(100% - 24px)); max-width: calc(100vw - 24px);
-        margin-left: auto; margin-right: auto; padding: 14px 16px;
+        margin-inline-start: auto; margin-inline-end: auto; padding: 14px 16px;
         box-sizing: border-box; border: 1px solid var(--sp-min-border);
         border-radius: 12px;
         background: var(--sp-min-surface); color: var(--sp-min-text);
@@ -319,7 +320,7 @@ def render_minimal_dashboard_sections(
       }}
       .sp-min-fill {{
         position: absolute !important; display: block !important;
-        left: 0 !important; right: auto !important; top: 0 !important; bottom: 0 !important;
+        inset-inline-start: 0 !important; inset-inline-end: auto !important; top: 0 !important; bottom: 0 !important;
         width: var(--sp-min-progress, 0%) !important; height: 100% !important;
         min-width: 0 !important; margin: 0 !important; padding: 0 !important;
         border: 0 !important; border-radius: inherit !important;
@@ -430,7 +431,7 @@ def render_minimal_dashboard_sections(
         background: var(--sp-min-surface); box-shadow: 0 18px 55px rgba(0,0,0,.28);
       }}
       .sp-min-fact-close {{
-        position: sticky; z-index: 3; top: 0; margin: 0 0 6px auto;
+        position: sticky; z-index: 3; top: 0; margin-block:0 6px;margin-inline:auto 0;
         width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%;
         display: flex; align-items: center; justify-content: center; cursor: pointer;
         color: var(--sp-min-text); background: var(--sp-min-surface);
@@ -647,7 +648,7 @@ def render_minimal_dashboard_sections(
         )
 
     top_markup = f"""
-    <section class="sp-min-box sp-min-overview" aria-label="{_esc(_('Dashboard'))}">
+    <section class="sp-min-box sp-min-overview"{dir_attribute()} aria-label="{_esc(_('Dashboard'))}">
       <div class="sp-min-primary">
         <div class="sp-min-metric-card sp-min-simple-metric sp-min-interactive" role="button" tabindex="0"
              onclick="{gamification_click}"
@@ -695,7 +696,7 @@ def render_minimal_dashboard_sections(
         {daily_widget_html}
       </div>
     </section>
-    <section class="sp-min-box sp-min-deadline-box sp-min-interactive{deadline_nav_class}" role="button" tabindex="0"
+    <section class="sp-min-box sp-min-deadline-box sp-min-interactive{deadline_nav_class}"{dir_attribute()} role="button" tabindex="0"
              aria-label="{_esc(_('Deadline'))}" title="{_esc(deadline_tooltip)}"
              onclick="window.smartstudyDashboardCommand('pycmd:smartstudy:deadline_settings','deadline')"
              onkeydown="if(event.key==='Enter'||event.key===' '){{event.preventDefault();this.click();}}">
@@ -704,7 +705,7 @@ def render_minimal_dashboard_sections(
       <div class="sp-min-track"><i class="sp-min-fill" style="--sp-min-progress:{deadline_progress:.1f}%"></i></div>
       <span class="sp-min-deadline-days">{_esc(deadline_days)}</span>
     </section>
-    <div id="sp-min-fact-overlay" class="sp-min-fact-overlay" aria-hidden="true"
+    <div id="sp-min-fact-overlay" class="sp-min-fact-overlay"{dir_attribute()} aria-hidden="true"
          onclick="if(event.target===this)window.smartstudyCloseDailyFact()">
       <div class="sp-min-fact-dialog" role="dialog" aria-modal="true" aria-label="{_esc(_('Daily Fact'))}">
         <div id="sp-min-fact-close" class="sp-min-fact-close" role="button" tabindex="0" aria-label="{_esc(_('Close'))}"
@@ -716,7 +717,7 @@ def render_minimal_dashboard_sections(
     """
 
     stats_markup = f"""
-    <section class="sp-min-box sp-min-statistics" role="button" tabindex="0"
+    <section class="sp-min-box sp-min-statistics"{dir_attribute()} role="button" tabindex="0"
              aria-label="{_esc(_('Statistics'))}"
              onclick="window.smartstudyDashboardCommand('pycmd:smartstudy:stats_info','statistics')"
              onkeydown="if(event.key==='Enter'||event.key===' '){{event.preventDefault();this.click();}}">

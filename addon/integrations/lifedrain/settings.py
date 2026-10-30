@@ -6,6 +6,7 @@ from __future__ import annotations
 from operator import itemgetter
 from typing import TYPE_CHECKING, Any, Iterator, Optional, Union
 
+from ..strings import fa_tr
 from .defaults import BEHAVIORS, DEFAULTS, POSITION_OPTIONS, TEXT_FORMAT
 from .version import VERSION
 
@@ -36,7 +37,7 @@ class Form:
             text: The text to be shown by the label.
             color: Optional. The color of the text in hex format.
         """
-        label = self._qt.QLabel(text)
+        label = self._qt.QLabel(fa_tr(text))
         label.setWordWrap(True)
         if color:
             label.setStyleSheet(f'color: {color}')
@@ -54,12 +55,13 @@ class Form:
             placeholder: A sample input or tip
             tooltip: The tooltip to be shown.
         """
-        label = self._qt.QLabel(label_text)
+        label = self._qt.QLabel(fa_tr(label_text))
         text_field = self._qt.QLineEdit(self.widget)
         text_field.setMaxLength(15)
         if placeholder is not None:
             text_field.setPlaceholderText(placeholder)
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             label.setToolTip(tooltip)
             text_field.setToolTip(tooltip)
 
@@ -81,11 +83,12 @@ class Form:
             options: A list of options.
             tooltip: The tooltip to be shown.
         """
-        label = self._qt.QLabel(label_text)
+        label = self._qt.QLabel(fa_tr(label_text))
         combo_box = self._qt.QComboBox(self.widget)
         for option in options:
-            combo_box.addItem(option)
+            combo_box.addItem(fa_tr(option))
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             label.setToolTip(tooltip)
             combo_box.setToolTip(tooltip)
 
@@ -105,8 +108,9 @@ class Form:
             label_text: A text that describes what is the check box for.
             tooltip: The tooltip to be shown.
         """
-        check_box = self._qt.QCheckBox(label_text, self.widget)
+        check_box = self._qt.QCheckBox(fa_tr(label_text), self.widget)
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             check_box.setToolTip(tooltip)
 
         check_box.get_value = check_box.isChecked
@@ -126,10 +130,11 @@ class Form:
             val_range: A list of two integers that are the range.
             tooltip: The tooltip to be shown.
         """
-        label = self._qt.QLabel(label_text)
+        label = self._qt.QLabel(fa_tr(label_text))
         spin_box = self._qt.QSpinBox(self.widget)
         spin_box.setRange(val_range[0], val_range[1])
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             label.setToolTip(tooltip)
             spin_box.setToolTip(tooltip)
 
@@ -151,12 +156,13 @@ class Form:
             val_range: A list of two floats that are the range.
             tooltip: The tooltip to be shown.
         """
-        label = self._qt.QLabel(label_text)
+        label = self._qt.QLabel(fa_tr(label_text))
         double_spin_box = self._qt.QDoubleSpinBox(self.widget)
         double_spin_box.setRange(val_range[0], val_range[1])
         double_spin_box.setDecimals(1)
         double_spin_box.setSingleStep(0.1)
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             label.setToolTip(tooltip)
             double_spin_box.setToolTip(tooltip)
 
@@ -184,14 +190,15 @@ class Form:
             css = f'QLabel {{ background-color: {color}; }}'
             preview_label.setStyleSheet(css)
 
-        label = self._qt.QLabel(label_text)
-        select_button = self._qt.QPushButton('Select')
+        label = self._qt.QLabel(fa_tr(label_text))
+        select_button = self._qt.QPushButton(fa_tr('Select'))
         preview_label = self._qt.QLabel('')
         color_dialog = self._qt.QColorDialog(select_button)
         color_dialog.setOption(
             self._qt.QColorDialog.ColorDialogOption.DontUseNativeDialog)
         select_button.pressed.connect(choose_color)
         if tooltip is not None:
+            tooltip = fa_tr(tooltip)
             label.setToolTip(tooltip)
             select_button.setToolTip(tooltip)
             preview_label.setToolTip(tooltip)
@@ -285,16 +292,16 @@ def global_settings(aqt: Any, mw: AnkiQt, config: GlobalConf, deck_manager: Deck
 
     conf = config.get()
     dialog = aqt.QDialog(mw)
-    dialog.setWindowTitle(f'Life Drain Global Settings (v{VERSION})')
+    dialog.setWindowTitle(fa_tr('Life Drain Global Settings (v{version})').format(version=VERSION))
 
     basic_tab = _global_basic_tab(aqt, conf)
     bar_style_tab = _global_bar_style_tab(aqt, conf)
     deck_defaults_tab = _global_deck_defaults(aqt, conf)
 
     tab_widget = aqt.QTabWidget()
-    tab_widget.addTab(basic_tab, 'Basic')
-    tab_widget.addTab(bar_style_tab, 'Bar Style')
-    tab_widget.addTab(deck_defaults_tab, 'Deck Defaults')
+    tab_widget.addTab(basic_tab, fa_tr('Basic'))
+    tab_widget.addTab(bar_style_tab, fa_tr('Bar Style'))
+    tab_widget.addTab(deck_defaults_tab, fa_tr('Deck Defaults'))
 
     button_box = aqt.QDialogButtonBox(
         aqt.QDialogButtonBox.StandardButton.Ok |
@@ -340,13 +347,13 @@ program behave when suspending a card/note?''')
 There is no validation for your shortcut string, so edit with care!
 Invalid shortcuts, or already used shortcuts won't work.'''
         tab.text_field('globalShortcut', 'Global Settings', DEFAULTS['globalSettingsShortcut'],
-                       'Shortcut for the Global Settings.' + shortcut_tooltip)
+                       fa_tr('Shortcut for the Global Settings.') + fa_tr(shortcut_tooltip))
         tab.text_field('deckShortcut', 'Deck Settings', DEFAULTS['deckSettingsShortcut'],
-                       'Shortcut for the Deck Settings.' + shortcut_tooltip)
+                       fa_tr('Shortcut for the Deck Settings.') + fa_tr(shortcut_tooltip))
         tab.text_field('pauseShortcut', 'Pause', DEFAULTS['pauseShortcut'],
-                       'Shortcut for pausing.' + shortcut_tooltip)
+                       fa_tr('Shortcut for pausing.') + fa_tr(shortcut_tooltip))
         tab.text_field('recoverShortcut', 'Recover', None,
-                       'Shortcut for recovering.' + shortcut_tooltip)
+                       fa_tr('Shortcut for recovering.') + fa_tr(shortcut_tooltip))
         tab.fill_space()
         return tab.widget
 
@@ -568,7 +575,7 @@ def deck_settings(aqt: Any, mw: AnkiQt, config: DeckConf, global_config: GlobalC
 
     conf = config.get()
     dialog = aqt.QDialog(mw)
-    dialog.setWindowTitle(f'Life Drain Deck Settings for {conf["name"]}')
+    dialog.setWindowTitle(fa_tr('Life Drain Deck Settings for {name}').format(name=conf['name']))
 
     global_conf = global_config.get()
     if global_conf['shareDrain']:
@@ -578,8 +585,8 @@ def deck_settings(aqt: Any, mw: AnkiQt, config: DeckConf, global_config: GlobalC
     damage_tab = _deck_damage_tab(aqt, conf)
 
     tab_widget = aqt.QTabWidget()
-    tab_widget.addTab(basic_tab, 'Basic')
-    tab_widget.addTab(damage_tab, 'Damage')
+    tab_widget.addTab(basic_tab, fa_tr('Basic'))
+    tab_widget.addTab(damage_tab, fa_tr('Damage'))
 
     button_box = aqt.QDialogButtonBox(
         aqt.QDialogButtonBox.StandardButton.Ok |

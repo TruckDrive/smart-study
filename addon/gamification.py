@@ -20,6 +20,12 @@ except (ImportError, AttributeError):
     ADDON_FOLDER_NAME = "SmartStudy1"
 
 try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
+try:
     from .locales import _
 except ImportError:
     def _(text):  # type: ignore
@@ -1034,7 +1040,7 @@ class GamificationManager:
             }}
             .gamewidget {{
                 background-color: var(--stat-bg); border-radius: 12px; padding: 15px;
-                border: 1px solid var(--stat-border); text-align: left;
+                border: 1px solid var(--stat-border); text-align: start;
                 flex: 1 1 auto; min-width: 0; box-sizing: border-box;
                 display: flex; flex-direction: column; justify-content: center; position: relative;
             }}
@@ -1131,6 +1137,6 @@ class GamificationManager:
         
         gamification_container_style = f""" width:100%; max-width: {WIDGET_CONTAINER_MAX_WIDTH}; margin: 0 auto {margin_b} auto; padding: 0 10px; box-sizing: border-box; """
         
-        html = f'<div id="gamification-widgets-container" style="{gamification_container_style}"><div class="gamification-grid">{lvl_wid}{strk_wid}{chall_wid}{next_lvl_wid}</div></div>'
+        html = f'<div id="gamification-widgets-container"{dir_attribute()} style="{gamification_container_style}"><div class="gamification-grid">{lvl_wid}{strk_wid}{chall_wid}{next_lvl_wid}</div></div>'
 
         return css + html

@@ -93,7 +93,7 @@
     padding:2px 9px;border-radius:12px;background:var(--accent-soft);
     color:var(--accent-bright);font-size:11px;font-weight:650;font-variant-numeric:tabular-nums;
   }
-  .ch-chip.done{background:transparent;color:var(--green);padding-right:0;}
+  .ch-chip.done{background:transparent;color:var(--green);padding-inline-end:0;}
   #challengeText{margin:0 0 12px;line-height:1.5;font-size:13px;}
   .ch-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:13px;}
   .cbar{flex:1;height:10px;border-radius:6px;background:var(--track);overflow:hidden;}
@@ -119,12 +119,12 @@
   .achievement-button.locked>img{filter:grayscale(1);opacity:.32;}
   .achievement-button:hover{background:var(--accent-soft);}
   .achievement-button:focus-visible,.achievement-button[aria-expanded="true"]{outline:2px solid var(--accent-bright);outline-offset:1px;}
-  .achievement-lock{position:absolute;bottom:1px;right:0;background:var(--card);border:1px solid var(--border);border-radius:50%;padding:2px;}
+  .achievement-lock{position:absolute;bottom:1px;inset-inline-end:0;background:var(--card);border:1px solid var(--border);border-radius:50%;padding:2px;}
   .achievement-lock svg{width:12px;height:12px;}
-  .achievement-new{position:absolute;top:-5px;right:-5px;min-width:25px;padding:3px 5px;border-radius:8px;background:var(--accent);color:#fff;font-size:8px;font-weight:750;line-height:1;letter-spacing:.02em;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.16);}
-  .achievement-favorite-mark{position:absolute;left:0;bottom:0;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);color:var(--accent-bright);font-size:12px;line-height:1;}
+  .achievement-new{position:absolute;top:-5px;inset-inline-end:-5px;min-width:25px;padding:3px 5px;border-radius:8px;background:var(--accent);color:#fff;font-size:8px;font-weight:750;line-height:1;letter-spacing:.02em;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.16);}
+  .achievement-favorite-mark{position:absolute;inset-inline-start:0;bottom:0;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);color:var(--accent-bright);font-size:12px;line-height:1;}
   #achievementCount{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
-  #achievementGoal{width:100%;min-height:44px;margin:8px 0 0;padding:8px 10px;border:1px solid transparent;border-radius:9px;background:var(--accent-soft);color:var(--text);font:inherit;text-align:left;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;}
+  #achievementGoal{width:100%;min-height:44px;margin:8px 0 0;padding:8px 10px;border:1px solid transparent;border-radius:9px;background:var(--accent-soft);color:var(--text);font:inherit;text-align:start;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;}
   #achievementGoal[hidden]{display:none;}
   #achievementGoal:hover{border-color:var(--accent);}
   #achievementGoal:focus-visible{outline:2px solid var(--accent-bright);outline-offset:2px;}
@@ -143,7 +143,7 @@
   #achievementTier{font-size:11px;color:var(--muted);margin-top:3px;}
   #achievementEarnedDate{font-size:11px;color:var(--muted);margin:3px 0 0;}
   #achievementEarnedDate[hidden]{display:none;}
-  #achievementClose{align-self:flex-start;margin-left:auto;flex-shrink:0;background:none;border:0;color:var(--muted);font-size:21px;cursor:pointer;padding:2px 5px;border-radius:6px;}
+  #achievementClose{align-self:flex-start;margin-inline-start:auto;flex-shrink:0;background:none;border:0;color:var(--muted);font-size:21px;cursor:pointer;padding:2px 5px;border-radius:6px;}
   #achievementClose:focus-visible{outline:2px solid var(--accent);}
   #achievementDescription{font-size:12px;line-height:1.5;margin:10px 0;}
   #achievementFavorite{width:100%;margin:2px 0 4px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font:inherit;font-size:11px;font-weight:600;cursor:pointer;}
@@ -192,7 +192,7 @@
   .guide details[open] summary::after{content:" ▴";}
   .guide-body{font-size:11.5px;line-height:1.55;color:var(--text);margin-top:10px;}
   .guide-body p{margin:0 0 6px;}
-  .guide-body ul{margin:2px 0 8px;padding-left:18px;}
+  .guide-body ul{margin:2px 0 8px;padding-inline-start:18px;}
   .guide-body .tip{color:var(--muted);font-style:italic;}
 </style>
 <script>
@@ -522,10 +522,10 @@
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
-            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+            var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
                 + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'

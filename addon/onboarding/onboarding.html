@@ -123,7 +123,7 @@ body {
   font-weight: 500;
   flex-shrink: 0;
   min-width: 32px;
-  text-align: right;
+  text-align: end;
 }
 
 /* ── Typography ── */
@@ -268,7 +268,7 @@ h2.screen-title {
 .bottom-row {
   position: absolute;
   bottom: 32px;
-  right: 44px;
+  inset-inline-end:44px;
   display: flex;
   justify-content: flex-end;
   z-index: 100;
@@ -372,7 +372,7 @@ h2.screen-title {
   font-size: 14px; 
   color: #9ca3af;
   font-weight: 500;
-  text-align: left;
+  text-align: start;
   margin-bottom: 8px;
   transition: color 0.3s;
 }
@@ -470,7 +470,7 @@ h2.screen-title {
   margin-bottom: 4px;
 }
 .tos-modal-body ul {
-  margin: 6px 0 4px 18px;
+  margin-block:6px 4px;margin-inline:18px 0;
   padding: 0;
 }
 .tos-modal-body ul li {
@@ -566,6 +566,7 @@ html.dark .tos-row a { color: #93c5fd; }
         <button class="opt" data-lang="ko"  onclick="selectLang(this)">한국어</button>
         <button class="opt" data-lang="zh"  onclick="selectLang(this)">中文</button>
         <button class="opt" data-lang="pl"  onclick="selectLang(this)">Polski</button>
+        <button class="opt" data-lang="fa"  onclick="selectLang(this)">فارسی</button>
       </div>
     </div>
     <div class="bottom-row">
@@ -740,6 +741,28 @@ html.dark .tos-row a { color: #93c5fd; }
 ═══════════════════════════════════════ -->
 <script>
 const T = {
+  fa: {
+    welcomeTo: "خوش آمدید به", welcomeSub: "آماده‌اید تجربهٔ Anki خود را بهتر کنید؟",
+    getStarted: "شروع کنیم", continue: "ادامه", start: "شروع",
+    chooseLanguage: "زبان خود را انتخاب کنید",
+    whoAreYou: "شما که هستید؟",
+    medicalStudent: "دانشجوی پزشکی", lawStudent: "دانشجوی حقوق",
+    highschoolStudent: "دانش‌آموز دبیرستان", programmer: "برنامه‌نویس",
+    languageLearner: "زبان‌آموز", other: "دیگر",
+    whereDidYouFind: "Smart Study را از کجا شناختید؟",
+    ankiStore: "فروشگاه افزونه‌های Anki", friends: "دوستان", google: "Google",
+    socialMedia: "شبکه‌های اجتماعی", chatgptAI: "ChatGPT / هوش مصنوعی", reddit: "Reddit",
+    whichTheme: "کدام پوسته را انتخاب می‌کنید؟",
+    changeThemeLater: "بعداً می‌توانید آن را در تنظیمات تغییر دهید.",
+    settingsTipTitle: "تنظیمات را پیدا کنید",
+    settingsTipText: "همهٔ تنظیمات با کلیک روی لوگوی Smart Study در گوشهٔ بالای رابط Anki در دسترس است.",
+    supportTitle: "از پروژهٔ من حمایت کنید!",
+    supportText1: "این پروژه را یک نفر ساخته تا تجربهٔ Anki همه را بهتر کند. ممکن است گاهی اشکال و مشکل پیش بیاید.",
+    supportText2: "اگر پسندیدید، لطفاً در AnkiWeb با یک لایک حمایت کنید. این تنها انگیزهٔ من برای بهتر کردن و به‌روزرسانی آن است.",
+    thankYou: "سپاسگزارم!",
+    preparingAddon: "در حال آماده‌سازی Smart Study شما...",
+    loadingDone: "✓ Smart Study آماده است!", close: "بستن",
+  },
   pl: {
     welcomeTo: "Witaj w", welcomeSub: "Chcesz lepiej korzystać z Anki?",
     getStarted: "Zaczynamy", continue: "Dalej", start: "Start",
@@ -989,6 +1012,7 @@ function errorTr(source) {
 function applyLang(lang) {
   selectedLang = lang;
   document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
   const dict = T[lang] || T['en'];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
@@ -1159,10 +1183,10 @@ function finish() {
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:left;'
+                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
-            var btnCss = 'margin-right:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
+            var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
                 + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'

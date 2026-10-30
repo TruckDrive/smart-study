@@ -110,6 +110,25 @@ HTML_STREAK: str = """
 </div>
 """
 
+# The fixed English parts of the templates above, for fa_html()
+HTML_PHRASES = (
+    "Go back\n(Shift-click for first year)",
+    "Go forward\n(Shift-click for last year)",
+    "Today",
+    "Options",
+    "Support this add-on",
+    "Daily average:",
+    "Average reviews on active days",
+    "Days learned:",
+    "Percentage of days with review activity over entire review history",
+    "Longest streak:",
+    "Longest continuous streak of review activity. All types of repetitions included.",
+    "Current streak:",
+    "Current card review activity streak. All types of repetitions included.",
+    "No activity data to show (",
+    ">options<",
+)
+
 HTML_INFO_NODATA: str = """
 No activity data to show (<span class="linkspan" onclick='pycmd("revhm_opts");'>options</span>).
 """

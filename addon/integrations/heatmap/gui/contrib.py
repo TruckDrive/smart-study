@@ -35,6 +35,7 @@ Contributions dialog
 
 from aqt.qt import QApplication
 
+from ...strings import translate_widgets
 from ..libaddon.gui.dialog_contrib import ContribDialog
 from ..libaddon.platform import PLATFORM
 from .forms import contrib as qtform_contrib
@@ -50,6 +51,7 @@ class RevHmContrib(ContribDialog):
         super(RevHmContrib, self).__init__(qtform_contrib, parent=parent)
 
     def _setupUI(self):
+        translate_widgets(self)
         super(RevHmContrib, self)._setupUI()
 
         # manually adjust title label font sizes on Windows

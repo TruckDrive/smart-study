@@ -38,6 +38,8 @@ from typing import Optional
 
 from aqt.qt import QAction, QApplication, QWidget
 
+from ...strings import fa_tr, translate_widgets
+
 from aqt import mw
 from aqt.studydeck import StudyDeck
 
@@ -117,6 +119,7 @@ class RevHmOptions(OptionsDialog):
     # UI adjustments
 
     def _setupUI(self):
+        translate_widgets(self)
         super(RevHmOptions, self)._setupUI()
 
         # manually adjust title label font sizes on Windows
@@ -146,8 +149,8 @@ class RevHmOptions(OptionsDialog):
         list_widget = self.form.listDecks
         ret = StudyDeck(
             self.mw,
-            accept="Choose",
-            title="Choose Deck",
+            accept=fa_tr("Choose"),
+            title=fa_tr("Choose Deck"),
             help="",
             parent=self,
             geomKey="selectDeck",
@@ -169,7 +172,7 @@ class RevHmOptions(OptionsDialog):
     # Helpers:
 
     def _getComboItems(self, dct):
-        return list((val["label"], key) for key, val in dct.items())
+        return list((fa_tr(val["label"]), key) for key, val in dct.items())
 
     # Config setters:
 
@@ -217,6 +220,6 @@ def invoke_options_dialog(parent: Optional[QWidget] = None) -> int:
 def initialize_options():
     config.setConfigAction(invoke_options_dialog)
     # Set up menu entry:
-    options_action = QAction("Review &Heatmap Options...", mw)
+    options_action = QAction(fa_tr("Review &Heatmap Options..."), mw)
     options_action.triggered.connect(lambda _: invoke_options_dialog())
     mw.form.menuTools.addAction(options_action)

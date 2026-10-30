@@ -31,6 +31,7 @@ try:
 except ImportError:
     is_win = False
 
+from ..strings import fa_tr
 from .utils import State, dbg
 
 from aqt import mw as _mw
@@ -70,7 +71,7 @@ def get_config() -> dict:
     loaded_config = _ct_manager.getConfig(__name__)
 
     if loaded_config is None:
-        tooltip("Contanki was unable to load config, using defaults.")
+        tooltip(fa_tr("Contanki was unable to load config, using defaults."))
     else:
         config.update(loaded_config)
 
@@ -107,7 +108,7 @@ def for_states(states: list[State]) -> Callable:
             if get_state() in states:
                 return func(*args, **kwargs)
             else:
-                tooltip("Action not available on this screen")
+                tooltip(fa_tr("Action not available on this screen"))
 
         return wrapped
 
@@ -366,7 +367,7 @@ def undo():
     if mw.undo_actions_info().can_undo:
         mw.undo()
     else:
-        tooltip("Nothing to undo")
+        tooltip(fa_tr("Nothing to undo"))
 
 
 def redo():
@@ -374,7 +375,7 @@ def redo():
     if mw.undo_actions_info().can_redo:
         mw.redo()
     else:
-        tooltip("Nothing to redo")
+        tooltip(fa_tr("Nothing to redo"))
 
 
 # FIXME: this is terrible, find a better way
@@ -429,7 +430,7 @@ def build_previous_card_info() -> Callable[[], None]:
         _previous_card_info = mw.reviewer.on_previous_card_info
     except NameError:
         # for Anki <= 2.1.49
-        return lambda: tooltip("This action is only available in Anki 2.1.50+")
+        return lambda: tooltip(fa_tr("This action is only available in Anki 2.1.50+"))
     return for_states(["question", "answer"])(_previous_card_info)
 
 
@@ -537,7 +538,7 @@ DEBUG_STRING = """See the <a href="https://ankiweb.net/shared/info/1898790263">a
 
 def get_debug_str() -> str:
     """Returns a string with debug information."""
-    result = DEBUG_STRING
+    result = fa_tr(DEBUG_STRING)
     result += supportText().replace("\n", "<br>")
     debug_info = mw.contanki.debug_info  # type: ignore
     count = len(debug_info)

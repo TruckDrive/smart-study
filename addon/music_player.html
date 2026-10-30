@@ -98,7 +98,7 @@
   .barbox input[type=range]{width:100%;display:block;}
   .times{display:flex;align-items:center;justify-content:space-between;margin-top:1px;}
   .times span{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:52px;}
-  .times span:last-child{text-align:right;}
+  .times span:last-child{text-align:end;}
   .volbtn{
     border:none;background:transparent;color:var(--muted);cursor:pointer;
     padding:4px 6px;border-radius:7px;display:flex;align-items:center;justify-content:center;
@@ -157,7 +157,7 @@
     transition:background .2s;font-style:normal;
   }
   .sw i::before{
-    content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;
+    content:"";position:absolute;width:16px;height:16px;inset-inline-start:2px;top:2px;background:#fff;
     border-radius:50%;transition:transform .2s;
   }
   .sw input:checked + i{background:var(--accent);}
@@ -176,12 +176,12 @@
     border:0;background:transparent;color:inherit;font:inherit;font-size:inherit;font-weight:inherit;
     cursor:pointer;min-width:0;
   }
-  .saved-pill .saved-open{padding:6px 7px 6px 11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .saved-pill .saved-open{padding-block:6px;padding-inline:11px 7px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .saved-pill .saved-remove{
-    width:25px;padding:0 7px 1px 5px;font-size:16px;font-weight:500;line-height:1;
-    border-left:1px solid var(--border);opacity:.72;
+    width:25px;padding-block:0 1px;padding-inline:5px 7px;font-size:16px;font-weight:500;line-height:1;
+    border-inline-start:1px solid var(--border);opacity:.72;
   }
-  .saved-pill.on .saved-remove{border-left-color:rgba(255,255,255,.28);}
+  .saved-pill.on .saved-remove{border-inline-start-color:rgba(255,255,255,.28);}
   .saved-pill .saved-remove:hover{opacity:1;background:rgba(127,127,127,.14);}
   .urlrow{display:none;gap:6px;padding:4px 0;flex-shrink:0;}
   .urlrow.on{display:flex;}
@@ -207,6 +207,10 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
   outline: 2px solid var(--accent, var(--primary-color, #0071d3));
   outline-offset: 2px;
 }
+/* RTL */
+[dir=rtl] .sw input:checked + i::before{transform:translateX(-14px);}
+  /* Playback controls and timelines keep their direction in RTL languages. */
+  [dir=rtl] .transport,[dir=rtl] .barbox,[dir=rtl] .volrow,[dir=rtl] input[type=range]{direction:ltr;}
 </style>
 </head>
 <body>

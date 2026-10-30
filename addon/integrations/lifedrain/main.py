@@ -10,6 +10,7 @@ from anki.decks import DeckId
 from aqt import gui_hooks, mw, qt
 
 from .._shim import manager
+from ..strings import fa_tr
 from .exceptions import GetCollectionError, GetMainWindowError
 from .lifedrain import Lifedrain
 
@@ -78,7 +79,7 @@ def setup_overview(lifedrain: Lifedrain) -> None:
     def bottom_bar_draw(link_handler: Callable[..., bool], links: list[list]) -> Callable:
         config = lifedrain.config.get()
         links.append([config.get('deckSettingsShortcut') or 'None', 'lifedrain', 'Life Drain'])
-        links.append([config.get('recoverShortcut') or 'None', 'recover', 'Recover'])
+        links.append([config.get('recoverShortcut') or 'None', 'recover', fa_tr('Recover')])
 
         def custom_link_handler(url: str) -> bool:
             if url == 'lifedrain':

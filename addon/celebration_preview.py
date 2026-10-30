@@ -3,6 +3,12 @@ import html
 import json
 from pathlib import Path
 
+try:
+    from .rtl import dir_attribute
+except ImportError:
+    def dir_attribute():  # type: ignore
+        return ""
+
 
 def render_preview(events, *, dark=False, accent="#397cf6", reduced_motion=False,
                    translate=lambda text: text, live=False, image_url=None):
@@ -63,7 +69,7 @@ def render_preview(events, *, dark=False, accent="#397cf6", reduced_motion=False
     if not re.fullmatch(r"#[0-9a-fA-F]{6}", accent):
         accent = "#397cf6"
     settings = json.dumps({"dark": bool(dark), "reduced": bool(reduced_motion), "live": bool(live)})
-    document = '''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    document = '''<!doctype html><html DIR_ATTRIBUTE><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
     :root{color-scheme:light;--bg:#edf0f5;--surface:#fffdfa;--text:#242737;--muted:#646979;--border:#dedfe7;--halo:ACCENT18;--accent:ACCENT}
     html.dark{color-scheme:dark;--bg:#2c2c2c;--surface:#252525;--text:#ffffff;--muted:#b0b0b0;--border:#414141;--halo:ACCENT28}
@@ -71,7 +77,7 @@ def render_preview(events, *, dark=False, accent="#397cf6", reduced_motion=False
     .preview-label{text-align:center;color:var(--muted);font-size:11px;margin:18px 16px;line-height:1.5}
     #preview{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:12px 18px 25px}
     .card{position:relative;width:360px;max-width:100%;border:1px solid var(--border);border-radius:22px;padding:28px 24px 21px;text-align:center;background:var(--surface);box-shadow:0 12px 35px #00000018}
-    .close{position:absolute;right:10px;top:9px;width:32px;height:32px;font-size:24px;background:none;border:0;color:var(--muted);cursor:pointer;border-radius:8px}
+    .close{position:absolute;inset-inline-end:10px;top:9px;width:32px;height:32px;font-size:24px;background:none;border:0;color:var(--muted);cursor:pointer;border-radius:8px}
     .eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:5px 20px 12px}
     .stage{position:relative;height:176px;width:100%;margin:0 auto 8px}
     .new{position:absolute;width:112px;height:112px;object-fit:contain;left:50%;top:28px;transform:translateX(-50%);animation:reveal 1.7s both}
@@ -138,7 +144,7 @@ def render_preview(events, *, dark=False, accent="#397cf6", reduced_motion=False
       }
     });document.querySelector('.continue').focus({preventScroll:true});
     </script></body></html>'''
-    replacements = {"ACCENT":accent, "ACCENT18":accent + "18", "ACCENT28":accent + "28", "OPTIONS":settings,
+    replacements = {"DIR_ATTRIBUTE":dir_attribute().strip(), "ACCENT":accent, "ACCENT18":accent + "18", "ACCENT28":accent + "28", "OPTIONS":settings,
         "PREVIEW_LABEL":text(translate("Preview only. Your profile stays unchanged.")),
         "CLOSE":text(translate("Close")), "EYEBROW":eyebrow, "STAGE":stage,
         "HEADING":"" if heading_in_stage else f'<h1 id="title">{title}</h1>', "SUBTITLE":subtitle, "EXTRA":extra,

@@ -6,13 +6,14 @@ from __future__ import annotations
 
 import os
 import json
-from functools import partial
+from functools import lru_cache, partial
 from typing import Any, Callable, Iterable, Type
 
 import requests
 
 from aqt import QIcon, QScrollArea, qconnect
 from .._shim import manager as _ct_factory
+from ..strings import fa_active, fa_tr
 _ct_manager = _ct_factory('contanki')  # Smart Study: own config store
 from aqt.qt import QTableWidget, QTableWidgetItem, QComboBox, QFormLayout, QHeaderView
 from aqt.qt import (
@@ -71,6 +72,19 @@ states: dict[State, str] = {
 }
 
 
+@lru_cache(maxsize=1)
+def _translated_names() -> dict[str, str]:
+    names = {name for actions in STATE_ACTIONS.values() for name in actions}
+    names.update(name for actions in QUICK_SELECT_ACTIONS.values() for name in actions)
+    names.update(OptionsPage.AxisRoleSelector.items)
+    return {fa_tr(name): name for name in names if name}
+
+
+def stored_name(text: str) -> str:
+    """Action and axis role names are saved in English; dropdowns may show Persian."""
+    return _translated_names().get(text, text) if fa_active() else text
+
+
 class ContankiConfig(QDialog):
     """Contanki's config dialog.
 
@@ -79,8 +93,10 @@ class ContankiConfig(QDialog):
     def __init__(self, parent: QWidget, contanki, profile: Profile | None) -> None:
         if profile is None:
             showInfo(
-                "Controller not detected. "
-                "Connect your controller and press any button to initialise."
+                fa_tr(
+                    "Controller not detected. "
+                    "Connect your controller and press any button to initialise."
+                )
             )
             return
         self.loaded = False
@@ -97,7 +113,7 @@ class ContankiConfig(QDialog):
 
         # Initialise dialog
         super().__init__(parent)
-        self.setWindowTitle("Contanki Options")
+        self.setWindowTitle(fa_tr("Contanki Options"))
         self.setObjectName("Contanki Options")
         layout = QVBoxLayout(self)
         layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
@@ -109,11 +125,11 @@ class ContankiConfig(QDialog):
             QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum
         )
         self.options_page = OptionsPage(self)
-        self.tab_bar.addTab(self.options_page, "Options")
+        self.tab_bar.addTab(self.options_page, fa_tr("Options"))
         self.controls_page = ControlsPage(self)
-        self.tab_bar.addTab(self.controls_page, "Controls")
+        self.tab_bar.addTab(self.controls_page, fa_tr("Controls"))
         self.controller_page = ControllerPage(self, profile.controller)
-        self.tab_bar.addTab(self.controller_page, "Controller")
+        self.tab_bar.addTab(self.controller_page, fa_tr("Controller"))
         layout.addWidget(self.tab_bar)
 
         # Add buttons
@@ -183,7 +199,7 @@ class ContankiConfig(QDialog):
         self.options_page.update()
         self.controls_page.update_tabs()
         self.controller_page = ControllerPage(self, self._profile.controller)
-        self.tab_bar.addTab(self.controller_page, "Controller")
+        self.tab_bar.addTab(self.controller_page, fa_tr("Controller"))
         self.tab_bar.setCurrentIndex(current_tab)
         self.loaded = True
 
@@ -198,7 +214,7 @@ class Button(QPushButton):
 
     def __init__(self, parent: QWidget, name: str, func: Callable) -> None:
         super().__init__(parent)
-        self.setText(name)
+        self.setText(fa_tr(name))
         self.setObjectName(name.lower().replace(" ", "_"))
         qconnect(self.clicked, func)
 
@@ -257,7 +273,7 @@ class OptionsPage(QWidget):
         layout.addWidget(self.profile_bar, 0, 0, 1, 3, alignment=Alignment.AlignTop)
 
         # Main Options
-        form = QGroupBox("Options", self)
+        form = QGroupBox(fa_tr("Options"), self)
         form_layout = QFormLayout(self)
         for key, value in self.config.items():
             if isinstance(value, bool):
@@ -269,7 +285,7 @@ class OptionsPage(QWidget):
                 widget.setValue(value)
             else:
                 continue
-            form_layout.addRow(key, widget)
+            form_layout.addRow(fa_tr(key), widget)
             self.options[key] = widget
         form.setLayout(form_layout)
         left_column.addWidget(form, alignment=Alignment.AlignTop)
@@ -346,7 +362,7 @@ class OptionsPage(QWidget):
             # Controller Selection Dropdown
             self.controller_combo = self.controller_selection()
 
-            layout.addWidget(QLabel("Profile", self))
+            layout.addWidget(QLabel(fa_tr("Profile"), self))
             layout.addWidget(self.profile_combo)
             layout.addWidget(Button(self, "Add Profile", self.add_profile))
             layout.addWidget(Button(self, "Rename", self.rename_profile))
@@ -376,15 +392,15 @@ class OptionsPage(QWidget):
             """Add a new profile."""
             old, okay1 = QInputDialog().getItem(
                 self,
-                "Create New Profile",
-                "Select an existing profile to copy:",
+                fa_tr("Create New Profile"),
+                fa_tr("Select an existing profile to copy:"),
                 get_profile_list(),
                 editable=False,
             )
             if not (old and okay1):
                 return
             name, okay2 = QInputDialog().getText(
-                self, "Create New Profile", "Enter the new profile name:"
+                self, fa_tr("Create New Profile"), fa_tr("Enter the new profile name:")
             )
             if not (name and okay2):
                 return
@@ -398,7 +414,7 @@ class OptionsPage(QWidget):
         def delete_profile(self) -> None:
             """Delete the current profile."""
             if len(self.profiles) == 1:
-                showInfo("You can't delete the last profile")
+                showInfo(fa_tr("You can't delete the last profile"))
                 return
             self.to_delete.append(self.profile.name)
             index = self.profile_combo.currentIndex()
@@ -410,7 +426,7 @@ class OptionsPage(QWidget):
             """Rename the current profile."""
             old_name = self.profile.name
             new_name, success = getText(
-                "Please enter a new profile name", self, title="New Name"
+                fa_tr("Please enter a new profile name"), self, title=fa_tr("New Name")
             )
             if not success:
                 return
@@ -421,15 +437,15 @@ class OptionsPage(QWidget):
         def import_profile(self) -> None:
             filename = QFileDialog().getOpenFileName(
                 self,
-                "Import Profile",
+                fa_tr("Import Profile"),
                 "",
-                "Contanki Profiles (*.contanki)",
+                fa_tr("Contanki Profiles (*.contanki)"),
             )
             if filename and filename[0]:
                 with open(filename[0], "r") as file:
                     profile = Profile.from_json(file.read())
                 if profile is None:
-                    showInfo("Invalid profile")
+                    showInfo(fa_tr("Invalid profile"))
                     return
                 self.profiles.append(profile)
                 self.profile_combo.addItem(profile.name)
@@ -438,9 +454,9 @@ class OptionsPage(QWidget):
         def export_profile(self) -> None:
             filename = QFileDialog().getSaveFileName(
                 self,
-                "Export Profile",
+                fa_tr("Export Profile"),
                 f"{self.profile.name}.contanki",
-                "Contanki Profiles (*.contanki)",
+                fa_tr("Contanki Profiles (*.contanki)"),
             )
             if filename:
                 with open(filename[0], "w") as file:
@@ -487,7 +503,7 @@ class OptionsPage(QWidget):
             self.table = QTableWidget(len(actions), 2, parent)
             self.table.setColumnWidth(0, 150)
             self.table.setColumnWidth(1, 100)
-            self.table.setHorizontalHeaderLabels(["Custom Action", "Shortcut"])
+            self.table.setHorizontalHeaderLabels([fa_tr("Custom Action"), fa_tr("Shortcut")])
             hheader = self.table.horizontalHeader()
             if hheader is None:
                 raise RuntimeError(
@@ -526,7 +542,7 @@ class OptionsPage(QWidget):
             key_edit = QKeySequenceEdit(QKeySequence(""))
             self.key_edits.insert(current_row, key_edit)
             self.table.insertRow(current_row)
-            self.table.setItem(current_row, 0, QTableWidgetItem("New Action", 0))
+            self.table.setItem(current_row, 0, QTableWidgetItem(fa_tr("New Action"), 0))
             self.table.setCellWidget(current_row, 1, key_edit)
             self.table.setCurrentCell(current_row, 0)
             self.update_config()
@@ -595,7 +611,7 @@ class OptionsPage(QWidget):
         """Lets the user select which flags are cycled when reviewing."""
 
         def __init__(self, parent: ContankiConfig):
-            super().__init__("Flags", parent)
+            super().__init__(fa_tr("Flags"), parent)
             self.config = parent.config
             layout = QFormLayout(self)
             self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
@@ -633,7 +649,7 @@ class OptionsPage(QWidget):
         )
 
         def __init__(self, parent: ContankiConfig) -> None:
-            super().__init__("Axis Roles", parent)
+            super().__init__(fa_tr("Axis Roles"), parent)
             self.get_profile = parent.get_profile
             self.dropdowns: list[QComboBox] = list()
             self.update_controls_page = parent.update_controls_page
@@ -642,7 +658,7 @@ class OptionsPage(QWidget):
 
         def update_binding(self, axis: int, role: str) -> None:
             """Update the binding for the given axis."""
-            self.get_profile().axes_bindings[axis] = role
+            self.get_profile().axes_bindings[axis] = stored_name(role)
             self.update_controls_page()
 
         def update_invert_axis(self, axis: int, invert: bool) -> None:
@@ -665,8 +681,8 @@ class OptionsPage(QWidget):
                     QSizePolicy.Policy.MinimumExpanding,
                     QSizePolicy.Policy.MinimumExpanding,
                 )
-                dropdown.addItems(self.items)
-                dropdown.setCurrentText(profile.axes_bindings[axis])
+                dropdown.addItems([fa_tr(item) for item in self.items])
+                dropdown.setCurrentText(fa_tr(profile.axes_bindings[axis]))
                 qconnect(
                     dropdown.currentTextChanged,
                     partial(self.update_binding, axis),
@@ -676,7 +692,7 @@ class OptionsPage(QWidget):
                 label.setPixmap(
                     pixmap.scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio)
                 )
-                invert = QCheckBox("Invert")
+                invert = QCheckBox(fa_tr("Invert"))
                 invert.setChecked(profile.invert_axis[axis])
                 qconnect(
                     invert.stateChanged,
@@ -695,13 +711,13 @@ class OptionsPage(QWidget):
             self.setLayout(layout)
 
         def __getitem__(self, item: int) -> str:
-            return self.dropdowns[item].currentText()
+            return stored_name(self.dropdowns[item].currentText())
 
     class QuickSelectSettings(QGroupBox):
         """Settings for the Quick Select radial menu."""
 
         def __init__(self, parent: ContankiConfig):
-            super().__init__("Quick Select", parent)
+            super().__init__(fa_tr("Quick Select"), parent)
             self.get_profile = parent.get_profile
             self.config = parent.config
             self._parent = parent
@@ -716,7 +732,7 @@ class OptionsPage(QWidget):
                 checkbox = QCheckBox(self._parent)
                 checkbox.setChecked(value)
                 qconnect(checkbox.stateChanged, partial(self.update_option, option))
-                layout.addRow(option, checkbox)
+                layout.addRow(fa_tr(option), checkbox)
                 if (
                     option == "Select with Stick"
                     and not self.get_profile().controller.has_stick
@@ -779,9 +795,9 @@ class ControlsPage(QTabWidget):
         for state, i, combo in combos_iter:
             inherited = ""
             if action := all_bindings[i]:
-                inherited = action + " (inherited)"
+                inherited = fa_tr(action) + fa_tr(" (inherited)")
             if state in ("question", "answer") and (action := review_bindings[i]):
-                inherited = action + " (inherited)"
+                inherited = fa_tr(action) + fa_tr(" (inherited)")
             combo.setItemText(0, inherited)
 
     def update_tabs(self):
@@ -795,15 +811,16 @@ class ControlsPage(QTabWidget):
             self.tabs[state] = state_tab = self.ControlsTab(self, state)
             state_tab.setObjectName("state_tab")
             self.combos[state] = state_tab.combos
-            self.addTab(state_tab, state_name)
+            self.addTab(state_tab, fa_tr(state_name))
         self.tabs["quick_select"] = self.QuickSelectActions(self._parent)
-        self.addTab(self.tabs["quick_select"], "Quick Select")
+        self.addTab(self.tabs["quick_select"], fa_tr("Quick Select"))
         self.update_inheritance()
 
     def update_binding(self, state: State, button: int, action: str) -> None:
         """Updates the binding for the given state, mod, and index."""
-        if "inherit" in action:
+        if "inherit" in action or action.endswith(fa_tr(" (inherited)")):
             action = ""
+        action = stored_name(action)
         self._update_binding(state, button, action)
 
     class ControlsTab(QWidget):
@@ -834,8 +851,10 @@ class ControlsPage(QTabWidget):
                 layout.addWidget(icon, row, col)
                 col += 1
                 combo = QComboBox()
-                combo.addItems(sorted(STATE_ACTIONS[state]) + parent.custom_actions)
-                combo.setCurrentText(parent.get_profile().bindings[(state, index)])
+                combo.addItems(
+                    [fa_tr(a) for a in sorted(STATE_ACTIONS[state], key=fa_tr)] + parent.custom_actions
+                )
+                combo.setCurrentText(fa_tr(parent.get_profile().bindings[(state, index)]))
                 combo.setMaximumWidth(170)
                 combo.setFixedHeight(30)
                 qconnect(
@@ -867,10 +886,10 @@ class ControlsPage(QTabWidget):
 
         def setup_group(self, state: State) -> QGroupBox:
             """Adds all the checkboxes to the groupbox."""
-            group = QGroupBox(states[state], self)
+            group = QGroupBox(fa_tr(states[state]), self)
             combos = []
             for action in QUICK_SELECT_ACTIONS[state] + self.custom_actions:
-                checkbox = QCheckBox(action, self)
+                checkbox = QCheckBox(fa_tr(action), self)
                 checkbox.setChecked(
                     action in self.get_profile().quick_select["actions"][state]
                 )
@@ -899,7 +918,7 @@ class ControlsPage(QTabWidget):
             elif not checked and action in actions:
                 actions.remove(action)
             for combo in self.checkboxes[state]:
-                combo.setEnabled(len(actions) < 8 or combo.text() in actions)
+                combo.setEnabled(len(actions) < 8 or stored_name(combo.text()) in actions)
 
 
 class ControllerPage(QWidget):
@@ -975,7 +994,7 @@ class ControllerPage(QWidget):
             layout.addWidget(self.ButtonControl(self, icon, axis=axis), row, col)
             col += 1
         row += 1
-        bottom_label = QLabel(self.info, self)
+        bottom_label = QLabel(fa_tr(self.info), self)
         bottom_label.setWordWrap(True)
         layout.addWidget(bottom_label, row, 0, 1, self.GRID_WIDTH)
 
@@ -989,8 +1008,10 @@ class ControllerPage(QWidget):
             file.write(self.controller.to_json())
         self._parent._profile.controller = self.controller
         if askUser(
-            "Would you be willing to share your controller configuration with the developer? "
-            "This makes it easier to support this controller out of the box.",
+            fa_tr(
+                "Would you be willing to share your controller configuration with the developer? "
+                "This makes it easier to support this controller out of the box."
+            ),
             parent=self,
             title="Contanki",
         ):
@@ -1039,7 +1060,7 @@ class ControllerPage(QWidget):
                 self.index = axis
             else:
                 raise ValueError("Must provide either button or axis")
-            self.addItem("Not Assigned")
+            self.addItem(fa_tr("Not Assigned"))
             items_to_add = (
                 self._parent.controller.parent.buttons
                 if self.is_button
@@ -1054,7 +1075,7 @@ class ControllerPage(QWidget):
             if self.index in items_to_assign:
                 self.setCurrentText(items_to_assign[self.index])
             else:
-                self.setCurrentText("Not Assigned")
+                self.setCurrentText(fa_tr("Not Assigned"))
             for i in range(self.count() - 1):
                 i += 1
                 self.setItemIcon(
@@ -1070,7 +1091,7 @@ class ControllerPage(QWidget):
             if layout is None:
                 return
             assignment = self.currentText()
-            if assignment == "Not Assigned":
+            if assignment == fa_tr("Not Assigned"):
                 assignment = ""
             if assignment and self.is_button:
                 self._parent.controller.buttons[self.index] = assignment
