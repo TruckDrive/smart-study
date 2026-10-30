@@ -47,6 +47,8 @@ except ImportError:
 
 ADDON_NAME = "GamificationPlusDailyWidgets_" + ADDON_FOLDER_NAME
 CONFIG_KEY = f"addon_{ADDON_NAME}_data"
+# Where Synapse (package "SynapsePro1") kept the same data; imported once
+SYNAPSE_CONFIG_KEY = "addon_GamificationPlusDailyWidgets_SynapsePro1_data"
 CMD_RESET_DATA = f"gamification_reset_data_{ADDON_FOLDER_NAME}"
 CMD_CLAIM_CHALLENGE = f"gamification_claim_challenge_{ADDON_FOLDER_NAME}"
 CMD_LP_START_PREFIX = f"lp_start"
@@ -340,8 +342,10 @@ class GamificationManager:
             else:
                 self.data = defaults
 
+        imported_level = self._import_synapse_progress()
+
         # Fill in any missing keys from a newer version of the addon.
-        updated = False
+        updated = imported_level is not None
         for k, v in defaults.items():
             if k not in self.data:
                 self.data[k] = v
@@ -352,6 +356,48 @@ class GamificationManager:
 
         if updated or not loaded_from_col:
             self.save_data()
+        if imported_level is not None:
+            from aqt.qt import QTimer
+            QTimer.singleShot(1500, lambda: tooltip(
+                _("Your Synapse level {} was carried over to Smart Study.").format(imported_level),
+                period=8000))
+
+    def _load_synapse_data(self) -> Optional[Dict]:
+        """Level data Synapse left behind: collection config first, then its profile backup."""
+        try:
+            data = mw.col.get_config(SYNAPSE_CONFIG_KEY, None)
+        except Exception:
+            data = None
+        if not isinstance(data, dict):
+            try:
+                path = os.path.join(mw.pm.profileFolder(), "SynapsePro_Data", "gamification_data.json")
+                with open(path, encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                return None
+        return data if isinstance(data, dict) else None
+
+    def _import_synapse_progress(self) -> Optional[int]:
+        """Takes over Synapse's level once if it is ahead; returns the imported level.
+
+        Removing an add-on keeps its collection config and profile files, so a
+        Synapse user switching to Smart Study would otherwise start again at 1.
+        The XP ledger comes along, so time studied since then is still paid.
+        """
+        if self.data.get("synapse_import_done"):
+            return None
+        old = self._load_synapse_data()
+        if not old:
+            return None  # nothing yet; may arrive with a later sync
+        try:
+            old_rank = (int(old.get("level", 1)), int(old.get("xp", 0)))
+        except (TypeError, ValueError):
+            return None
+        ahead = old_rank > (int(self.data.get("level", 1)), int(self.data.get("xp", 0)))
+        if ahead:
+            self.data = dict(old)
+        self.data["synapse_import_done"] = True
+        return old_rank[0] if ahead else None
 
     def save_data(self):
         if mw.col:

@@ -121,6 +121,8 @@ DE: Dict[str, str] = {
     "Persian (فارسی): all of Smart Study in Persian, with a right-to-left layout.": "Persisch (فارسی): ganz Smart Study auf Persisch, mit Layout von rechts nach links.",
     "Anki itself in Persian: Smart Study repairs Anki's Persian translation, which otherwise shows English.": "Anki selbst auf Persisch: Smart Study repariert Ankis persische Übersetzung, die sonst Englisch anzeigt.",
     "The AI assistant can answer in Persian.": "Der KI-Assistent kann auf Persisch antworten.",
+    "Coming from Synapse: your level and XP are taken over automatically on the first start, if they are higher than in Smart Study.": "Von Synapse umgestiegen: Dein Level und deine XP werden beim ersten Start automatisch übernommen, wenn sie höher sind als in Smart Study.",
+    "Third-party notices now also list KaTeX (math in AI answers).": "Die Lizenzhinweise nennen jetzt auch KaTeX (Formeln in KI-Antworten).",
     "Copying a selection with pictures: the text is in the image again when Anki is in night mode (it was white on white).": "Auswahl mit Bildern kopieren: Im Nachtmodus ist der Text wieder im Bild (er war weiß auf weiß).",
 }
 

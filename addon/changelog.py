@@ -7,6 +7,14 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.5.0",
+        "date": "October 30, 2026",
+        "items": [
+            {"tag": "New", "text": "Coming from Synapse: your level and XP are taken over automatically on the first start, if they are higher than in Smart Study."},
+            {"tag": "Changed", "text": "Third-party notices now also list KaTeX (math in AI answers)."},
+        ],
+    },
+    {
         "version": "2.4.1",
         "date": "October 30, 2026",
         "items": [

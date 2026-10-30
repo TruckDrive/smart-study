@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.0 – 2026-10-30
+
+- **Coming from Synapse**: Smart Study takes over your Synapse level and XP once on start, if Synapse's is higher. Removing Synapse keeps its data in the collection and the profile folder, so nothing needs to be reinstalled. Study time since then is still credited
+- **Third-party notices**: KaTeX (math in AI answers) is now listed; its license file was already included
+
 ## 2.4.1 – 2026-10-30
 
 - **Fix – copy selections with pictures**: in night mode the text of the selection was drawn white on the white image, so only the pictures were visible after pasting. The image now always has dark text; white text colors from the card (also in single-quoted `style` attributes) no longer carry over

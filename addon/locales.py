@@ -168,6 +168,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "Choose which celebrations appear on the dashboard. Changes are saved immediately.": {"de": "Wähle die Erfolgsmeldungen für dein Dashboard. Änderungen werden sofort gespeichert."},
     "Google is having trouble loading or requests verification. You can try DuckDuckGo instead. Home stays unchanged.": {"de": "Google lädt nicht richtig oder verlangt eine Sicherheitsprüfung. Du kannst stattdessen DuckDuckGo ausprobieren. Home bleibt unverändert."},
     "Try DuckDuckGo": {"de": "DuckDuckGo ausprobieren"},
+    "Your Synapse level {} was carried over to Smart Study.": {"de": "Dein Synapse-Level {} wurde in Smart Study übernommen."},
     "Your statistics, explained": {"de": "Deine Statistiken erklärt"},
     "Understand the insights on your dashboard.": {"de": "Was die Kennzahlen auf deinem Dashboard bedeuten."},
     "Enable the celebration types selected in Settings.": {"de": "Aktiviert die in den Einstellungen ausgewählten Erfolgsmeldungen."},

@@ -190,6 +190,14 @@ accepting any such warranty or additional liability.
 
 END OF TERMS AND CONDITIONS
 
+## KaTeX 0.16.22
+
+Files: `vendor/katex/` (script, stylesheet and WOFF2 fonts)
+
+Copyright (c) 2013-2020 Khan Academy and other contributors. Released under
+the MIT License; the full text is in `vendor/katex/LICENSE`. Source:
+<https://github.com/KaTeX/KaTeX>
+
 ## wordcloud2.js
 
 File: `media/wordcloud2.min.js`

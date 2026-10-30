@@ -2166,5 +2166,8 @@
  "{}: Error executing script. Check Remote Debugger.": "{}: خطا در اجرای اسکریپت. Remote Debugger را بررسی کنید.",
  "{}: Unexpected script result. Check Remote Debugger.": "{}: نتیجهٔ غیرمنتظرهٔ اسکریپت. Remote Debugger را بررسی کنید.",
  "↗ · Free arrow": "↗ · پیکان آزاد",
- "✓ {} downloaded": "✓ {} دانلود شد"
+ "✓ {} downloaded": "✓ {} دانلود شد",
+ "Your Synapse level {} was carried over to Smart Study.": "سطح {} شما از Synapse به Smart Study منتقل شد.",
+ "Coming from Synapse: your level and XP are taken over automatically on the first start, if they are higher than in Smart Study.": "از Synapse آمده‌اید: سطح و XP شما در اولین اجرا به‌طور خودکار منتقل می‌شود، اگر از Smart Study بیشتر باشد.",
+ "Third-party notices now also list KaTeX (math in AI answers).": "اطلاعیه‌های شخص ثالث اکنون KaTeX (فرمول‌ها در پاسخ‌های هوش مصنوعی) را هم فهرست می‌کنند."
 }
