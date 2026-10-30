@@ -7,6 +7,13 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.4.1",
+        "date": "October 30, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Copying a selection with pictures: the text is in the image again when Anki is in night mode (it was white on white)."},
+        ],
+    },
+    {
         "version": "2.4.0",
         "date": "October 30, 2026",
         "items": [

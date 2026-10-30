@@ -121,6 +121,7 @@ DE: Dict[str, str] = {
     "Persian (فارسی): all of Smart Study in Persian, with a right-to-left layout.": "Persisch (فارسی): ganz Smart Study auf Persisch, mit Layout von rechts nach links.",
     "Anki itself in Persian: Smart Study repairs Anki's Persian translation, which otherwise shows English.": "Anki selbst auf Persisch: Smart Study repariert Ankis persische Übersetzung, die sonst Englisch anzeigt.",
     "The AI assistant can answer in Persian.": "Der KI-Assistent kann auf Persisch antworten.",
+    "Copying a selection with pictures: the text is in the image again when Anki is in night mode (it was white on white).": "Auswahl mit Bildern kopieren: Im Nachtmodus ist der Text wieder im Bild (er war weiß auf weiß).",
 }
 
 

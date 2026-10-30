@@ -15,8 +15,9 @@ from html import unescape
 from urllib.parse import unquote, urlparse
 
 from aqt import gui_hooks, mw
-from aqt.qt import (QImage, QMimeData, QPainter, QTextCursor, QTextDocument,
-                    QTimer, QUrl, Qt)
+from aqt.qt import (QAbstractTextDocumentLayout, QColor, QImage, QMimeData,
+                    QPainter, QPalette, QTextCursor, QTextDocument, QTimer,
+                    QUrl, Qt)
 from aqt.utils import tooltip
 from anki.utils import is_mac
 
@@ -66,7 +67,7 @@ def _local_src(src: str) -> str:
 def _clean(html: str) -> str:
     # The card's own <style> (e.g. white text in night mode) must not apply.
     html = re.sub(r"<(style|script)\b.*?</\1>", "", html, flags=re.S | re.I)
-    html = re.sub(r'\s(style|class|id|width|height|color|bgcolor)="[^"]*"', "", html)
+    html = re.sub(r'''\s(style|class|id|width|height|color|bgcolor)=("[^"]*"|'[^']*')''', "", html)
     html = re.sub(r'<input[^>]*type="?checkbox[^>]*>', "☐ ", html)
     html = re.sub(r'<input[^>]*type="?radio[^>]*>', "○ ", html)
     return re.sub(r'<img[^>]*?src="([^"]+)"[^>]*>',
@@ -114,7 +115,11 @@ def render(html: str) -> QImage:
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
     painter.scale(SCALE, SCALE)
-    doc.drawContents(painter)
+    # drawContents() takes the text color from Anki's palette, which is white
+    # in night mode: the text vanished on the white background.
+    ctx = QAbstractTextDocumentLayout.PaintContext()
+    ctx.palette.setColor(QPalette.ColorRole.Text, QColor("#111"))
+    doc.documentLayout().draw(painter, ctx)
     painter.end()
     return out
 

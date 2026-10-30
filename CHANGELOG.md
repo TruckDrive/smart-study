@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1 – 2026-10-30
+
+- **Fix – copy selections with pictures**: in night mode the text of the selection was drawn white on the white image, so only the pictures were visible after pasting. The image now always has dark text; white text colors from the card (also in single-quoted `style` attributes) no longer carry over
+
 ## 2.4.0 – 2026-10-30
 
 - **Persian (فارسی)**: all of Smart Study is available in Persian, with a right-to-left layout in its windows, pages and dashboard widgets. Choose it under *Settings → General → Language*, in the first-start window, or leave it on *Auto* with Anki set to Persian

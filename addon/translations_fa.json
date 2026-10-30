@@ -432,6 +432,7 @@
  "Copy the key that appears (it starts with “sk-or-”).": "کلیدی را که ظاهر می‌شود کپی کنید (با «sk-or-» شروع می‌شود).",
  "Copy the key that appears (it starts with “sk-”) — you only see it once!": "کلیدی را که ظاهر می‌شود کپی کنید (با «sk-» شروع می‌شود)؛ فقط یک بار آن را می‌بینید!",
  "Copy to Clipboard": "کپی در حافظه",
+ "Copying a selection with pictures: the text is in the image again when Anki is in night mode (it was white on white).": "کپی انتخاب همراه با تصویر: در حالت شب، متن دوباره در تصویر دیده می‌شود (قبلاً سفید روی سفید بود).",
  "Correct answers: {:.1f}% ({}).": "پاسخ‌های درست: {:.1f}% ({}).",
  "Could not access user music folder.": "دسترسی به پوشهٔ موسیقی کاربر ممکن نشد.",
  "Could not be started.": "اجرا نشد.",
