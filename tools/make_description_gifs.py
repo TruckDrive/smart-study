@@ -114,7 +114,7 @@ def hero():
         if w / 2 - 150 < lx < w / 2 + 150:
             d.line([(max(w / 2 - 150, lx - 60)) * SCALE, 224 * SCALE, min(w / 2 + 150, lx) * SCALE, 224 * SCALE], fill=CYAN, width=2 * SCALE)
         frames.append(img)
-    save("hero.gif", frames, 70)
+    save("hero.gif", frames, 130)
 
 
 def persian_flip():
@@ -166,7 +166,7 @@ def persian_flip():
             else:
                 rect(d, (cx0, y, cx0 + bar, y + 16), 8, fill=(BLUE, CYAN, ORANGE)[r])
         frames.append(img)
-    save("persian.gif", frames, 75)
+    save("persian.gif", frames, 130)
 
 
 def tiles():
@@ -225,7 +225,7 @@ def tiles():
                 if bar_w > 3:
                     rect(d, (x + 18, cy + 18, x + 18 + bar_w, cy + 30), 6, fill=PINK)
         frames.append(img)
-    save("tools.gif", frames, 70)
+    save("tools.gif", frames, 130)
 
 
 if __name__ == "__main__":
