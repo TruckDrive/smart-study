@@ -81,7 +81,7 @@ def hero():
     random.seed(7)
     dots = [(random.uniform(0, w), random.uniform(0, h), random.uniform(1, 2.6), random.choice((BLUE, CYAN, ORANGE, PINK)),
              random.randint(1, 2) * random.choice((-1, 1))) for _ in range(46)]
-    words = [("Your whole study workflow", False), ("همهٔ مطالعهٔ شما در یک افزونه", True), ("Dein ganzes Lernen", False)]
+    words = ["Your whole study workflow", "Study plans up to your exam", "Notebook, mind maps, timer and AI"]
     base = background(w, h)
     frames = []
     for i in range(n):
@@ -106,10 +106,8 @@ def hero():
         k = int(t * len(words))
         local = t * len(words) - k
         fade = ease(local / 0.18) * ease((1 - local) / 0.18)
-        s, rtl = words[k]
         col = mix(BG_BOTTOM, CYAN, fade)
-        kw = {"direction": "rtl", "language": "fa"} if rtl else {}
-        text(d, (w / 2, 182 + (1 - fade) * 6), s, font(22, False), col, "ma", **kw)
+        text(d, (w / 2, 182 + (1 - fade) * 6), words[k], font(22, False), col, "ma")
         # shimmer line
         lx = (t * 1.4 - 0.2) * w
         d.line([(w / 2 - 150) * SCALE, 224 * SCALE, (w / 2 + 150) * SCALE, 224 * SCALE], fill=LINE, width=SCALE)
