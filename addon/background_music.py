@@ -1554,6 +1554,11 @@ def toggle_music_menu(button_widget: Optional['QWidget']):
     if not _has_multimedia:
         if tooltip: tooltip(_("Multimedia libs missing."))
         return
+    # The music button also closes the streaming sidebar it opened, so one
+    # click is enough instead of going through "Streaming" again.
+    from .music_accounts import close_if_open
+    if close_if_open():
+        return
     w = _ensure_window()
     if w is None:
         return

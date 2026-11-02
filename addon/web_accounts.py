@@ -135,6 +135,9 @@ class AccountSitesPanel(QWidget):
         if self.view is None:
             self.view = QWebEngineView()
             self.view.setPage(_Page(account_profile(), self.view))
+            # Music keeps playing when the sidebar closes.
+            from .website_sidebar import _keep_audio_playing
+            _keep_audio_playing(self.view)
             self.stack.addWidget(self.view)
         return self.view
 

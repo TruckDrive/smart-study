@@ -1,4 +1,7 @@
 {
+ "Block on {}": "مسدود کردن در {}",
+ "{} blocked on this page": "{} مورد در این صفحه مسدود شد",
+ "Loading filter lists\u2026": "در حال بارگیری فهرست‌های فیلتر…",
  "Search engine": "موتور جستجو",
  "Block ads and trackers": "مسدود کردن تبلیغات و ردیاب‌ها",
  "Search engine and ad blocker": "موتور جستجو و مسدودکنندهٔ تبلیغات",
@@ -2173,7 +2176,8 @@
  "Your Synapse level {} was carried over to Smart Study.": "سطح {} شما از Synapse به Smart Study منتقل شد.",
  "NotebookLM in the AI assistant: a fourth tab next to ChatGPT, Claude and Gemini, with your own Google account.": "NotebookLM در دستیار هوش مصنوعی: زبانهٔ چهارم کنار ChatGPT، Claude و Gemini، با حساب Google خودتان.",
  "Browser: choose your search engine (DuckDuckGo, Google, Brave Search, Startpage, Ecosia, Bing) with the new ⚙ button.": "مرورگر: موتور جستجوی خود را انتخاب کنید (DuckDuckGo، Google، Brave Search، Startpage، Ecosia، Bing) با دکمهٔ جدید ⚙.",
- "Browser: built-in blocker for ads and trackers, on by default.": "مرورگر: مسدودکنندهٔ داخلی تبلیغات و ردیاب‌ها، به‌طور پیش‌فرض روشن.",
+ "Browser: built-in ad blocker with uBlock Origin's filter lists (uBlock filters, EasyList, EasyPrivacy), on by default; skips YouTube video ads.": "مرورگر: مسدودکنندهٔ داخلی تبلیغات با فهرست‌های فیلتر uBlock Origin (uBlock filters، EasyList، EasyPrivacy)، به‌طور پیش‌فرض روشن؛ تبلیغات ویدیویی YouTube را رد می‌کند.",
+ "The music button also closes the streaming sidebar, no need to click “Streaming” again.": "دکمهٔ موسیقی اکنون نوار کناری پخش آنلاین را هم می‌بندد؛ دیگر لازم نیست دوباره روی «Streaming» بزنید.",
  "Sound from the browser (YouTube, podcasts) keeps playing when you close the browser or open another sidebar such as the AI chat.": "صدای مرورگر (YouTube، پادکست) هنگام بستن مرورگر یا باز کردن نوار کناری دیگری مانند گفتگوی هوش مصنوعی ادامه می‌یابد.",
  "Lighter on your computer: a paused SoundCloud player and the dashboard timers use almost no CPU anymore.": "سبک‌تر برای رایانهٔ شما: پخش‌کنندهٔ SoundCloud در حالت توقف و زمان‌سنج‌های داشبورد تقریباً CPU مصرف نمی‌کنند.",
  "Coming from Synapse: your level and XP are taken over automatically on the first start, if they are higher than in Smart Study.": "از Synapse آمده‌اید: سطح و XP شما در اولین اجرا به‌طور خودکار منتقل می‌شود، اگر از Smart Study بیشتر باشد.",

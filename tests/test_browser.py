@@ -20,15 +20,45 @@ assert search.search_url("google", "Plexus brachialis") == "https://www.google.c
 assert search.search_url("brave", "a&b") == "https://search.brave.com/search?q=a%26b"
 assert search.search_url("startpage", "x") == "https://www.startpage.com/sp/search?query=x"
 
-sys.modules.setdefault("PyQt6", None)  # the Qt part is optional
-adblock = load("browser_adblock")
-hosts = adblock.parse_hosts([
-    "# comment", "127.0.0.1 localhost", "0.0.0.0 0.0.0.0",
-    "0.0.0.0 ads.example.com  # trailing", "0.0.0.0 Tracker.NET other.org", "1.2.3.4 not-blocking.com",
-])
-assert hosts == {"ads.example.com", "tracker.net", "other.org"}, hosts
-assert adblock.is_blocked("ads.example.com", hosts)
-assert adblock.is_blocked("x.y.ads.example.com.", hosts)
-assert not adblock.is_blocked("example.com", hosts)
-assert not adblock.is_blocked("badads.example.com", hosts)
+engine_module = load("adblock_engine")
+engine = engine_module.FilterEngine().add_lists(["""
+! comment
+0.0.0.0 hosts-file.example
+||ads.example.com^
+||tracker.net^$third-party
+||cdn.example.org/ads/*$script,domain=news.com|~sub.news.com
+/banner/*/img^
+@@||cdn.example.org/ads/allowed.js
+||important.example^$important
+@@||important.example^
+||broken.example^
+||broken.example^$badfilter
+@@||trusted.org^$document
+news.com,google.*##.ad-slot
+news.com#@#.ad-slot
+~other.com,shop.com##.sponsor
+youtube.com##+js(json-prune, adPlacements)
+example.com##div:has-text(Ad)
+"""])
+block = engine.should_block
+assert block("https://ads.example.com/x.js", "ads.example.com", "site.com", "script")
+assert block("https://x.ads.example.com/x.js", "x.ads.example.com", "site.com", "script")
+assert block("http://hosts-file.example/a", "hosts-file.example", "site.com", "image")
+assert not block("https://badads.example.com/x.js", "badads.example.com", "site.com", "script")
+assert block("https://tracker.net/t.gif", "tracker.net", "site.com", "image")
+assert not block("https://tracker.net/t.gif", "tracker.net", "www.tracker.net", "image"), "first party"
+assert block("https://cdn.example.org/ads/a.js", "cdn.example.org", "www.news.com", "script")
+assert not block("https://cdn.example.org/ads/a.js", "cdn.example.org", "sub.news.com", "script")
+assert not block("https://cdn.example.org/ads/a.js", "cdn.example.org", "www.news.com", "image")
+assert not block("https://cdn.example.org/ads/a.js", "cdn.example.org", "other.com", "script")
+assert not block("https://cdn.example.org/ads/allowed.js", "cdn.example.org", "news.com", "script")
+assert block("https://site.com/banner/top/img?id=1", "site.com", "site.com", "image")
+assert not block("https://site.com/banners/top/img?id=1", "site.com", "site.com", "image")
+assert block("https://important.example/a", "important.example", "site.com", "script")
+assert not block("https://broken.example/a", "broken.example", "site.com", "script"), "badfilter"
+assert not block("https://ads.example.com/x.js", "ads.example.com", "www.trusted.org", "script"), "$document"
+assert engine.css_for("www.google.de") == ".ad-slot{display:none!important}"
+assert engine.css_for("news.com") == ""
+assert engine.css_for("shop.com") == ".sponsor{display:none!important}"
+assert engine.css_for("youtube.com") == "" and engine.css_for("example.com") == ""
 print("ALL TESTS OK")

@@ -165,6 +165,9 @@ def translate_for_language(text: str, lang: str) -> str:
 # Translations
 # --------------------------------------------------------------------- #
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "Block on {}": {"de": "Auf {} blockieren"},
+    "{} blocked on this page": {"de": "{} auf dieser Seite blockiert"},
+    "Loading filter lists\u2026": {"de": "Filterlisten werden geladen …"},
     "Search engine": {"de": "Suchmaschine"},
     "Block ads and trackers": {"de": "Werbung und Tracker blockieren"},
     "Search engine and ad blocker": {"de": "Suchmaschine und Werbeblocker"},

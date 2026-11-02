@@ -70,6 +70,14 @@ def toggle_music_accounts() -> None:
     _dock.setVisible(not _dock.isVisible())
 
 
+def close_if_open() -> bool:
+    """Hide the streaming sidebar; True if it was open.  Playback goes on."""
+    if _dock is not None and _dock.isVisible():
+        _dock.hide()
+        return True
+    return False
+
+
 def cleanup_music_accounts() -> None:
     global _dock, _panel
     if _panel is not None:

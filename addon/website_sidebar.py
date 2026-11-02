@@ -14,7 +14,7 @@ BROWSER_HOME_URL = "https://duckduckgo.com/"  # default; see _home_url()
 from . import constants, diagnostics
 from .browser_fallback import is_google_url, needs_search_help, duckduckgo_url
 from . import browser_search
-from .browser_adblock import AdBlocker
+from .browser_adblock import AdBlocker, FilteringPage
 
 try:
     from .locales import _
@@ -423,6 +423,16 @@ def _toggle_adblock(on: bool) -> None:
         sidebar_webview.reload()
 
 
+def _toggle_adblock_site(host: str, on: bool) -> None:
+    """Switch the blocker off for one site that breaks with it."""
+    if ad_blocker is None:
+        return
+    (ad_blocker.allowed_sites.discard if on else ad_blocker.allowed_sites.add)(host)
+    _set_browser_option("adblock_off_sites", sorted(ad_blocker.allowed_sites))
+    if sidebar_webview is not None:
+        sidebar_webview.reload()
+
+
 def _fill_options_menu(menu) -> None:
     menu.clear()
     engines = menu.addMenu(_("Search engine"))
@@ -433,10 +443,21 @@ def _fill_options_menu(menu) -> None:
         action.setChecked(key == current)
         qconnect(action.triggered, lambda _=False, k=key: _choose_search_engine(k))
     if ad_blocker is not None:
+        menu.addSeparator()
         block = menu.addAction(_("Block ads and trackers"))
         block.setCheckable(True)
         block.setChecked(ad_blocker.enabled)
         qconnect(block.toggled, _toggle_adblock)
+        host = sidebar_webview.url().host() if sidebar_webview is not None else ""
+        if ad_blocker.enabled and host:
+            here = menu.addAction(_("Block on {}").format(host))
+            here.setCheckable(True)
+            here.setChecked(host not in ad_blocker.allowed_sites)
+            qconnect(here.toggled, lambda on, h=host: _toggle_adblock_site(h, on))
+            count = ad_blocker.blocked.get(host, 0)
+            info = menu.addAction(_("{} blocked on this page").format(count)
+                                  if ad_blocker.engine is not None else _("Loading filter lists…"))
+            info.setEnabled(False)
 
 
 def open_add_site_dialog():
@@ -632,6 +653,7 @@ def create_website_dock() -> Optional[QDockWidget]:
                 global ad_blocker
                 ad_blocker = AdBlocker(website_profile)
                 ad_blocker.enabled = _adblock_on()
+                ad_blocker.allowed_sites = set(_load_website_state().get("adblock_off_sites", []))
                 ad_blocker.start(os.path.dirname(os.path.dirname(profile_dir)))
                 website_profile.setUrlRequestInterceptor(ad_blocker)
         except Exception as e_profile:
@@ -729,7 +751,10 @@ def create_website_dock() -> Optional[QDockWidget]:
 
         sidebar_webview = QWebEngineView()
         sidebar_webview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        page = QWebEnginePage(website_profile, sidebar_webview)
+        if FilteringPage is not None:
+            page = FilteringPage(website_profile, sidebar_webview, ad_blocker)
+        else:
+            page = QWebEnginePage(website_profile, sidebar_webview)
         sidebar_webview.setPage(page)
         diagnostics.attach_webview(sidebar_webview)
         settings = sidebar_webview.settings()
