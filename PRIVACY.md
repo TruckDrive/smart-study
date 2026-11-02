@@ -19,8 +19,14 @@ add-on with several optional online tools.
   text is included. Providers have their own privacy policies. Ollama and
   llama.cpp can be used locally.
 - **Website sidebar:** loads websites selected by the user. “Search in Sidebar”
-  sends the selected search phrase to Google after the user chooses the action.
-- **AI websites (ChatGPT, Claude, Gemini):** the tabs in the AI assistant load
+  sends the selected search phrase to the search engine chosen under ⚙ in the
+  browser (DuckDuckGo by default) after the user chooses the action.
+- **Browser ad blocker:** when the browser is opened, it downloads Steven
+  Black's hosts list (MIT) from raw.githubusercontent.com at most once a week
+  and keeps it in `SmartStudy_Data/adblock_hosts.txt`. Blocking happens
+  locally; nothing about your browsing is sent anywhere. It can be switched
+  off under ⚙.
+- **AI websites (ChatGPT, Claude, Gemini, NotebookLM):** the tabs in the AI assistant load
   these websites like a normal browser. What you type there goes to that
   website under its own privacy policy. Sign-ins and cookies are kept in
   `SmartStudy_Data/web_profiles/accounts` of the Anki profile.

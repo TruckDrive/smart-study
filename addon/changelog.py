@@ -11,6 +11,8 @@ CHANGELOG = [
         "date": "November 2, 2026",
         "items": [
             {"tag": "New", "text": "NotebookLM in the AI assistant: a fourth tab next to ChatGPT, Claude and Gemini, with your own Google account."},
+            {"tag": "New", "text": "Browser: choose your search engine (DuckDuckGo, Google, Brave Search, Startpage, Ecosia, Bing) with the new ⚙ button."},
+            {"tag": "New", "text": "Browser: built-in blocker for ads and trackers, on by default."},
             {"tag": "New", "text": "Sound from the browser (YouTube, podcasts) keeps playing when you close the browser or open another sidebar such as the AI chat."},
             {"tag": "Changed", "text": "Lighter on your computer: a paused SoundCloud player and the dashboard timers use almost no CPU anymore."},
         ],

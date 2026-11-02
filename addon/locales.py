@@ -165,6 +165,9 @@ def translate_for_language(text: str, lang: str) -> str:
 # Translations
 # --------------------------------------------------------------------- #
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "Search engine": {"de": "Suchmaschine"},
+    "Block ads and trackers": {"de": "Werbung und Tracker blockieren"},
+    "Search engine and ad blocker": {"de": "Suchmaschine und Werbeblocker"},
     "Choose which celebrations appear on the dashboard. Changes are saved immediately.": {"de": "Wähle die Erfolgsmeldungen für dein Dashboard. Änderungen werden sofort gespeichert."},
     "Google is having trouble loading or requests verification. You can try DuckDuckGo instead. Home stays unchanged.": {"de": "Google lädt nicht richtig oder verlangt eine Sicherheitsprüfung. Du kannst stattdessen DuckDuckGo ausprobieren. Home bleibt unverändert."},
     "Try DuckDuckGo": {"de": "DuckDuckGo ausprobieren"},

@@ -8,11 +8,13 @@ from typing import Optional, List, Dict, Tuple
 import os
 import urllib.parse
 
-BROWSER_HOME_URL = "https://duckduckgo.com/"
+BROWSER_HOME_URL = "https://duckduckgo.com/"  # default; see _home_url()
 
 # --- Local Imports ---
 from . import constants, diagnostics
 from .browser_fallback import is_google_url, needs_search_help, duckduckgo_url
+from . import browser_search
+from .browser_adblock import AdBlocker
 
 try:
     from .locales import _
@@ -262,6 +264,7 @@ def _apply_window_icon(btn, active: bool = False) -> None:
 sidebar_dock: Optional[QDockWidget] = None
 sidebar_webview: Optional[QWebEngineView] = None
 website_profile: Optional[QWebEngineProfile] = None
+ad_blocker = None  # browser_adblock.AdBlocker of the current profile
 button_container_layout: Optional[QHBoxLayout] = None
 nav_button_layout: Optional[QHBoxLayout] = None
 add_button_widget: Optional[QPushButton] = None
@@ -388,6 +391,54 @@ def load_last_opened_url() -> Optional[str]:
 
 
 # --- UI Actions ---
+def _search_engine() -> str:
+    return browser_search.engine_key(_load_website_state().get("search_engine"))
+
+
+def _home_url() -> str:
+    return browser_search.home_url(_search_engine())
+
+
+def _adblock_on() -> bool:
+    return _load_website_state().get("adblock", True) is not False
+
+
+def _set_browser_option(key: str, value) -> None:
+    state = _load_website_state()
+    state[key] = value
+    _save_website_state(state)
+
+
+def _choose_search_engine(key: str) -> None:
+    _set_browser_option("search_engine", key)
+    if sidebar_webview is not None:
+        load_url_in_webview(sidebar_webview, browser_search.home_url(key))
+
+
+def _toggle_adblock(on: bool) -> None:
+    _set_browser_option("adblock", bool(on))
+    if ad_blocker is not None:
+        ad_blocker.enabled = bool(on)
+    if sidebar_webview is not None:
+        sidebar_webview.reload()
+
+
+def _fill_options_menu(menu) -> None:
+    menu.clear()
+    engines = menu.addMenu(_("Search engine"))
+    current = _search_engine()
+    for key, (name, _home, _base, _param) in browser_search.ENGINES.items():
+        action = engines.addAction(name)
+        action.setCheckable(True)
+        action.setChecked(key == current)
+        qconnect(action.triggered, lambda _=False, k=key: _choose_search_engine(k))
+    if ad_blocker is not None:
+        block = menu.addAction(_("Block ads and trackers"))
+        block.setCheckable(True)
+        block.setChecked(ad_blocker.enabled)
+        qconnect(block.toggled, _toggle_adblock)
+
+
 def open_add_site_dialog():
     if not mw or QInputDialog is object or not _qt_available: return
     current_sites = load_custom_sites()
@@ -467,7 +518,7 @@ def open_current_in_browser() -> None:
 
 def search_in_browser(text: str) -> None:
     if text and QTimer is not object:
-        url = "https://www.google.com/search?" + urllib.parse.urlencode({"q": text})
+        url = browser_search.search_url(_search_engine(), text)
         QTimer.singleShot(0, lambda: _open_browser_url(url))
 
 
@@ -577,6 +628,12 @@ def create_website_dock() -> Optional[QDockWidget]:
             website_profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.AllowPersistentCookies)
             website_profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
             print(f"WS Info: Created/Using persistent profile: {profile_name} at {profile_dir}")
+            if AdBlocker is not None:
+                global ad_blocker
+                ad_blocker = AdBlocker(website_profile)
+                ad_blocker.enabled = _adblock_on()
+                ad_blocker.start(os.path.dirname(os.path.dirname(profile_dir)))
+                website_profile.setUrlRequestInterceptor(ad_blocker)
         except Exception as e_profile:
             print(f"WS Warn: Could not create persistent profile (Error: {e_profile}). Falling back to an off-the-record profile.")
             if mw: website_profile = QWebEngineProfile(mw)
@@ -654,6 +711,15 @@ def create_website_dock() -> Optional[QDockWidget]:
         external_button.setToolTip(_("Open in browser"))
         external_button.setAccessibleName(_("Open in browser"))
         qconnect(external_button.clicked, open_current_in_browser)
+        options_button = QPushButton("⚙")
+        options_button.setObjectName("smartstudyBrowserOptions")
+        options_button.setStyleSheet(_icon_style)
+        options_button.setToolTip(_("Search engine and ad blocker"))
+        options_button.setAccessibleName(_("Search engine and ad blocker"))
+        options_menu = QMenu(options_button)
+        qconnect(options_menu.aboutToShow, lambda: _fill_options_menu(options_menu))
+        options_button.setMenu(options_menu)
+        nav_button_layout.addWidget(options_button)
         nav_button_layout.addWidget(external_button)
         nav_button_layout.addWidget(window_button)
         toolbar_layout.addLayout(nav_button_layout)
@@ -733,7 +799,7 @@ def create_website_dock() -> Optional[QDockWidget]:
         main_layout.addWidget(sidebar_webview)
 
         if qconnect and sidebar_webview:
-             qconnect(home_button_widget.clicked, partial(load_url_in_webview, webview=sidebar_webview, url_str=BROWSER_HOME_URL))
+             qconnect(home_button_widget.clicked, lambda: load_url_in_webview(sidebar_webview, _home_url()))
         else:
              home_button_widget.setEnabled(False)
 
@@ -892,7 +958,7 @@ def open_website_window():
     except Exception:
         cur = ""
     if not cur or cur == "about:blank" or cur.startswith("data:text/html"):
-        load_url_in_webview(sidebar_webview, BROWSER_HOME_URL)
+        load_url_in_webview(sidebar_webview, _home_url())
 
     # Detach the dock's content widget and hide the (now empty) dock.
     content = sidebar_dock.widget()
@@ -976,7 +1042,7 @@ def toggle_website_dock():
             sidebar_dock.raise_()
 
             if sidebar_webview and sidebar_webview.url().toString() in ("", "about:blank"):
-                load_url_in_webview(sidebar_webview, BROWSER_HOME_URL)
+                load_url_in_webview(sidebar_webview, _home_url())
             elif not sidebar_webview:
                 print("WS Warn: Sidebar webview not available on toggle show.")
     except Exception as e:
@@ -1003,9 +1069,10 @@ def refresh_website_theme() -> None:
         if hint is not None:
             hint.setStyleSheet(_search_help_style())
     if sidebar_dock is not None:
-        external_button = sidebar_dock.findChild(QPushButton, "smartstudyOpenBrowser")
-        if external_button is not None:
-            external_button.setStyleSheet(icon_style)
+        for name in ("smartstudyOpenBrowser", "smartstudyBrowserOptions"):
+            button = sidebar_dock.findChild(QPushButton, name)
+            if button is not None:
+                button.setStyleSheet(icon_style)
     if home_button_widget is not None:
         try: home_button_widget.setStyleSheet(_get_raised_text_button_style())
         except Exception: pass
@@ -1077,8 +1144,12 @@ def cleanup_website_sidebar():
         try: sidebar_dock.deleteLater()
         except Exception: pass
     if website_profile is not None:
+        try: website_profile.setUrlRequestInterceptor(None)
+        except Exception: pass
         try: website_profile.deleteLater()
         except Exception: pass
+    global ad_blocker
+    ad_blocker = None
 
     sidebar_dock = None; sidebar_webview = None; website_profile = None; button_container_layout = None; nav_button_layout = None
     add_button_widget = None; home_button_widget = None; back_button = None; forward_button = None; refresh_button = None
@@ -1131,7 +1202,7 @@ def _execute_search_in_sidebar(text: str):
     if not text: return
 
     query = urllib.parse.quote(text)
-    search_url = f"https://www.google.com/search?q={query}"
+    search_url = browser_search.search_url(_search_engine(), text)
 
     global sidebar_dock, sidebar_webview
     try:
