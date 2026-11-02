@@ -14,7 +14,7 @@ BROWSER_HOME_URL = "https://duckduckgo.com/"  # default; see _home_url()
 from . import constants, diagnostics
 from .browser_fallback import is_google_url, needs_search_help, duckduckgo_url
 from . import browser_search
-from .browser_adblock import AdBlocker, FilteringPage
+from .browser_adblock import AdBlocker, FilteringPage, install_youtube_pruner
 
 try:
     from .locales import _
@@ -419,8 +419,23 @@ def _toggle_adblock(on: bool) -> None:
     _set_browser_option("adblock", bool(on))
     if ad_blocker is not None:
         ad_blocker.enabled = bool(on)
+    _apply_youtube_pruner()
     if sidebar_webview is not None:
         sidebar_webview.reload()
+
+
+def _apply_youtube_pruner() -> None:
+    """YouTube ad pruning follows the ad-blocker switches; the streaming
+    sidebar (YouTube Music) uses it too."""
+    on = _adblock_on()
+    off = ad_blocker.allowed_sites if ad_blocker is not None else ()
+    try:
+        if website_profile is not None:
+            install_youtube_pruner(website_profile, on, off)
+        from .web_accounts import account_profile
+        install_youtube_pruner(account_profile(), on, off)
+    except Exception as e:
+        print(f"WS Warn: YouTube ad pruning not available: {e}")
 
 
 def _toggle_adblock_site(host: str, on: bool) -> None:
@@ -429,6 +444,7 @@ def _toggle_adblock_site(host: str, on: bool) -> None:
         return
     (ad_blocker.allowed_sites.discard if on else ad_blocker.allowed_sites.add)(host)
     _set_browser_option("adblock_off_sites", sorted(ad_blocker.allowed_sites))
+    _apply_youtube_pruner()
     if sidebar_webview is not None:
         sidebar_webview.reload()
 
@@ -656,6 +672,7 @@ def create_website_dock() -> Optional[QDockWidget]:
                 ad_blocker.allowed_sites = set(_load_website_state().get("adblock_off_sites", []))
                 ad_blocker.start(os.path.dirname(os.path.dirname(profile_dir)))
                 website_profile.setUrlRequestInterceptor(ad_blocker)
+                _apply_youtube_pruner()
         except Exception as e_profile:
             print(f"WS Warn: Could not create persistent profile (Error: {e_profile}). Falling back to an off-the-record profile.")
             if mw: website_profile = QWebEngineProfile(mw)

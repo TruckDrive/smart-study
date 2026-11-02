@@ -62,6 +62,66 @@ YOUTUBE_SKIPPER = r"""
 })();
 """
 
+# Like uBlock Origin's json-prune filter for YouTube: drop the ad data from
+# YouTube's player responses before the player reads them, so ads are not
+# even requested.  Runs in the page's own world at document creation; the
+# Proxy keeps JSON.parse looking native to the page.  %s = sites switched off.
+YOUTUBE_PRUNER = r"""
+(function (off) {
+  var host = location.hostname;
+  if (!/(^|\.)(youtube\.com|youtube-nocookie\.com)$/.test(host)) return;
+  if (off.indexOf(host) >= 0 || window.__smartstudyAdPrune) return;
+  window.__smartstudyAdPrune = true;
+  var KEYS = ['adPlacements', 'playerAds', 'adSlots', 'adBreakHeartbeatParams'];
+  function prune(value) {
+    if (value && typeof value === 'object') {
+      [value, value.playerResponse].forEach(function (target) {
+        if (target && typeof target === 'object') {
+          KEYS.forEach(function (key) { if (key in target) delete target[key]; });
+        }
+      });
+    }
+    return value;
+  }
+  JSON.parse = new Proxy(JSON.parse, {
+    apply: function (target, self, args) { return prune(Reflect.apply(target, self, args)); }
+  });
+  Response.prototype.json = new Proxy(Response.prototype.json, {
+    apply: function (target, self, args) { return Reflect.apply(target, self, args).then(prune); }
+  });
+  // The first video's data comes as "var ytInitialPlayerResponse = {…}".
+  var initial;
+  try {
+    Object.defineProperty(window, 'ytInitialPlayerResponse', {
+      configurable: true,
+      get: function () { return initial; },
+      set: function (value) { initial = prune(value); }
+    });
+  } catch (e) {}
+})(%s);
+"""
+PRUNER_NAME = "smartstudy-youtube-ads"
+
+
+def install_youtube_pruner(profile, enabled: bool, off_sites=()) -> None:
+    """(Re)place the profile-wide YouTube ad pruner.  Profile scripts reach
+    the very first page load, unlike scripts added during a navigation."""
+    import json
+    from PyQt6.QtWebEngineCore import QWebEngineScript
+    scripts = profile.scripts()
+    for old in scripts.find(PRUNER_NAME):
+        scripts.remove(old)
+    if not enabled:
+        return
+    script = QWebEngineScript()
+    script.setName(PRUNER_NAME)
+    script.setSourceCode(YOUTUBE_PRUNER % json.dumps(sorted(off_sites)))
+    script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+    script.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
+    script.setRunsOnSubFrames(True)   # embedded videos
+    scripts.insert(script)
+
+
 _STYLE_INJECTOR = r"""
 (function (css) {
   if (window.__smartstudyAdCss) return;
