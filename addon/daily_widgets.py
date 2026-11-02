@@ -483,31 +483,39 @@ def generate_learning_plan_widget(plan_data: List[Dict]) -> str:
                     }}
                 }};
 
+                // Write only real changes; this runs every second for every row.
+                function setText(node, text) {{
+                    if (node.textContent !== text) node.textContent = text;
+                }}
+                function setBg(node, color) {{
+                    if (node.dataset.bg !== color) {{ node.dataset.bg = color; node.style.backgroundColor = color; }}
+                }}
+
                 function renderRow(el, itemState, originalDuration, originalBg) {{
                     const timeSpan = el.querySelector('.time-display');
 
                     if (!itemState || itemState.status === 'idle') {{
-                        el.style.backgroundColor = originalBg;
-                        timeSpan.textContent = el.dataset.initialText;
+                        setBg(el, originalBg);
+                        setText(timeSpan, el.dataset.initialText);
                         return;
                     }}
 
                     if (itemState.status === 'done') {{
-                        el.style.backgroundColor = DONE_COLOR;
-                        timeSpan.textContent = LBL_DONE;
+                        setBg(el, DONE_COLOR);
+                        setText(timeSpan, LBL_DONE);
                         return;
                     }}
 
                     if (itemState.status === 'paused') {{
-                        el.style.backgroundColor = PAUSED_COLOR;
+                        setBg(el, PAUSED_COLOR);
                         const totalElapsed = (itemState.elapsedTime || 0);
                         const remaining = originalDuration - totalElapsed;
-                        timeSpan.textContent = formatTime(Math.max(0, Math.floor(remaining))) + " (" + LBL_PAUSED + ")";
+                        setText(timeSpan, formatTime(Math.max(0, Math.floor(remaining))) + " (" + LBL_PAUSED + ")");
                         return;
                     }}
 
                     if (itemState.status === 'running') {{
-                        el.style.backgroundColor = RUNNING_COLOR;
+                        setBg(el, RUNNING_COLOR);
                         const elapsedSinceStart = (Date.now() - itemState.startTime) / 1000;
                         const totalElapsed = (itemState.elapsedTime || 0) + elapsedSinceStart;
                         const remaining = originalDuration - totalElapsed;
@@ -521,12 +529,12 @@ def generate_learning_plan_widget(plan_data: List[Dict]) -> str:
                             globalState[key] = itemState;
                             saveState(globalState);
 
-                            el.style.backgroundColor = DONE_COLOR;
-                            timeSpan.textContent = LBL_DONE;
+                            setBg(el, DONE_COLOR);
+                            setText(timeSpan, LBL_DONE);
                             // The "time's up" notification is fired by the Python-side
                             // timer (works even during review), so nothing to do here.
                         }} else {{
-                            timeSpan.textContent = formatTime(Math.floor(remaining));
+                            setText(timeSpan, formatTime(Math.floor(remaining)));
                         }}
                     }}
                 }}

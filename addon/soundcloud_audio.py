@@ -160,6 +160,8 @@ class SoundCloudNativeAudio(QObject):
     def _poll(self):
         # MPVBase's reader thread queues events. Drain them on Qt's GUI thread;
         # no blocking media/property polling and no JS from a worker thread.
+        # Fast while something plays (smooth position bar), slow when paused.
+        self.timer.setInterval(100 if any(s.playing for s in self.elements.values()) else 1000)
         for key, stream in list(self.elements.items()):
             if stream.failed:
                 continue
@@ -243,6 +245,7 @@ class SoundCloudNativeAudio(QObject):
                 if other is not stream and other.playing:
                     self._command(other_key, other, 'set_property', 'pause', True)
             self._command(key, stream, 'set_property', 'pause', False)
+            self.timer.start(100)
         elif command == 'pause':
             self._command(key, stream, 'set_property', 'pause', True)
             self._send(key, 'pause')

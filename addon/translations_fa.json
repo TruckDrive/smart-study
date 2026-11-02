@@ -1674,7 +1674,7 @@
  "Sidebar Visibility:": "نمایش نوار کناری:",
  "Sidebar width": "عرض نوار کناری",
  "Sign in with your Google account.": "با حساب Google خود وارد شوید.",
- "Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in.": "با حساب خودتان وارد شوید؛ کلید API لازم نیست. از نشانی ایمیل استفاده کنید: Google اجازهٔ «ورود با Google» را داخل برنامه‌هایی مانند Anki نمی‌دهد. Gemini بدون ورود هم کار می‌کند.",
+ "Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in; NotebookLM needs a Google account.": "با حساب خودتان وارد شوید؛ کلید API لازم نیست. از نشانی ایمیل استفاده کنید: Google اجازهٔ «ورود با Google» را داخل برنامه‌هایی مانند Anki نمی‌دهد. Gemini بدون ورود هم کار می‌کند؛ NotebookLM به حساب Google نیاز دارد.",
  "Sign in — or create a free account if you don’t have one.": "وارد شوید؛ یا اگر حساب ندارید، حساب رایگان بسازید.",
  "Sign in — you can use a Google or GitHub account.": "وارد شوید؛ می‌توانید از حساب Google یا GitHub استفاده کنید.",
  "Silver": "نقره",
@@ -2168,6 +2168,9 @@
  "↗ · Free arrow": "↗ · پیکان آزاد",
  "✓ {} downloaded": "✓ {} دانلود شد",
  "Your Synapse level {} was carried over to Smart Study.": "سطح {} شما از Synapse به Smart Study منتقل شد.",
+ "NotebookLM in the AI assistant: a fourth tab next to ChatGPT, Claude and Gemini, with your own Google account.": "NotebookLM در دستیار هوش مصنوعی: زبانهٔ چهارم کنار ChatGPT، Claude و Gemini، با حساب Google خودتان.",
+ "Sound from the browser (YouTube, podcasts) keeps playing when you close the browser or open another sidebar such as the AI chat.": "صدای مرورگر (YouTube، پادکست) هنگام بستن مرورگر یا باز کردن نوار کناری دیگری مانند گفتگوی هوش مصنوعی ادامه می‌یابد.",
+ "Lighter on your computer: a paused SoundCloud player and the dashboard timers use almost no CPU anymore.": "سبک‌تر برای رایانهٔ شما: پخش‌کنندهٔ SoundCloud در حالت توقف و زمان‌سنج‌های داشبورد تقریباً CPU مصرف نمی‌کنند.",
  "Coming from Synapse: your level and XP are taken over automatically on the first start, if they are higher than in Smart Study.": "از Synapse آمده‌اید: سطح و XP شما در اولین اجرا به‌طور خودکار منتقل می‌شود، اگر از Smart Study بیشتر باشد.",
  "Third-party notices now also list KaTeX (math in AI answers).": "اطلاعیه‌های شخص ثالث اکنون KaTeX (فرمول‌ها در پاسخ‌های هوش مصنوعی) را هم فهرست می‌کنند."
 }

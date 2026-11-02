@@ -1217,6 +1217,7 @@ class MiniMusicPlayer(QDialog):
                 self._sc_playing = playing
                 self._push_sc_state(playing=playing)
                 _notify_artwork()
+                self._sc_sync_activity()
 
         title = (st.get("title") or "").strip()
         artist = (st.get("artist") or "").strip()
@@ -1449,37 +1450,45 @@ class MiniMusicPlayer(QDialog):
 
     def showEvent(self, event):
         super().showEvent(event)
+        if self._sc_poll is not None and self._sc_poll.isActive():
+            self._sc_poll.setInterval(800)
         # Position pushes are skipped while hidden — sync the bar on show.
         QTimer.singleShot(150, lambda: self._push_position(force=True))
 
     def hideEvent(self, event):
         super().hideEvent(event)
-        # The SoundCloud widget streams through JavaScript/MSE inside Chromium.
-        # Keep its page active when only the player chrome is hidden; otherwise
-        # background throttling can starve the stream and cause brief dropouts.
+        # Run after Qt has propagated the dialog's hidden state to child views.
+        QTimer.singleShot(0, self._sc_sync_activity)
+
+    def _sc_sync_activity(self):
+        """The SoundCloud widget streams through JavaScript/MSE inside Chromium.
+        While it plays with the player chrome hidden, keep its page active;
+        otherwise background throttling can starve the stream and cause brief
+        dropouts.  Paused and hidden, let Chromium throttle it and poll it
+        rarely, so an idle player costs (almost) no CPU."""
         if self._mode != "soundcloud" or self.sc_view is None:
             return
-
-        def keep_soundcloud_active():
-            try:
-                page = self.sc_view.page()
-                if page is None:
-                    return
-                # QWebEngineView normally marks its page invisible together
-                # with the dialog.  The UI remains hidden, but treating the
-                # audio page as visible prevents Chromium timer throttling.
-                page.setVisible(True)
+        try:
+            hidden = not self.isVisible()
+            if self._sc_poll is not None and self._sc_poll.isActive():
+                self._sc_poll.setInterval(4000 if hidden and not self._sc_playing else 800)
+            if not hidden:
+                return  # Qt manages a visible view's page itself.
+            page = self.sc_view.page()
+            if page is None:
+                return
+            # QWebEngineView marks its page invisible together with the
+            # dialog; treating a playing page as visible prevents throttling.
+            page.setVisible(self._sc_playing)
+            if self._sc_playing:
                 try:
                     page.setLifecycleState(QWebEnginePage.LifecycleState.Active)
                 except (AttributeError, TypeError):
                     # LifecycleState is unavailable on some older Qt builds;
                     # page visibility alone is still the important safeguard.
                     pass
-            except RuntimeError:
-                pass  # view was deleted during profile/add-on shutdown
-
-        # Run after Qt has propagated the dialog's hidden state to child views.
-        QTimer.singleShot(0, keep_soundcloud_active)
+        except RuntimeError:
+            pass  # view was deleted during profile/add-on shutdown
 
     def closeEvent(self, event):
         self.save_state()

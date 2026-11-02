@@ -514,9 +514,12 @@ def render_minimal_dashboard_sections(
           var hours = Math.floor(remaining / 3600);
           var minutes = Math.floor((remaining % 3600) / 60);
           var seconds = remaining % 60;
-          timer.textContent = hours
+          var text = hours
             ? hours + 'h ' + String(minutes).padStart(2, '0') + 'min'
             : (minutes ? minutes + 'm ' + String(seconds).padStart(2, '0') + 's' : seconds + 's');
+          // Unchanged text must not touch the DOM: every write wakes the
+          // layout MutationObserver below.
+          if (timer.textContent !== text) timer.textContent = text;
         }}
         function syncLayout() {{
           syncWidth();

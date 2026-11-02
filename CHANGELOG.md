@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.0 – 2026-11-02
+
+- **NotebookLM in the AI assistant**: a fourth tab next to ChatGPT, Claude and Gemini. Sign in with the e-mail address of your Google account (Google does not allow "Sign in with Google" inside Anki)
+- **Background playback in the browser**: sound from YouTube, podcasts and the like keeps playing when you close the browser or another sidebar (e.g. the AI chat) replaces it. Only a page that is playing sound stays awake, and only until it has been silent for 30 seconds
+- **Lighter on CPU**: a paused SoundCloud player is no longer kept awake in the background and is polled every 4 s instead of every 0.8 s (mpv every 1 s instead of 0.1 s). The dashboard's study timers only touch the page when the shown time changes, so the layout is no longer recalculated every second
+
 ## 2.5.0 – 2026-10-30
 
 - **Coming from Synapse**: Smart Study takes over your Synapse level and XP once on start, if Synapse's is higher. Removing Synapse keeps its data in the collection and the profile folder, so nothing needs to be reinstalled. Study time since then is still credited

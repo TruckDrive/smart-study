@@ -26,7 +26,7 @@ try:
     from aqt.qt import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
                         QInputDialog, QDockWidget, QSizePolicy, QMessageBox,
                         QMenu, QAction, QIcon, QPixmap, QPainter, QUrl, QTimer,
-                        QSize, Qt, QByteArray, QDesktopServices)
+                        QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
     from PyQt6 import sip
@@ -38,7 +38,7 @@ except ImportError as e:
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton = object, object, object, object
     QInputDialog, QDockWidget, QSizePolicy, QMessageBox = object, object, object, object
     QUrl, QTimer, QSize, Qt = object, object, object, None
-    QDesktopServices = object
+    QDesktopServices = object; QEvent = object; QObject = object
     QByteArray = object; QIcon = object; QPixmap = object; QPainter = object
     QWebEngineView, QWebEngineProfile, QWebEnginePage, QWebEngineSettings = object, object, object, object
     QAction = object; WebAction = object; QMenu = object
@@ -729,6 +729,7 @@ def create_website_dock() -> Optional[QDockWidget]:
         qconnect(view.loadFinished, inspect_loaded_page)
         qconnect(switch_button.clicked, switch_search)
         qconnect(dismiss_button.clicked, dismiss_hint)
+        _keep_audio_playing(view)
         main_layout.addWidget(sidebar_webview)
 
         if qconnect and sidebar_webview:
@@ -785,6 +786,64 @@ def create_website_dock() -> Optional[QDockWidget]:
         back_button = None; forward_button = None; refresh_button = None
         custom_button_containers.clear()
     return sidebar_dock
+
+class _AudioKeeper(QObject):
+    """Keeps sound (YouTube, podcasts, …) playing while the browser is hidden,
+    e.g. when another sidebar such as the AI chat opens.  Qt marks a hidden
+    view's page invisible and Chromium then throttles it, which stalls
+    streams.  Only a page that is playing sound stays "visible", and only
+    until it has been silent for a while, so a hidden browser costs nothing."""
+
+    SILENCE_MS = 30000
+
+    def __init__(self, view):
+        super().__init__(view)
+        self.view = view
+        self.silence = QTimer(self)
+        self.silence.setSingleShot(True)
+        self.silence.setInterval(self.SILENCE_MS)
+        qconnect(self.silence.timeout, self._let_sleep)
+        qconnect(view.page().recentlyAudibleChanged, self._audible_changed)
+        view.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if obj is self.view and event.type() == QEvent.Type.Hide:
+            # After Qt has propagated the hidden state to the page.
+            QTimer.singleShot(0, self._keep_awake)
+        return False
+
+    def _keep_awake(self):
+        if sip.isdeleted(self.view) or self.view.isVisible():
+            return
+        page = self.view.page()
+        if page is None or not page.recentlyAudible():
+            return
+        page.setVisible(True)
+        try:
+            page.setLifecycleState(QWebEnginePage.LifecycleState.Active)
+        except (AttributeError, TypeError):
+            pass  # older Qt builds; visibility alone is the important part
+
+    def _audible_changed(self, audible):
+        if audible:
+            self.silence.stop()
+        elif not sip.isdeleted(self.view) and not self.view.isVisible():
+            self.silence.start()
+
+    def _let_sleep(self):
+        if sip.isdeleted(self.view) or self.view.isVisible():
+            return
+        page = self.view.page()
+        if page is not None and not page.recentlyAudible():
+            page.setVisible(False)
+
+
+def _keep_audio_playing(view) -> None:
+    try:
+        view._smartstudy_audio = _AudioKeeper(view)
+    except Exception as e:
+        print(f"WS Warn: background audio not available: {e}")
+
 
 def on_webview_url_changed(url: QUrl):
     if not sidebar_webview or QUrl is object or not _qt_available: return

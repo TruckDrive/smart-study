@@ -7,6 +7,15 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.6.0",
+        "date": "November 2, 2026",
+        "items": [
+            {"tag": "New", "text": "NotebookLM in the AI assistant: a fourth tab next to ChatGPT, Claude and Gemini, with your own Google account."},
+            {"tag": "New", "text": "Sound from the browser (YouTube, podcasts) keeps playing when you close the browser or open another sidebar such as the AI chat."},
+            {"tag": "Changed", "text": "Lighter on your computer: a paused SoundCloud player and the dashboard timers use almost no CPU anymore."},
+        ],
+    },
+    {
         "version": "2.5.0",
         "date": "October 30, 2026",
         "items": [

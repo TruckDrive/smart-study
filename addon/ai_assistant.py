@@ -172,6 +172,7 @@ AI_SITES = [
     ("chatgpt", "ChatGPT", "https://chatgpt.com/"),
     ("claude", "Claude", "https://claude.ai/new"),
     ("gemini", "Gemini", "https://gemini.google.com/app"),
+    ("notebooklm", "NotebookLM", "https://notebooklm.google.com/"),
 ]
 try:
     from .integrations.strings import tr as _web_tr
@@ -1714,12 +1715,12 @@ def _setup_sidebar() -> bool:
         _dock.setTitleBarWidget(QWidget())
         _dock.setMinimumWidth(340)
         _webview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        # Tabs: the API chat, or ChatGPT/Claude/Gemini with your own account.
+        # Tabs: the API chat, or ChatGPT/Claude/Gemini/NotebookLM with your own account.
         global _sites_panel
         from .web_accounts import AccountSitesPanel
         _sites_panel = AccountSitesPanel(
             [("api", _web_tr("API chat"), _webview)] + AI_SITES,
-            hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in."),
+            hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in; NotebookLM needs a Google account."),
             remember=lambda key: _cfg_set(CK_WEB_SITE, key),
         )
         _sites_panel.show_site(_cfg_get(CK_WEB_SITE, "api") or "api")
