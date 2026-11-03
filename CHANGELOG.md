@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1 – 2026-11-03
+
+- **Controller: multiple choice cards**: on the question side, the D-pad picks options 1 (up), 2 (right), 3 (down) and 4 (left), R2 picks option 5, and R buries the card. Works with checkboxes and radio buttons of the AllInOne cards. Included as the default profile *Xbox Series*; existing profiles of yours are not changed
+
 ## 2.6.0 – 2026-11-02
 
 - **NotebookLM in the AI assistant**: a fourth tab next to ChatGPT, Claude and Gemini. Sign in with the e-mail address of your Google account (Google does not allow "Sign in with Google" inside Anki)
