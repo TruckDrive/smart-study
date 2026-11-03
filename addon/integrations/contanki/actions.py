@@ -55,6 +55,17 @@ def scroll_step(direction: int) -> None:
     )
 
 
+def choose_option(number: int) -> None:
+    """Clicks the input of the given row on an AllInOne card (checkbox or radio)."""
+    assert mw is not None
+    mw.web.eval(
+        "(function() { "
+        "const rows = [...document.querySelectorAll('#qtable tr')].filter(r => r.querySelector('input')); "
+        f"const input = rows[{number - 1}] && rows[{number - 1}].querySelector('input'); "
+        "if (input) input.click(); })()"
+    )
+
+
 def check_filter(func: Callable) -> Callable:
     """Wrapper/decorator to check that the current deck is filtered."""
 
@@ -156,6 +167,11 @@ button_actions: dict[str, Callable[[], Any]] = {
     "Replay Audio":             mw.reviewer.replayAudio,
     "Edit Note":                mw.onEditCurrent,
     "Flip Card":                mw.reviewer.onEnterKey,
+    "Choice 1":                 partial(choose_option, 1),
+    "Choice 2":                 partial(choose_option, 2),
+    "Choice 3":                 partial(choose_option, 3),
+    "Choice 4":                 partial(choose_option, 4),
+    "Choice 5":                 partial(choose_option, 5),
     "Set Due Date":             mw.reviewer.on_set_due,                     # Not Tested
     "Toggle IO Masks":          toggle_image_occlusion_masks,                
 }
@@ -213,6 +229,8 @@ REVIEW_ACTIONS = [
     "Replay Audio",     "Pause Audio",      "Audio -5s",        "Audio +5s",
     "Record Voice",     "Replay Voice",     "Edit Note",        "Set Due Date",
     "Card Info",        "Previous Card Info",                   "Toggle IO Masks",
+    "Choice 1",         "Choice 2",         "Choice 3",         "Choice 4",
+    "Choice 5",
 ]
 
 STATE_ACTIONS = {

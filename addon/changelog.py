@@ -7,6 +7,13 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.6.1",
+        "date": "November 3, 2026",
+        "items": [
+            {"tag": "New", "text": "Controller on multiple choice cards: D-pad up/right/down/left picks options 1–4, R2 picks option 5, R buries the card. Included as the default profile “Xbox Series”."},
+        ],
+    },
+    {
         "version": "2.6.0",
         "date": "November 2, 2026",
         "items": [
