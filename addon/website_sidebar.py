@@ -15,6 +15,7 @@ from . import constants, diagnostics
 from .browser_fallback import is_google_url, needs_search_help, duckduckgo_url
 from . import browser_search
 from .browser_adblock import AdBlocker, FilteringPage, install_youtube_pruner
+from . import browser_features, web_sleep
 
 try:
     from .locales import _
@@ -28,7 +29,8 @@ try:
     from aqt.qt import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
                         QInputDialog, QDockWidget, QSizePolicy, QMessageBox,
                         QMenu, QAction, QIcon, QPixmap, QPainter, QUrl, QTimer,
-                        QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject)
+                        QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject,
+                        QTabBar, QStackedWidget, QShortcut, QKeySequence)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
     from PyQt6 import sip
@@ -44,6 +46,7 @@ except ImportError as e:
     QByteArray = object; QIcon = object; QPixmap = object; QPainter = object
     QWebEngineView, QWebEngineProfile, QWebEnginePage, QWebEngineSettings = object, object, object, object
     QAction = object; WebAction = object; QMenu = object
+    QTabBar = QStackedWidget = QShortcut = QKeySequence = object
 
 # QtSvg is optional – used only to render crisp toolbar icons. A failure here
 # must never break the rest of the module, so it gets its own guarded import.
@@ -274,6 +277,13 @@ forward_button: Optional[QPushButton] = None
 refresh_button: Optional[QPushButton] = None
 window_button: Optional[QPushButton] = None
 custom_button_containers: List[QWidget] = []
+# Tabs: sidebar_webview is always the view of the current tab.
+tab_bar = None        # QTabBar
+tab_stack = None      # QStackedWidget with one QWebEngineView per tab
+search_help = None    # the "Google is having trouble" hint above the views
+pip_placeholder = None  # shown for a tab whose video plays in picture in picture
+browser_container = None  # the browser's content widget (for its shortcuts)
+MAX_TABS = 20
 
 # Embedded view (inside the Anki main window) that borrows the dock content.
 website_main_layout: Optional[QVBoxLayout] = None
@@ -449,8 +459,18 @@ def _toggle_adblock_site(host: str, on: bool) -> None:
         sidebar_webview.reload()
 
 
+def _open_browser_settings() -> None:
+    try:
+        import importlib
+        importlib.import_module(__package__).show_settings_dialog("browser")
+    except Exception as e:
+        print(f"WS Warn: settings not opened: {e}")
+
+
 def _fill_options_menu(menu) -> None:
     menu.clear()
+    menu.addAction(_("Browser settings…")).triggered.connect(lambda: QTimer.singleShot(0, _open_browser_settings))
+    menu.addSeparator()
     engines = menu.addMenu(_("Search engine"))
     current = _search_engine()
     for key, (name, _home, _base, _param) in browser_search.ENGINES.items():
@@ -515,6 +535,7 @@ def delete_custom_site(index_to_delete: int):
 def load_url_in_webview(webview: Optional[QWebEngineView], url_str: str):
     if not webview or QWebEngineView is object or QUrl is object or not _qt_available: return
     url = QUrl.fromUserInput(url_str)
+    webview._ss_pending = None  # a tab waiting for its page gets this one instead
     if url.isValid() and url.scheme() in ["http", "https"]:
         webview.setUrl(url)
     else:
@@ -579,8 +600,7 @@ def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
     delete_button.setToolTip(_("Remove '{}'").format(name))
 
     if qconnect:
-        action = partial(load_url_in_webview, webview=sidebar_webview, url_str=url)
-        qconnect(site_button.clicked, action)
+        qconnect(site_button.clicked, lambda _=False, u=url: load_url_in_webview(sidebar_webview, u))
         delete_action = partial(delete_custom_site, index_to_delete=index)
         qconnect(delete_button.clicked, delete_action)
     else:
@@ -664,6 +684,9 @@ def create_website_dock() -> Optional[QDockWidget]:
             website_profile.setPersistentStoragePath(profile_dir)
             website_profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.AllowPersistentCookies)
             website_profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
+            from .web_accounts import keep_youtube_theme_fixed, share_login_from
+            keep_youtube_theme_fixed(website_profile)
+            share_login_from(website_profile)
             print(f"WS Info: Created/Using persistent profile: {profile_name} at {profile_dir}")
             if AdBlocker is not None:
                 global ad_blocker
@@ -766,25 +789,6 @@ def create_website_dock() -> Optional[QDockWidget]:
         if qconnect and window_button:
             qconnect(window_button.clicked, toggle_website_window)
 
-        sidebar_webview = QWebEngineView()
-        sidebar_webview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        if FilteringPage is not None:
-            page = FilteringPage(website_profile, sidebar_webview, ad_blocker)
-        else:
-            page = QWebEnginePage(website_profile, sidebar_webview)
-        sidebar_webview.setPage(page)
-        diagnostics.attach_webview(sidebar_webview)
-        settings = sidebar_webview.settings()
-        attrs_to_set = [
-            (QWebEngineSettings.WebAttribute.JavascriptEnabled, True),
-            (QWebEngineSettings.WebAttribute.LocalStorageEnabled, True),
-            (QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True),
-            (QWebEngineSettings.WebAttribute.PluginsEnabled, False),
-            (QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True), ]
-        for attr, value in attrs_to_set:
-            try: settings.setAttribute(attr, value)
-            except AttributeError: pass
-        sidebar_webview.setUrl(QUrl("about:blank"))
         fallback = QWidget(container_widget)
         fallback.setObjectName("smartstudySearchHelp")
         hint_layout = QVBoxLayout(fallback)
@@ -807,40 +811,72 @@ def create_website_dock() -> Optional[QDockWidget]:
         hint_layout.addLayout(actions)
         fallback.setStyleSheet(_search_help_style())
         fallback.hide()
-        main_layout.addWidget(fallback)
-        view = sidebar_webview
-        dismissed_url = [None]
-        def offer_fallback(url=None, ok=True):
-            current = view.url().toString()
-            if url is not None:
-                dismissed_url[0] = None
-            fallback.setVisible(current != dismissed_url[0] and needs_search_help(current, ok))
-        def inspect_loaded_page(ok):
-            offer_fallback(ok=ok)
-            current = view.url().toString()
-            if not ok or not is_google_url(current):
-                return
-            # One small check after a Google load, not a polling loop or a
-            # text scan of search results that might merely discuss CAPTCHAs.
-            def inspected(blocked):
-                if sidebar_webview is not view:
-                    return
-                if current == view.url().toString() and current != dismissed_url[0]:
-                    fallback.setVisible(needs_search_help(current, ok, bool(blocked)))
-            view.page().runJavaScript("Boolean(document.querySelector('form[action*=\"/sorry/\"], #captcha-form, .g-recaptcha, iframe[src*=\"recaptcha/api2/anchor\"]'))", inspected)
+        global search_help, tab_bar, tab_stack
+        search_help = fallback
         def switch_search():
-            load_url_in_webview(view, duckduckgo_url(view.url().toString()))
+            if sidebar_webview is not None:
+                load_url_in_webview(sidebar_webview, duckduckgo_url(sidebar_webview.url().toString()))
         def dismiss_hint():
-            dismissed_url[0] = view.url().toString()
+            if sidebar_webview is not None:
+                sidebar_webview._smartstudy_dismissed_url = sidebar_webview.url().toString()
             fallback.hide()
-        qconnect(view.urlChanged, offer_fallback)
-        qconnect(view.loadFinished, inspect_loaded_page)
         qconnect(switch_button.clicked, switch_search)
         qconnect(dismiss_button.clicked, dismiss_hint)
-        _keep_audio_playing(view)
-        main_layout.addWidget(sidebar_webview)
 
-        if qconnect and sidebar_webview:
+        tab_row = QWidget()
+        tab_row.setObjectName("smartstudyWebTabs")
+        tab_row.setStyleSheet(_tab_row_style())
+        tab_row_layout = QHBoxLayout(tab_row)
+        tab_row_layout.setContentsMargins(6, 4, 6, 0); tab_row_layout.setSpacing(2)
+        tab_bar = QTabBar()
+        tab_bar.setDocumentMode(True)
+        tab_bar.setExpanding(False)
+        tab_bar.setMovable(True)
+        tab_bar.setUsesScrollButtons(True)
+        tab_bar.setElideMode(Qt.TextElideMode.ElideRight)
+        tab_bar.setDrawBase(False)
+        tab_row_layout.addWidget(tab_bar, 1)
+        new_tab_button = QPushButton("+")
+        new_tab_button.setObjectName("smartstudyNewTab")
+        new_tab_button.setStyleSheet(_get_icon_button_style())
+        new_tab_button.setToolTip(_("New tab") + " (Ctrl+T)")
+        new_tab_button.setAccessibleName(_("New tab"))
+        qconnect(new_tab_button.clicked, lambda: new_tab(_home_url()))
+        tab_row_layout.addWidget(new_tab_button)
+        groups_button = QPushButton("▤")
+        groups_button.setObjectName("smartstudyTabGroups")
+        groups_button.setStyleSheet(_get_icon_button_style())
+        groups_button.setToolTip(_("Tab groups"))
+        groups_button.setAccessibleName(_("Tab groups"))
+        groups_menu = QMenu(groups_button)
+        qconnect(groups_menu.aboutToShow, lambda: browser_features.fill_groups_menu(groups_menu))
+        groups_button.setMenu(groups_menu)
+        tab_row_layout.addWidget(groups_button)
+        main_layout.addWidget(tab_row)
+        main_layout.addWidget(fallback)
+        tab_stack = QStackedWidget()
+        tab_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        main_layout.addWidget(tab_stack)
+        global pip_placeholder, browser_container
+        pip_placeholder = QWidget()
+        pip_layout = QVBoxLayout(pip_placeholder)
+        pip_layout.addStretch(1)
+        pip_label = QLabel(_("This video plays in picture in picture."))
+        pip_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pip_label.setWordWrap(True)
+        pip_layout.addWidget(pip_label)
+        pip_back = QPushButton(_("Back to the browser"))
+        qconnect(pip_back.clicked, lambda: browser_features.close_pip(show_browser=True))
+        pip_layout.addWidget(pip_back, 0, Qt.AlignmentFlag.AlignCenter)
+        pip_layout.addStretch(1)
+        tab_stack.addWidget(pip_placeholder)
+        browser_container = container_widget
+        qconnect(tab_bar.currentChanged, _on_tab_changed)
+        qconnect(tab_bar.tabCloseRequested, close_tab)
+        qconnect(tab_bar.tabMoved, lambda *_a: _schedule_save_tabs())
+        _restore_tabs()
+
+        if qconnect:
              qconnect(home_button_widget.clicked, lambda: load_url_in_webview(sidebar_webview, _home_url()))
         else:
              home_button_widget.setEnabled(False)
@@ -858,31 +894,16 @@ def create_website_dock() -> Optional[QDockWidget]:
             qconnect(back_button.clicked, lambda: diagnostics.record('browser.back'))
             qconnect(forward_button.clicked, lambda: diagnostics.record('browser.forward'))
             qconnect(refresh_button.clicked, lambda: diagnostics.record('browser.reload'))
-            qconnect(back_button.clicked, view.back)
-            qconnect(forward_button.clicked, view.forward)
-            qconnect(refresh_button.clicked, view.reload)
-            buttons = (back_button, forward_button)
-            def sync_nav_buttons(*_args):
-                # Deferred, so the page has finished updating its history.
-                def apply():
-                    if sip.isdeleted(view) or any(sip.isdeleted(b) for b in buttons):
-                        return
-                    history = view.history()
-                    buttons[0].setEnabled(history.canGoBack())
-                    buttons[1].setEnabled(history.canGoForward())
-                QTimer.singleShot(0, apply)
-            qconnect(view.urlChanged, sync_nav_buttons)
-            qconnect(view.loadFinished, sync_nav_buttons)
-        
-        if qconnect and not hasattr(sidebar_webview, '_urlChangedConnected_ws'):
-            qconnect(sidebar_webview.urlChanged, on_webview_url_changed)
-            sidebar_webview._urlChangedConnected_ws = True
+            qconnect(back_button.clicked, lambda: sidebar_webview and sidebar_webview.back())
+            qconnect(forward_button.clicked, lambda: sidebar_webview and sidebar_webview.forward())
+            qconnect(refresh_button.clicked, lambda: sidebar_webview and sidebar_webview.reload())
 
         sidebar_dock.setWidget(container_widget)
         sidebar_dock.setVisible(False)
         from .sidebar_widths import attach
         attach(mw, sidebar_dock, "website", lambda: website_window is not None)
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, sidebar_dock)
+        browser_features.start()
         print(f"WS Info: New dock created and added successfully.")
 
     except Exception as e:
@@ -894,6 +915,393 @@ def create_website_dock() -> Optional[QDockWidget]:
         back_button = None; forward_button = None; refresh_button = None
         custom_button_containers.clear()
     return sidebar_dock
+
+
+# --- Tabs ---
+def _tab_row_style() -> str:
+    c = _toolbar_palette()
+    return f"""
+    #smartstudyWebTabs {{ background-color: {c['bar']}; border-bottom: 1px solid {c['line']}; }}
+    #smartstudyWebTabs QTabBar {{ background: transparent; }}
+    #smartstudyWebTabs QTabBar::tab {{ background: transparent; color: {c['text']}; border: none;
+        border-radius: 6px 6px 0 0; padding: 5px 8px; margin-right: 2px; max-width: 170px; min-width: 40px; }}
+    #smartstudyWebTabs QTabBar::tab:selected {{ background: {c['select_bg']}; }}
+    #smartstudyWebTabs QTabBar::tab:hover:!selected {{ background: {c['hover']}; }}
+    #smartstudyWebTabs QPushButton#smartstudyCloseTab {{ background: transparent; color: {c['muted']};
+        border: none; border-radius: 9px; padding: 0; font-size: 14px; }}
+    #smartstudyWebTabs QPushButton#smartstudyCloseTab:hover {{ background: {c['hover']}; color: {c['text']}; }}
+    """
+
+
+if FilteringPage is not None:
+    _PageBase = FilteringPage
+else:
+    _PageBase = QWebEnginePage if QWebEnginePage is not object else object
+
+
+class _TabPage(_PageBase):
+    """Links that want a new window or tab (middle click, Ctrl+click,
+    target=_blank, "Open link in new tab") get a new tab."""
+
+    def createWindow(self, kind):
+        background = kind == QWebEnginePage.WebWindowType.WebBrowserBackgroundTab
+        view = new_tab(None, background=background)
+        return view.page() if view is not None else None
+
+    def acceptNavigationRequest(self, url, nav_type, is_main_frame):
+        view = getattr(self, "_ss_view", None)
+        if is_main_frame and view is not None and browser_features.focus_blocks(url):
+            QTimer.singleShot(0, lambda: browser_features.show_blocked(view, url))
+            return False
+        return super().acceptNavigationRequest(url, nav_type, is_main_frame)
+
+
+def _make_tab_view():
+    view = QWebEngineView()
+    view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+    if FilteringPage is not None:
+        page = _TabPage(website_profile, view, ad_blocker)
+    else:
+        page = _TabPage(website_profile, view)
+    view.setPage(page)
+    page._ss_view = view
+    diagnostics.attach_webview(view)
+    settings = view.settings()
+    attrs_to_set = [
+        (QWebEngineSettings.WebAttribute.JavascriptEnabled, True),
+        (QWebEngineSettings.WebAttribute.LocalStorageEnabled, True),
+        (QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True),
+        (QWebEngineSettings.WebAttribute.PluginsEnabled, False),
+        (QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True), ]
+    for attr, value in attrs_to_set:
+        try: settings.setAttribute(attr, value)
+        except AttributeError: pass
+    view._smartstudy_dismissed_url = None
+
+    def offer_fallback(url=None, ok=True):
+        if sidebar_webview is not view or search_help is None:
+            return
+        current = view.url().toString()
+        if url is not None:
+            view._smartstudy_dismissed_url = None
+        search_help.setVisible(current != view._smartstudy_dismissed_url and needs_search_help(current, ok))
+    def inspect_loaded_page(ok):
+        offer_fallback(ok=ok)
+        current = view.url().toString()
+        if not ok or not is_google_url(current):
+            return
+        # One small check after a Google load, not a polling loop or a
+        # text scan of search results that might merely discuss CAPTCHAs.
+        def inspected(blocked):
+            if sidebar_webview is not view or search_help is None:
+                return
+            if current == view.url().toString() and current != view._smartstudy_dismissed_url:
+                search_help.setVisible(needs_search_help(current, ok, bool(blocked)))
+        view.page().runJavaScript("Boolean(document.querySelector('form[action*=\"/sorry/\"], #captcha-form, .g-recaptcha, iframe[src*=\"recaptcha/api2/anchor\"]'))", inspected)
+    qconnect(view.urlChanged, offer_fallback)
+    qconnect(view.loadFinished, inspect_loaded_page)
+    qconnect(view.urlChanged, lambda *_a: _sync_nav_buttons(view))
+    qconnect(view.loadFinished, lambda *_a: _sync_nav_buttons(view))
+    # Kept from the signals: asking a page that is waking up from Discarded
+    # for its icon crashed Qt (WebContentsAdapter::icon).
+    view._ss_title, view._ss_icon = "", None
+    qconnect(view.titleChanged, lambda t: (setattr(view, "_ss_title", t), _update_tab_label(view)))
+    qconnect(view.iconChanged, lambda i: (setattr(view, "_ss_icon", i), _update_tab_label(view)))
+    qconnect(view.urlChanged, lambda url: sidebar_webview is view and on_webview_url_changed(url))
+    view._urlChangedConnected_ws = True
+    qconnect(view.urlChanged, lambda *_a: _schedule_save_tabs())
+    qconnect(view.titleChanged, lambda *_a: _schedule_save_tabs())
+    _keep_audio_playing(view)
+    browser_features.setup_view(view)
+    # Tabs not looked at for 10 minutes give their memory back; a tab playing
+    # sound or shown in picture in picture is never unloaded.
+    web_sleep.watch(view, discard_after=600, keep_awake=lambda: bool(getattr(view, "_ss_pip", False)))
+    return view
+
+
+def new_tab(url: Optional[str] = None, background: bool = False, pending: Optional[Dict] = None,
+            at_end: bool = False):
+    """Open a tab (url None: the page fills it, e.g. a link's new window).
+    pending {"url", "title"}: a tab that loads only when it is first shown."""
+    if tab_bar is None or tab_stack is None:
+        return None
+    if tab_bar.count() >= MAX_TABS:
+        tooltip(_("Up to {} tabs").format(MAX_TABS))
+        return None
+    view = _make_tab_view()
+    index = tab_bar.count() if at_end or not tab_bar.count() else tab_bar.currentIndex() + 1
+    tab_stack.addWidget(view)
+    tab_bar.insertTab(index, (pending or {}).get("title") or _("New tab"))
+    tab_bar.setTabData(index, view)
+    view._ss_pending = (pending or {}).get("url")
+    close = QPushButton("×")
+    close.setObjectName("smartstudyCloseTab")
+    close.setFixedSize(18, 18)
+    close.setCursor(Qt.CursorShape.PointingHandCursor)
+    close.setToolTip(_("Close tab"))
+    close.setAccessibleName(_("Close tab"))
+    qconnect(close.clicked, lambda: close_tab(_tab_index(view)))
+    tab_bar.setTabButton(index, QTabBar.ButtonPosition.RightSide, close)
+    _show_close_buttons()
+    if url:
+        if url == "about:blank": view.setUrl(QUrl(url))
+        else:
+            view._ss_requested = url
+            load_url_in_webview(view, url)
+    _schedule_save_tabs()
+    if not background:
+        if tab_bar.currentIndex() == index:
+            _on_tab_changed(index)  # the first tab became current before its data was set
+        else:
+            tab_bar.setCurrentIndex(index)
+        if url and url != "about:blank":
+            view.setFocus()
+    return view
+
+
+def close_tab(index: int) -> None:
+    if tab_bar is None or tab_stack is None or tab_bar.count() <= 1:
+        return
+    view = _tab_view(index)
+    if view is None:
+        return
+    if getattr(view, "_ss_pip", False):
+        browser_features.close_pip()
+    tab_stack.removeWidget(view)
+    tab_bar.removeTab(index)  # emits currentChanged for the new tab
+    _show_close_buttons()
+    _schedule_save_tabs()
+    try: view.setUrl(QUrl("about:blank"))
+    except Exception: pass
+    view.deleteLater()
+
+
+def _tab_view(index: int):
+    """The view of a tab; the stack's order does not follow moved tabs."""
+    return tab_bar.tabData(index) if tab_bar is not None and index >= 0 else None
+
+
+def _tab_index(view) -> int:
+    for index in range(tab_bar.count() if tab_bar is not None else 0):
+        if tab_bar.tabData(index) is view:
+            return index
+    return -1
+
+
+def all_tab_views() -> list:
+    return [_tab_view(i) for i in range(tab_bar.count())] if tab_bar is not None else []
+
+
+def _show_close_buttons() -> None:
+    """The last tab cannot be closed, so it shows no ×."""
+    for index in range(tab_bar.count()):
+        button = tab_bar.tabButton(index, QTabBar.ButtonPosition.RightSide)
+        if button is not None:
+            button.setVisible(tab_bar.count() > 1)
+
+
+def _step_tab(step: int) -> None:
+    if tab_bar is not None and tab_bar.count() > 1:
+        tab_bar.setCurrentIndex((tab_bar.currentIndex() + step) % tab_bar.count())
+
+
+def _on_tab_changed(index: int, load: bool = True) -> None:
+    global sidebar_webview
+    if tab_stack is None or index < 0:
+        return
+    view = _tab_view(index)
+    if view is None:
+        return
+    if getattr(view, "_ss_pip", False) and pip_placeholder is not None:
+        tab_stack.setCurrentWidget(pip_placeholder)
+    else:
+        tab_stack.setCurrentWidget(view)
+    sidebar_webview = view
+    if load:
+        _load_pending(view)
+    _schedule_save_tabs()
+    if search_help is not None:
+        search_help.hide()
+    _sync_nav_buttons(view)
+    on_webview_url_changed(view.url())
+
+
+def show_browser() -> bool:
+    """Make the browser visible (sidebar or main window); False if it
+    cannot be created."""
+    global sidebar_dock
+    if sidebar_dock is None:
+        sidebar_dock = create_website_dock()
+    if sidebar_dock is None or tab_bar is None:
+        return False
+    if website_window is None and not sidebar_dock.isVisible():
+        sidebar_dock.show()
+        sidebar_dock.raise_()
+        _notify_launcher_dock_opened()
+    return True
+
+
+def _is_blank(view) -> bool:
+    return (view is not None and view.url().toString() in ("", "about:blank")
+            and not getattr(view, "_ss_requested", None) and not getattr(view, "_ss_pending", None))
+
+
+def detach_view(view) -> None:
+    """Take a tab's view out of the browser (for picture in picture)."""
+    if tab_stack is None:
+        return
+    tab_stack.removeWidget(view)
+    view._ss_pip = True
+    if sidebar_webview is view and pip_placeholder is not None:
+        tab_stack.setCurrentWidget(pip_placeholder)
+    _update_tab_label(view)
+
+
+def attach_view(view, show: bool = False) -> None:
+    """Put a view back after picture in picture."""
+    if tab_stack is None or sip.isdeleted(view):
+        return
+    view._ss_pip = False
+    tab_stack.addWidget(view)
+    index = _tab_index(view)
+    if sidebar_webview is view:
+        tab_stack.setCurrentWidget(view)
+    _update_tab_label(view)
+    if show and index >= 0 and show_browser():
+        tab_bar.setCurrentIndex(index)
+
+
+def open_tab_entries() -> List[Dict[str, str]]:
+    """The open tabs as {"url", "title"} (for groups and the next start)."""
+    entries = []
+    for view in all_tab_views():
+        if view is None:
+            continue
+        url = getattr(view, "_ss_pending", None) or view.url().toString()
+        if not url.startswith(("http://", "https://")):
+            continue
+        index = _tab_index(view)
+        entries.append({"url": url, "title": tab_bar.tabText(index)[:200] if index >= 0 else ""})
+    return entries
+
+
+def open_tabs(entries: List[Dict], replace: bool = False) -> None:
+    """Open saved tabs; only the first one loads right away."""
+    entries = [e for e in entries if isinstance(e, dict) and str(e.get("url", "")).startswith(("http://", "https://"))]
+    if not entries or not show_browser():
+        return
+    old = all_tab_views() if replace else []
+    room = MAX_TABS - (0 if replace else tab_bar.count())
+    if len(entries) > room:
+        tooltip(_("Up to {} tabs").format(MAX_TABS))
+        entries = entries[:max(1, room)]
+    first = None
+    for entry in entries:
+        view = new_tab(None, background=True, pending={"url": entry["url"], "title": entry.get("title", "")}, at_end=True)
+        if view is not None and first is None:
+            first = view
+    if first is not None:
+        tab_bar.setCurrentIndex(_tab_index(first))
+    for view in old:
+        index = _tab_index(view)
+        if index >= 0:
+            close_tab(index)
+
+
+def _restore_tabs() -> None:
+    saved = _load_website_state().get("open_tabs")
+    entries = saved.get("tabs") if isinstance(saved, dict) else None
+    if not browser_features.load_settings()["restore_tabs"] or not isinstance(entries, list) or not entries:
+        _new_home_tab()
+        return
+    for entry in entries[:MAX_TABS]:
+        if isinstance(entry, dict) and str(entry.get("url", "")).startswith(("http://", "https://")):
+            new_tab(None, background=True, pending={"url": entry["url"], "title": str(entry.get("title", ""))}, at_end=True)
+    if tab_bar.count() == 0:
+        _new_home_tab()
+        return
+    current = saved.get("current") if isinstance(saved.get("current"), int) else 0
+    current = min(max(0, current), tab_bar.count() - 1)
+    if tab_bar.currentIndex() == current:
+        _on_tab_changed(current)
+    else:
+        tab_bar.setCurrentIndex(current)
+
+
+def _new_home_tab() -> None:
+    """The first tab: no renderer until the browser is shown or another
+    page is opened in it."""
+    new_tab(None, background=True, pending={"url": _home_url(), "title": _("New tab")}, at_end=True)
+    _on_tab_changed(tab_bar.count() - 1, load=False)
+
+
+def _load_pending(view) -> None:
+    if view is not None and getattr(view, "_ss_pending", None):
+        url, view._ss_pending = view._ss_pending, None
+        view._ss_requested = url
+        load_url_in_webview(view, url)
+
+
+_save_tabs_timer = None
+
+
+def _schedule_save_tabs() -> None:
+    global _save_tabs_timer
+    if tab_bar is None or QTimer is object:
+        return
+    if _save_tabs_timer is None:
+        _save_tabs_timer = QTimer()
+        _save_tabs_timer.setSingleShot(True)
+        _save_tabs_timer.setInterval(1500)
+        _save_tabs_timer.timeout.connect(_save_tabs)
+    _save_tabs_timer.start()
+
+
+def _save_tabs() -> None:
+    if tab_bar is None:
+        return
+    entries = open_tab_entries()
+    current = sidebar_webview
+    urls = [e["url"] for e in entries]
+    current_url = (getattr(current, "_ss_pending", None) or current.url().toString()) if current is not None else ""
+    state = _load_website_state()
+    state["open_tabs"] = {"tabs": entries, "current": urls.index(current_url) if current_url in urls else 0}
+    _save_website_state(state)
+
+
+def _update_tab_label(view) -> None:
+    if tab_bar is None or sip.isdeleted(view):
+        return
+    index = _tab_index(view)
+    if index < 0:
+        return
+    if getattr(view, "_ss_pending", None) or web_sleep.state(view.page()) == "Discarded":
+        return  # keeps its title while it is not loaded
+    url = view.url()
+    title = view._ss_title or url.host() or _("New tab")
+    if url.toString() in ("", "about:blank"):
+        title = _("New tab")
+    if getattr(view, "_ss_pip", False):
+        title = "⧉ " + title
+    tab_bar.setTabText(index, title)
+    tab_bar.setTabToolTip(index, title)
+    if view._ss_icon is not None:
+        tab_bar.setTabIcon(index, view._ss_icon)
+
+
+def _sync_nav_buttons(view) -> None:
+    # Deferred, so the page has finished updating its history.
+    def apply():
+        if sidebar_webview is not view or sip.isdeleted(view):
+            return
+        buttons = (back_button, forward_button)
+        if any(b is None or sip.isdeleted(b) for b in buttons):
+            return
+        history = view.history()
+        back_button.setEnabled(history.canGoBack())
+        forward_button.setEnabled(history.canGoForward())
+    QTimer.singleShot(0, apply)
+
 
 class _AudioKeeper(QObject):
     """Keeps sound (YouTube, podcasts, …) playing while the browser is hidden,
@@ -999,7 +1407,9 @@ def open_website_window():
         cur = sidebar_webview.url().toString() if QUrl is not object else ""
     except Exception:
         cur = ""
-    if not cur or cur == "about:blank" or cur.startswith("data:text/html"):
+    if getattr(sidebar_webview, "_ss_pending", None):
+        _load_pending(sidebar_webview)
+    elif (not cur or cur == "about:blank" or cur.startswith("data:text/html")) and _is_blank(sidebar_webview):
         load_url_in_webview(sidebar_webview, _home_url())
 
     # Detach the dock's content widget and hide the (now empty) dock.
@@ -1083,7 +1493,9 @@ def toggle_website_dock():
             sidebar_dock.show()
             sidebar_dock.raise_()
 
-            if sidebar_webview and sidebar_webview.url().toString() in ("", "about:blank"):
+            if getattr(sidebar_webview, "_ss_pending", None):
+                _load_pending(sidebar_webview)
+            elif _is_blank(sidebar_webview):
                 load_url_in_webview(sidebar_webview, _home_url())
             elif not sidebar_webview:
                 print("WS Warn: Sidebar webview not available on toggle show.")
@@ -1106,12 +1518,13 @@ def _search_help_style():
 def refresh_website_theme() -> None:
     """Re-apply theme-aware button styles after a colour-theme change."""
     icon_style = _get_icon_button_style()
-    if sidebar_webview is not None and sidebar_webview.parentWidget() is not None:
-        hint = sidebar_webview.parentWidget().findChild(QWidget, "smartstudySearchHelp")
-        if hint is not None:
-            hint.setStyleSheet(_search_help_style())
+    if search_help is not None:
+        search_help.setStyleSheet(_search_help_style())
     if sidebar_dock is not None:
-        for name in ("smartstudyOpenBrowser", "smartstudyBrowserOptions"):
+        row = sidebar_dock.findChild(QWidget, "smartstudyWebTabs")
+        if row is not None:
+            row.setStyleSheet(_tab_row_style())
+        for name in ("smartstudyOpenBrowser", "smartstudyBrowserOptions", "smartstudyNewTab", "smartstudyTabGroups"):
             button = sidebar_dock.findChild(QPushButton, name)
             if button is not None:
                 button.setStyleSheet(icon_style)
@@ -1151,8 +1564,14 @@ def cleanup_website_sidebar():
     global back_button, forward_button, refresh_button
     global custom_button_containers
     global website_main_layout, website_window, window_button
+    global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
 
     diagnostics.record('browser.cleanup')
+    try: browser_features.stop()
+    except Exception as e: print(f"WS Info: browser extras not stopped: {e}")
+    if _save_tabs_timer is not None and _save_tabs_timer.isActive():
+        _save_tabs_timer.stop()
+        _save_tabs()
 
     # Only close the embedded Browser owned by this module.  A Notebook or
     # Mind Map may be the active embedded tool; restoring its container here
@@ -1164,22 +1583,16 @@ def cleanup_website_sidebar():
             except Exception: pass
         website_window = None
 
-    if sidebar_webview and hasattr(sidebar_webview, 'urlChanged') and hasattr(sidebar_webview, '_urlChangedConnected_ws'):
-        try:
-            if hasattr(sidebar_webview.urlChanged, 'disconnect'):
-                 sidebar_webview.urlChanged.disconnect(on_webview_url_changed) # type: ignore
-            del sidebar_webview._urlChangedConnected_ws
-        except (TypeError, RuntimeError, Exception) as e_disc:
-            print(f"WS Info: Could not disconnect urlChanged on cleanup: {e_disc}")
-        except AttributeError: pass
-
     # Anki's main window survives profile switches. Destroy the Qt objects so
     # a page, cookie store, or signal from the old profile cannot remain live.
-    if sidebar_webview is not None:
-        try: sidebar_webview.setUrl(QUrl("about:blank"))
+    for view in all_tab_views() or [sidebar_webview]:
+        if view is None:
+            continue
+        try: view.setUrl(QUrl("about:blank"))
         except Exception: pass
-        try: sidebar_webview.deleteLater()
+        try: view.deleteLater()
         except Exception: pass
+    tab_bar = None; tab_stack = None; search_help = None; pip_placeholder = None; browser_container = None
     if sidebar_dock is not None:
         try: mw.removeDockWidget(sidebar_dock)
         except Exception: pass

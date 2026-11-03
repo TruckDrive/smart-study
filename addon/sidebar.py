@@ -220,6 +220,9 @@ class GamificationSidebar(QDockWidget):
         self._view = QWebEngineView(self)
         self._page = _GamiPage(self._on_message, self._view)
         self._view.setPage(self._page)
+        # Hidden: frozen, after 30 min unloaded; it redraws itself on "ready".
+        from . import web_sleep
+        web_sleep.watch(self._view, discard_after=1800)
 
         # Match the page background to the theme BEFORE anything paints —
         # otherwise the view flashes white in dark mode while loading.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.7.0 – 2026-11-03
+
+- **Browser tabs**: open several pages at once (+, Ctrl+T, middle click or Ctrl+click on a link); a link that wants a new window opens in a tab. Sound in a background tab keeps playing
+- **Tab groups**: ▤ next to + saves the open tabs as a named group and opens it again later, in addition to or instead of the open tabs. Open tabs come back after a restart and load only when you open them
+- **Study-plan videos in the browser**: links from the study plan open in a browser tab. A video starts where you stopped and is checked off in the plan once you have watched 90 % of it (80–100 % adjustable)
+- **Video control from anywhere in Anki**: play/pause, 10 s back/forward, slower/faster, picture in picture and “card at this point of the video” with keyboard shortcuts that also work while reviewing, and as controller actions
+- **Picture in picture**: the video plays in a small window over Anki that you can move and resize, also over the reviewer
+- **Cards from the browser**: right-click selected text (“Create card from selection”), an image (“Image occlusion from this image”, opens Anki's mask editor) or a video (“Card at this point of the video”, with a link to the second). They open in Anki's Add window with the source
+- **Focus mode**: hide YouTube Shorts, start-page recommendations, suggestions or comments and block sites such as Instagram or TikTok – always or only during a Pomodoro study phase. YouTube itself stays usable, e.g. for music
+- **SponsorBlock**: skips sponsors, self-promotion, like/subscribe reminders and non-music parts of music videos on YouTube; categories selectable
+- **New settings page “Browser”**: all of the above, with freely assignable shortcuts
+- **YouTube starts faster**: with YouTube set to “device theme” every page loaded twice (about 3 s per video). Smart Study now sets light or dark as in Anki
+- **Much less memory**: hidden web pages no longer keep running. After a minute out of sight a page is frozen (no CPU). Browser tabs, AI websites and YouTube Music not looked at for 10 minutes, and the music controls and the gamification sidebar after 30 minutes, are unloaded and reload when you open them again. Anything playing sound is never touched. The API chat is only frozen, so its conversation stays on screen. The SoundCloud page is unloaded when you switch back to local music, and the browser no longer starts an empty page. Measured in a test profile with music, AI assistant, YouTube Music and three tabs open and then closed: 2.85 GB → 2.19 GB after 11 minutes and 1.63 GB after 31 minutes (sum of RSS; measured with AI websites and YouTube Music still unloading after 30 minutes)
+- **Gemini and NotebookLM signed in**: they use the Google sign-in of the Smart Study browser, as Google refuses most sign-ins inside the AI sidebar
+
 ## 2.6.1 – 2026-11-03
 
 - **Controller: multiple choice cards**: on the question side, the D-pad picks options 1 (up), 2 (right), 3 (down) and 4 (left), R2 picks option 5, and R buries the card. Works with checkboxes and radio buttons of the AllInOne cards. Included as the default profile *Xbox Series*; existing profiles of yours are not changed

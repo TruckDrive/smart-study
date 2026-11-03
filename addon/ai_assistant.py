@@ -1676,6 +1676,10 @@ def _setup_sidebar() -> bool:
         _webview = QWebEngineView()
         page     = ChatPage(_profile, _webview)
         _webview.setPage(page)
+        # Hidden: frozen only. Reloading would empty the visible chat, as the
+        # page does not get the conversation back.
+        from . import web_sleep
+        web_sleep.watch(_webview)
         # Match the page background to the theme BEFORE anything paints —
         # otherwise the view flashes white in dark mode while loading.
         try:
@@ -1720,7 +1724,7 @@ def _setup_sidebar() -> bool:
         from .web_accounts import AccountSitesPanel
         _sites_panel = AccountSitesPanel(
             [("api", _web_tr("API chat"), _webview)] + AI_SITES,
-            hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in; NotebookLM needs a Google account."),
+            hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini and NotebookLM use your Google sign-in from the Smart Study browser: sign in to Google there once."),
             remember=lambda key: _cfg_set(CK_WEB_SITE, key),
         )
         _sites_panel.show_site(_cfg_get(CK_WEB_SITE, "api") or "api")

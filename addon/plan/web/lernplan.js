@@ -326,7 +326,7 @@ function itemEl(it, day) {
   });
   const psrc = it.kind === "pages" && plan.sources.find(s => s.id === it.source);
   if (psrc && psrc.file) act(L("📖 öffnen", "📖 open", "📖 باز کردن"), async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
-  if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url }); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
+  if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url, id: plan.id, item: it.id }); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
   const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));
   return row;

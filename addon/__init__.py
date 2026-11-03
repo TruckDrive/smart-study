@@ -839,10 +839,10 @@ def show_settings_dialog(initial_page=None, initial_section=None):
             from . import settings_dialog
             dlg = settings_dialog.SettingsDialog(addon_settings, mw)
 
-        if initial_page in ("deck", "dashboard"):
+        if initial_page in ("deck", "dashboard", "browser"):
             dlg._initial_page = initial_page
             dlg._initial_section = initial_section
-            if hasattr(dlg, "_nav"):
+            if hasattr(dlg, "_nav") and initial_page != "browser":
                 dlg._nav.setCurrentRow(4 if initial_page == "deck" else 3)
                 if initial_section == "celebrations":
                     def reveal_celebrations():
@@ -1297,6 +1297,11 @@ def on_profile_close():
     cleanup_pomodoro(); cleanup_website_sidebar()
     cleanup_music_player(); cleanup_ai_assistant_sidebar()
     cleanup_mindmap_sidebar(); cleanup_notebook_sidebar()
+    try:
+        from . import web_sleep
+        web_sleep.stop()
+    except Exception:
+        pass
     try:
         from . import music_accounts, web_accounts
         music_accounts.cleanup_music_accounts()

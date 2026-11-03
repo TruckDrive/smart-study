@@ -50,8 +50,135 @@ def account_profile() -> "QWebEngineProfile":
     settings.setAttribute(attr.LocalStorageEnabled, True)
     settings.setAttribute(attr.FullScreenSupportEnabled, True)
     settings.setAttribute(attr.PlaybackRequiresUserGesture, False)
+    keep_youtube_theme_fixed(profile)
     _profiles[folder] = profile
+    _copy_saved_login(os.path.join(folder, "SmartStudy_Data", "web_profiles", "website"), profile)
     return profile
+
+
+# Google refuses most sign-ins inside Anki's sidebars, but a sign-in in the
+# Smart Study browser works.  Gemini, NotebookLM and YouTube Music then use
+# that same sign-in: these cookies are copied to the account profile.
+_SHARED_LOGIN = ("google.com", "youtube.com")
+
+
+def _shares_login(domain: str) -> bool:
+    domain = domain.lstrip(".")
+    return any(domain == d or domain.endswith("." + d) for d in _SHARED_LOGIN)
+
+
+def _copy_saved_login(website_folder: str, target) -> None:
+    """Copy the browser's saved Google/YouTube cookies (read from its file,
+    as Qt hands them out only once pages load)."""
+    import sqlite3
+    from PyQt6.QtCore import QDateTime
+    from PyQt6.QtNetwork import QNetworkCookie
+    path = os.path.join(website_folder, "Cookies")
+    if not os.path.exists(path):
+        return
+    try:
+        db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        try:
+            rows = db.execute(
+                "SELECT host_key, name, value, path, expires_utc, is_secure, is_httponly"
+                " FROM cookies WHERE value != ''").fetchall()
+        finally:
+            db.close()
+    except sqlite3.Error:
+        return
+    store = target.cookieStore()
+    for host, name, value, cookie_path, expires, secure, httponly in rows:
+        if not _shares_login(host):
+            continue
+        cookie = QNetworkCookie(name.encode("latin-1", "replace"), value.encode("latin-1", "replace"))
+        if host.startswith("."):
+            cookie.setDomain(host)  # without a dot it is host-only (__Host- cookies)
+        cookie.setPath(cookie_path or "/")
+        cookie.setSecure(bool(secure))
+        cookie.setHttpOnly(bool(httponly))
+        if expires:
+            # Chromium time: microseconds since 1601.
+            cookie.setExpirationDate(QDateTime.fromSecsSinceEpoch(
+                max(0, expires // 1_000_000 - 11_644_473_600)))
+        store.setCookie(cookie, QUrl("https://" + host.lstrip(".")))
+
+
+def share_login_from(website_profile) -> None:
+    """Pass later sign-ins in the browser on to the account profile."""
+    def added(cookie):
+        if _shares_login(cookie.domain()) and mw.pm.profileFolder() in _profiles:
+            target = _profiles[mw.pm.profileFolder()].cookieStore()
+            target.setCookie(cookie, QUrl("https://" + cookie.domain().lstrip(".")))
+    website_profile.cookieStore().cookieAdded.connect(added)
+
+
+# YouTube's theme flags in its PREF cookie (f6, hex).  With "device theme" the
+# server cannot know the colour scheme, renders light, and the page then loads
+# itself a second time (…&themeRefresh=1): seconds lost on every video.
+_YT_DEVICE, _YT_DARK, _YT_LIGHT = 0x40000000, 0x400, 0x80000
+
+
+def _fixed_youtube_pref(value: str) -> Optional[str]:
+    """The PREF cookie value with light or dark instead of "device theme",
+    or None when it needs no change."""
+    fields = value.split("&")
+    for i, field in enumerate(fields):
+        if field.startswith("f6="):
+            try:
+                flags = int(field[3:], 16)
+            except ValueError:
+                return None
+            if not flags & _YT_DEVICE:
+                return None
+            from aqt.theme import theme_manager
+            flags &= ~(_YT_DEVICE | _YT_DARK | _YT_LIGHT)
+            flags |= _YT_DARK if theme_manager.night_mode else _YT_LIGHT
+            fields[i] = "f6=%x" % flags
+            return "&".join(fields)
+    return None
+
+
+def keep_youtube_theme_fixed(profile) -> None:
+    """Replace YouTube's "device theme" by light or dark as in Anki."""
+    import sqlite3
+    from PyQt6.QtCore import QDateTime
+    from PyQt6.QtNetwork import QNetworkCookie
+    store = profile.cookieStore()
+
+    def put(cookie: "QNetworkCookie", value: str) -> None:
+        cookie.setValue(value.encode("latin-1"))
+        store.setCookie(cookie, QUrl("https://www.youtube.com"))
+
+    # Qt hands out saved cookies only once pages load, too late for the
+    # first one, so read the saved cookie straight from the profile.
+    path = os.path.join(profile.persistentStoragePath(), "Cookies")
+    try:
+        db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        try:
+            row = db.execute(
+                "SELECT value, expires_utc FROM cookies WHERE host_key = '.youtube.com'"
+                " AND name = 'PREF' AND path = '/'").fetchone()
+        finally:
+            db.close()
+    except sqlite3.Error:
+        row = None
+    if row and _fixed_youtube_pref(row[0]):
+        cookie = QNetworkCookie(b"PREF")
+        cookie.setDomain(".youtube.com")
+        cookie.setPath("/")
+        cookie.setSecure(True)
+        # Chromium time: microseconds since 1601.
+        cookie.setExpirationDate(QDateTime.fromSecsSinceEpoch(
+            max(0, row[1] // 1_000_000 - 11_644_473_600)))
+        put(cookie, _fixed_youtube_pref(row[0]))
+
+    def added(cookie):
+        if bytes(cookie.name()) == b"PREF" and cookie.domain().endswith("youtube.com"):
+            value = _fixed_youtube_pref(bytes(cookie.value()).decode("latin-1"))
+            if value:
+                put(QNetworkCookie(cookie), value)
+
+    store.cookieAdded.connect(added)
 
 
 def forget_profiles() -> None:
@@ -138,6 +265,10 @@ class AccountSitesPanel(QWidget):
             # Music keeps playing when the sidebar closes.
             from .website_sidebar import _keep_audio_playing
             _keep_audio_playing(self.view)
+            # ChatGPT, Gemini, YouTube Music … keep their state on their
+            # servers: after 10 min hidden (and silent) the page is unloaded.
+            from . import web_sleep
+            web_sleep.watch(self.view, discard_after=600)
             self.stack.addWidget(self.view)
         return self.view
 

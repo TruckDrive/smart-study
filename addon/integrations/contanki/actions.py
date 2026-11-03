@@ -66,6 +66,12 @@ def choose_option(number: int) -> None:
     )
 
 
+def browser_action(key: str) -> None:
+    """Video control and tabs of the Smart Study browser."""
+    from ... import browser_features
+    browser_features.run_action(key)
+
+
 def check_filter(func: Callable) -> Callable:
     """Wrapper/decorator to check that the current deck is filtered."""
 
@@ -174,6 +180,15 @@ button_actions: dict[str, Callable[[], Any]] = {
     "Choice 5":                 partial(choose_option, 5),
     "Set Due Date":             mw.reviewer.on_set_due,                     # Not Tested
     "Toggle IO Masks":          toggle_image_occlusion_masks,                
+    "Video Play/Pause":         partial(browser_action, "play_pause"),
+    "Video -10s":               partial(browser_action, "back"),
+    "Video +10s":               partial(browser_action, "forward"),
+    "Video Slower":             partial(browser_action, "slower"),
+    "Video Faster":             partial(browser_action, "faster"),
+    "Video Picture-in-Picture": partial(browser_action, "pip"),
+    "Video Card":               partial(browser_action, "video_card"),
+    "Browser Next Tab":         partial(browser_action, "next_tab"),
+    "Browser Previous Tab":     partial(browser_action, "prev_tab"),
 }
 
 release_actions: dict[str, Callable[[], Any]] = {
@@ -210,6 +225,9 @@ COMMON_ACTIONS = [
     "Open Browser",     "Add Notes",        "Fullscreen",       "Study Deck",
     "Go to Main Screen","Go to Overview",   "Go to Review",     "Preferences",
     "Open Statistics",  "Options",          "Quit",
+    "Video Play/Pause", "Video -10s",       "Video +10s",       "Video Slower",
+    "Video Faster",     "Video Picture-in-Picture",             "Video Card",
+    "Browser Next Tab", "Browser Previous Tab",
 ]
 
 if is_mac:

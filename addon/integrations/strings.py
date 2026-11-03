@@ -41,7 +41,7 @@ DE: Dict[str, str] = {
     "YouTube Music plays here without signing in. Google does not allow signing in inside apps like Anki – for your own playlists, open YouTube Music in your browser with ↗.": "YouTube Music spielt hier ohne Anmeldung. Google erlaubt keine Anmeldung in Apps wie Anki – für deine eigenen Playlists öffne YouTube Music mit ↗ im Browser.",
     "Music": "Musik",
     "API chat": "API-Chat",
-    "Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini also works without signing in; NotebookLM needs a Google account.": "Mit deinem eigenen Account anmelden – kein API-Schlüssel nötig. Nutze deine E-Mail-Adresse: Google erlaubt „Mit Google anmelden“ nicht in Apps wie Anki. Gemini funktioniert auch ohne Anmeldung, NotebookLM braucht ein Google-Konto.",
+    "Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini and NotebookLM use your Google sign-in from the Smart Study browser: sign in to Google there once.": "Mit deinem eigenen Account anmelden – kein API-Schlüssel nötig. Nutze deine E-Mail-Adresse: Google erlaubt „Mit Google anmelden“ nicht in Apps wie Anki. Gemini und NotebookLM nutzen deine Google-Anmeldung aus dem Smart-Study-Browser: Melde dich dort einmal bei Google an.",
     "Streaming": "Streaming",
     "YouTube Music or Spotify": "YouTube Music oder Spotify",
     "Built-in add-ons: you no longer need to install them separately. Switch them on or off under Tools → Smart Study → Built-in add-ons.": "Eingebaute Add-ons: Du musst sie nicht mehr extra installieren. Ein- und ausschalten unter Extras → Smart Study → Eingebaute Add-ons.",

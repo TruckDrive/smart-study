@@ -189,6 +189,14 @@
     cursor:pointer;text-align:center;}
   .shortcut-btn:hover,.shortcut-btn:focus{border-color:var(--accent);color:var(--accent);outline:none;}
   .shortcut-btn.set{color:var(--text);border-color:var(--group-border);}
+  .shortcut-btn.recording{border-color:var(--accent);color:var(--accent);}
+  .bchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .bchip{display:inline-flex;align-items:center;gap:6px;background:var(--field-bg);border-radius:8px;padding:5px 10px;font-size:12.5px;cursor:pointer;user-select:none;}
+  .bchip input{margin:0;accent-color:var(--accent);}
+  .btextarea{width:100%;box-sizing:border-box;margin-top:8px;background:var(--field-bg);color:var(--text);border:1px solid transparent;border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px;min-height:46px;resize:vertical;outline:none;}
+  .btextarea:focus{border-color:var(--accent);}
+  .row.block{display:block;}
+  .bkey-error{color:#d93025;font-size:11.5px;margin-top:4px;}
 
   /* select — the native <select> stays in the DOM as the value store, but is
      hidden: QtWebEngine renders the native popup mis-scaled (and it grows a
@@ -401,6 +409,7 @@
           <div class="nav-item" data-page="dashboard"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</div>
           <div class="nav-item" data-page="deck"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Deck Overview</div>
           <div class="nav-item" data-page="sidebar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg></span>Sidebar</div>
+          <div class="nav-item" data-page="browser"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg></span>Browser</div>
           <div class="nav-item" data-page="addons" id="addonsNav"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4a2 2 0 1 0 4 0h2v6h-2a2 2 0 1 0 0 4h2v4H3V3h2a2 2 0 1 0 4 0z"/></svg></span><span id="addonsNavLabel">Add-ons</span></div>
           <div class="nav-sep"></div>
           <div class="nav-item" data-page="changelog"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h9"/><path d="M9 12h9"/><path d="M9 19h9"/><circle cx="4.5" cy="5" r="1.3"/><circle cx="4.5" cy="12" r="1.3"/><circle cx="4.5" cy="19" r="1.3"/></svg></span>Changelog</div>
@@ -638,6 +647,26 @@
           <p class="rd" style="margin:12px 4px 0;">Shortcuts apply immediately after saving. Restart Anki after enabling or disabling sidebar tools.</p>
         </section>
 
+        <!-- BROWSER (browser_features.py) -->
+        <section class="page" data-page="browser">
+          <h1 class="page-title">Browser</h1>
+          <p class="page-sub">Videos, tabs, shortcuts and focus in the Smart Study browser. Applies after saving.</p>
+          <div class="group-label">Study videos</div>
+          <div class="group" id="browserVideoGroup"></div>
+          <div class="group-label">Tabs</div>
+          <div class="group" id="browserTabGroup"></div>
+          <div class="group-label">Keyboard shortcuts</div>
+          <div class="group" id="browserKeysGroup"></div>
+          <p class="rd" style="margin:8px 4px 0;" id="browserKeysHint">Video shortcuts work everywhere in Anki, also while you review. Click a shortcut and press the new keys; Backspace removes it, Esc cancels.</p>
+          <div class="group-label">Controller</div>
+          <div class="group"><div class="row"><div class="rl"><div class="rt">Video control with a controller</div><div class="rd">In the controller settings, the actions “Video Play/Pause”, “Video -10s”, “Video +10s”, “Video Slower”, “Video Faster”, “Video Picture-in-Picture”, “Video Card” and “Browser Next/Previous Tab” can be put on any button.</div></div><div class="rc"><button type="button" class="btn btn-grey" onclick="bridge('openController')">Controller settings…</button></div></div></div>
+          <div class="group-label">Focus mode</div>
+          <div class="group" id="browserFocusGroup"></div>
+          <div class="group-label">SponsorBlock</div>
+          <div class="group" id="browserSponsorGroup"></div>
+          <p class="rd" style="margin:8px 4px 0;">Skips parts of YouTube videos that other viewers marked (sponsor.ajay.app). Only the first characters of a hash of the video ID are sent, not which video you watch.</p>
+        </section>
+
         <!-- ADD-ONS (built-in add-ons, see integrations/) -->
         <section class="page" data-page="addons">
           <h1 class="page-title" id="addonsTitle">Built-in add-ons</h1>
@@ -770,6 +799,99 @@
   }
   function openExampleWallpapers(){renderExampleWallpapers();document.getElementById('exampleWallpaperModal').classList.add('open');}
   function closeExampleWallpapers(){document.getElementById('exampleWallpaperModal').classList.remove('open');}
+
+  // ---- Browser page (values go to browser_features.save_settings) ----
+  var _browser = null, _bkeys = {}, _recording = null;
+  function bswitch(key,on){ return '<label class="switch"><input type="checkbox" data-bkey="'+key+'" '+(on?'checked':'')+'><span class="slider"></span></label>'; }
+  function brow(title,desc,controls,block){ return '<div class="row'+(block?' block':'')+'"><div class="rl"><div class="rt">'+esc(tr(title))+'</div>'+(desc?'<div class="rd">'+esc(tr(desc))+'</div>':'')+'</div>'+(block?controls:'<div class="rc">'+controls+'</div>')+'</div>'; }
+  function bchips(name,items,selected,type){
+    return '<div class="bchips">'+items.map(function(it){
+      var on = type==='radio' ? selected===it.key : selected.indexOf(it.key)>=0;
+      return '<label class="bchip"><input type="'+(type||'checkbox')+'" name="'+name+'" data-bgroup="'+name+'" value="'+esc(it.key)+'" '+(on?'checked':'')+'>'+esc(tr(it.label))+'</label>';
+    }).join('')+'</div>';
+  }
+  function keyLabel(seq){ return seq ? seq.replace('Ctrl+', (navigator.platform||'').indexOf('Mac')===0?'⌘':'Ctrl+') : tr('Add Shortcut'); }
+  function renderBrowserKeys(){
+    var g=document.getElementById('browserKeysGroup');
+    g.innerHTML=_browser.shortcuts.map(function(a){
+      var seq=_bkeys[a.key]||'';
+      var where = a.where==='app' ? 'Everywhere in Anki' : 'In the browser';
+      return '<div class="row"><div class="rl"><div class="rt">'+esc(tr(a.label))+'</div><div class="rd">'+esc(tr(where))+'</div><div class="bkey-error" data-kerr="'+a.key+'"></div></div>'+
+        '<div class="rc"><button type="button" class="shortcut-btn'+(seq?' set':'')+'" data-bkeybtn="'+a.key+'">'+esc(keyLabel(seq))+'</button></div></div>';
+    }).join('')+'<div class="row"><div class="rl"></div><div class="rc"><button type="button" class="btn btn-grey" id="browserKeysReset">'+esc(tr('Restore Defaults'))+'</button></div></div>';
+    g.querySelectorAll('[data-bkeybtn]').forEach(function(btn){
+      btn.addEventListener('click',function(){ startRecording(btn.dataset.bkeybtn, btn); });
+    });
+    document.getElementById('browserKeysReset').addEventListener('click',function(){
+      _browser.shortcuts.forEach(function(a){ _bkeys[a.key]=a.default; }); renderBrowserKeys();
+    });
+  }
+  var KEYMAP={' ':'Space','ArrowLeft':'Left','ArrowRight':'Right','ArrowUp':'Up','ArrowDown':'Down','PageUp':'PgUp','PageDown':'PgDown','Home':'Home','End':'End','Insert':'Ins','Delete':'Del','Tab':'Tab','Enter':'Return'};
+  function keyOf(e){
+    if(KEYMAP[e.key]) return KEYMAP[e.key];
+    if(/^F\d{1,2}$/.test(e.key)) return e.key;
+    if(e.code && /^Key[A-Z]$/.test(e.code)) return e.code.slice(3);
+    if(e.code && /^Digit\d$/.test(e.code)) return e.code.slice(5);
+    if(e.key && e.key.length===1) return e.key.toUpperCase();
+    return null;
+  }
+  function startRecording(key, btn){
+    if(_recording) stopRecording();
+    _recording={key:key,btn:btn};
+    btn.classList.add('recording'); btn.textContent=tr('Press keys…');
+    document.addEventListener('keydown', recordKey, true);
+  }
+  function stopRecording(){
+    document.removeEventListener('keydown', recordKey, true);
+    if(_recording){ _recording.btn.classList.remove('recording'); }
+    _recording=null;
+  }
+  function recordKey(e){
+    if(['Control','Alt','Shift','Meta','AltGraph'].indexOf(e.key)>=0) return;
+    e.preventDefault(); e.stopPropagation();
+    var r=_recording, err=document.querySelector('[data-kerr="'+r.key+'"]');
+    if(e.key==='Escape'){ stopRecording(); renderBrowserKeys(); return; }
+    if((e.key==='Backspace'||e.key==='Delete') && !e.ctrlKey && !e.altKey && !e.metaKey){ _bkeys[r.key]=''; stopRecording(); renderBrowserKeys(); return; }
+    var k=keyOf(e); if(!k) return;
+    var mods=[]; if(e.ctrlKey)mods.push('Ctrl'); if(e.altKey)mods.push('Alt'); if(e.shiftKey)mods.push('Shift'); if(e.metaKey)mods.push('Meta');
+    if(!mods.length && !/^F\d/.test(k)){ err.textContent=tr('Use Ctrl, Alt, Command or a function key.'); return; }
+    var seq=mods.concat([k]).join('+');
+    var other=_browser.shortcuts.filter(function(a){ return a.key!==r.key && _bkeys[a.key]===seq; })[0];
+    if(other){ err.textContent=tr('Already used for: ')+tr(other.label); return; }
+    _bkeys[r.key]=seq; stopRecording(); renderBrowserKeys();
+  }
+  function renderBrowser(b){
+    var page=document.querySelector('.nav-item[data-page="browser"]');
+    _browser=b||null;
+    if(!b){ if(page) page.style.display='none'; return; }
+    var v=b.values; _bkeys=Object.assign({}, v.shortcuts);
+    document.getElementById('browserVideoGroup').innerHTML=
+      brow('Open study-plan links in the browser','Videos and links from your study plan open in a Smart Study browser tab instead of your system browser.',bswitch('plan_videos_in_browser',v.plan_videos_in_browser))+
+      brow('Continue where you left off','A study-plan video starts again at the point where you stopped.',bswitch('resume_videos',v.resume_videos))+
+      brow('Check off in the study plan','A study-plan video counts as done once you have watched this much of it.',
+        bchips('done_percent',[{key:'80',label:'80 %'},{key:'90',label:'90 %'},{key:'95',label:'95 %'},{key:'100',label:'100 %'}],String(v.done_percent),'radio'),true);
+    document.getElementById('browserTabGroup').innerHTML=
+      brow('Restore tabs on start','The tabs that were open come back after a restart (they load when you open them). Save tab groups with ▤ next to +.',bswitch('restore_tabs',v.restore_tabs));
+    renderBrowserKeys();
+    document.getElementById('browserFocusGroup').innerHTML=
+      brow('When','',bchips('focus_mode',[{key:'off',label:'Off'},{key:'always',label:'Always'},{key:'pomodoro',label:'Only during a Pomodoro study phase'}],v.focus_mode,'radio'),true)+
+      brow('Hide on YouTube','YouTube itself stays usable, also for music – only what you tick here disappears.',bchips('focus_youtube',b.focusYoutube,v.focus_youtube),true)+
+      brow('Block these sites','',bchips('focus_sites',b.focusSites,v.focus_sites)+
+        '<textarea class="btextarea" data-bkey="focus_custom" placeholder="'+esc(tr('More sites, e.g. 9gag.com, one per line'))+'">'+esc(v.focus_custom||'')+'</textarea>',true);
+    document.getElementById('browserSponsorGroup').innerHTML=
+      brow('Skip marked parts of YouTube videos','',bswitch('sponsorblock',v.sponsorblock))+
+      brow('What to skip','',bchips('sponsor_categories',b.sponsorCategories,v.sponsor_categories),true);
+  }
+  function collectBrowser(){
+    var out={shortcuts:Object.assign({},_bkeys)};
+    document.querySelectorAll('[data-bkey]').forEach(function(el){ out[el.dataset.bkey] = el.type==='checkbox' ? el.checked : el.value; });
+    ['focus_youtube','focus_sites','sponsor_categories'].forEach(function(name){
+      out[name]=Array.prototype.map.call(document.querySelectorAll('input[data-bgroup="'+name+'"]:checked'),function(i){return i.value;});
+    });
+    var mode=document.querySelector('input[data-bgroup="focus_mode"]:checked'); out.focus_mode=mode?mode.value:'off';
+    var pct=document.querySelector('input[data-bgroup="done_percent"]:checked'); out.done_percent=pct?Number(pct.value):90;
+    return out;
+  }
 
   function toggleRow(key,title,desc,on,withShortcut){
     var controls = '<label class="switch"><input type="checkbox" data-key="'+key+'" '+(on?'checked':'')+'><span class="slider"></span></label>';
@@ -1201,6 +1323,7 @@
       renderToggles('deckGroup', DECK, cfg);
       renderDeckOverviewSettings(data.deckOverview);
       renderToggles('sideGroup', SIDE, cfg, true);
+      renderBrowser(data.browser);
       setIntegrations(data.integrations);
       setAddonSync(data.addonSync);
       var minimalToggle = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
@@ -1315,6 +1438,7 @@
     };
     document.querySelectorAll('input[type=checkbox][data-key]').forEach(function(cb){ out[cb.dataset.key]=cb.checked; });
     Object.assign(out, collectDeckOverviewSettings());
+    if(_browser) out.browser_settings = collectBrowser();
     return out;
   }
   function save(){ if(!validateDeckOverviewSettings())return; bridge('save', JSON.stringify(collect())); }

@@ -234,6 +234,14 @@ if _QT_AVAILABLE:
 
         def get_new_settings(self) -> Dict:
             s = dict(self._result or {})
+            # Browser settings are stored with the browser, not in the add-on config.
+            browser = s.pop("browser_settings", None)
+            if isinstance(browser, dict):
+                try:
+                    from . import browser_features
+                    browser_features.save_settings(browser)
+                except Exception as e:
+                    print(f"WebSettings: browser settings not saved: {e}")
             # Built-in add-on switches are kept apart from the settings file.
             self.integration_switches = {
                 k.split(":", 1)[1]: bool(s.pop(k)) for k in list(s) if k.startswith("integration:")
@@ -296,6 +304,12 @@ if _QT_AVAILABLE:
                     QTimer.singleShot(0, lambda code=payload: self._install_addon(code))
                 elif action == "openIntegrations":
                     QTimer.singleShot(0, self._open_integrations)
+                elif action == "openController":
+                    def open_controller():
+                        from . import integrations
+                        if not integrations.is_enabled("contanki") or not integrations.open_options("contanki"):
+                            self._open_integrations()
+                    QTimer.singleShot(0, open_controller)
                 elif action == "openUrl":
                     if payload:
                         QDesktopServices.openUrl(QUrl(payload))
@@ -766,7 +780,14 @@ if _QT_AVAILABLE:
                 default = k not in ("minimal_dashboard_enabled", "gamification_popup_level")
                 conf[k] = bool(cfg.get(k, default))
             banner_fallback = self._banner_fallback_uri()
+            try:
+                from . import browser_features
+                browser = browser_features.settings_payload()
+            except Exception as e:
+                print(f"WebSettings: browser settings unavailable: {e}")
+                browser = None
             return {
+                "browser": browser,
                 "deckOverview": deck_payload(cfg, _),
                 "initialPage": getattr(self, "_initial_page", None),
                 "initialSection": getattr(self, "_initial_section", None),
