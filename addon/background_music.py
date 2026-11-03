@@ -740,6 +740,10 @@ class MiniMusicPlayer(QDialog):
             if os.path.isfile(html_path):
                 from . import rtl; rtl.prepare_view(self.ui_view)
                 self.ui_view.setUrl(QUrl.fromLocalFile(html_path))
+            # Only the controls live here (Qt plays local music), and they are
+            # sent again on "ready": hidden for 30 min, the page is unloaded.
+            from . import web_sleep
+            web_sleep.watch(self.ui_view, discard_after=1800)
             lay.addWidget(self.ui_view, 1)
         else:
             warn = QLabel(_("QtWebEngine is required for the music player."))
@@ -767,6 +771,8 @@ class MiniMusicPlayer(QDialog):
             _set_web_attr(s, "PlaybackRequiresUserGesture", False)
             self.sc_view.setVisible(False)
             lay.addWidget(self.sc_view, 1)
+            from . import web_sleep
+            web_sleep.watch(self.sc_view, keep_awake=lambda: self._sc_playing)
 
     def _enter_local_layout(self):
         if self.ui_view is not None:
@@ -1163,11 +1169,26 @@ class MiniMusicPlayer(QDialog):
             self._sc_playing = False
             self._push_sc_state(playing=False)
             self._enter_local_layout()
+            # After Qt has marked the hidden view's page invisible.
+            QTimer.singleShot(500, self._unload_sc)
         self.save_state()
+
+    def _unload_sc(self):
+        """Back in local mode the SoundCloud page is not needed: free its
+        renderer; it loads again when SoundCloud is chosen."""
+        if not self._sc_loaded or self.sc_view is None:
+            return
+        from . import web_sleep
+        if web_sleep.set_state(self.sc_view.page(), "Discarded"):
+            self._sc_loaded = False
+            if self._sc_poll is not None:
+                self._sc_poll.stop()
 
     def _ensure_sc_loaded(self):
         if self._sc_loaded or self.sc_view is None:
             return
+        from . import web_sleep
+        web_sleep.wake(self.sc_view)
         path = os.path.join(constants.addon_path, SC_HTML_FILENAME)
         if not os.path.isfile(path):
             if tooltip:

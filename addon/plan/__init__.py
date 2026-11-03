@@ -251,6 +251,10 @@ def handle(cmd, a):
     if cmd == "openLink":
         if not str(a["url"]).startswith(("http://", "https://", "file://")):
             raise ValueError(tr("nur Web-Links oder Dateien", "only web links or files", "فقط لینک وب یا فایل"))
+        if a.get("id") and a.get("item") and str(a["url"]).startswith(("http://", "https://")):
+            from .. import browser_features
+            if browser_features.open_plan_video(a["url"], a["id"], a["item"]):
+                return True
         openLink(a["url"])
         return True
     if cmd == "studyItem":

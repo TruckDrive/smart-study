@@ -7,6 +7,20 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.7.0",
+        "date": "November 3, 2026",
+        "items": [
+            {"tag": "New", "text": "Browser tabs: open several pages at once (+, Ctrl+T, middle click). ▤ saves the open tabs as a group, and open tabs come back after a restart."},
+            {"tag": "New", "text": "Study-plan videos open in the browser, continue where you stopped and are checked off once watched (90 %, adjustable)."},
+            {"tag": "New", "text": "Video control from anywhere in Anki, also while reviewing: play/pause, ±10 s, speed, picture in picture and a card at the current second – with your own shortcuts or the controller."},
+            {"tag": "New", "text": "Cards from the browser: right-click selected text, an image (image occlusion) or a video."},
+            {"tag": "New", "text": "Focus mode: hide YouTube Shorts and recommendations, block sites like Instagram – always or only during a Pomodoro. SponsorBlock skips sponsors in YouTube videos."},
+            {"tag": "New", "text": "Settings → Browser: all browser options and shortcuts in one place."},
+            {"tag": "Changed", "text": "Much less memory: hidden pages are frozen and later unloaded; anything playing sound keeps running."},
+            {"tag": "Changed", "text": "YouTube starts about 3 seconds faster, and Gemini and NotebookLM use your Google sign-in from the Smart Study browser."},
+        ],
+    },
+    {
         "version": "2.6.1",
         "date": "November 3, 2026",
         "items": [

@@ -26,10 +26,20 @@ add-on with several optional online tools.
   ublockorigin.github.io at most once a week and keeps them in
   `SmartStudy_Data/adblock`. Blocking happens locally; nothing about your
   browsing is sent anywhere. It can be switched off under ⚙, also per site.
+- **SponsorBlock (browser):** on a YouTube video page, the browser asks
+  sponsor.ajay.app for the parts other viewers marked (sponsors, intros, …).
+  Only the first 4 characters of a SHA-256 hash of the video ID are sent, so
+  the service cannot tell which video you watch. Switch it off under
+  Settings → Browser.
+- **Browser data kept locally:** open tabs, tab groups and where you stopped
+  in study-plan videos are stored in `SmartStudy_Data/website_state.json` of
+  the Anki profile and are not synced.
 - **AI websites (ChatGPT, Claude, Gemini, NotebookLM):** the tabs in the AI assistant load
   these websites like a normal browser. What you type there goes to that
   website under its own privacy policy. Sign-ins and cookies are kept in
-  `SmartStudy_Data/web_profiles/accounts` of the Anki profile.
+  `SmartStudy_Data/web_profiles/accounts` of the Anki profile. Google and
+  YouTube cookies of the Smart Study browser are copied there, so a Google
+  sign-in in the browser also works for Gemini, NotebookLM and YouTube Music.
 - **YouTube Music:** the Streaming sidebar loads music.youtube.com (same
   browser storage as above). The Spotify tab only opens the Spotify app or
   open.spotify.com in your normal browser.
