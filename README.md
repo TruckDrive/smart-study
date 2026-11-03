@@ -18,52 +18,7 @@ ln -s "$PWD/smart-study/addon" ~/.local/share/Anki2/addons21/smart_study   # Lin
 
 **Updating from an older version** (0.x): uninstall it first, otherwise Anki shows two **Study Plan** links. Your plans come back by themselves through the Anki collection.
 
-## What's new in 2.4
-
-- **Persian (فارسی)**: all of Smart Study in Persian, right to left, including the study plan and the built-in add-ons
-- **Anki itself in Persian**: Smart Study repairs Anki's Persian translation, which otherwise falls back to English (text from Anki's backend stays English)
-- **AI assistant** can answer in Persian
-
-## What's new in 2.3
-
-- **Same add-ons on all your devices**: Smart Study asks once whether to sync your AnkiWeb add-ons; other devices then offer to install what is missing
-- **Install add-ons by code** under *Settings → Add-ons*
-- **New color Orange** and the **Orange Pixel Wallpaper** example background
-- **Your own text color** for the "Studied … today" line on custom backgrounds
-- The leftover "Study Plan" decks from early versions are now called **Smart Study system data**
-
-## What's new in 2.2
-
-- **Settings sync between your devices**: Smart Study's settings and the switches for the built-in add-ons are kept in the Anki collection, so your normal AnkiWeb sync takes them to your other computers (like the study plans). Of two copies, the newer one wins
-- **Built-in add-ons in the settings**: a new **Add-ons** page in the Smart Study settings switches each built-in add-on on or off at any time
-- **Progress bar removed**: the built-in progress bar is gone. If you want it back, install [Progress bar](https://ankiweb.net/shared/info/1708250053) from AnkiWeb
-
-## What's new in 2.1
-
-- **Built-in add-ons**: copy selections with pictures as an image, review heatmap, controller support and Life Drain come with Smart Study. Switch each one on or off under *Tools → Smart Study → Built-in add-ons…* (see [Built-in add-ons](#built-in-add-ons))
-- **Already installed one of them?** Smart Study asks once whether to keep yours or use the built-in one, and takes over your settings
-- **AI assistant with your own account**: ChatGPT, Claude and Gemini as tabs next to the API chat – no API key needed
-- **Streaming**: YouTube Music in a sidebar; Spotify opens in its app
-- **"What's new" after updates**, with a switch next to everything that was switched on
-- **Fix**: searching in the website sidebar no longer crashes Anki
-
-| Built-in add-ons | After an update |
-|---|---|
-| ![Built-in add-ons](screenshots/builtin-addons.png) | ![What's new](screenshots/whats-new.png) |
-
-## What's new in 2.0
-
-Smart Study 2.0 turns the study planner into **one** complete Anki extension:
-
-- **One add-on, one name.** One menu (*Tools → Smart Study*), one settings window, one `.ankiaddon` file
-- **A full workspace around your plan**: notebook with PDF viewer, mind maps, focus timer, music, AI assistant, website sidebar, gamification, statistics and deadlines (see [Features](#features))
-- **The planner is the study plan.** *Tools → Smart Study → Study Plan…* and the **Study Plan** link in the top bar open it; there is no second, simpler plan any more
-- **Private by design.** No analytics, no remotely loaded banners or content, no update pings. The website sidebar starts on DuckDuckGo
-- **No Terms gate.** The first-run setup only asks for language, study area and color theme
-- **New look.** New logo, icons, rank badges, achievements, music covers and wallpapers, plus synthesized focus sounds and timer chimes, all made for Smart Study (`tools/make_assets.py` generates them)
-- **The launcher no longer covers Anki.** The left icon bar starts below Anki's top toolbar
-
-Full list: [CHANGELOG.md](CHANGELOG.md).
+Changelog and release notes: [CHANGELOG.md](CHANGELOG.md) · [Releases](https://github.com/TruckDrive/smart-study/releases)
 
 ## About
 
