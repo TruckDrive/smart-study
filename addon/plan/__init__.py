@@ -10,11 +10,11 @@ import traceback
 
 from anki.lang import current_lang
 from aqt import dialogs, gui_hooks, mw
-from aqt.qt import QAction, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
+from aqt.qt import QAction, QApplication, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
-from . import ankidata, planner, store
+from . import ankidata, planner, share, store
 from .planner import tr
 from ..constants import ADDON_VERSION as VERSION
 from ..locales import _current_lang
@@ -72,6 +72,12 @@ def open_pdf(path, page):
                             "PDF not found – choose the file under Edit → Sources.",
                             "فایل PDF پیدا نشد – از ویرایش ← منابع فایل را انتخاب کنید."))
     page = max(1, page)
+    try:  # first choice: a tab of the Smart Study browser, at that page
+        from .. import browser_features
+        if browser_features.open_plan_pdf(path, page):
+            return {"ok": True, "page": page, "browser": True}
+    except Exception:
+        traceback.print_exc()
     for prog, args in (("okular", ["-p", str(page)]), ("evince", ["-i", str(page)])):
         if shutil.which(prog):
             subprocess.Popen([prog, *args, path], start_new_session=True,
@@ -319,6 +325,53 @@ def handle(cmd, a):
     if cmd == "delete":
         store.delete(a["id"])
         return True
+    if cmd == "shareCode":
+        return {"code": share.encode(share.export_plan(store.load(a["id"])))}
+    if cmd == "copyText":
+        QApplication.clipboard().setText(str(a.get("text", ""))[:500000])
+        return True
+    if cmd == "exportFile":
+        plan = store.load(a["id"])
+        start = os.path.join(os.path.expanduser("~"), share.file_name(plan["title"]))
+        path, _ = QFileDialog.getSaveFileName(_win, tr("Plan als Datei speichern", "Save plan as file", "ذخیرهٔ برنامه به‌صورت فایل"),
+                                              start, tr("Smart-Study-Plan (*.json)", "Smart Study plan (*.json)", "برنامهٔ Smart Study (*.json)"))
+        if not path:
+            return None
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(share.export_plan(plan), f, ensure_ascii=False, indent=1)
+        return path
+    if cmd in ("importCode", "importFile"):
+        if cmd == "importFile":
+            path, _ = QFileDialog.getOpenFileName(_win, tr("Plan importieren", "Import plan", "وارد کردن برنامه"), os.path.expanduser("~"),
+                                                  tr("Smart-Study-Plan (*.json);;Alle Dateien (*)", "Smart Study plan (*.json);;All files (*)",
+                                                     "برنامهٔ Smart Study (*.json);;همهٔ فایل‌ها (*)"))
+            if not path:
+                return None
+            if os.path.getsize(path) > share.MAX_BYTES:
+                raise ValueError(tr("Die Datei ist zu groß.", "The file is too large.", "فایل بیش از حد بزرگ است."))
+            with open(path, encoding="utf-8-sig", errors="replace") as f:
+                text = f.read()
+        else:
+            text = a.get("text", "")
+        try:
+            data = share.decode(text)
+            t = today().isoformat()
+            plan = share.import_plan(data, store.new_plan("", "", t, store.profile()))
+        except share.ShareError as e:
+            raise ValueError({
+                "newer version": tr("Dieser Plan kommt aus einer neueren Smart-Study-Version – bitte Add-on aktualisieren.",
+                                    "This plan comes from a newer Smart Study version – please update the add-on.",
+                                    "این برنامه از نسخهٔ جدیدتر Smart Study است – لطفاً افزونه را به‌روز کنید."),
+                "too large": tr("Der Plan ist zu groß.", "The plan is too large.", "برنامه بیش از حد بزرگ است."),
+            }.get(str(e), tr("Das ist kein gültiger Smart-Study-Plan (Code unvollständig kopiert?).",
+                             "This is not a valid Smart Study plan (code copied incompletely?).",
+                             "این یک برنامهٔ معتبر Smart Study نیست (شاید کد کامل کپی نشده است؟).")))
+        if not plan.get("start"):
+            plan["start"] = t
+        store.save(plan)
+        missing = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s) if d not in set(ankidata.deck_names(col))]
+        return {"id": plan["id"], "title": plan["title"], "pdfs": sum(1 for s in plan["sources"] if s["type"] == "pages"),
+                "missingDecks": missing[:10]}
     if cmd == "maintenance":
         plan = store.load(a["id"])
         plan.setdefault("maintenance", {})["reviewsPerDay"] = int(a.get("reviewsPerDay") or 50)

@@ -43,7 +43,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 **While studying**
 - **Auto checkmarks**: card and review items are checked off from your Anki activity, everything else with a click
-- **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **📖 open** opens the PDF at the right page (Okular/Evince)
+- **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **📖 open** opens the PDF at the right page in a Smart Study browser tab (or Okular/Evince)
 - **Weak spots round**: finds the topics with the most mistakes and schedules the pages, video and weak cards for them again
 - **Weak cards** open in Anki's browser with a search, nothing gets moved
 - **Mock exam** runs in the plan window: random studied cards against the clock, show the answer, mark it right or wrong, with a per-topic result
@@ -53,6 +53,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Maintenance mode**: keeps the decks running without new cards and with capped reviews (restores your old deck options when switched off)
 - **Archive** and **next plan** in one click, plus a **study streak** and a **6-month heatmap** on the overview
 - Plans **sync between devices** through your Anki collection (AnkiWeb sync)
+- **Share with friends**: 📤 Share copies a code for WhatsApp & co. or saves the plan as a file; 📥 Import takes it over. Your progress and file paths stay private
 
 ### Workspace
 
@@ -62,7 +63,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Pomodoro and session timers** with study-time analytics by deck
 - **Music player** for local audio, optional SoundCloud, plus a Streaming sidebar with YouTube Music (Spotify opens in its app)
 - **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
-- **Website sidebar** for your own study sites
+- **Browser** with tabs, address bar, PDF viewer (PDFs open right in the tab), ad blocker and your own study sites
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - **Dashboard**: statistics, deadlines and countdowns, daily facts, custom deck overview
 - Light and dark mode, color themes, custom backgrounds, eleven interface languages

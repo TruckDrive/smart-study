@@ -30,7 +30,8 @@ try:
                         QInputDialog, QDockWidget, QSizePolicy, QMessageBox,
                         QMenu, QAction, QIcon, QPixmap, QPainter, QUrl, QTimer,
                         QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject,
-                        QTabBar, QStackedWidget, QShortcut, QKeySequence)
+                        QTabBar, QStackedWidget, QShortcut, QKeySequence,
+                        QLineEdit, QFileDialog, QStandardPaths)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
     from PyQt6 import sip
@@ -47,6 +48,7 @@ except ImportError as e:
     QWebEngineView, QWebEngineProfile, QWebEnginePage, QWebEngineSettings = object, object, object, object
     QAction = object; WebAction = object; QMenu = object
     QTabBar = QStackedWidget = QShortcut = QKeySequence = object
+    QLineEdit = QFileDialog = QStandardPaths = object
 
 # QtSvg is optional – used only to render crisp toolbar icons. A failure here
 # must never break the rest of the module, so it gets its own guarded import.
@@ -470,6 +472,7 @@ def _open_browser_settings() -> None:
 def _fill_options_menu(menu) -> None:
     menu.clear()
     menu.addAction(_("Browser settings…")).triggered.connect(lambda: QTimer.singleShot(0, _open_browser_settings))
+    menu.addAction(_("Open PDF file…")).triggered.connect(lambda: QTimer.singleShot(0, open_pdf_file))
     menu.addSeparator()
     engines = menu.addMenu(_("Search engine"))
     current = _search_engine()
@@ -532,11 +535,30 @@ def delete_custom_site(index_to_delete: int):
     else:
         showWarning(_("Could not delete site: Invalid index."))
 
+def _is_local_pdf(url) -> bool:
+    """A PDF file on this computer (the only local files the browser shows)."""
+    try:
+        return bool(url.isLocalFile() and url.toLocalFile().lower().endswith(".pdf"))
+    except Exception:
+        return False
+
+
+def _restorable(url: str) -> bool:
+    """Web pages and local PDFs that still exist can be reopened as tabs."""
+    url = str(url or "")
+    if url.startswith(("http://", "https://")):
+        return True
+    if url.startswith("file://") and QUrl is not object:
+        q = QUrl(url)
+        return _is_local_pdf(q) and os.path.isfile(q.toLocalFile())
+    return False
+
+
 def load_url_in_webview(webview: Optional[QWebEngineView], url_str: str):
     if not webview or QWebEngineView is object or QUrl is object or not _qt_available: return
     url = QUrl.fromUserInput(url_str)
     webview._ss_pending = None  # a tab waiting for its page gets this one instead
-    if url.isValid() and url.scheme() in ["http", "https"]:
+    if url.isValid() and (url.scheme() in ["http", "https"] or _is_local_pdf(url)):
         webview.setUrl(url)
     else:
         safe_url = html.escape(str(url_str), quote=True)
@@ -561,6 +583,9 @@ def _open_browser_url(url: str) -> None:
 def open_current_in_browser() -> None:
     if sidebar_webview is None:
         return
+    if _is_local_pdf(sidebar_webview.url()):  # a PDF: open it in the PDF app
+        QDesktopServices.openUrl(QUrl.fromLocalFile(sidebar_webview.url().toLocalFile()))
+        return
     url = sidebar_webview.url().toString()
     # Use Google's original destination instead of moving its CAPTCHA/session
     # token to another browser, where that challenge may no longer be valid.
@@ -578,6 +603,200 @@ def search_in_browser(text: str) -> None:
     if text and QTimer is not object:
         url = browser_search.search_url(_search_engine(), text)
         QTimer.singleShot(0, lambda: _open_browser_url(url))
+
+
+# --- Address bar ---
+address_bar = None  # QLineEdit above the page
+
+
+if QLineEdit is not object:
+    class _AddressBar(QLineEdit):
+        """Selects everything on click, Esc puts the page's address back."""
+
+        def focusInEvent(self, event):
+            super().focusInEvent(event)
+            QTimer.singleShot(0, self.selectAll)
+
+        def keyPressEvent(self, event):
+            if event.key() == Qt.Key.Key_Escape:
+                self.setModified(False)
+                show_address()
+                if sidebar_webview is not None:
+                    sidebar_webview.setFocus()
+                return
+            super().keyPressEvent(event)
+else:
+    _AddressBar = object
+
+
+def _address_style() -> str:
+    c = _toolbar_palette()
+    return f"""
+    QLineEdit#smartstudyAddressBar {{ background: {c['select_bg']}; color: {c['text']};
+        border: 1px solid {c['line']}; border-radius: 6px; padding: 3px 8px; font-size: 12.5px;
+        selection-background-color: #4a90e2; selection-color: #ffffff; }}
+    QLineEdit#smartstudyAddressBar:focus {{ border: 1px solid #4a90e2; }}
+    """
+
+
+def _display_url(url: str) -> str:
+    if not url or url == "about:blank" or url.startswith("data:"):
+        return ""
+    q = QUrl(url)
+    if _is_local_pdf(q):
+        return q.toLocalFile()  # a path reads better than file:///…%20…
+    return q.toDisplayString()
+
+
+def show_address(view=None) -> None:
+    """Show the current tab's address (not while the user is typing)."""
+    if address_bar is None or sip.isdeleted(address_bar):
+        return
+    view = view or sidebar_webview
+    if view is None or view is not sidebar_webview or sip.isdeleted(view):
+        return
+    if address_bar.hasFocus() and address_bar.isModified():
+        return
+    url = getattr(view, "_ss_pending", None) or view.url().toString()
+    if not url or url == "about:blank":
+        url = getattr(view, "_ss_requested", None) or ""
+    address_bar.setText(_display_url(url))
+    address_bar.setCursorPosition(0)
+    address_bar.setModified(False)
+
+
+def _address_entered() -> None:
+    if address_bar is None:
+        return
+    target = browser_search.address_target(address_bar.text(), _search_engine())
+    if not target:
+        return
+    address_bar.setModified(False)
+    diagnostics.record('browser.address')
+    view = sidebar_webview
+    if view is None:
+        new_tab(target)
+        return
+    view._ss_requested = target
+    load_url_in_webview(view, target)
+    view.setFocus()
+
+
+def focus_address_bar() -> None:
+    if address_bar is None or not show_browser():
+        return
+    address_bar.setFocus(Qt.FocusReason.ShortcutFocusReason)
+    address_bar.selectAll()
+
+
+# --- PDFs ---
+def open_pdf_file() -> None:
+    """Choose a PDF on this computer and open it in a new tab."""
+    if QFileDialog is object or mw is None:
+        return
+    start = _load_website_state().get("last_pdf_folder") or os.path.expanduser("~")
+    path, _sel = QFileDialog.getOpenFileName(mw, _("Open PDF file…"), start, _("PDF Files (*.pdf)"))
+    if not path:
+        return
+    _set_browser_option("last_pdf_folder", os.path.dirname(path))
+    open_local_pdf(path)
+
+
+def open_local_pdf(path: str, page: int = 0, view=None):
+    """Show a local PDF in the browser (at a page); returns the tab or None."""
+    if not path or not os.path.isfile(path) or not show_browser():
+        return None
+    url = QUrl.fromLocalFile(os.path.abspath(path))
+    if page and page > 1:
+        url.setFragment(f"page={int(page)}")
+    target = url.toString()
+    if view is None:
+        same = QUrl.fromLocalFile(os.path.abspath(path)).toString()
+        view = next((v for v in all_tab_views() if v is not None and not getattr(v, "_ss_pending", None)
+                     and v.url().toString(QUrl.UrlFormattingOption.RemoveFragment) == same), None)
+    if view is None:
+        return new_tab(target)
+    tab_bar.setCurrentIndex(_tab_index(view))
+    view._ss_requested = target
+    if view.url().toString(QUrl.UrlFormattingOption.RemoveFragment) == target.split("#")[0]:
+        # Same file: a new #page only reaches the PDF viewer with a reload.
+        view.setUrl(QUrl(target))
+        QTimer.singleShot(0, lambda: not sip.isdeleted(view) and view.reload())
+    else:
+        load_url_in_webview(view, target)
+    view.setFocus()
+    return view
+
+
+def _pdf_folder() -> str:
+    base = ""
+    try:
+        if QStandardPaths is not object:
+            base = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DownloadLocation)
+    except Exception:
+        base = ""
+    if not base or not os.path.isdir(base):
+        root = mw.pm.profileFolder() if mw and getattr(mw, "pm", None) else os.path.expanduser("~")
+        return os.path.join(root, "SmartStudy_Data", "pdf_downloads")
+    return os.path.join(base, "Smart Study PDFs")
+
+
+def _pdf_file_name(url: str, suggested: str, folder: str) -> str:
+    """The same link keeps its file (a newer download replaces it);
+    another file with the same name gets " (2)" etc."""
+    state = _load_website_state()
+    known = state.get("pdf_downloads") if isinstance(state.get("pdf_downloads"), dict) else {}
+    name = known.get(url)
+    if not name:
+        stem = os.path.splitext(os.path.basename(suggested or ""))[0]
+        stem = "".join(ch for ch in stem if ch not in '<>:"/\\|?*' and ord(ch) >= 32).strip(" .")[:120] or "document"
+        taken = set(known.values())
+        name, n = stem + ".pdf", 2
+        while name in taken or os.path.exists(os.path.join(folder, name)):
+            name, n = f"{stem} ({n}).pdf", n + 1
+        known[url] = name
+        if len(known) > 300:
+            known = dict(list(known.items())[-300:])
+        state["pdf_downloads"] = known
+        _save_website_state(state)
+    return name
+
+
+def _on_download_requested(download) -> None:
+    """PDFs that a site sends as a download open right away in a tab;
+    other downloads are left alone as before."""
+    try:
+        name = download.downloadFileName() or ""
+        mime = (download.mimeType() or "").lower()
+        if mime != "application/pdf" and not name.lower().endswith(".pdf"):
+            return
+        url = download.url().toString()
+        folder = _pdf_folder()
+        os.makedirs(folder, exist_ok=True)
+        file_name = _pdf_file_name(url, name, folder)
+        download.setDownloadDirectory(folder)
+        download.setDownloadFileName(file_name)
+        page = download.page()
+        view = getattr(page, "_ss_view", None) if page is not None else None
+        path = os.path.join(folder, file_name)
+
+        def finished():
+            if not download.isFinished():
+                return
+            from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
+            completed = QWebEngineDownloadRequest.DownloadState.DownloadCompleted
+            if download.state() != completed or not os.path.isfile(path):
+                tooltip(_("The PDF could not be downloaded."))
+                return
+            # A link that opened an empty tab for the download shows the PDF there.
+            target = view if view is not None and not sip.isdeleted(view) and _is_blank(view) else None
+            open_local_pdf(path, view=target)
+        download.isFinishedChanged.connect(finished)
+        download.accept()
+        tooltip(_("Opening PDF…"), period=1500)
+    except Exception as e:
+        print(f"WS Warn: PDF download not opened: {e}")
+        traceback.print_exc()
 
 
 def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
@@ -708,6 +927,10 @@ def create_website_dock() -> Optional[QDockWidget]:
         if not website_profile:
             print("WS FATAL: Could not obtain any QWebEngineProfile.")
             return None
+        try:
+            website_profile.downloadRequested.connect(_on_download_requested)
+        except Exception as e_dl:
+            print(f"WS Warn: PDF downloads will not open in the browser: {e_dl}")
 
         sidebar_dock = QDockWidget(_("Web Sidebar"), mw)
         sidebar_dock.setObjectName(constants.WEBSITE_DOCK_OBJECT_NAME)
@@ -766,7 +989,19 @@ def create_website_dock() -> Optional[QDockWidget]:
             _btn.setStyleSheet(_icon_style)
         _apply_window_icon(window_button)
         nav_button_layout.addWidget(back_button); nav_button_layout.addWidget(forward_button)
-        nav_button_layout.addWidget(refresh_button); nav_button_layout.addStretch(1)
+        nav_button_layout.addWidget(refresh_button)
+        global address_bar
+        address_bar = _AddressBar()
+        address_bar.setObjectName("smartstudyAddressBar")
+        address_bar.setPlaceholderText(_("Search or enter address"))
+        address_bar.setAccessibleName(_("Address bar"))
+        address_bar.setToolTip(_("Address bar") + " (Ctrl+L)")
+        address_bar.setClearButtonEnabled(True)
+        address_bar.setMinimumWidth(60)
+        address_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        address_bar.setStyleSheet(_address_style())
+        qconnect(address_bar.returnPressed, _address_entered)
+        nav_button_layout.addWidget(address_bar, 1)
         external_button = QPushButton("↗")
         external_button.setObjectName("smartstudyOpenBrowser")
         external_button.setStyleSheet(_icon_style)
@@ -950,6 +1185,8 @@ class _TabPage(_PageBase):
 
     def acceptNavigationRequest(self, url, nav_type, is_main_frame):
         view = getattr(self, "_ss_view", None)
+        if is_main_frame and url.isLocalFile() and not _is_local_pdf(url):
+            return False  # of the files on this computer, only PDFs are shown
         if is_main_frame and view is not None and browser_features.focus_blocks(url):
             QTimer.singleShot(0, lambda: browser_features.show_blocked(view, url))
             return False
@@ -967,15 +1204,21 @@ def _make_tab_view():
     page._ss_view = view
     diagnostics.attach_webview(view)
     settings = view.settings()
+    # PluginsEnabled + PdfViewerEnabled: PDFs show in the tab (Chromium's
+    # built-in viewer) instead of being offered as a download.
     attrs_to_set = [
-        (QWebEngineSettings.WebAttribute.JavascriptEnabled, True),
-        (QWebEngineSettings.WebAttribute.LocalStorageEnabled, True),
-        (QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True),
-        (QWebEngineSettings.WebAttribute.PluginsEnabled, False),
-        (QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True), ]
-    for attr, value in attrs_to_set:
+        ("JavascriptEnabled", True),
+        ("LocalStorageEnabled", True),
+        ("ScrollAnimatorEnabled", True),
+        ("PluginsEnabled", True),
+        ("PdfViewerEnabled", True),
+        ("FullScreenSupportEnabled", True), ]
+    for name, value in attrs_to_set:
+        attr = getattr(QWebEngineSettings.WebAttribute, name, None)
+        if attr is None:
+            continue
         try: settings.setAttribute(attr, value)
-        except AttributeError: pass
+        except (AttributeError, TypeError): pass
     view._smartstudy_dismissed_url = None
 
     def offer_fallback(url=None, ok=True):
@@ -1008,6 +1251,7 @@ def _make_tab_view():
     qconnect(view.titleChanged, lambda t: (setattr(view, "_ss_title", t), _update_tab_label(view)))
     qconnect(view.iconChanged, lambda i: (setattr(view, "_ss_icon", i), _update_tab_label(view)))
     qconnect(view.urlChanged, lambda url: sidebar_webview is view and on_webview_url_changed(url))
+    qconnect(view.urlChanged, lambda *_a: show_address(view))
     view._urlChangedConnected_ws = True
     qconnect(view.urlChanged, lambda *_a: _schedule_save_tabs())
     qconnect(view.titleChanged, lambda *_a: _schedule_save_tabs())
@@ -1124,6 +1368,9 @@ def _on_tab_changed(index: int, load: bool = True) -> None:
         search_help.hide()
     _sync_nav_buttons(view)
     on_webview_url_changed(view.url())
+    if address_bar is not None and not sip.isdeleted(address_bar):
+        address_bar.setModified(False)
+    show_address(view)
 
 
 def show_browser() -> bool:
@@ -1178,7 +1425,7 @@ def open_tab_entries() -> List[Dict[str, str]]:
         if view is None:
             continue
         url = getattr(view, "_ss_pending", None) or view.url().toString()
-        if not url.startswith(("http://", "https://")):
+        if not _restorable(url):
             continue
         index = _tab_index(view)
         entries.append({"url": url, "title": tab_bar.tabText(index)[:200] if index >= 0 else ""})
@@ -1187,7 +1434,7 @@ def open_tab_entries() -> List[Dict[str, str]]:
 
 def open_tabs(entries: List[Dict], replace: bool = False) -> None:
     """Open saved tabs; only the first one loads right away."""
-    entries = [e for e in entries if isinstance(e, dict) and str(e.get("url", "")).startswith(("http://", "https://"))]
+    entries = [e for e in entries if isinstance(e, dict) and _restorable(e.get("url", ""))]
     if not entries or not show_browser():
         return
     old = all_tab_views() if replace else []
@@ -1215,7 +1462,7 @@ def _restore_tabs() -> None:
         _new_home_tab()
         return
     for entry in entries[:MAX_TABS]:
-        if isinstance(entry, dict) and str(entry.get("url", "")).startswith(("http://", "https://")):
+        if isinstance(entry, dict) and _restorable(entry.get("url", "")):
             new_tab(None, background=True, pending={"url": entry["url"], "title": str(entry.get("title", ""))}, at_end=True)
     if tab_bar.count() == 0:
         _new_home_tab()
@@ -1520,6 +1767,8 @@ def refresh_website_theme() -> None:
     icon_style = _get_icon_button_style()
     if search_help is not None:
         search_help.setStyleSheet(_search_help_style())
+    if address_bar is not None and not sip.isdeleted(address_bar):
+        address_bar.setStyleSheet(_address_style())
     if sidebar_dock is not None:
         row = sidebar_dock.findChild(QWidget, "smartstudyWebTabs")
         if row is not None:
@@ -1593,6 +1842,8 @@ def cleanup_website_sidebar():
         try: view.deleteLater()
         except Exception: pass
     tab_bar = None; tab_stack = None; search_help = None; pip_placeholder = None; browser_container = None
+    global address_bar
+    address_bar = None
     if sidebar_dock is not None:
         try: mw.removeDockWidget(sidebar_dock)
         except Exception: pass

@@ -415,6 +415,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "New tab": {"de": "Neuer Tab"},
     "Close tab": {"de": "Tab schließen"},
     "Up to {} tabs": {"de": "Höchstens {} Tabs"},
+    "Address bar": {"de": "Adresszeile"},
+    "Search or enter address": {"de": "Suchen oder Adresse eingeben"},
+    "Open PDF file…": {"de": "PDF-Datei öffnen…"},
+    "Opening PDF…": {"de": "PDF wird geöffnet…"},
+    "The PDF could not be downloaded.": {"de": "Die PDF konnte nicht geladen werden."},
 
     # ================================================================= #
     # __init__.py – tooltips & menu entries
