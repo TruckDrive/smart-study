@@ -21,7 +21,7 @@ import urllib.request
 from typing import Callable, Dict, List, Optional
 
 from aqt import mw
-from aqt.qt import (QApplication, QFrame, QHBoxLayout, QInputDialog, QKeySequence,
+from aqt.qt import (QApplication, QFrame, QObject, QHBoxLayout, QInputDialog, QKeySequence,
                     QLabel, QMenu, QPushButton, QShortcut, QSizeGrip, QTimer,
                     QUrl, QVBoxLayout, QWidget, Qt)
 from aqt.utils import tooltip
@@ -598,10 +598,26 @@ def open_plan_pdf(path: str, page: int) -> bool:
         return False
     if _ws().open_local_pdf(path, page) is None:
         return False
-    if mw is not None:
-        mw.activateWindow()
-        mw.raise_()
+    bring_browser_forward()
     return True
+
+
+def bring_browser_forward() -> None:
+    """After the study plan opened something in the browser: get the plan
+    window out of the way and show Anki with the browser."""
+    try:
+        from . import plan as plan_module
+        window = getattr(plan_module, "_win", None)
+        if window is not None and window.isVisible() and not window.isMinimized():
+            window.showMinimized()
+    except Exception as e:
+        print(f"Smart Study browser: could not minimise the study plan: {e}")
+    if mw is None:
+        return
+    if mw.isMinimized():
+        mw.showNormal()
+    mw.raise_()
+    mw.activateWindow()
 
 
 def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
@@ -632,6 +648,7 @@ def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
             return False
     view._ss_plan = (plan_id, item_id, key)
     view._ss_resumed = None
+    bring_browser_forward()
     if not getattr(view, "_ss_pending", None) and video_key(view.url().toString()) == key:
         _resume(view)  # already open: no load will follow
     _tracker.start()
@@ -1173,8 +1190,50 @@ def on_url_changed(view, url: QUrl) -> None:
         QTimer.singleShot(1500, lambda: _alive(view) and _resume(view))
 
 
+# ── Touchpad pinch → the tab under the pointer ────────────────────────────
+
+class _GestureRouter(QObject):
+    """Touchpad gestures (pinch to zoom) are sometimes delivered to the
+    window or a container instead of the page under the pointer – then the
+    page never zooms.  Hand them to the browser tab below the pointer."""
+
+    def eventFilter(self, obj, event):
+        if event.type() != event.Type.NativeGesture or getattr(event, "_ss_routed", False):
+            return False
+        try:
+            pos = event.globalPosition().toPoint()
+        except Exception:
+            return False
+        target = None
+        for view in _ws().all_tab_views() + ([_pip.view] if _pip is not None else []):
+            if not _alive(view) or not view.isVisible():
+                continue
+            local = view.mapFromGlobal(pos)
+            if view.rect().contains(local):
+                target = view.focusProxy() or view
+                break
+        if target is None or obj is target:
+            return False
+        if isinstance(obj, QWidget) and (obj is target or target.isAncestorOf(obj)):
+            return False
+        from aqt.qt import QPointF
+        local = QPointF(target.mapFromGlobal(pos))
+        copy = type(event)(event.gestureType(), event.pointingDevice(), event.fingerCount(), local, local,
+                           event.globalPosition(), event.value(), event.delta())
+        copy._ss_routed = True
+        QApplication.sendEvent(target, copy)
+        return True
+
+
+_gesture_router: Optional[_GestureRouter] = None
+
+
 def start() -> None:
     """When the browser has been created."""
+    global _gesture_router
+    if _gesture_router is None and QApplication.instance() is not None:
+        _gesture_router = _GestureRouter()
+        QApplication.instance().installEventFilter(_gesture_router)
     apply_shortcuts()
     _focus_changed(force=True)
     _focus_timer.start()

@@ -11,6 +11,9 @@ CHANGELOG = [
         "date": "November 5, 2026",
         "items": [
             {"tag": "New", "text": "Full screen in the browser: a video's full-screen button now fills the whole screen. Esc brings it back into its tab."},
+            {"tag": "New", "text": "Logins in the browser (e.g. Moodle) are kept when Anki restarts."},
+            {"tag": "New", "text": "Opening a video or PDF from the study plan brings the browser to the front."},
+            {"tag": "Fix", "text": "Touchpad pinch to zoom works in browser tabs and PDFs."},
             {"tag": "Fix", "text": "No more error when a study-plan video tab is closed right after it changed page."},
         ],
     },

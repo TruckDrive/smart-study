@@ -901,7 +901,9 @@ def create_website_dock() -> Optional[QDockWidget]:
             os.makedirs(profile_dir, exist_ok=True)
             website_profile = QWebEngineProfile(profile_name, mw)
             website_profile.setPersistentStoragePath(profile_dir)
-            website_profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.AllowPersistentCookies)
+            # Force: also keep session cookies (Moodle, Shibboleth/SSO logins),
+            # so a login survives restarting Anki until the site ends it.
+            website_profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
             website_profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
             from .web_accounts import keep_youtube_theme_fixed, share_login_from
             keep_youtube_theme_fixed(website_profile)

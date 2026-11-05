@@ -3,6 +3,9 @@
 ## 2.8.2 – 2026-11-05
 
 - **Full screen in the browser**: the full-screen button of a video (YouTube, Moodle/Opencast …, also double-click or *f*) now fills the whole screen instead of doing nothing. Esc or the button again brings it back into its tab
+- **Stay logged in**: logins in the browser (e.g. Moodle with university single sign-on) are kept when Anki restarts, until the site itself ends the session
+- **Study plan → browser**: opening a video or PDF from the study plan in the Smart Study browser now puts the study-plan window aside and brings Anki with the browser to the front
+- **Pinch to zoom**: touchpad pinch gestures reach the browser tab under the pointer (pages and PDFs) even when the system hands them to the window around it
 - **Fix**: closing a study-plan video tab right after it changed page no longer shows an error (“wrapped C/C++ object of type QWebEngineView has been deleted”)
 
 ## 2.8.1 – 2026-11-05
