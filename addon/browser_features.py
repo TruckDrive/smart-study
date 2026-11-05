@@ -602,6 +602,14 @@ def open_plan_pdf(path: str, page: int) -> bool:
     return True
 
 
+def _fill_passwords(view) -> None:
+    try:
+        from . import browser_passwords
+        browser_passwords.page_loaded(view)
+    except Exception as e:
+        print(f"Smart Study passwords: {e}")
+
+
 def bring_browser_forward() -> None:
     """After the study plan opened something in the browser: get the plan
     window out of the way and show Anki with the browser."""
@@ -614,6 +622,9 @@ def bring_browser_forward() -> None:
         print(f"Smart Study browser: could not minimise the study plan: {e}")
     if mw is None:
         return
+    from . import browser_layout
+    if browser_layout.bring_forward():
+        return  # the browser is its own window
     if mw.isMinimized():
         mw.showNormal()
     mw.raise_()
@@ -1175,6 +1186,7 @@ def setup_view(view) -> None:
     view.customContextMenuRequested.connect(lambda pos: show_context_menu(view, pos))
     view.urlChanged.connect(lambda url: on_url_changed(view, url))
     view.loadFinished.connect(lambda ok: ok and _resume(view))
+    view.loadFinished.connect(lambda ok: ok and _fill_passwords(view))
     view.page().fullScreenRequested.connect(lambda request: _on_fullscreen(view, request))
     # A full page load starts a new document; URL changes within YouTube don't.
     view.loadFinished.connect(lambda ok: ok and _sponsorblock(view, view.url()))

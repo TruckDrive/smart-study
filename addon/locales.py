@@ -9301,6 +9301,25 @@ TRANSLATIONS.update({
     "Custom deck name color": {"de":"Eigene Farbe für den Decknamen", "es":"Color personalizado del nombre del mazo", "fr":"Couleur personnalisée du nom du paquet", "pt":"Cor personalizada do nome do baralho", "ko":"덱 이름 사용자 지정 색상", "vi":"Màu tùy chỉnh cho tên bộ thẻ", "zh":"自定义牌组名称颜色", "hi":"डेक के नाम का कस्टम रंग"},
 })
 
+# Smart Study 2.8.2: browser layout and saved passwords
+TRANSLATIONS.update({
+    "Split view (cards | browser)": {"de": "Geteilt (Karten | Browser)"},
+    "Main window": {"de": "Hauptfenster"},
+    "Own window": {"de": "Eigenes Fenster"},
+    "Browser layout": {"de": "Browser-Ansicht"},
+    "Save password?": {"de": "Passwort speichern?"},
+    "Update the saved password for {}?": {"de": "Gespeichertes Passwort für {} aktualisieren?"},
+    "Save the password for {}?": {"de": "Passwort für {} speichern?"},
+    "User name: {}": {"de": "Benutzername: {}"},
+    "It is stored in your system keyring (e.g. KWallet, GNOME Keyring, macOS Keychain, Windows Credential Manager). Next time the login page is filled in for you – you only click “Log in”.": {"de": "Es wird im Passwortspeicher deines Systems abgelegt (z. B. KWallet, GNOME Keyring, macOS-Schlüsselbund, Windows-Anmeldeinformationsverwaltung). Beim nächsten Mal wird die Anmeldeseite für dich ausgefüllt – du klickst nur noch auf „Anmelden“."},
+    "Never for this site": {"de": "Nie für diese Seite"},
+    "Could not save the password (system keyring not reachable).": {"de": "Passwort konnte nicht gespeichert werden (Passwortspeicher des Systems nicht erreichbar)."},
+    "Save and fill in passwords": {"de": "Passwörter speichern und ausfüllen"},
+    "Needs a system keyring (on Linux: secret-tool with KWallet, GNOME Keyring or KeePassXC).": {"de": "Braucht einen Passwortspeicher des Systems (unter Linux: secret-tool mit KWallet, GNOME Keyring oder KeePassXC)."},
+    "Delete saved passwords…": {"de": "Gespeicherte Passwörter löschen…"},
+    "Delete all passwords saved by the Smart Study browser?": {"de": "Alle vom Smart-Study-Browser gespeicherten Passwörter löschen?"},
+})
+
 
 def translate_standard_buttons(button_box):
     """Use the add-on language for its own Qt button boxes, not the OS locale."""

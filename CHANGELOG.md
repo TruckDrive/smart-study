@@ -2,6 +2,8 @@
 
 ## 2.8.2 – 2026-11-05
 
+- **Browser layout**: the window button in the browser's bar now offers *Sidebar*, *Split view* (cards and browser half and half, divider still draggable), *Main window* and *Own window*. The own window is a normal window: any size, maximise it, snap it beside Anki (e.g. Meta+←/→ on KDE/Windows) or move it to a second screen. Its size and place are remembered; videos from the study plan open there
+- **Saved passwords**: after you log in on a site, the browser offers to save the user name and password. Next time the login page is filled in – you only click *Log in*. Passwords are kept in your system keyring (Linux: KWallet, GNOME Keyring, KeePassXC … via `secret-tool`; macOS Keychain; Windows Credential Manager), never in the add-on's files. *⚙ → Save and fill in passwords* turns it off, *Delete saved passwords…* removes them
 - **Full screen in the browser**: the full-screen button of a video (YouTube, Moodle/Opencast …, also double-click or *f*) now fills the whole screen instead of doing nothing. Esc or the button again brings it back into its tab
 - **Stay logged in**: logins in the browser (e.g. Moodle with university single sign-on) are kept when Anki restarts, until the site itself ends the session
 - **Study plan → browser**: opening a video or PDF from the study plan in the Smart Study browser now puts the study-plan window aside and brings Anki with the browser to the front

@@ -16,6 +16,7 @@ from .browser_fallback import is_google_url, needs_search_help, duckduckgo_url
 from . import browser_search
 from .browser_adblock import AdBlocker, FilteringPage, install_youtube_pruner
 from . import browser_features, web_sleep
+from . import browser_layout, browser_passwords
 
 try:
     from .locales import _
@@ -481,6 +482,7 @@ def _fill_options_menu(menu) -> None:
         action.setCheckable(True)
         action.setChecked(key == current)
         qconnect(action.triggered, lambda _=False, k=key: _choose_search_engine(k))
+    browser_passwords.menu_entries(menu)
     if ad_blocker is not None:
         menu.addSeparator()
         block = menu.addAction(_("Block ads and trackers"))
@@ -1023,8 +1025,13 @@ def create_website_dock() -> Optional[QDockWidget]:
         nav_button_layout.addWidget(window_button)
         toolbar_layout.addLayout(nav_button_layout)
         main_layout.addWidget(toolbar_widget)
-        if qconnect and window_button:
-            qconnect(window_button.clicked, toggle_website_window)
+        if window_button:
+            # One button for where the browser sits: sidebar, split, main window, own window.
+            window_button.setToolTip(_("Browser layout"))
+            window_button.setAccessibleName(_("Browser layout"))
+            layout_menu = QMenu(window_button)
+            qconnect(layout_menu.aboutToShow, lambda: browser_layout.fill_menu(layout_menu))
+            window_button.setMenu(layout_menu)
 
         fallback = QWidget(container_widget)
         fallback.setObjectName("smartstudySearchHelp")
@@ -1193,6 +1200,17 @@ class _TabPage(_PageBase):
             QTimer.singleShot(0, lambda: browser_features.show_blocked(view, url))
             return False
         return super().acceptNavigationRequest(url, nav_type, is_main_frame)
+
+    def javaScriptConsoleMessage(self, level, message, line, source):  # type: ignore[override]
+        try:
+            if browser_passwords.console_message(self, message):
+                return  # a sent login, reported by our isolated page script
+        except Exception as e:
+            print(f"Smart Study passwords: {e}")
+        try:
+            super().javaScriptConsoleMessage(level, message, line, source)
+        except Exception:
+            pass
 
 
 def _make_tab_view():
@@ -1387,6 +1405,7 @@ def show_browser() -> bool:
         sidebar_dock.show()
         sidebar_dock.raise_()
         _notify_launcher_dock_opened()
+    browser_layout.bring_forward()  # only when it is its own window
     return True
 
 
@@ -1680,7 +1699,7 @@ def open_website_window():
     website_window = True  # marker: an embedded view is active
     if window_button is not None:
         try:
-            window_button.setToolTip(_("Back to sidebar"))
+            window_button.setToolTip(_("Browser layout"))
         except Exception:
             pass
         # Flip the icon to the "close window" state (frame with a dash).
@@ -1701,7 +1720,7 @@ def close_website_window():
     website_window = None
     if window_button is not None:
         try:
-            window_button.setToolTip(_("Open in main window"))
+            window_button.setToolTip(_("Browser layout"))
         except Exception:
             pass
         # Restore the normal "open in main window" icon.
@@ -1818,6 +1837,8 @@ def cleanup_website_sidebar():
     global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
 
     diagnostics.record('browser.cleanup')
+    try: browser_layout.cleanup()
+    except Exception as e: print(f"WS Info: browser window not reset: {e}")
     try: browser_features.stop()
     except Exception as e: print(f"WS Info: browser extras not stopped: {e}")
     if _save_tabs_timer is not None and _save_tabs_timer.isActive():

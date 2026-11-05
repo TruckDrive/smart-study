@@ -2268,5 +2268,20 @@
  "Reminders to like or subscribe": "یادآوری لایک یا اشتراک",
  "Intros": "مقدمه‌ها",
  "Outros and end cards": "پایان‌بندی‌ها و کارت‌های پایانی",
- "Non-music parts of music videos": "بخش‌های غیرموسیقی ویدیوهای موسیقی"
+ "Non-music parts of music videos": "بخش‌های غیرموسیقی ویدیوهای موسیقی",
+ "Split view (cards | browser)": "نمای دوتکه (کارت‌ها | مرورگر)",
+ "Main window": "پنجرهٔ اصلی",
+ "Own window": "پنجرهٔ جداگانه",
+ "Browser layout": "چیدمان مرورگر",
+ "Save password?": "رمز عبور ذخیره شود؟",
+ "Update the saved password for {}?": "رمز ذخیره‌شده برای {} به‌روز شود؟",
+ "Save the password for {}?": "رمز عبور برای {} ذخیره شود؟",
+ "User name: {}": "نام کاربری: {}",
+ "It is stored in your system keyring (e.g. KWallet, GNOME Keyring, macOS Keychain, Windows Credential Manager). Next time the login page is filled in for you – you only click “Log in”.": "در گاوصندوق رمز سیستم شما ذخیره می‌شود (مثلاً KWallet، GNOME Keyring، Keychain مک، Credential Manager ویندوز). دفعهٔ بعد صفحهٔ ورود برایتان پر می‌شود – فقط روی «ورود» بزنید.",
+ "Never for this site": "هرگز برای این سایت",
+ "Could not save the password (system keyring not reachable).": "رمز ذخیره نشد (گاوصندوق رمز سیستم در دسترس نیست).",
+ "Save and fill in passwords": "ذخیره و پر کردن رمزها",
+ "Needs a system keyring (on Linux: secret-tool with KWallet, GNOME Keyring or KeePassXC).": "به گاوصندوق رمز سیستم نیاز دارد (در لینوکس: secret-tool با KWallet، GNOME Keyring یا KeePassXC).",
+ "Delete saved passwords…": "حذف رمزهای ذخیره‌شده…",
+ "Delete all passwords saved by the Smart Study browser?": "همهٔ رمزهایی که مرورگر Smart Study ذخیره کرده حذف شوند؟"
 }
