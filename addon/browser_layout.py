@@ -98,11 +98,8 @@ def _set_width(width: int) -> None:
         center = mw.centralWidget()
         center_min = max(160, center.minimumSizeHint().width()) if center else 160
         width = min(width, max(dock.minimumWidth(), mw.contentsRect().width() - center_min - 12))
-    try:
-        from .smooth_ui import animate_dock_width
-        animate_dock_width(dock, width)
-    except Exception:
-        mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
+    # One step: resizing web pages frame by frame looks jerky.
+    mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
 
 
 class _GeometryKeeper(QObject):

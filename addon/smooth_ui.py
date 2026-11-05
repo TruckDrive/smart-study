@@ -3,7 +3,7 @@
 * Kinetic scrolling: on Linux, Qt WebEngine stops dead when the fingers leave
   the touchpad. After a quick swipe the page now keeps gliding and slows down,
   like in Firefox or on a phone – in the browser and in Anki's own pages.
-* Animated browser width when switching between sidebar and split view.
+* Sidebars slide in and out (a picture of them moves, the page is laid out once).
 * Anki's deck list and deck overview fade in instead of popping up.
 * Compact deck list: when a sidebar leaves Anki's main area narrow (e.g. the
   split view), the dashboard switches to its compact form and the big widgets
@@ -18,7 +18,7 @@ from typing import Optional
 
 from aqt import gui_hooks, mw
 from aqt.qt import (QApplication, QDockWidget, QEvent, QEasingCurve, QGraphicsOpacityEffect, QLabel,
-                    QObject, QPoint, QPointF, QPropertyAnimation, Qt, QTimer, QVariantAnimation,
+                    QObject, QPoint, QPointF, QPropertyAnimation, Qt, QTimer,
                     QWheelEvent)
 
 try:
@@ -169,97 +169,112 @@ _kinetic: Optional[_Kinetic] = None
 
 # ── Animated sidebars ─────────────────────────────────────────────────────
 
-_width_anim: Optional[QVariantAnimation] = None
-_width_cleanup = None
-
-
-def _finish_width_anim() -> None:
-    global _width_anim, _width_cleanup
-    if _width_anim is not None:
-        _width_anim.stop()
-    _width_anim = None
-    if _width_cleanup is not None:
-        cleanup, _width_cleanup = _width_cleanup, None
-        cleanup()
-
-
-def animate_dock_width(dock, width: int, start: Optional[int] = None, done=None, ms: int = 240) -> None:
-    """Glide a docked sidebar to a new width (from `start`, default: now)."""
-    global _width_anim, _width_cleanup
-    _finish_width_anim()
-    begin = dock.width() if start is None else start
-    if abs(begin - width) < 4:
-        mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
-        if done:
-            done()
-        return
-    # Let it get narrower than its usual minimum while it slides.
-    content = dock.widget()
-    saved_dock_min = dock.minimumWidth()
-    dock.setMinimumWidth(1)
-    if content is not None:
-        content.setMinimumWidth(1)
-
-    def cleanup():
-        try:
-            dock.setMinimumWidth(saved_dock_min)
-            if content is not None:
-                # 0 hands the minimum back to the content's layout
-                content.setMinimumWidth(0)
-                if content.layout() is not None:
-                    content.layout().activate()
-        except RuntimeError:
-            pass  # deleted meanwhile
-    _width_cleanup = cleanup
-    mw.resizeDocks([dock], [max(1, begin)], Qt.Orientation.Horizontal)
-    anim = QVariantAnimation(mw)
-    anim.setStartValue(float(max(1, begin)))
-    anim.setEndValue(float(width))
-    anim.setDuration(ms)
-    anim.setEasingCurve(QEasingCurve.Type.OutCubic)
-    anim.valueChanged.connect(lambda value: mw.resizeDocks([dock], [int(value)], Qt.Orientation.Horizontal))
-
-    def finished():
-        global _width_anim
-        if _width_anim is anim:
-            _width_anim = None
-            _finish_width_anim()
-            mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
-        if done:
-            done()
-    anim.finished.connect(finished)
-    _width_anim = anim
-    anim.start()
-
-
 class _DockSlide(QObject):
     """Sidebars (browser, AI chat, notebook, mind map, music …) slide in from
-    the side when they open instead of popping up."""
+    the side when they open and out when they close.
+
+    The sidebar itself is laid out once at its final width; only a picture
+    of it moves (cheap, so it stays smooth – resizing web pages every frame
+    is what made it jerky)."""
+
+    MS_IN = 230
+    MS_OUT = 190
+
+    def __init__(self):
+        super().__init__()
+        self.pictures = {}  # id(dock) → last picture of it
 
     def eventFilter(self, obj, event):
-        if (event.type() == QEvent.Type.Show and isinstance(obj, QDockWidget)
-                and mw is not None and obj.parent() is mw):
-            QTimer.singleShot(0, lambda: self._slide(obj))
+        kind = event.type()
+        if kind not in (QEvent.Type.Show, QEvent.Type.Hide):
+            return False
+        if not isinstance(obj, QDockWidget) or mw is None or obj.parent() is not mw:
+            return False
+        if kind == QEvent.Type.Show:
+            QTimer.singleShot(0, lambda: self._slide_in(obj))
+        else:
+            self._slide_out(obj)
         return False
 
     @staticmethod
-    def _slide(dock) -> None:
+    def _side(dock) -> int:
+        """+1 right sidebar, -1 left, 0 not a docked sidebar."""
         try:
-            if not dock.isVisible() or dock.isFloating() or _width_anim is not None:
+            if dock.isFloating():
+                return 0
+            area = mw.dockWidgetArea(dock)
+        except RuntimeError:
+            return 0
+        if area == Qt.DockWidgetArea.RightDockWidgetArea:
+            return 1
+        if area == Qt.DockWidgetArea.LeftDockWidgetArea:
+            return -1
+        return 0
+
+    def _overlay(self, dock, picture, fill: bool):
+        """A plain widget over the sidebar's place holding its picture."""
+        from aqt.qt import QWidget
+        geo = dock.geometry()
+        frame = QWidget(mw)
+        frame.setGeometry(geo)
+        frame.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        if fill:
+            frame.setAutoFillBackground(True)
+            pal = frame.palette()
+            pal.setColor(frame.backgroundRole(), mw.palette().window().color())
+            frame.setPalette(pal)
+        label = QLabel(frame)
+        label.setPixmap(picture)
+        label.setGeometry(0, 0, geo.width(), geo.height())
+        frame.show()
+        frame.raise_()
+        return frame, label
+
+    def _move(self, frame, label, start_x: int, end_x: int, ms: int, curve) -> None:
+        anim = QPropertyAnimation(label, b"pos", frame)
+        anim.setStartValue(QPoint(start_x, 0))
+        anim.setEndValue(QPoint(end_x, 0))
+        anim.setDuration(ms)
+        anim.setEasingCurve(curve)
+        anim.finished.connect(frame.deleteLater)
+        anim.start()
+
+    def _slide_in(self, dock) -> None:
+        try:
+            side = self._side(dock)
+            if not side or not dock.isVisible():
                 return
-            if mw.dockWidgetArea(dock) not in (Qt.DockWidgetArea.LeftDockWidgetArea,
-                                               Qt.DockWidgetArea.RightDockWidgetArea):
+            tracker = getattr(dock, "_smartstudy_width", None)
+            if tracker is not None:  # settle at its remembered width first
+                tracker.timer.stop()
+                tracker.restore()
+            width = dock.width()
+            if width < 120:
                 return
+            picture = self.pictures.get(id(dock))
+            if picture is None or picture.size() != dock.size():
+                picture = dock.grab()
         except RuntimeError:
             return
-        tracker = getattr(dock, "_smartstudy_width", None)
-        if tracker is not None:  # its remembered width first, then glide there
-            tracker.timer.stop()
-            tracker.restore()
-        target = dock.width()
-        if target < 120:
+        frame, label = self._overlay(dock, picture, fill=True)
+        start = width if side > 0 else -width
+        label.move(start, 0)
+        self._move(frame, label, start, 0, self.MS_IN, QEasingCurve.Type.OutCubic)
+
+    def _slide_out(self, dock) -> None:
+        try:
+            side = self._side(dock)
+            if not side or dock.width() < 120 or dock.height() < 60:
+                return
+            picture = dock.grab()  # still holds its last frame
+        except RuntimeError:
             return
-        animate_dock_width(dock, target, start=max(1, target // 6), ms=260)
+        if picture.isNull():
+            return
+        self.pictures[id(dock)] = picture
+        frame, label = self._overlay(dock, picture, fill=False)
+        end = dock.width() if side > 0 else -dock.width()
+        self._move(frame, label, 0, end, self.MS_OUT, QEasingCurve.Type.InCubic)
 
 
 _dock_slide: Optional[_DockSlide] = None
@@ -302,25 +317,25 @@ _FADE = ("<style id='ss-fade'>@keyframes ssFadeIn{from{opacity:0;transform:trans
 COMPACT_CSS = """<style id="ss-compact">
 /* Narrow main area (browser beside Anki): the deck list fits the width. */
 @media (max-width: @NARROW@px) {
-  .sp-min-deadline-box, .sp-min-statistics, .rh-container, .sp-min-plan-fact-row { display: none !important; }
-  .sp-min-overview { padding: 6px 8px !important; margin-bottom: 6px !important; }
-  center { display: block; width: 100%; padding: 0 8px; box-sizing: border-box; }
-  center > table, .decks-container, .decks-container table, .sp-min-box {
+  html:not(#ss-a):not(#ss-b) .sp-min-deadline-box, html:not(#ss-a):not(#ss-b) .sp-min-statistics, html:not(#ss-a):not(#ss-b) .rh-container, html:not(#ss-a):not(#ss-b) .sp-min-plan-fact-row { display: none !important; }
+  html:not(#ss-a):not(#ss-b) .sp-min-overview { padding: 6px 8px !important; margin-bottom: 6px !important; }
+  html:not(#ss-a):not(#ss-b) center { display: block; width: 100%; padding: 0 8px; box-sizing: border-box; }
+  html:not(#ss-a):not(#ss-b) center > table, html:not(#ss-a):not(#ss-b) .decks-container, html:not(#ss-a):not(#ss-b) .decks-container table, html:not(#ss-a):not(#ss-b) .sp-min-box {
     box-sizing: border-box !important; width: 100% !important; max-width: 100% !important;
     min-width: 0 !important; margin-left: 0 !important; margin-right: 0 !important; }
   /* the deck name takes the room, the counts only what they need */
   /* Anki caps the name at 100vw - 300px: almost nothing when narrow. */
-  td.decktd, th.decktd { min-width: 0 !important; max-width: none !important; width: auto !important; white-space: nowrap !important; overflow: hidden; }
-  td.decktd a.deck { white-space: normal !important; overflow-wrap: break-word; display: inline !important; min-width: 0 !important; }
-  .count { min-width: 0 !important; }
+  html:not(#ss-a):not(#ss-b) td.decktd, html:not(#ss-a):not(#ss-b) th.decktd { min-width: 0 !important; max-width: none !important; width: auto !important; white-space: nowrap !important; overflow: hidden; }
+  html:not(#ss-a):not(#ss-b) td.decktd a.deck { white-space: normal !important; overflow-wrap: break-word; display: inline !important; min-width: 0 !important; }
+  html:not(#ss-a):not(#ss-b) .count { min-width: 0 !important; }
   /* fixed columns: the counts get what they need, the name the rest */
-  center > table { table-layout: fixed !important; }
-  center > table th.count { width: 4.4em !important; font-size: .86em; overflow: hidden; text-overflow: ellipsis; }
-  center > table td[align="end"], center > table th.count { white-space: nowrap !important; padding-left: 3px !important; padding-right: 3px !important; }
-  center > table th.optscol { width: 26px !important; }
-  center > table td.opts { padding: 0 2px !important; }
-  center > table th[colspan] { width: auto !important; }
-  html, body { overflow-x: hidden; }
+  html:not(#ss-a):not(#ss-b) center > table { table-layout: fixed !important; }
+  html:not(#ss-a):not(#ss-b) center > table th.count { width: 4.4em !important; font-size: .86em; overflow: hidden; text-overflow: ellipsis; }
+  html:not(#ss-a):not(#ss-b) center > table td[align="end"], html:not(#ss-a):not(#ss-b) center > table th.count { white-space: nowrap !important; padding-left: 3px !important; padding-right: 3px !important; }
+  html:not(#ss-a):not(#ss-b) center > table th.optscol { width: 26px !important; }
+  html:not(#ss-a):not(#ss-b) center > table td.opts { padding: 0 2px !important; }
+  html:not(#ss-a):not(#ss-b) center > table th[colspan] { width: auto !important; }
+  html:not(#ss-a):not(#ss-b), html:not(#ss-a):not(#ss-b) body { overflow-x: hidden; }
 }
 </style>""" .replace("@NARROW@", str(NARROW_WIDTH - 1))
 
