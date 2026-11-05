@@ -1376,10 +1376,15 @@ def _on_tab_changed(index: int, load: bool = True) -> None:
     view = _tab_view(index)
     if view is None:
         return
-    if getattr(view, "_ss_pip", False) and pip_placeholder is not None:
-        tab_stack.setCurrentWidget(pip_placeholder)
-    else:
-        tab_stack.setCurrentWidget(view)
+    target = pip_placeholder if getattr(view, "_ss_pip", False) and pip_placeholder is not None else view
+    old = tab_stack.currentWidget()
+    if old is not None and old is not target:
+        try:  # cover with a picture of the old tab, which then fades out
+            from .smooth_ui import crossfade
+            crossfade(tab_stack, old)
+        except Exception as e:
+            print(f"WS Info: no tab fade: {e}")
+    tab_stack.setCurrentWidget(target)
     sidebar_webview = view
     if load:
         _load_pending(view)

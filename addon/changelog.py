@@ -11,6 +11,8 @@ CHANGELOG = [
         "date": "November 5, 2026",
         "items": [
             {"tag": "New", "text": "Smooth scrolling: pages keep gliding after a quick touchpad swipe – in the browser and in Anki."},
+            {"tag": "New", "text": "Sidebars slide in from the side, browser tabs cross-fade."},
+            {"tag": "Fix", "text": "YouTube's “Allow YouTube ads?” message no longer blocks videos while the ad blocker is on."},
             {"tag": "New", "text": "With the browser beside Anki, the deck list switches to a compact form that fits without scrolling."},
             {"tag": "New", "text": "Browser layout: sidebar, split view, main window or its own window (snap it beside Anki, use a second screen)."},
             {"tag": "New", "text": "The browser saves passwords in your system keyring and fills in login pages – you only click “Log in”."},

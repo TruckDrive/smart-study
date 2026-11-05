@@ -17,8 +17,9 @@ from collections import deque
 from typing import Optional
 
 from aqt import gui_hooks, mw
-from aqt.qt import (QApplication, QEvent, QEasingCurve, QObject, QPoint, QPointF, Qt, QTimer,
-                    QVariantAnimation, QWheelEvent)
+from aqt.qt import (QApplication, QDockWidget, QEvent, QEasingCurve, QGraphicsOpacityEffect, QLabel,
+                    QObject, QPoint, QPointF, QPropertyAnimation, Qt, QTimer, QVariantAnimation,
+                    QWheelEvent)
 
 try:
     from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -39,10 +40,10 @@ def _kinetic_on() -> bool:
 # ── Kinetic scrolling ─────────────────────────────────────────────────────
 
 class _Kinetic(QObject):
-    TAU_MS = 325.0      # how quickly the glide slows down (like iOS / Firefox)
+    TAU_MS = 420.0      # how quickly the glide slows down (like iOS / Firefox)
     MIN_SPEED = 0.25    # px/ms at release needed to start gliding
     STOP_SPEED = 0.02   # px/ms: glide ends below this
-    MAX_SPEED = 8.0
+    MAX_SPEED = 14.0    # fast swipes may cross several PDF pages
 
     def __init__(self):
         super().__init__()
@@ -166,31 +167,129 @@ class _Kinetic(QObject):
 _kinetic: Optional[_Kinetic] = None
 
 
-# ── Animated dock width ───────────────────────────────────────────────────
+# ── Animated sidebars ─────────────────────────────────────────────────────
 
 _width_anim: Optional[QVariantAnimation] = None
+_width_cleanup = None
 
 
-def animate_dock_width(dock, width: int, done=None) -> None:
-    """Glide a docked sidebar to a new width."""
-    global _width_anim
+def _finish_width_anim() -> None:
+    global _width_anim, _width_cleanup
     if _width_anim is not None:
         _width_anim.stop()
-    start = dock.width()
-    if abs(start - width) < 4:
+    _width_anim = None
+    if _width_cleanup is not None:
+        cleanup, _width_cleanup = _width_cleanup, None
+        cleanup()
+
+
+def animate_dock_width(dock, width: int, start: Optional[int] = None, done=None, ms: int = 240) -> None:
+    """Glide a docked sidebar to a new width (from `start`, default: now)."""
+    global _width_anim, _width_cleanup
+    _finish_width_anim()
+    begin = dock.width() if start is None else start
+    if abs(begin - width) < 4:
         mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
         if done:
             done()
         return
+    # Let it get narrower than its usual minimum while it slides.
+    content = dock.widget()
+    saved_dock_min = dock.minimumWidth()
+    dock.setMinimumWidth(1)
+    if content is not None:
+        content.setMinimumWidth(1)
+
+    def cleanup():
+        try:
+            dock.setMinimumWidth(saved_dock_min)
+            if content is not None:
+                # 0 hands the minimum back to the content's layout
+                content.setMinimumWidth(0)
+                if content.layout() is not None:
+                    content.layout().activate()
+        except RuntimeError:
+            pass  # deleted meanwhile
+    _width_cleanup = cleanup
+    mw.resizeDocks([dock], [max(1, begin)], Qt.Orientation.Horizontal)
     anim = QVariantAnimation(mw)
-    anim.setStartValue(float(start))
+    anim.setStartValue(float(max(1, begin)))
     anim.setEndValue(float(width))
-    anim.setDuration(240)
+    anim.setDuration(ms)
     anim.setEasingCurve(QEasingCurve.Type.OutCubic)
     anim.valueChanged.connect(lambda value: mw.resizeDocks([dock], [int(value)], Qt.Orientation.Horizontal))
-    if done:
-        anim.finished.connect(done)
+
+    def finished():
+        global _width_anim
+        if _width_anim is anim:
+            _width_anim = None
+            _finish_width_anim()
+            mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
+        if done:
+            done()
+    anim.finished.connect(finished)
     _width_anim = anim
+    anim.start()
+
+
+class _DockSlide(QObject):
+    """Sidebars (browser, AI chat, notebook, mind map, music …) slide in from
+    the side when they open instead of popping up."""
+
+    def eventFilter(self, obj, event):
+        if (event.type() == QEvent.Type.Show and isinstance(obj, QDockWidget)
+                and mw is not None and obj.parent() is mw):
+            QTimer.singleShot(0, lambda: self._slide(obj))
+        return False
+
+    @staticmethod
+    def _slide(dock) -> None:
+        try:
+            if not dock.isVisible() or dock.isFloating() or _width_anim is not None:
+                return
+            if mw.dockWidgetArea(dock) not in (Qt.DockWidgetArea.LeftDockWidgetArea,
+                                               Qt.DockWidgetArea.RightDockWidgetArea):
+                return
+        except RuntimeError:
+            return
+        tracker = getattr(dock, "_smartstudy_width", None)
+        if tracker is not None:  # its remembered width first, then glide there
+            tracker.timer.stop()
+            tracker.restore()
+        target = dock.width()
+        if target < 120:
+            return
+        animate_dock_width(dock, target, start=max(1, target // 6), ms=260)
+
+
+_dock_slide: Optional[_DockSlide] = None
+
+
+# ── Browser tabs: cross-fade ──────────────────────────────────────────────
+
+def crossfade(stack, old) -> None:
+    """Fade the previous tab out over the new one (180 ms)."""
+    try:
+        if old is None or not old.isVisible() or stack.width() < 20:
+            return
+        picture = old.grab()
+    except Exception:
+        return
+    cover = QLabel(stack)
+    cover.setPixmap(picture)
+    cover.setGeometry(old.geometry())
+    cover.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+    effect = QGraphicsOpacityEffect(cover)
+    effect.setOpacity(1.0)
+    cover.setGraphicsEffect(effect)
+    cover.show()
+    cover.raise_()
+    anim = QPropertyAnimation(effect, b"opacity", cover)
+    anim.setStartValue(1.0)
+    anim.setEndValue(0.0)
+    anim.setDuration(180)
+    anim.setEasingCurve(QEasingCurve.Type.OutQuad)
+    anim.finished.connect(cover.deleteLater)
     anim.start()
 
 
@@ -201,12 +300,41 @@ _FADE = ("<style id='ss-fade'>@keyframes ssFadeIn{from{opacity:0;transform:trans
          "@media (prefers-reduced-motion: reduce){body{animation:none}}</style>")
 
 COMPACT_CSS = """<style id="ss-compact">
-/* Narrow main area (browser beside Anki): keep the deck list in view. */
-.sp-min-deadline-box, .sp-min-statistics, .rh-container, .sp-min-plan-fact-row { display: none !important; }
-.sp-min-overview { padding: 6px 8px !important; margin-bottom: 6px !important; }
-center { padding: 0 6px; box-sizing: border-box; }
-center > table { width: 100% !important; max-width: 100% !important; }
-html { overflow-x: hidden; }
+/* Narrow main area (browser beside Anki): the deck list fits the width. */
+@media (max-width: @NARROW@px) {
+  .sp-min-deadline-box, .sp-min-statistics, .rh-container, .sp-min-plan-fact-row { display: none !important; }
+  .sp-min-overview { padding: 6px 8px !important; margin-bottom: 6px !important; }
+  center { display: block; width: 100%; padding: 0 8px; box-sizing: border-box; }
+  center > table, .decks-container, .decks-container table, .sp-min-box {
+    box-sizing: border-box !important; width: 100% !important; max-width: 100% !important;
+    min-width: 0 !important; margin-left: 0 !important; margin-right: 0 !important; }
+  /* the deck name takes the room, the counts only what they need */
+  /* Anki caps the name at 100vw - 300px: almost nothing when narrow. */
+  td.decktd, th.decktd { min-width: 0 !important; max-width: none !important; width: auto !important; white-space: nowrap !important; overflow: hidden; }
+  td.decktd a.deck { white-space: normal !important; overflow-wrap: break-word; display: inline !important; min-width: 0 !important; }
+  .count { min-width: 0 !important; }
+  /* fixed columns: the counts get what they need, the name the rest */
+  center > table { table-layout: fixed !important; }
+  center > table th.count { width: 4.4em !important; font-size: .86em; overflow: hidden; text-overflow: ellipsis; }
+  center > table td[align="end"], center > table th.count { white-space: nowrap !important; padding-left: 3px !important; padding-right: 3px !important; }
+  center > table th.optscol { width: 26px !important; }
+  center > table td.opts { padding: 0 2px !important; }
+  center > table th[colspan] { width: auto !important; }
+  html, body { overflow-x: hidden; }
+}
+</style>""" .replace("@NARROW@", str(NARROW_WIDTH - 1))
+
+_TOOLBAR_CSS = """<style id="ss-toolbar-narrow">
+@media (max-width: 900px) {
+  /* Anki's three equal columns squeeze the links: give them the middle. */
+  .header { grid-template-columns: auto minmax(0, 1fr) auto !important; }
+  .toolbar { display: flex !important; justify-content: safe center !important; justify-self: stretch !important;
+             min-width: 0 !important; width: auto !important; max-width: 100% !important;
+             white-space: nowrap; overflow-x: auto !important; scrollbar-width: none; }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .hitem { padding-left: 6px !important; padding-right: 6px !important; flex: none; }
+}
+@media (max-width: 600px) { .hitem { font-size: 92% !important; } }
 </style>"""
 
 _rendered_compact: Optional[bool] = None
@@ -230,6 +358,10 @@ def _on_content(web_content, context) -> None:
         return
     if isinstance(context, (DeckBrowser, Overview)):
         web_content.head += _FADE
+    if isinstance(context, DeckBrowser):
+        web_content.head += COMPACT_CSS  # takes effect only while narrow
+    if type(context).__name__ in ("Toolbar", "TopToolbar"):
+        web_content.head += _TOOLBAR_CSS
 
 
 class _MainAreaWatcher(QObject):
@@ -276,10 +408,14 @@ def _setup_main_web() -> None:
 
 
 def setup() -> None:
-    global _kinetic
-    if _kinetic is None and QApplication.instance() is not None:
+    global _kinetic, _dock_slide
+    app = QApplication.instance()
+    if _kinetic is None and app is not None:
         _kinetic = _Kinetic()
-        QApplication.instance().installEventFilter(_kinetic)
+        app.installEventFilter(_kinetic)
+    if _dock_slide is None and app is not None:
+        _dock_slide = _DockSlide()
+        app.installEventFilter(_dock_slide)
     gui_hooks.webview_will_set_content.append(_on_content)
     gui_hooks.main_window_did_init.append(_setup_main_web)
     if getattr(mw, "web", None) is not None:

@@ -1452,8 +1452,6 @@ def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrow
         print(f"SmartStudy: celebration popup error: {e}")
 
     content.stats = compact_stats_html + stats_html + celebrate_html + getattr(content, 'stats', '')
-    if compact_area and smooth_ui is not None:
-        compact_html = smooth_ui.COMPACT_CSS + compact_html
     content.tree = compact_html + gamification_html + daily_html + deadline_html + getattr(content, 'tree', '')
 
 # --- Study-plan countdown timers ------------------------------------------------

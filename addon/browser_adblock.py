@@ -78,11 +78,29 @@ YOUTUBE_PRUNER = r"""
       [value, value.playerResponse].forEach(function (target) {
         if (target && typeof target === 'object') {
           KEYS.forEach(function (key) { if (key in target) delete target[key]; });
+          // "Ad blockers are not allowed / Allow YouTube ads?" comes in the data.
+          var ui = target.auxiliaryUi && target.auxiliaryUi.messageRenderers;
+          if (ui && ui.enforcementMessageViewModel) delete ui.enforcementMessageViewModel;
         }
       });
     }
     return value;
   }
+  // Should the message still appear: remove it and let the video play on.
+  function dropWall() {
+    var walls = document.querySelectorAll('ytd-enforcement-message-view-model');
+    if (!walls.length) return;
+    walls.forEach(function (wall) {
+      var dialog = wall.closest('tp-yt-paper-dialog, ytd-popup-container > *') || wall;
+      dialog.remove();
+    });
+    document.querySelectorAll('tp-yt-iron-overlay-backdrop').forEach(function (b) { b.remove(); });
+    document.body && document.body.style.removeProperty('overflow');
+    var video = document.querySelector('video');
+    if (video && video.paused && !video.ended) video.play().catch(function () {});
+  }
+  new MutationObserver(function () { dropWall(); })
+    .observe(document, {childList: true, subtree: true});
   JSON.parse = new Proxy(JSON.parse, {
     apply: function (target, self, args) { return prune(Reflect.apply(target, self, args)); }
   });
