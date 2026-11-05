@@ -53,7 +53,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Maintenance mode**: keeps the decks running without new cards and with capped reviews (restores your old deck options when switched off)
 - **Archive** and **next plan** in one click, plus a **study streak** and a **6-month heatmap** on the overview
 - Plans **sync between devices** through your Anki collection (AnkiWeb sync)
-- **Share with friends**: 📤 Share copies a code for WhatsApp & co. or saves the plan as a file; 📥 Import takes it over. Your progress and file paths stay private
+- **Share with friends**: Share copies a code for WhatsApp & co. or saves the plan as a file; Import takes it over. Your progress and file paths stay private
 
 ### Workspace
 

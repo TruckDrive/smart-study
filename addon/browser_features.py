@@ -74,7 +74,8 @@ SPONSOR_CATEGORIES = [
     ("outro", "Outros and end cards"), ("music_offtopic", "Non-music parts of music videos"),
 ]
 DEFAULTS = {
-    "plan_videos_in_browser": True,
+    # Study-plan videos and PDFs: True = system browser / PDF app, False = Smart Study browser tab.
+    "plan_external": True,
     "resume_videos": True,
     "done_percent": 90,
     "restore_tabs": True,
@@ -491,7 +492,7 @@ def open_plan_pdf(path: str, page: int) -> bool:
             return False
     except Exception:
         pass
-    if not load_settings()["plan_videos_in_browser"]:
+    if load_settings()["plan_external"]:
         return False
     if _ws().open_local_pdf(path, page) is None:
         return False
@@ -510,7 +511,7 @@ def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
             return False
     except Exception:
         pass
-    if not load_settings()["plan_videos_in_browser"]:
+    if load_settings()["plan_external"]:
         return False
     ws = _ws()
     key = video_key(url)
