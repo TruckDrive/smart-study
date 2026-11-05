@@ -21,6 +21,11 @@ except ImportError:  # outside Anki
 
 
 DE: Dict[str, str] = {
+    "Share study plans with friends: “📤 Share” copies a code for WhatsApp & co., saves the plan as a file or copies a readable overview. Your progress and file paths stay private.": "Lernpläne mit Freunden teilen: „📤 Teilen“ kopiert einen Code für WhatsApp & Co., speichert den Plan als Datei oder kopiert eine lesbare Übersicht. Dein Fortschritt und deine Dateipfade bleiben privat.",
+    "“📥 Import” on the study plan start page takes over a plan from a code or file.": "„📥 Importieren“ auf der Lernplan-Startseite übernimmt einen Plan aus einem Code oder einer Datei.",
+    "PDFs open right in the browser instead of being downloaded – also PDFs that a site (e.g. Moodle) sends as a download. ⚙ → “Open PDF file…” shows a PDF from your computer.": "PDFs öffnen sich direkt im Browser, statt heruntergeladen zu werden – auch PDFs, die eine Seite (z. B. Moodle) als Download schickt. ⚙ → „PDF-Datei öffnen…“ zeigt eine PDF von deinem Computer.",
+    "Study-plan pages (📖 open) open the PDF in a browser tab at the right page.": "Lernplan-Seiten (📖 öffnen) öffnen die PDF in einem Browser-Tab auf der richtigen Seite.",
+    "Address bar in the browser: type an address or a search, see where you are. Ctrl+L jumps into it.": "Adresszeile im Browser: Adresse oder Suchbegriff eintippen und sehen, wo du gerade bist. Strg+L springt hinein.",
     "Copy selections with pictures as an image": "Auswahl mit Bildern als Bild kopieren",
     "Review heatmap": "Lern-Heatmap",
     "Controller support": "Controller-Steuerung",
@@ -134,6 +139,11 @@ DE: Dict[str, str] = {
 
 
 FA: Dict[str, str] = {
+    "Share study plans with friends: “📤 Share” copies a code for WhatsApp & co., saves the plan as a file or copies a readable overview. Your progress and file paths stay private.": "اشتراک برنامهٔ مطالعه با دوستان: «📤 اشتراک‌گذاری» یک کد برای واتس‌اپ و غیره کپی می‌کند، برنامه را به‌صورت فایل ذخیره می‌کند یا خلاصه‌ای خوانا کپی می‌کند. پیشرفت و مسیر فایل‌های شما خصوصی می‌ماند.",
+    "“📥 Import” on the study plan start page takes over a plan from a code or file.": "«📥 وارد کردن» در صفحهٔ اصلی برنامهٔ مطالعه، برنامه‌ای را از یک کد یا فایل وارد می‌کند.",
+    "PDFs open right in the browser instead of being downloaded – also PDFs that a site (e.g. Moodle) sends as a download. ⚙ → “Open PDF file…” shows a PDF from your computer.": "فایل‌های PDF مستقیماً در مرورگر باز می‌شوند و دیگر دانلود نمی‌شوند – حتی PDFهایی که سایتی (مثلاً Moodle) به‌صورت دانلود می‌فرستد. ⚙ ← «باز کردن فایل PDF…» یک PDF از رایانهٔ شما را نشان می‌دهد.",
+    "Study-plan pages (📖 open) open the PDF in a browser tab at the right page.": "صفحه‌های برنامهٔ مطالعه (📖 باز کردن) فایل PDF را در یک زبانهٔ مرورگر و در صفحهٔ درست باز می‌کنند.",
+    "Address bar in the browser: type an address or a search, see where you are. Ctrl+L jumps into it.": "نوار آدرس در مرورگر: آدرس یا عبارت جستجو را تایپ کنید و ببینید کجا هستید. Ctrl+L شما را به آن می‌برد.",
     # Life Drain
     "Life Drain Global Settings (v{version})": "تنظیمات سراسری Life Drain (نسخهٔ {version})",
     "Life Drain Deck Settings for {name}": "تنظیمات Life Drain برای {name}",

@@ -131,7 +131,9 @@ function renderHome(root) {
   const d = S.data;
   root.append(h("div", { class: "top" },
     h("div", null, h("h1", null, "Smart Study"), h("p", { class: "sub" }, L("Pläne bis zur Prüfung – Anki hakt sich selbst ab.", "Study plans up to your exam – Anki checks itself off.", "برنامهٔ مطالعه تا روز امتحان – Anki موارد را خودش تیک می‌زند."))),
-    h("button", { class: "primary", onclick: () => newPlan() }, L("+ Neuer Plan", "+ New plan", "+ برنامهٔ جدید"))));
+    h("div", { class: "bar-actions" },
+      h("button", { onclick: () => importDialog(), title: L("Plan von Freunden übernehmen (Code oder Datei)", "Use a plan from friends (code or file)", "استفاده از برنامهٔ دوستان (کد یا فایل)") }, L("📥 Importieren", "📥 Import", "📥 وارد کردن")),
+      h("button", { class: "primary", onclick: () => newPlan() }, L("+ Neuer Plan", "+ New plan", "+ برنامهٔ جدید")))));
 
   const tiles = h("div", { class: "tiles" },
     tile(L("Lern-Serie", "Study streak", "روزهای پیاپی مطالعه"), String(d.streak), null, days(d.streak)),
@@ -203,7 +205,8 @@ function renderPlan(root) {
     h("div", { class: "bar-actions" },
       h("button", { onclick: () => go("edit") }, L("Bearbeiten", "Edit", "ویرایش")),
       h("button", { onclick: () => replan() }, L("Neu planen", "Replan", "برنامه‌ریزی دوباره")),
-      h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")))));
+      h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")),
+      h("button", { onclick: () => shareDialog() }, L("📤 Teilen", "📤 Share", "📤 اشتراک‌گذاری")))));
 
   for (const n of plan.notes || []) root.append(h("div", { class: "card warn" }, n));
 
@@ -330,6 +333,65 @@ function itemEl(it, day) {
   const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));
   return row;
+}
+
+// ---------- Share ----------
+function planText(plan) {
+  const lines = [`📚 ${plan.title}`, `${L("Prüfung", "Exam", "امتحان")}: ${plan.exam ? fmt(plan.exam) + " " + plan.exam.slice(0, 4) : "–"}${plan.examTime ? COMMA() + plan.examTime + L(" Uhr", "", "") : ""}`, ""];
+  for (const day of plan.days) {
+    const its = day.items.filter(it => !it.moved && it.text && !["weakround", "sim"].includes(it.kind));
+    if (!its.length) continue;
+    const mins = its.filter(it => it.kind !== "note").reduce((a, it) => a + (it.min || 0), 0);
+    lines.push(`${fmt(day.d)}${mins ? " (≈ " + hm(mins) + ")" : ""}`);
+    for (const it of its) lines.push(`  • ${it.text}${it.url ? " – " + it.url : ""}`);
+    lines.push("");
+  }
+  lines.push(L("Erstellt mit Smart Study für Anki", "Made with Smart Study for Anki", "ساخته‌شده با Smart Study برای Anki"));
+  return lines.join("\n");
+}
+async function shareDialog() {
+  const { plan } = S.data;
+  const copyCode = async () => {
+    const r = await run(call("shareCode", { id: plan.id }));
+    const msg = L(`📚 Mein Lernplan „${plan.title}“${plan.exam ? " (Prüfung " + dmy(plan.exam) + ")" : ""}\nSo übernimmst du ihn: Anki → Study Plan → 📥 Importieren → diese ganze Nachricht einfügen.\n(Braucht das Anki-Add-on „Smart Study“.)\n\n`,
+      `📚 My study plan “${plan.title}”${plan.exam ? " (exam " + dmy(plan.exam) + ")" : ""}\nTo use it: Anki → Study Plan → 📥 Import → paste this whole message.\n(Needs the Anki add-on “Smart Study”.)\n\n`,
+      `📚 برنامهٔ مطالعهٔ من «${plan.title}»${plan.exam ? " (امتحان " + dmy(plan.exam) + ")" : ""}\nبرای استفاده: Anki ← Study Plan ← 📥 وارد کردن ← کل این پیام را جای‌گذاری کنید.\n(به افزونهٔ Anki «Smart Study» نیاز دارد.)\n\n`) + r.code;
+    await run(call("copyText", { text: msg }));
+    toast(L("Kopiert – jetzt z. B. in WhatsApp, Signal oder eine Mail einfügen.", "Copied – now paste it into WhatsApp, Signal or an email, for example.", "کپی شد – حالا مثلاً در واتس‌اپ، سیگنال یا ایمیل جای‌گذاری کنید."), 4000);
+  };
+  const saveFile = async () => {
+    const path = await run(call("exportFile", { id: plan.id }));
+    if (path) toast(L("Gespeichert: ", "Saved: ", "ذخیره شد: ") + path + L(" – die Datei kannst du jetzt verschicken.", " – you can send this file now.", " – اکنون می‌توانید این فایل را بفرستید."), 5000);
+  };
+  const copyText = async () => {
+    await run(call("copyText", { text: planText(plan) }));
+    toast(L("Übersicht kopiert – zum Lesen, auch ohne Anki.", "Overview copied – for reading, also without Anki.", "خلاصه کپی شد – برای خواندن، حتی بدون Anki."), 4000);
+  };
+  const opt = (label, hint, fn, cls) => h("div", { style: "display:flex;gap:10px;align-items:center;margin:8px 0" },
+    h("button", { class: cls, style: "min-width:170px", onclick: fn }, label), h("span", { class: "muted small" }, hint));
+  await modal(L("Plan teilen", "Share plan", "اشتراک‌گذاری برنامه"), h("div", null,
+    h("p", { class: "small", style: "margin:0 0 6px" }, L("Deine Freunde bekommen den Plan mit allen Tagen, Themen und Video-Links – aber nicht deinen Fortschritt und keine Dateipfade von deinem Computer.",
+      "Your friends get the plan with all days, topics and video links – but not your progress and no file paths from your computer.",
+      "دوستانتان برنامه را با همهٔ روزها، موضوع‌ها و لینک‌های ویدیو دریافت می‌کنند – اما نه پیشرفت شما و نه مسیر فایل‌های رایانهٔ شما را.")),
+    opt(L("📋 Code kopieren", "📋 Copy code", "📋 کپی کد"), L("Für WhatsApp & Co. – einfügen und senden.", "For WhatsApp & co. – paste and send.", "برای واتس‌اپ و غیره – جای‌گذاری و ارسال."), copyCode, "primary"),
+    opt(L("💾 Als Datei speichern", "💾 Save as file", "💾 ذخیره به‌صورت فایل"), L("Zum Mailen oder für einen Cloud-Ordner.", "For email or a cloud folder.", "برای ایمیل یا پوشهٔ ابری."), saveFile),
+    opt(L("📝 Als Text kopieren", "📝 Copy as text", "📝 کپی به‌صورت متن"), L("Lesbare Übersicht für alle ohne Smart Study.", "Readable overview for anyone without Smart Study.", "خلاصهٔ خوانا برای کسانی که Smart Study ندارند."), copyText)),
+    [[L("Schließen", "Close", "بستن"), null]]);
+}
+async function importDialog() {
+  const box = h("textarea", { placeholder: L("Nachricht mit dem Code (SSP1:…) hier einfügen", "Paste the message with the code (SSP1:…) here", "پیام حاوی کد (SSP1:…) را اینجا جای‌گذاری کنید"), style: "min-height:120px" });
+  const how = await modal(L("Plan importieren", "Import plan", "وارد کردن برنامه"), h("div", null,
+    h("p", { class: "small", style: "margin:0 0 8px" }, L("Füge die Nachricht ein, die dir jemand mit „Teilen“ geschickt hat – oder wähle die Plan-Datei.", "Paste the message someone sent you with “Share” – or choose the plan file.", "پیامی را که کسی با «اشتراک‌گذاری» برایتان فرستاده جای‌گذاری کنید – یا فایل برنامه را انتخاب کنید.")), box),
+    [[L("Abbrechen", "Cancel", "انصراف"), null], [L("Datei wählen…", "Choose file…", "انتخاب فایل…"), "file"], [L("Importieren", "Import", "وارد کردن"), "code", "primary"]]);
+  if (!how) return;
+  if (how === "code" && !box.value.trim()) return toast(L("Bitte zuerst den Code einfügen.", "Please paste the code first.", "لطفاً ابتدا کد را جای‌گذاری کنید."));
+  const r = await run(call(how === "file" ? "importFile" : "importCode", { text: box.value }));
+  if (!r) return;
+  const hints = [];
+  if (r.missingDecks.length) hints.push(L("Diese Decks fehlen bei dir: ", "You don't have these decks: ", "این دسته‌ها را ندارید: ") + r.missingDecks.join(", "));
+  if (r.pdfs) hints.push(L("PDF-Datei unter Bearbeiten → Quellen wählen.", "Choose the PDF file under Edit → Sources.", "فایل PDF را از ویرایش ← منابع انتخاب کنید."));
+  toast(L(`„${r.title}“ übernommen.`, `“${r.title}” imported.`, `«${r.title}» وارد شد.`) + (hints.length ? " " + hints.join(" ") : ""), hints.length ? 7000 : 3000);
+  go("plan", r.id);
 }
 
 async function replan() {

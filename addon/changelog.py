@@ -7,6 +7,17 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.8.0",
+        "date": "November 5, 2026",
+        "items": [
+            {"tag": "New", "text": "Share study plans with friends: “📤 Share” copies a code for WhatsApp & co., saves the plan as a file or copies a readable overview. Your progress and file paths stay private."},
+            {"tag": "New", "text": "“📥 Import” on the study plan start page takes over a plan from a code or file."},
+            {"tag": "New", "text": "PDFs open right in the browser instead of being downloaded – also PDFs that a site (e.g. Moodle) sends as a download. ⚙ → “Open PDF file…” shows a PDF from your computer."},
+            {"tag": "New", "text": "Study-plan pages (📖 open) open the PDF in a browser tab at the right page."},
+            {"tag": "New", "text": "Address bar in the browser: type an address or a search, see where you are. Ctrl+L jumps into it."},
+        ],
+    },
+    {
         "version": "2.7.0",
         "date": "November 3, 2026",
         "items": [

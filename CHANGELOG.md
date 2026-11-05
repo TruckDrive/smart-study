@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.8.0 – 2026-11-05
+
+- **Share study plans with friends**: the new *📤 Share* button in a plan copies a code that fits into a chat message (WhatsApp, Signal, e-mail …), saves the plan as a `.smartstudy.json` file, or copies a readable day-by-day overview for people without the add-on. Shared are the days, topics, sources, milestones and video links – not your progress (ticks, mock exams, retrospective) and not the paths of PDFs on your computer
+- **Import a plan**: *📥 Import* on the study plan start page takes over a plan from the pasted message or from a file. A plan from someone else is checked and cleaned before it is stored (only web links, no file paths, sane sizes); missing Anki decks and the PDF to choose are pointed out
+- **PDFs in the browser**: PDFs are shown in the browser tab with Chromium's PDF viewer instead of being offered as a download (which did nothing before). PDFs that a site sends as a download (e.g. Moodle's “force download”) are saved to *Downloads/Smart Study PDFs* and opened in the tab right away; the same link reuses its file. *⚙ → Open PDF file…* shows a PDF from your computer, and ↗ opens a PDF tab in your PDF app. Of local files, only PDFs can be opened in the browser
+- **Study-plan PDFs in the browser**: *📖 open* in the study plan opens the PDF in a browser tab at the right page (Okular/Evince are still used when *Open study-plan links in the browser* is off)
+- **Address bar**: the browser shows the address of the current tab; type an address, a path to a PDF or a search (with your search engine) and press Enter. Esc restores the address, Ctrl+L (adjustable under *Settings → Browser*) jumps into it
+
 ## 2.7.0 – 2026-11-03
 
 - **Browser tabs**: open several pages at once (+, Ctrl+T, middle click or Ctrl+click on a link); a link that wants a new window opens in a tab. Sound in a background tab keeps playing

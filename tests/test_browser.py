@@ -20,6 +20,24 @@ assert search.search_url("google", "Plexus brachialis") == "https://www.google.c
 assert search.search_url("brave", "a&b") == "https://search.brave.com/search?q=a%26b"
 assert search.search_url("startpage", "x") == "https://www.startpage.com/sp/search?query=x"
 
+# Address bar: web addresses, local PDFs, everything else is a search.
+target = search.address_target
+assert target("", "google") == ""
+assert target("https://moodle.uni.de/x?y=1", "google") == "https://moodle.uni.de/x?y=1"
+assert target("wikipedia.org", "google") == "https://wikipedia.org"
+assert target("de.wikipedia.org/wiki/Herz", "google") == "https://de.wikipedia.org/wiki/Herz"
+assert target("localhost:8080", "google") == "http://localhost:8080"
+assert target("192.168.0.1/admin", "google") == "https://192.168.0.1/admin"
+assert target("Plexus brachialis", "google") == "https://www.google.com/search?q=Plexus+brachialis"
+assert target("ventricle", "duckduckgo") == "https://duckduckgo.com/?q=ventricle"
+assert target("e.g. heart", "google").startswith("https://www.google.com/search?q=")
+import tempfile
+with tempfile.TemporaryDirectory() as folder:
+    pdf = os.path.join(folder, "Skript 1.pdf")
+    open(pdf, "wb").close()
+    assert target(pdf, "google").startswith("file://") and target(pdf, "google").endswith("/Skript%201.pdf")
+    assert target(os.path.join(folder, "missing.pdf"), "google").startswith("https://www.google.com/search?q=")
+
 engine_module = load("adblock_engine")
 engine = engine_module.FilterEngine().add_lists(["""
 ! comment

@@ -55,6 +55,7 @@ SHORTCUT_ACTIONS = [
     ("close_tab", "Close tab", "Ctrl+W", "browser"),
     ("next_tab", "Next tab", "Ctrl+Tab", "browser"),
     ("prev_tab", "Previous tab", "Ctrl+Shift+Tab", "browser"),
+    ("address_bar", "Address bar", "Ctrl+L", "browser"),
 ]
 FOCUS_YOUTUBE = [
     ("shorts", "YouTube Shorts"),
@@ -163,6 +164,7 @@ def _actions() -> Dict[str, Callable[[], None]]:
         "close_tab": lambda: ws.tab_bar is not None and ws.close_tab(ws.tab_bar.currentIndex()),
         "next_tab": lambda: ws._step_tab(1),
         "prev_tab": lambda: ws._step_tab(-1),
+        "address_bar": ws.focus_address_bar,
     }
 
 
@@ -478,6 +480,25 @@ def _save_position(key: str, t: float, d: float) -> None:
             positions.pop(old, None)
     state["video_positions"] = positions
     ws._save_website_state(state)
+
+
+def open_plan_pdf(path: str, page: int) -> bool:
+    """Opens a study-plan PDF at a page in a browser tab; False → open it elsewhere."""
+    try:
+        import importlib
+        package = importlib.import_module(__package__)
+        if not getattr(package, "addon_settings", {}).get("website_viewer_enabled", True):
+            return False
+    except Exception:
+        pass
+    if not load_settings()["plan_videos_in_browser"]:
+        return False
+    if _ws().open_local_pdf(path, page) is None:
+        return False
+    if mw is not None:
+        mw.activateWindow()
+        mw.raise_()
+    return True
 
 
 def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
