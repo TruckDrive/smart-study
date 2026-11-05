@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.8.2 – 2026-11-05
+
+- **Full screen in the browser**: the full-screen button of a video (YouTube, Moodle/Opencast …, also double-click or *f*) now fills the whole screen instead of doing nothing. Esc or the button again brings it back into its tab
+- **Fix**: closing a study-plan video tab right after it changed page no longer shows an error (“wrapped C/C++ object of type QWebEngineView has been deleted”)
+
 ## 2.8.1 – 2026-11-05
 
 - **Study-plan videos and PDFs in your default browser**: new switch under *Settings → Browser*, on by default. On: videos open in your normal web browser and PDFs in your PDF app (Okular/Evince at the right page, otherwise the default app). Off: both open in a Smart Study browser tab as in 2.8.0. Replaces the switch *Open study-plan links in the browser*

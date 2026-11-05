@@ -32,6 +32,19 @@ except ImportError:  # pragma: no cover
     QWebEngineContextMenuRequest = QWebEngineScript = None  # type: ignore
 
 try:
+    from PyQt6 import sip
+except ImportError:  # pragma: no cover
+    sip = None  # type: ignore
+
+
+def _alive(widget) -> bool:
+    """False once Qt has deleted the widget (e.g. its tab was closed)."""
+    try:
+        return widget is not None and not (sip is not None and sip.isdeleted(widget))
+    except Exception:
+        return False
+
+try:
     from .locales import _
 except ImportError:  # pragma: no cover
     def _(text):  # type: ignore
@@ -452,6 +465,95 @@ def close_pip(show_browser: bool = False) -> None:
     window.deleteLater()
 
 
+# ── Full screen (the video's own button, double-click, "f" on YouTube) ────
+
+class _FullscreenWindow(QWidget):
+    """Shows one browser tab over the whole screen.  Esc or the video's
+    button brings it back into its tab."""
+
+    def __init__(self, view):
+        super().__init__(None)
+        self.view = view
+        self.setWindowTitle(getattr(view, "_ss_title", "") or "Smart Study")
+        self.setStyleSheet("background:#000;")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(view)
+        view.show()  # the browser's stack hid it when it was taken out
+        # The page swallows Esc before any shortcut sees it, so watch the keys.
+        QApplication.instance().installEventFilter(self)
+        view.destroyed.connect(lambda *_a: leave_fullscreen())
+        self.showFullScreen()
+        self.raise_()
+        self.activateWindow()
+        view.setFocus()
+
+    def eventFilter(self, obj, event):
+        kind = event.type()
+        if (kind in (event.Type.ShortcutOverride, event.Type.KeyPress)
+                and getattr(event, "key", lambda: None)() == Qt.Key.Key_Escape
+                and self.isActiveWindow()):
+            if kind == event.Type.KeyPress:
+                QTimer.singleShot(0, leave_fullscreen)
+            event.accept()
+            return True
+        return False
+
+    def closeEvent(self, event):  # Alt+F4 or the window manager
+        if _fullscreen is self:
+            QTimer.singleShot(0, leave_fullscreen)
+        super().closeEvent(event)
+
+
+_fullscreen: Optional[_FullscreenWindow] = None
+
+
+def _on_fullscreen(view, request) -> None:
+    request.accept()
+    if request.toggleOn():
+        QTimer.singleShot(0, lambda: _alive(view) and _enter_fullscreen(view))
+    else:
+        QTimer.singleShot(0, leave_fullscreen)
+
+
+def _enter_fullscreen(view) -> None:
+    global _fullscreen
+    if _fullscreen is not None:
+        return
+    if getattr(view, "_ss_pip", False):
+        close_pip()
+    _ws().detach_view(view)
+    _fullscreen = _FullscreenWindow(view)
+    try:
+        view.page().setVisible(True)
+    except Exception:
+        pass
+
+
+def leave_fullscreen() -> None:
+    global _fullscreen
+    if _fullscreen is None:
+        return
+    window, _fullscreen = _fullscreen, None
+    try:
+        QApplication.instance().removeEventFilter(window)
+    except Exception:
+        pass
+    view = window.view
+    if _alive(view):
+        try:  # tell the page too, in case Esc ended it here and not in the page
+            view.triggerPageAction(type(view.page()).WebAction.ExitFullScreen)
+        except Exception:
+            pass
+        _ws().attach_view(view, show=True)
+        view.setFocus()
+    window.hide()
+    window.deleteLater()
+    if mw is not None:
+        mw.activateWindow()
+
+
 # ── Study-plan videos: resume and check off ───────────────────────────────
 
 def video_key(url: str) -> str:
@@ -538,6 +640,8 @@ def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
 
 def _resume(view) -> None:
     """Jump to where a study-plan video was left (once per page)."""
+    if not _alive(view):
+        return  # the tab was closed in the meantime
     plan = getattr(view, "_ss_plan", None)
     if not plan or not load_settings()["resume_videos"]:
         return
@@ -1054,6 +1158,7 @@ def setup_view(view) -> None:
     view.customContextMenuRequested.connect(lambda pos: show_context_menu(view, pos))
     view.urlChanged.connect(lambda url: on_url_changed(view, url))
     view.loadFinished.connect(lambda ok: ok and _resume(view))
+    view.page().fullScreenRequested.connect(lambda request: _on_fullscreen(view, request))
     # A full page load starts a new document; URL changes within YouTube don't.
     view.loadFinished.connect(lambda ok: ok and _sponsorblock(view, view.url()))
 
@@ -1061,11 +1166,11 @@ def setup_view(view) -> None:
 def on_url_changed(view, url: QUrl) -> None:
     # YouTube changes pages without loading them, so check every URL change.
     if focus_blocks(url):
-        QTimer.singleShot(0, lambda: show_blocked(view, url))
+        QTimer.singleShot(0, lambda: _alive(view) and show_blocked(view, url))
         return
     _sponsorblock(view, url)
     if getattr(view, "_ss_plan", None):
-        QTimer.singleShot(1500, lambda: _resume(view))
+        QTimer.singleShot(1500, lambda: _alive(view) and _resume(view))
 
 
 def start() -> None:
@@ -1076,6 +1181,7 @@ def start() -> None:
 
 
 def stop() -> None:
+    leave_fullscreen()
     close_pip()
     _tracker.stop()
     _focus_timer.stop()

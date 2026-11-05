@@ -7,6 +7,14 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.8.2",
+        "date": "November 5, 2026",
+        "items": [
+            {"tag": "New", "text": "Full screen in the browser: a video's full-screen button now fills the whole screen. Esc brings it back into its tab."},
+            {"tag": "Fix", "text": "No more error when a study-plan video tab is closed right after it changed page."},
+        ],
+    },
+    {
         "version": "2.8.1",
         "date": "November 5, 2026",
         "items": [
