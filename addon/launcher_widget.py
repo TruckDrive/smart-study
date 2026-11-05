@@ -324,7 +324,12 @@ class SidebarWidget(QWidget):
             if dock_name == keep_dock_name or not callable(action_func):
                 continue
             other = mw.findChild(QDockWidget, dock_name)
-            if other is not None and other.isVisible():
+            try:
+                from . import dock_layout
+                own_window = dock_layout.dock_is_own_window(other)
+            except Exception:
+                own_window = False
+            if other is not None and other.isVisible() and not own_window:  # own windows stay open
                 try:
                     action_func()
                 except Exception as e:

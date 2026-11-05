@@ -9303,6 +9303,8 @@ TRANSLATIONS.update({
 
 # Smart Study 2.8.2: browser layout and saved passwords
 TRANSLATIONS.update({
+    "Split view": {"de": "Geteilte Ansicht"},
+    "Layout": {"de": "Ansicht"},
     "Smooth scrolling": {"de": "Flüssiges Scrollen"},
     "After a quick swipe on the touchpad, pages in the browser keep gliding and slow down.": {"de": "Nach einem schnellen Wischen auf dem Touchpad gleiten Seiten im Browser weiter und werden langsamer."},
     "Split view (cards | browser)": {"de": "Geteilt (Karten | Browser)"},

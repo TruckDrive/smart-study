@@ -188,6 +188,7 @@ class _DockSlide(QObject):
     def __init__(self):
         super().__init__()
         self.pictures = {}  # id(dock) → last picture of it
+        self.leaving = None  # (dock, frame, label, side, width) – a sidebar just closed
 
     def eventFilter(self, obj, event):
         kind = event.type()
@@ -196,10 +197,42 @@ class _DockSlide(QObject):
         if not isinstance(obj, QDockWidget) or mw is None or obj.parent() is not mw:
             return False
         if kind == QEvent.Type.Show:
-            QTimer.singleShot(0, lambda: self._slide_in(obj))
+            if self._swap(obj):  # the old sidebar closed just before
+                return False
+            # …or closes right after (then it is a swap as well)
+            QTimer.singleShot(0, lambda: self._swap(obj) or self._slide_in(obj))
         else:
             self._slide_out(obj)
         return False
+
+    def _swap(self, dock) -> bool:
+        """One sidebar replaces another on the same side (e.g. browser →
+        AI chat): keep the width, so Anki needn't lay out again, and only
+        fade the old one out – two slides at once looked jerky."""
+        leaving, self.leaving = self.leaving, None
+        if leaving is None:
+            return False
+        old_dock, frame, label, side, width = leaving
+        try:
+            if old_dock is dock or self._side(dock) != side:
+                return False
+        except RuntimeError:
+            return False
+        tracker = getattr(dock, "_smartstudy_width", None)
+        if tracker is not None:
+            tracker.widths[tracker.feature] = width  # its restore keeps this width
+        mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
+        frame._ss_swap = True
+        effect = QGraphicsOpacityEffect(label)
+        label.setGraphicsEffect(effect)
+        anim = QPropertyAnimation(effect, b"opacity", frame)
+        anim.setStartValue(1.0)
+        anim.setEndValue(0.0)
+        anim.setDuration(160)
+        anim.setEasingCurve(QEasingCurve.Type.OutQuad)
+        anim.finished.connect(frame.deleteLater)
+        anim.start()
+        return True
 
     @staticmethod
     def _side(dock) -> int:
@@ -295,8 +328,17 @@ class _DockSlide(QObject):
             return
         self.pictures[id(dock)] = picture
         frame, label = self._overlay(dock, picture, fill=False)
-        end = dock.width() if side > 0 else -dock.width()
-        self._move(frame, label, 0, end, self.MS_OUT, QEasingCurve.Type.InCubic)
+        width = dock.width()
+        end = width if side > 0 else -width
+        self.leaving = (dock, frame, label, side, width)
+
+        def start():  # unless another sidebar took its place meanwhile
+            if self.leaving is not None and self.leaving[1] is frame:
+                self.leaving = None
+            if getattr(frame, "_ss_swap", False):
+                return
+            self._move(frame, label, 0, end, self.MS_OUT, QEasingCurve.Type.InCubic)
+        QTimer.singleShot(30, start)
 
 
 _dock_slide: Optional[_DockSlide] = None

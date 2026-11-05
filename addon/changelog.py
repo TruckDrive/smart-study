@@ -12,6 +12,7 @@ CHANGELOG = [
         "items": [
             {"tag": "New", "text": "Smooth scrolling: pages in the browser keep gliding after a quick touchpad swipe."},
             {"tag": "New", "text": "Sidebars slide in from the side, browser tabs cross-fade."},
+            {"tag": "New", "text": "AI assistant, notebook and mind map: sidebar, split view or their own window, like the browser."},
             {"tag": "Fix", "text": "YouTube's “Allow YouTube ads?” message no longer blocks videos while the ad blocker is on."},
             {"tag": "New", "text": "With the browser beside Anki, the deck list switches to a compact form that fits without scrolling."},
             {"tag": "New", "text": "Browser layout: sidebar, split view, main window or its own window (snap it beside Anki, use a second screen)."},

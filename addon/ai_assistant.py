@@ -1733,6 +1733,7 @@ def _setup_sidebar() -> bool:
         from .sidebar_widths import attach
         attach(mw, _dock, "ai")
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, _dock)
+        _register_layout()
 
         # Hooks
         if not _hooks_connected and gui_hooks:
@@ -1799,6 +1800,29 @@ def refresh_ai_assistant_theme() -> None:
         f"if(window.setAccentColor){{setAccentColor({json.dumps(accent)});}}"
         "})();"
     )
+
+
+def _show_for_layout() -> bool:
+    if _dock is None and not _setup_sidebar():
+        return False
+    if _dock is None:
+        return False
+    _dock.show()
+    _dock.raise_()
+    return True
+
+
+def _register_layout() -> None:
+    """Sidebar / split view / own window, like the browser (⧉ in the tab bar)."""
+    try:
+        from . import dock_layout
+        dock_layout.register("ai", lambda: _dock, _show_for_layout, _("AI Assistant"))
+        if _sites_panel is not None and getattr(_sites_panel, "external", None) is not None:
+            row = _sites_panel.external.parentWidget().layout()
+            if row is not None:
+                row.addWidget(dock_layout.menu_button("ai"))
+    except Exception as e:
+        print(f"AI Assistant: no layout button: {e}")
 
 
 def toggle_ai_assistant_dock() -> None:

@@ -2129,7 +2129,9 @@ class NotebookPanel(QWidget):
             if self.is_embedded:
                 self.exit_window()
             elif not self.is_in_fullscreen:
-                self.enter_window()
+                # sidebar, split view, main window or an own window
+                from . import dock_layout
+                QTimer.singleShot(0, lambda: dock_layout.show_menu_at_cursor("notebook"))
             return
 
         if payload == "versions" and self.current_tool == "notebook":
@@ -2693,6 +2695,39 @@ def open_pdf_review_link(token: str) -> bool:
 # Dock management
 # ──────────────────────────────────────────────
 
+def _panel_for_layout():
+    panel = _ensure_dock().widget()
+    return panel if isinstance(panel, NotebookPanel) else None
+
+
+def _register_layout() -> None:
+    from . import dock_layout
+
+    def show():
+        dock = _ensure_dock()
+        dock.show()
+        dock.raise_()
+        panel = dock.widget()
+        if isinstance(panel, NotebookPanel):
+            panel.load_content()
+        _sync_notebook_launcher()
+        return True
+
+    def enter_main():
+        show()
+        panel = _panel_for_layout()
+        if panel is not None and not panel.is_embedded:
+            panel.enter_window()
+
+    def exit_main():
+        panel = _panel_for_layout()
+        if panel is not None and panel.is_embedded:
+            panel.exit_window()
+    dock_layout.register("notebook", lambda: _dock, show, _(DOCK_TITLE),
+                         is_main=lambda: bool(_dock is not None and getattr(_dock.widget(), "is_embedded", False)),
+                         enter_main=enter_main, exit_main=exit_main)
+
+
 def _ensure_dock() -> QDockWidget:
     global _dock
 
@@ -2719,6 +2754,7 @@ def _ensure_dock() -> QDockWidget:
     attach(mw, _dock, panel.current_tool,
            lambda: panel.is_in_fullscreen or panel.is_embedded)
     mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, _dock)
+    _register_layout()
     return _dock
 
 

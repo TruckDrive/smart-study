@@ -596,7 +596,7 @@ class MindmapPanel(QWidget):
                 "roadmap-export": self.export_roadmap,
                 "fullscreen": self.enter_fullscreen,
                 "exitfullscreen": self.close_fullscreen,
-                "window": self.enter_window,
+                "window": self._layout_menu,
                 "exitwindow": self.exit_window,
             }.get(command)
             if action is not None:
@@ -942,6 +942,11 @@ class MindmapPanel(QWidget):
         self._set_html_toggle(web_view_ref, False, windowed=False)
 
     # ── Embedded view (inside the Anki main window) ──
+    def _layout_menu(self):
+        """Sidebar, split view, main window or an own window."""
+        from . import dock_layout
+        QTimer.singleShot(0, lambda: dock_layout.show_menu_at_cursor("mindmap"))
+
     def enter_window(self):
         if not self.web_view: return
         if self.is_in_fullscreen or self.is_embedded: return
@@ -1024,10 +1029,39 @@ def setup_mindmap_dock():
                lambda: panel.is_in_fullscreen or panel.is_embedded)
         if Qt: mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, mindmap_dock)
         mindmap_dock.setVisible(False)
+        _register_layout()
 
     except Exception as e:
         print(f"MindmapSidebar Setup Error: {e}")
         traceback.print_exc()
+
+def _register_layout() -> None:
+    from . import dock_layout
+
+    def show():
+        if mindmap_dock is None:
+            setup_mindmap_dock()
+        if mindmap_dock is None:
+            return False
+        mindmap_dock.show()
+        mindmap_dock.raise_()
+        return True
+
+    def panel():
+        return mindmap_dock.widget() if mindmap_dock is not None else None
+
+    def enter_main():
+        if show() and panel() is not None and not panel().is_embedded:
+            panel().load_content()  # the web view is built when it is first shown
+            panel().enter_window()
+
+    def exit_main():
+        if panel() is not None and panel().is_embedded:
+            panel().exit_window()
+    dock_layout.register("mindmap", lambda: mindmap_dock, show, _("MindMap"),
+                         is_main=lambda: bool(panel() is not None and getattr(panel(), "is_embedded", False)),
+                         enter_main=enter_main, exit_main=exit_main)
+
 
 def toggle_mindmap_dock():
     if mindmap_dock is None:
