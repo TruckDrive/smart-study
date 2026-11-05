@@ -90,6 +90,8 @@ DEFAULTS = {
     # Study-plan videos and PDFs: True = system browser / PDF app, False = Smart Study browser tab.
     "plan_external": True,
     "resume_videos": True,
+    # Touchpad: pages keep gliding after a quick swipe (browser and Anki).
+    "kinetic_scroll": True,
     "done_percent": 90,
     "restore_tabs": True,
     "shortcuts": {key: default for key, _l, default, _w in SHORTCUT_ACTIONS},

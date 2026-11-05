@@ -2283,5 +2283,7 @@
  "Save and fill in passwords": "ذخیره و پر کردن رمزها",
  "Needs a system keyring (on Linux: secret-tool with KWallet, GNOME Keyring or KeePassXC).": "به گاوصندوق رمز سیستم نیاز دارد (در لینوکس: secret-tool با KWallet، GNOME Keyring یا KeePassXC).",
  "Delete saved passwords…": "حذف رمزهای ذخیره‌شده…",
- "Delete all passwords saved by the Smart Study browser?": "همهٔ رمزهایی که مرورگر Smart Study ذخیره کرده حذف شوند؟"
+ "Delete all passwords saved by the Smart Study browser?": "همهٔ رمزهایی که مرورگر Smart Study ذخیره کرده حذف شوند؟",
+ "Smooth scrolling": "پیمایش نرم",
+ "After a quick swipe on the touchpad, pages keep gliding and slow down – in the browser and in Anki.": "پس از کشیدن سریع روی تاچ‌پد، صفحه کمی ادامه می‌لغزد و آرام می‌ایستد – در مرورگر و در Anki."
 }

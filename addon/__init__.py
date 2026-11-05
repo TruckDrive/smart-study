@@ -1357,6 +1357,17 @@ def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrow
         demo_stats = dashboard_demo.statistics(demo, int(display_settings.get("stats_time_range", 7)),
                                                int(display_settings.get("stats_consistency_days", 30)))
     minimal_enabled = bool(display_settings.get("minimal_dashboard_enabled", False))
+    # A sidebar (e.g. the browser in split view) leaves the main area narrow:
+    # use the compact dashboard and keep the deck list in view.
+    compact_area = False
+    try:
+        from . import smooth_ui
+        compact_area = smooth_ui.deck_area_narrow()
+        smooth_ui.note_rendered(compact_area)
+    except Exception:
+        smooth_ui = None
+    if compact_area:
+        minimal_enabled = True
     if (not minimal_enabled
             and not display_settings.get("statistics_widget_enabled", True)
             and not display_settings.get("gamification_widgets_enabled", True)
@@ -1441,6 +1452,8 @@ def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrow
         print(f"SmartStudy: celebration popup error: {e}")
 
     content.stats = compact_stats_html + stats_html + celebrate_html + getattr(content, 'stats', '')
+    if compact_area and smooth_ui is not None:
+        compact_html = smooth_ui.COMPACT_CSS + compact_html
     content.tree = compact_html + gamification_html + daily_html + deadline_html + getattr(content, 'tree', '')
 
 # --- Study-plan countdown timers ------------------------------------------------
@@ -1778,6 +1791,11 @@ if modules_loaded and mw and gui_hooks:
         )
     mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|integrations/[^/]+/web/.+)$") # theme css, notebook, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
+    try:
+        from . import smooth_ui
+        smooth_ui.setup()
+    except Exception as e:
+        print(f"SmartStudy: smooth scrolling/animations not set up: {e}")
     if hasattr(gui_hooks, "webview_did_inject_style_into_page"):
         gui_hooks.webview_did_inject_style_into_page.append(
             custom_background.on_internal_page_styled

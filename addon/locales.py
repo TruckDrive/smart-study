@@ -9303,6 +9303,8 @@ TRANSLATIONS.update({
 
 # Smart Study 2.8.2: browser layout and saved passwords
 TRANSLATIONS.update({
+    "Smooth scrolling": {"de": "Flüssiges Scrollen"},
+    "After a quick swipe on the touchpad, pages keep gliding and slow down – in the browser and in Anki.": {"de": "Nach einem schnellen Wischen auf dem Touchpad gleiten Seiten weiter und werden langsamer – im Browser und in Anki."},
     "Split view (cards | browser)": {"de": "Geteilt (Karten | Browser)"},
     "Main window": {"de": "Hauptfenster"},
     "Own window": {"de": "Eigenes Fenster"},

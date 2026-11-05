@@ -94,9 +94,14 @@ def _set_width(width: int) -> None:
         return
     tracker = getattr(dock, "_smartstudy_width", None)
     if tracker is not None:
-        tracker.widths[tracker.feature] = width  # restore() keeps the centre usable
-        tracker.restore()
-    else:
+        tracker.widths[tracker.feature] = width  # remembered for the next show
+        center = mw.centralWidget()
+        center_min = max(160, center.minimumSizeHint().width()) if center else 160
+        width = min(width, max(dock.minimumWidth(), mw.contentsRect().width() - center_min - 12))
+    try:
+        from .smooth_ui import animate_dock_width
+        animate_dock_width(dock, width)
+    except Exception:
         mw.resizeDocks([dock], [width], Qt.Orientation.Horizontal)
 
 

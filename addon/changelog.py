@@ -10,6 +10,8 @@ CHANGELOG = [
         "version": "2.8.2",
         "date": "November 5, 2026",
         "items": [
+            {"tag": "New", "text": "Smooth scrolling: pages keep gliding after a quick touchpad swipe – in the browser and in Anki."},
+            {"tag": "New", "text": "With the browser beside Anki, the deck list switches to a compact form that fits without scrolling."},
             {"tag": "New", "text": "Browser layout: sidebar, split view, main window or its own window (snap it beside Anki, use a second screen)."},
             {"tag": "New", "text": "The browser saves passwords in your system keyring and fills in login pages – you only click “Log in”."},
             {"tag": "New", "text": "Full screen in the browser: a video's full-screen button now fills the whole screen. Esc brings it back into its tab."},
