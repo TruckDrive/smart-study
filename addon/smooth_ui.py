@@ -1,10 +1,10 @@
 """Smoother feel for Anki and the Smart Study browser.
 
 * Kinetic scrolling: on Linux, Qt WebEngine stops dead when the fingers leave
-  the touchpad. After a quick swipe the page now keeps gliding and slows down,
-  like in Firefox or on a phone – in the browser and in Anki's own pages.
+  the touchpad. After a quick swipe a page of the Smart Study browser keeps
+  gliding and slows down, like in Firefox or on a phone. Anki's own pages
+  keep Anki's normal scrolling.
 * Sidebars slide in and out (a picture of them moves, the page is laid out once).
-* Anki's deck list and deck overview fade in instead of popping up.
 * Compact deck list: when a sidebar leaves Anki's main area narrow (e.g. the
   split view), the dashboard switches to its compact form and the big widgets
   (statistics, heatmap, deadline bar) step aside so the deck list fits.
@@ -63,12 +63,17 @@ class _Kinetic(QObject):
 
     @staticmethod
     def _in_web_view(obj) -> bool:
+        """Only pages of the Smart Study browser – Anki's own pages scroll as usual."""
         if QWebEngineView is None or isinstance(obj, QWebEngineView):
             return False
+        try:
+            from aqt.webview import AnkiWebView
+        except Exception:
+            AnkiWebView = ()  # type: ignore
         parent = obj.parent() if hasattr(obj, "parent") else None
         while parent is not None:
             if isinstance(parent, QWebEngineView):
-                return True
+                return not isinstance(parent, AnkiWebView)
             parent = parent.parent()
         return False
 
@@ -248,18 +253,35 @@ class _DockSlide(QObject):
             if tracker is not None:  # settle at its remembered width first
                 tracker.timer.stop()
                 tracker.restore()
-            width = dock.width()
-            if width < 120:
+            if dock.width() < 120:
                 return
             picture = self.pictures.get(id(dock))
-            if picture is None or picture.size() != dock.size():
-                picture = dock.grab()
         except RuntimeError:
             return
-        frame, label = self._overlay(dock, picture, fill=True)
+        # Cover the sidebar's place right away; Anki and the page lay
+        # themselves out underneath, then the picture starts to move.
+        from aqt.qt import QPixmap
+        frame, label = self._overlay(dock, picture if picture is not None else QPixmap(), fill=True)
+        width = dock.width()
         start = width if side > 0 else -width
         label.move(start, 0)
-        self._move(frame, label, start, 0, self.MS_IN, QEasingCurve.Type.OutCubic)
+
+        def go():
+            try:
+                geo = dock.geometry()
+                frame.setGeometry(geo)
+                pic = picture
+                if pic is None or pic.size() != geo.size():
+                    pic = dock.grab()
+                label.setPixmap(pic)
+                label.resize(geo.size())
+                begin = geo.width() if side > 0 else -geo.width()
+                label.move(begin, 0)
+                frame.raise_()
+                self._move(frame, label, begin, 0, self.MS_IN, QEasingCurve.Type.OutCubic)
+            except RuntimeError:
+                frame.deleteLater()
+        QTimer.singleShot(45, go)
 
     def _slide_out(self, dock) -> None:
         try:
@@ -309,10 +331,6 @@ def crossfade(stack, old) -> None:
 
 
 # ── Anki pages: fade in, smooth wheel, compact deck list ──────────────────
-
-_FADE = ("<style id='ss-fade'>@keyframes ssFadeIn{from{opacity:0;transform:translateY(6px)}"
-         "to{opacity:1;transform:none}}body{animation:ssFadeIn .18s ease-out both}"
-         "@media (prefers-reduced-motion: reduce){body{animation:none}}</style>")
 
 COMPACT_CSS = """<style id="ss-compact">
 /* Narrow main area (browser beside Anki): the deck list fits the width. */
@@ -371,8 +389,6 @@ def _on_content(web_content, context) -> None:
         from aqt.overview import Overview
     except Exception:
         return
-    if isinstance(context, (DeckBrowser, Overview)):
-        web_content.head += _FADE
     if isinstance(context, DeckBrowser):
         web_content.head += COMPACT_CSS  # takes effect only while narrow
     if type(context).__name__ in ("Toolbar", "TopToolbar"):
@@ -412,11 +428,6 @@ def _setup_main_web() -> None:
     web = getattr(mw, "web", None)
     if web is None:
         return
-    try:
-        from PyQt6.QtWebEngineCore import QWebEngineSettings
-        web.settings().setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
-    except Exception:
-        pass
     if _watcher is None:
         _watcher = _MainAreaWatcher()
         web.installEventFilter(_watcher)

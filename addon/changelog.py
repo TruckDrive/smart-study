@@ -10,7 +10,7 @@ CHANGELOG = [
         "version": "2.8.2",
         "date": "November 5, 2026",
         "items": [
-            {"tag": "New", "text": "Smooth scrolling: pages keep gliding after a quick touchpad swipe – in the browser and in Anki."},
+            {"tag": "New", "text": "Smooth scrolling: pages in the browser keep gliding after a quick touchpad swipe."},
             {"tag": "New", "text": "Sidebars slide in from the side, browser tabs cross-fade."},
             {"tag": "Fix", "text": "YouTube's “Allow YouTube ads?” message no longer blocks videos while the ad blocker is on."},
             {"tag": "New", "text": "With the browser beside Anki, the deck list switches to a compact form that fits without scrolling."},
