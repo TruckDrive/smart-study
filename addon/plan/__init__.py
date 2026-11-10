@@ -14,7 +14,7 @@ from aqt.qt import QAction, QApplication, QDesktopServices, QDialog, QFileDialog
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
-from . import ankidata, planner, share, store
+from . import ankidata, files, planner, share, store
 from .planner import tr
 from ..constants import ADDON_VERSION as VERSION
 from ..locales import _current_lang
@@ -59,6 +59,7 @@ def view(pid):
         phase = "setup"
     out = {"plan": plan, "ev": ev, "stats": {k: st[k] for k in ("today", "due", "decks")},
            "progress": [done, tot], "overdue": planner.overdue(plan, ev, t), "phase": phase}
+    out["files"] = {s["id"]: files.known(plan, s) for s in plan.get("sources", []) if s.get("type") == "pages"}
     if plan.get("sim", {}).get("started"):
         out["simResult"] = ankidata.sim_result(mw.col, plan, plan["sim"])
     return out
@@ -85,6 +86,25 @@ def open_pdf(path, page):
             return {"ok": True, "page": page}
     QDesktopServices.openUrl(QUrl.fromLocalFile(path))
     return {"ok": True, "page": page, "noPage": True}
+
+
+def ask_for_pdf(plan, src):
+    """The PDF is not on this device where it was, and the search found nothing:
+    ask where it is, remember the answer here and keep it for the other devices."""
+    name = src.get("fileName") or files.base_name(src.get("file")) or src.get("name") or "PDF"
+    start = os.path.dirname(os.path.expanduser(src.get("file") or ""))
+    if not os.path.isdir(start):
+        start = os.path.expanduser("~")
+    path, _ = QFileDialog.getOpenFileName(
+        _win, tr(f"Wo hast du „{name}“ gespeichert?", f"Where did you save “{name}”?", f"«{name}» را کجا ذخیره کرده‌اید؟"),
+        start, tr("PDF (*.pdf);;Alle Dateien (*)", "PDF (*.pdf);;All files (*)", "PDF (*.pdf);;همهٔ فایل‌ها (*)"))
+    if not path:
+        return ""
+    files.remember(plan["id"], src["id"], path)
+    src["file"] = path
+    files.describe(src, path)
+    store.save(plan)
+    return path
 
 
 def home():
@@ -170,6 +190,7 @@ def handle(cmd, a):
         for k in SETUP_KEYS:
             if k in a["plan"]:
                 plan[k] = a["plan"][k]
+        files.update_sources(plan)
         store.save(plan)
         return True
     if cmd == "generate":
@@ -276,7 +297,12 @@ def handle(cmd, a):
         plan = store.load(a["id"])
         it = next(i for _, i in planner.all_items(plan) if i["id"] == a["item"])
         src = next(s for s in plan["sources"] if s["id"] == it["source"])
-        return open_pdf(src.get("file", ""), int(it["pages"][0]) + int(src.get("pageOffset") or 0))
+        path = files.resolve(plan, src)
+        if not path:
+            path = ask_for_pdf(plan, src)
+            if not path:
+                return {"ok": False, "cancelled": True}
+        return open_pdf(path, int(it["pages"][0]) + int(src.get("pageOffset") or 0))
     if cmd == "pickFile":
         path, _ = QFileDialog.getOpenFileName(_win, tr("Datei wählen", "Choose file", "انتخاب فایل"), os.path.expanduser("~"),
                                               tr("PDF (*.pdf);;Alle Dateien (*)", "PDF (*.pdf);;All files (*)", "PDF (*.pdf);;همهٔ فایل‌ها (*)"))

@@ -107,6 +107,7 @@ async function go(view, pid) {
   if (view === "edit") {
     const d = await run(call("open", { id: S.pid }));
     S.edit = clone(d.plan); S.cands = {}; S.sugg = {};
+    for (const s of S.edit.sources) if (s.type === "pages" && d.files && d.files[s.id]) s.file = d.files[s.id];  // the path on this device
     for (const s of S.edit.sources) if (s.type === "anki" && !s.decks) { s.decks = s.deck ? [s.deck] : []; delete s.deck; }
     await loadCands();
   }
@@ -328,7 +329,7 @@ function itemEl(it, day) {
     if (r && r.ok === false) toast(L("Keine passenden Karten (mehr) gefunden.", "No matching cards (left).", "کارت مناسبی (دیگر) پیدا نشد."));
   });
   const psrc = it.kind === "pages" && plan.sources.find(s => s.id === it.source);
-  if (psrc && psrc.file) act(L("📖 öffnen", "📖 open", "📖 باز کردن"), async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
+  if (psrc && (psrc.file || psrc.fileName)) act(L("📖 öffnen", "📖 open", "📖 باز کردن"), async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r && r.cancelled) return; if (r && r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
   if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url, id: plan.id, item: it.id }); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
   const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.8.3 – 2026-11-10
+
+- **Study plan finds moved PDFs**: if a PDF of the plan is no longer where it was (moved into another folder, renamed folder …), *open* looks for it by its file name – first next to the plan's other PDFs, then in your home folder – and opens it at the right page. If it can't be found, a window asks where you saved it
+- **PDFs on every device**: each computer remembers its own paths to the plan's PDFs (in the add-on's `user_files`, not synced). The synced plan only carries the file's name and size, so on a second computer the same plan finds its copy of the PDF by itself, or asks once
+
 ## 2.8.2 – 2026-11-05
 
 - **Smooth scrolling**: after a quick swipe on the touchpad, pages of the Smart Study browser keep gliding and slow down (like in Firefox or on a phone); Anki's own pages keep Anki's normal scrolling. Switch: *Settings → Browser → Smooth scrolling*

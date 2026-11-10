@@ -7,6 +7,14 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.8.3",
+        "date": "November 10, 2026",
+        "items": [
+            {"tag": "New", "text": "Study plan: if a PDF is no longer where it was, Smart Study looks for it by name and otherwise asks where you saved it."},
+            {"tag": "New", "text": "Every device remembers where its PDFs are, so a synced plan opens the right files on each computer."},
+        ],
+    },
+    {
         "version": "2.8.2",
         "date": "November 5, 2026",
         "items": [

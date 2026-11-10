@@ -21,6 +21,8 @@ except ImportError:  # outside Anki
 
 
 DE: Dict[str, str] = {
+    "Study plan: if a PDF is no longer where it was, Smart Study looks for it by name and otherwise asks where you saved it.": "Lernplan: Liegt eine PDF nicht mehr dort, wo sie war, sucht Smart Study sie nach dem Namen und fragt sonst, wo du sie gespeichert hast.",
+    "Every device remembers where its PDFs are, so a synced plan opens the right files on each computer.": "Jedes Gerät merkt sich, wo seine PDFs liegen – ein synchronisierter Plan öffnet auf jedem Computer die richtigen Dateien.",
     "Settings → Browser: “Open study-plan videos and PDFs in your default browser” (on by default). Off: they open in a Smart Study browser tab.": "Einstellungen → Browser: „Lernplan-Videos und -PDFs im Standardbrowser öffnen“ (standardmäßig an). Aus: Sie öffnen sich in einem Tab des Smart-Study-Browsers.",
     "Share study plans with friends: “Share” copies a code for WhatsApp & co., saves the plan as a file or copies a readable overview. Your progress and file paths stay private.": "Lernpläne mit Freunden teilen: „Teilen“ kopiert einen Code für WhatsApp & Co., speichert den Plan als Datei oder kopiert eine lesbare Übersicht. Dein Fortschritt und deine Dateipfade bleiben privat.",
     "“Import” on the study plan start page takes over a plan from a code or file.": "„Importieren“ auf der Lernplan-Startseite übernimmt einen Plan aus einem Code oder einer Datei.",
@@ -140,6 +142,8 @@ DE: Dict[str, str] = {
 
 
 FA: Dict[str, str] = {
+    "Study plan: if a PDF is no longer where it was, Smart Study looks for it by name and otherwise asks where you saved it.": "برنامهٔ مطالعه: اگر یک PDF دیگر جای قبلی‌اش نباشد، Smart Study آن را با نامش جستجو می‌کند و در غیر این صورت می‌پرسد کجا ذخیره‌اش کرده‌اید.",
+    "Every device remembers where its PDFs are, so a synced plan opens the right files on each computer.": "هر دستگاه به خاطر می‌سپارد PDFهایش کجا هستند، بنابراین برنامهٔ همگام‌شده روی هر رایانه فایل‌های درست را باز می‌کند.",
     "Settings → Browser: “Open study-plan videos and PDFs in your default browser” (on by default). Off: they open in a Smart Study browser tab.": "تنظیمات ← مرورگر: «باز کردن ویدیوها و PDFهای برنامهٔ مطالعه در مرورگر پیش‌فرض» (به‌طور پیش‌فرض روشن). خاموش: در زبانه‌ای از مرورگر Smart Study باز می‌شوند.",
     "Share study plans with friends: “Share” copies a code for WhatsApp & co., saves the plan as a file or copies a readable overview. Your progress and file paths stay private.": "اشتراک برنامهٔ مطالعه با دوستان: «اشتراک‌گذاری» یک کد برای واتس‌اپ و غیره کپی می‌کند، برنامه را به‌صورت فایل ذخیره می‌کند یا خلاصه‌ای خوانا کپی می‌کند. پیشرفت و مسیر فایل‌های شما خصوصی می‌ماند.",
     "“Import” on the study plan start page takes over a plan from a code or file.": "«وارد کردن» در صفحهٔ اصلی برنامهٔ مطالعه، برنامه‌ای را از یک کد یا فایل وارد می‌کند.",
