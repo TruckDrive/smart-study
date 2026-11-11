@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .constants import is_night as _is_night
 import os, sys, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
@@ -780,7 +781,7 @@ def _sync_webview_bg_colors():
         from aqt.qt import QColor
         night = False
         try:
-            night = bool(mw.pm.night_mode())
+            night = bool(_is_night())
         except Exception:
             pass
         theme_qc = QColor(_get_theme_bg_hex(night))

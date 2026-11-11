@@ -2286,5 +2286,7 @@
  "Delete all passwords saved by the Smart Study browser?": "همهٔ رمزهایی که مرورگر Smart Study ذخیره کرده حذف شوند؟",
  "Smooth scrolling": "پیمایش نرم",
  "After a quick swipe on the touchpad, pages in the browser keep gliding and slow down.": "پس از کشیدن سریع روی تاچ‌پد، صفحه‌های مرورگر کمی ادامه می‌لغزند و آرام می‌ایستند.",
- "Split view": "نمای دوتکه"
+ "Split view": "نمای دوتکه",
+ "Stop loading": "توقف بارگیری",
+ "Open in new tab": "باز کردن در زبانهٔ جدید"
 }

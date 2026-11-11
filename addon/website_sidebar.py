@@ -17,6 +17,7 @@ from . import browser_search
 from .browser_adblock import AdBlocker, FilteringPage, install_youtube_pruner
 from . import browser_features, web_sleep
 from . import browser_layout, browser_passwords
+from . import browser_chrome
 
 try:
     from .locales import _
@@ -32,7 +33,7 @@ try:
                         QMenu, QAction, QIcon, QPixmap, QPainter, QUrl, QTimer,
                         QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject,
                         QTabBar, QStackedWidget, QShortcut, QKeySequence,
-                        QLineEdit, QFileDialog, QStandardPaths)
+                        QLineEdit, QFileDialog, QStandardPaths, QApplication)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
     from PyQt6 import sip
@@ -50,6 +51,7 @@ except ImportError as e:
     QAction = object; WebAction = object; QMenu = object
     QTabBar = QStackedWidget = QShortcut = QKeySequence = object
     QLineEdit = QFileDialog = QStandardPaths = object
+    QApplication = object
 
 # QtSvg is optional – used only to render crisp toolbar icons. A failure here
 # must never break the rest of the module, so it gets its own guarded import.
@@ -77,116 +79,30 @@ except ImportError:
 # Moderner Look: Kein Rahmen, leichter Schlagschatten (via border-bottom) und Klick-Animation
 
 def _toolbar_palette() -> dict:
-    """Clean grey toolbar palette matching the Notebook nav bar (theme-aware)."""
-    night = False
-    try:
-        night = bool(mw and hasattr(mw, 'pm') and mw.pm.night_mode())
-    except Exception:
-        night = False
-    if night:
-        return {
-            "bar": "#252525", "line": "rgba(255,255,255,0.12)",
-            "text": "#ffffff", "hover": "#414141", "pressed": "#505050",
-            "muted": "#7e7e7e", "select_bg": "#414141",
-        }
-    return {
-        "bar": "#f2f2f2", "line": "rgba(0,0,0,0.10)",
-        "text": "#37352f", "hover": "#e6e6e6", "pressed": "#dcdcdc",
-        "muted": "#b3b3b3", "select_bg": "#ffffff",
-    }
+    """Colours of the browser's bars (theme-aware)."""
+    return browser_chrome.palette()
 
 
 def _get_blue_button_style() -> str:
-    """Minimal text button (transparent on the grey bar, subtle hover)."""
-    c = _toolbar_palette()
-    return f"""
-QPushButton {{
-    background-color: transparent;
-    color: {c['text']};
-    border: none;
-    border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 13px;
-}}
-QPushButton:hover {{ background-color: {c['hover']}; }}
-QPushButton:pressed {{ background-color: {c['pressed']}; }}
-"""
+    return browser_chrome.chip()
 
 
 def _get_icon_button_style() -> str:
-    """Minimal square-ish icon button for nav glyphs (← → ↻ ⧉ +)."""
-    c = _toolbar_palette()
-    return f"""
-QPushButton {{
-    background-color: transparent;
-    color: {c['text']};
-    border: none;
-    border-radius: 6px;
-    padding: 4px 9px;
-    font-size: 15px;
-}}
-QPushButton:hover {{ background-color: {c['hover']}; }}
-QPushButton:pressed {{ background-color: {c['pressed']}; }}
-QPushButton:disabled {{ color: {c['muted']}; }}
-"""
+    """Square icon button of the bars (back, forward, reload, new tab …)."""
+    return browser_chrome.icon_button()
 
 
 def _get_raised_text_button_style() -> str:
-    """Clean 'card' text button: white/elevated surface with a soft border.
-
-    Mirrors the Mindmap 'New' button so saved sites / Home clearly read as
-    clickable buttons while staying minimal."""
-    c = _toolbar_palette()
-    return f"""
-QPushButton {{
-    background-color: {c['select_bg']};
-    color: {c['text']};
-    border: 1px solid {c['line']};
-    border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 13px;
-    font-weight: 500;
-}}
-QPushButton:hover {{ background-color: {c['hover']}; }}
-QPushButton:pressed {{ background-color: {c['pressed']}; }}
-QPushButton:disabled {{ color: {c['muted']}; }}
-"""
+    """A saved site or Home in the favourites row."""
+    return browser_chrome.chip()
 
 
 def _get_raised_icon_button_style() -> str:
-    """Clean 'card' icon button (white/elevated) for the add (+) button."""
-    c = _toolbar_palette()
-    return f"""
-QPushButton {{
-    background-color: {c['select_bg']};
-    color: {c['text']};
-    border: 1px solid {c['line']};
-    border-radius: 6px;
-    padding: 4px 11px;
-    font-size: 15px;
-    font-weight: 600;
-}}
-QPushButton:hover {{ background-color: {c['hover']}; }}
-QPushButton:pressed {{ background-color: {c['pressed']}; }}
-QPushButton:disabled {{ color: {c['muted']}; }}
-"""
+    return browser_chrome.small_icon_button()
 
 
 def _get_delete_button_style() -> str:
-    """Clean 'card' icon button with a red hover, for the site delete (-) button."""
-    c = _toolbar_palette()
-    return f"""
-QPushButton {{
-    background-color: {c['select_bg']};
-    color: {c['text']};
-    border: 1px solid {c['line']};
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 15px;
-}}
-QPushButton:hover {{ background-color: {c['hover']}; color: #e5484d; border-color: #e5484d; }}
-QPushButton:pressed {{ background-color: {c['pressed']}; }}
-"""
+    return browser_chrome.small_icon_button()
 
 
 # Backwards-compatible alias (still referenced in a few places).
@@ -246,12 +162,17 @@ def _make_window_icon(size: int = 16, active: bool = False):
 
 
 def _apply_window_icon(btn, active: bool = False) -> None:
-    """Put the window-frame icon on ``btn`` (falls back to the ⧉ glyph).
+    """Put the layout icon on ``btn`` (falls back to the ⧉ glyph).
 
     ``active`` shows the "close window" variant while the embedded view is on.
     """
     if btn is None:
         return
+    try:
+        browser_chrome.set_icon(btn, "layout-close" if active else "layout")
+        return
+    except Exception:
+        pass
     icon = _make_window_icon(16, active=active)
     if icon is not None:
         try:
@@ -284,6 +205,7 @@ custom_button_containers: List[QWidget] = []
 tab_bar = None        # QTabBar
 tab_stack = None      # QStackedWidget with one QWebEngineView per tab
 search_help = None    # the "Google is having trouble" hint above the views
+load_bar = None       # browser_chrome.LoadBar under the bars
 pip_placeholder = None  # shown for a tab whose video plays in picture in picture
 browser_container = None  # the browser's content widget (for its shortcuts)
 MAX_TABS = 20
@@ -617,7 +539,16 @@ if QLineEdit is not object:
 
         def focusInEvent(self, event):
             super().focusInEvent(event)
+            full = getattr(self, "_ss_full", "")
+            if full and not self.isModified():
+                self.setText(full)  # the whole address to edit or copy
+                self.setModified(False)
             QTimer.singleShot(0, self.selectAll)
+
+        def focusOutEvent(self, event):
+            super().focusOutEvent(event)
+            if not self.isModified():
+                QTimer.singleShot(0, show_address)
 
         def keyPressEvent(self, event):
             if event.key() == Qt.Key.Key_Escape:
@@ -632,13 +563,7 @@ else:
 
 
 def _address_style() -> str:
-    c = _toolbar_palette()
-    return f"""
-    QLineEdit#smartstudyAddressBar {{ background: {c['select_bg']}; color: {c['text']};
-        border: 1px solid {c['line']}; border-radius: 6px; padding: 3px 8px; font-size: 12.5px;
-        selection-background-color: #4a90e2; selection-color: #ffffff; }}
-    QLineEdit#smartstudyAddressBar:focus {{ border: 1px solid #4a90e2; }}
-    """
+    return browser_chrome.address()
 
 
 def _display_url(url: str) -> str:
@@ -648,6 +573,22 @@ def _display_url(url: str) -> str:
     if _is_local_pdf(q):
         return q.toLocalFile()  # a path reads better than file:///…%20…
     return q.toDisplayString()
+
+
+def _short_url(url: str) -> str:
+    """How the address reads while it is not being edited: without https:// and www.,
+    a PDF on this computer by its file name. http:// stays visible (not encrypted)."""
+    full = _display_url(url)
+    if not full:
+        return ""
+    q = QUrl(url)
+    if _is_local_pdf(q):
+        return os.path.basename(q.toLocalFile())
+    if full.startswith("https://"):
+        full = full[8:]
+        if full.startswith("www."):
+            full = full[4:]
+    return full[:-1] if full.endswith("/") and full.count("/") == 1 else full
 
 
 def show_address(view=None) -> None:
@@ -662,7 +603,8 @@ def show_address(view=None) -> None:
     url = getattr(view, "_ss_pending", None) or view.url().toString()
     if not url or url == "about:blank":
         url = getattr(view, "_ss_requested", None) or ""
-    address_bar.setText(_display_url(url))
+    address_bar._ss_full = _display_url(url)
+    address_bar.setText(address_bar._ss_full if address_bar.hasFocus() else _short_url(url))
     address_bar.setCursorPosition(0)
     address_bar.setModified(False)
 
@@ -802,37 +744,64 @@ def _on_download_requested(download) -> None:
 
 
 def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
-    if QWidget is object or QHBoxLayout is object or QPushButton is object or QSizePolicy is object or not sidebar_webview or not _qt_available:
+    """A saved site in the favourites row. Click: open here; middle click or Ctrl+click:
+    new tab; right click: open in a new tab or remove."""
+    if QWidget is object or QPushButton is object or QSizePolicy is object or not _qt_available:
         return None
-    button_pair_widget = QWidget()
-    pair_layout = QHBoxLayout(button_pair_widget)
-    pair_layout.setContentsMargins(0, 0, 0, 0)
-    pair_layout.setSpacing(2)
-
     site_button = QPushButton(name)
+    site_button.setObjectName("smartstudySiteChip")
     site_button.setStyleSheet(_get_raised_text_button_style())
-    site_button.setToolTip(_("Open: {}").format(url))
+    site_button.setToolTip(url)
+    site_button.setCursor(Qt.CursorShape.PointingHandCursor)
     site_button.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+    site_button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
-    delete_button = QPushButton("-")
-    delete_button.setObjectName("DeleteButton")
-    delete_button.setStyleSheet(_get_delete_button_style())
-    delete_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-    delete_button.setToolTip(_("Remove '{}'").format(name))
+    def open_here(_checked=False):
+        mods = QApplication.keyboardModifiers() if QApplication is not object else Qt.KeyboardModifier.NoModifier
+        if mods & Qt.KeyboardModifier.ControlModifier or sidebar_webview is None:
+            new_tab(url)
+        else:
+            load_url_in_webview(sidebar_webview, url)
 
-    if qconnect:
-        qconnect(site_button.clicked, lambda _=False, u=url: load_url_in_webview(sidebar_webview, u))
-        delete_action = partial(delete_custom_site, index_to_delete=index)
-        qconnect(delete_button.clicked, delete_action)
-    else:
-        site_button.setEnabled(False)
-        delete_button.setEnabled(False)
+    def menu(pos):
+        m = QMenu(site_button)
+        m.addAction(_("Open in new tab"), lambda: new_tab(url))
+        m.addSeparator()
+        m.addAction(_("Remove '{}'").format(name), partial(delete_custom_site, index_to_delete=index))
+        m.exec(site_button.mapToGlobal(pos))
 
-    pair_layout.addWidget(site_button)
-    pair_layout.addWidget(delete_button)
-    return button_pair_widget
+    qconnect(site_button.clicked, open_here)
+    qconnect(site_button.customContextMenuRequested, menu)
+    site_button.installEventFilter(_middle_click)
+    site_button._ss_middle = lambda: new_tab(url, background=True)
+    return site_button
+
+
+class _MiddleClick(QObject if QObject is not object else object):
+    """Middle click on a favourite opens it in a background tab; on a tab it closes the tab."""
+
+    def eventFilter(self, obj, event):
+        try:
+            if event.type() == QEvent.Type.MouseButtonRelease and event.button() == Qt.MouseButton.MiddleButton:
+                if obj is tab_bar:
+                    index = tab_bar.tabAt(event.position().toPoint())
+                    if index >= 0:
+                        QTimer.singleShot(0, lambda: close_tab(index))
+                        return True
+                action = getattr(obj, "_ss_middle", None)
+                if action is not None:
+                    QTimer.singleShot(0, action)
+                    return True
+        except Exception as e:
+            print(f"WS Info: middle click: {e}")
+        return False
+
+
+_middle_click = _MiddleClick() if QObject is not object else None
+
 
 def rebuild_custom_buttons_ui():
+    """Favourites row: Home, the saved sites, then + (add). Always in this order."""
     global button_container_layout, custom_button_containers, add_button_widget
     if not button_container_layout or QHBoxLayout is object or QWidget is object or QPushButton is object or not _qt_available:
         return
@@ -843,11 +812,14 @@ def rebuild_custom_buttons_ui():
     custom_button_containers.clear()
 
     custom_sites = load_custom_sites()
+    first = 0
+    if home_button_widget is not None:
+        first = max(0, button_container_layout.indexOf(home_button_widget)) + 1
 
     for i, site_info in enumerate(custom_sites):
         pair_widget = create_button_pair(site_info['name'], site_info['url'], index=i)
         if pair_widget:
-            button_container_layout.addWidget(pair_widget)
+            button_container_layout.insertWidget(first + len(custom_button_containers), pair_widget)
             custom_button_containers.append(pair_widget)
 
     if add_button_widget:
@@ -959,19 +931,19 @@ def create_website_dock() -> Optional[QDockWidget]:
         _pal = _toolbar_palette()
         toolbar_widget = QWidget()
         toolbar_widget.setObjectName("smartstudyWebToolbar")
-        toolbar_widget.setStyleSheet(
-            f"#smartstudyWebToolbar {{ background-color: {_pal['bar']};"
-            f" border-bottom: 1px solid {_pal['line']}; }}"
-        )
+        toolbar_widget.setStyleSheet(browser_chrome.toolbar())
         toolbar_layout = QVBoxLayout(toolbar_widget)
-        toolbar_layout.setContentsMargins(8, 6, 8, 6); toolbar_layout.setSpacing(5)
+        toolbar_layout.setContentsMargins(6, 2, 6, 4); toolbar_layout.setSpacing(2)
 
-        button_container_layout = QHBoxLayout(); button_container_layout.setSpacing(3)
+        # Favourites: Home, saved sites, + (below the address row).
+        button_container_layout = QHBoxLayout(); button_container_layout.setSpacing(1)
+        button_container_layout.setContentsMargins(2, 0, 2, 0)
         toolbar_layout.addLayout(button_container_layout)
 
         add_button_widget = QPushButton("+")
         add_button_widget.setObjectName("AddButton")
         add_button_widget.setStyleSheet(_get_raised_icon_button_style())
+        browser_chrome.set_icon(add_button_widget, "plus", 13)
         add_button_widget.setToolTip(_("Add new website"))
         add_button_widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         if qconnect: qconnect(add_button_widget.clicked, open_add_site_dialog)
@@ -981,16 +953,18 @@ def create_website_dock() -> Optional[QDockWidget]:
         home_button_widget.setObjectName("HomeButton")
         home_button_widget.setStyleSheet(_get_raised_text_button_style())
         home_button_widget.setToolTip(_("Home (Smart Study Browser)"))
+        home_button_widget.setCursor(Qt.CursorShape.PointingHandCursor)
         home_button_widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
-        nav_button_layout = QHBoxLayout(); nav_button_layout.setSpacing(5)
+        nav_button_layout = QHBoxLayout(); nav_button_layout.setSpacing(1)
         _icon_style = _get_icon_button_style()
         back_button = QPushButton("←"); back_button.setToolTip(_("Go Back")); back_button.setEnabled(False)
         forward_button = QPushButton("→"); forward_button.setToolTip(_("Go Forward")); forward_button.setEnabled(False)
         refresh_button = QPushButton("↻"); refresh_button.setToolTip(_("Reload Page"))
         window_button = QPushButton("⧉"); window_button.setToolTip(_("Open in main window"))
-        for _btn in (back_button, forward_button, refresh_button, window_button):
+        for _btn, _name in ((back_button, "back"), (forward_button, "forward"), (refresh_button, "reload"), (window_button, "layout")):
             _btn.setStyleSheet(_icon_style)
+            browser_chrome.set_icon(_btn, _name)
         _apply_window_icon(window_button)
         nav_button_layout.addWidget(back_button); nav_button_layout.addWidget(forward_button)
         nav_button_layout.addWidget(refresh_button)
@@ -1000,21 +974,25 @@ def create_website_dock() -> Optional[QDockWidget]:
         address_bar.setPlaceholderText(_("Search or enter address"))
         address_bar.setAccessibleName(_("Address bar"))
         address_bar.setToolTip(_("Address bar") + " (Ctrl+L)")
-        address_bar.setClearButtonEnabled(True)
+        address_bar.setClearButtonEnabled(False)  # a click selects everything, typing replaces it
         address_bar.setMinimumWidth(60)
         address_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         address_bar.setStyleSheet(_address_style())
         qconnect(address_bar.returnPressed, _address_entered)
+        nav_button_layout.addSpacing(4)
         nav_button_layout.addWidget(address_bar, 1)
+        nav_button_layout.addSpacing(4)
         external_button = QPushButton("↗")
         external_button.setObjectName("smartstudyOpenBrowser")
         external_button.setStyleSheet(_icon_style)
+        browser_chrome.set_icon(external_button, "external")
         external_button.setToolTip(_("Open in browser"))
         external_button.setAccessibleName(_("Open in browser"))
         qconnect(external_button.clicked, open_current_in_browser)
         options_button = QPushButton("⚙")
         options_button.setObjectName("smartstudyBrowserOptions")
         options_button.setStyleSheet(_icon_style)
+        browser_chrome.set_icon(options_button, "options")
         options_button.setToolTip(_("Search engine and ad blocker"))
         options_button.setAccessibleName(_("Search engine and ad blocker"))
         options_menu = QMenu(options_button)
@@ -1023,8 +1001,11 @@ def create_website_dock() -> Optional[QDockWidget]:
         nav_button_layout.addWidget(options_button)
         nav_button_layout.addWidget(external_button)
         nav_button_layout.addWidget(window_button)
-        toolbar_layout.addLayout(nav_button_layout)
+        toolbar_layout.insertLayout(0, nav_button_layout)  # address row above the favourites
         main_layout.addWidget(toolbar_widget)
+        global load_bar
+        load_bar = browser_chrome.LoadBar(container_widget)
+        main_layout.addWidget(load_bar)
         if window_button:
             # One button for where the browser sits: sidebar, split, main window, own window.
             window_button.setToolTip(_("Browser layout"))
@@ -1071,32 +1052,39 @@ def create_website_dock() -> Optional[QDockWidget]:
         tab_row.setObjectName("smartstudyWebTabs")
         tab_row.setStyleSheet(_tab_row_style())
         tab_row_layout = QHBoxLayout(tab_row)
-        tab_row_layout.setContentsMargins(6, 4, 6, 0); tab_row_layout.setSpacing(2)
-        tab_bar = QTabBar()
+        tab_row_layout.setContentsMargins(6, 5, 6, 1); tab_row_layout.setSpacing(2)
+        tab_bar = browser_chrome.Tabs(tab_row)
+        tab_row.installEventFilter(tab_bar)
+        tab_bar.on_refit = _show_close_buttons
         tab_bar.setDocumentMode(True)
         tab_bar.setExpanding(False)
         tab_bar.setMovable(True)
-        tab_bar.setUsesScrollButtons(True)
+        # With many tabs they all get narrower (down to their icon), as in any browser.
         tab_bar.setElideMode(Qt.TextElideMode.ElideRight)
         tab_bar.setDrawBase(False)
-        tab_row_layout.addWidget(tab_bar, 1)
+        tab_bar.setIconSize(QSize(14, 14))
+        tab_bar.installEventFilter(_middle_click)
+        tab_row_layout.addWidget(tab_bar, 0)
         new_tab_button = QPushButton("+")
         new_tab_button.setObjectName("smartstudyNewTab")
         new_tab_button.setStyleSheet(_get_icon_button_style())
+        browser_chrome.set_icon(new_tab_button, "plus")
         new_tab_button.setToolTip(_("New tab") + " (Ctrl+T)")
         new_tab_button.setAccessibleName(_("New tab"))
         qconnect(new_tab_button.clicked, lambda: new_tab(_home_url()))
         tab_row_layout.addWidget(new_tab_button)
+        tab_row_layout.addStretch(1)  # the + sits right after the last tab
         groups_button = QPushButton("▤")
         groups_button.setObjectName("smartstudyTabGroups")
         groups_button.setStyleSheet(_get_icon_button_style())
+        browser_chrome.set_icon(groups_button, "groups")
         groups_button.setToolTip(_("Tab groups"))
         groups_button.setAccessibleName(_("Tab groups"))
         groups_menu = QMenu(groups_button)
         qconnect(groups_menu.aboutToShow, lambda: browser_features.fill_groups_menu(groups_menu))
         groups_button.setMenu(groups_menu)
         tab_row_layout.addWidget(groups_button)
-        main_layout.addWidget(tab_row)
+        main_layout.insertWidget(0, tab_row)  # tabs on top, like in any browser
         main_layout.addWidget(fallback)
         tab_stack = QStackedWidget()
         tab_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -1125,10 +1113,10 @@ def create_website_dock() -> Optional[QDockWidget]:
         else:
              home_button_widget.setEnabled(False)
 
-        rebuild_custom_buttons_ui()
+        button_container_layout.addWidget(home_button_widget)
         button_container_layout.addWidget(add_button_widget)
-        button_container_layout.addWidget(home_button_widget) 
         button_container_layout.addStretch(1)
+        rebuild_custom_buttons_ui()
 
         # Navigation goes through the view and the button state is read from
         # the history after each URL change.  Connecting Python slots to the
@@ -1140,7 +1128,7 @@ def create_website_dock() -> Optional[QDockWidget]:
             qconnect(refresh_button.clicked, lambda: diagnostics.record('browser.reload'))
             qconnect(back_button.clicked, lambda: sidebar_webview and sidebar_webview.back())
             qconnect(forward_button.clicked, lambda: sidebar_webview and sidebar_webview.forward())
-            qconnect(refresh_button.clicked, lambda: sidebar_webview and sidebar_webview.reload())
+            qconnect(refresh_button.clicked, _reload_or_stop)
 
         sidebar_dock.setWidget(container_widget)
         sidebar_dock.setVisible(False)
@@ -1163,18 +1151,7 @@ def create_website_dock() -> Optional[QDockWidget]:
 
 # --- Tabs ---
 def _tab_row_style() -> str:
-    c = _toolbar_palette()
-    return f"""
-    #smartstudyWebTabs {{ background-color: {c['bar']}; border-bottom: 1px solid {c['line']}; }}
-    #smartstudyWebTabs QTabBar {{ background: transparent; }}
-    #smartstudyWebTabs QTabBar::tab {{ background: transparent; color: {c['text']}; border: none;
-        border-radius: 6px 6px 0 0; padding: 5px 8px; margin-right: 2px; max-width: 170px; min-width: 40px; }}
-    #smartstudyWebTabs QTabBar::tab:selected {{ background: {c['select_bg']}; }}
-    #smartstudyWebTabs QTabBar::tab:hover:!selected {{ background: {c['hover']}; }}
-    #smartstudyWebTabs QPushButton#smartstudyCloseTab {{ background: transparent; color: {c['muted']};
-        border: none; border-radius: 9px; padding: 0; font-size: 14px; }}
-    #smartstudyWebTabs QPushButton#smartstudyCloseTab:hover {{ background: {c['hover']}; color: {c['text']}; }}
-    """
+    return browser_chrome.tab_row()
 
 
 if FilteringPage is not None:
@@ -1261,6 +1238,10 @@ def _make_tab_view():
             if current == view.url().toString() and current != view._smartstudy_dismissed_url:
                 search_help.setVisible(needs_search_help(current, ok, bool(blocked)))
         view.page().runJavaScript("Boolean(document.querySelector('form[action*=\"/sorry/\"], #captcha-form, .g-recaptcha, iframe[src*=\"recaptcha/api2/anchor\"]'))", inspected)
+    view._ss_loading, view._ss_progress = False, 0
+    qconnect(view.loadStarted, lambda: _on_load(view, True, 0))
+    qconnect(view.loadProgress, lambda pct: _on_load(view, pct < 100 and view._ss_loading, pct))
+    qconnect(view.loadFinished, lambda *_a: _on_load(view, False, 100))
     qconnect(view.urlChanged, offer_fallback)
     qconnect(view.loadFinished, inspect_loaded_page)
     qconnect(view.urlChanged, lambda *_a: _sync_nav_buttons(view))
@@ -1283,6 +1264,40 @@ def _make_tab_view():
     return view
 
 
+def _on_load(view, loading: bool, percent: int) -> None:
+    """Remembers how far a tab has loaded and shows it for the current one:
+    the line under the bars fills, and Reload turns into Stop meanwhile."""
+    try:
+        if sip.isdeleted(view):
+            return
+        view._ss_loading, view._ss_progress = bool(loading), int(percent)
+        if view is sidebar_webview:
+            _show_load_state(view)
+    except Exception as e:
+        print(f"WS Info: load state: {e}")
+
+
+def _show_load_state(view) -> None:
+    loading = bool(getattr(view, "_ss_loading", False))
+    if load_bar is not None and not sip.isdeleted(load_bar):
+        load_bar.set_progress(getattr(view, "_ss_progress", 0), loading)
+    if refresh_button is not None and not sip.isdeleted(refresh_button):
+        want = "stop" if loading else "reload"
+        if getattr(refresh_button, "_ss_icon_name", None) != want:
+            browser_chrome.set_icon(refresh_button, want)
+            refresh_button.setToolTip(_("Stop loading") if loading else _("Reload Page"))
+
+
+def _reload_or_stop() -> None:
+    view = sidebar_webview
+    if view is None:
+        return
+    if getattr(view, "_ss_loading", False):
+        view.stop()
+    else:
+        view.reload()
+
+
 def new_tab(url: Optional[str] = None, background: bool = False, pending: Optional[Dict] = None,
             at_end: bool = False):
     """Open a tab (url None: the page fills it, e.g. a link's new window).
@@ -1298,9 +1313,10 @@ def new_tab(url: Optional[str] = None, background: bool = False, pending: Option
     tab_bar.insertTab(index, (pending or {}).get("title") or _("New tab"))
     tab_bar.setTabData(index, view)
     view._ss_pending = (pending or {}).get("url")
+    _default_tab_icon(index, view._ss_pending or url or "")
     close = QPushButton("×")
     close.setObjectName("smartstudyCloseTab")
-    close.setFixedSize(18, 18)
+    close.setFixedSize(16, 16)
     close.setCursor(Qt.CursorShape.PointingHandCursor)
     close.setToolTip(_("Close tab"))
     close.setAccessibleName(_("Close tab"))
@@ -1357,11 +1373,16 @@ def all_tab_views() -> list:
 
 
 def _show_close_buttons() -> None:
-    """The last tab cannot be closed, so it shows no ×."""
-    for index in range(tab_bar.count()):
+    """The last tab cannot be closed, so it shows no ×. While the tabs are narrow only
+    the current one keeps its ×, so the others have room for their title
+    (a middle click closes any tab)."""
+    count = tab_bar.count()
+    roomy = tab_bar.roomy() if hasattr(tab_bar, "roomy") else count <= 4
+    fits = tab_bar.close_fits() if hasattr(tab_bar, "close_fits") else True  # icon-sized tabs: middle click or Ctrl+W
+    for index in range(count):
         button = tab_bar.tabButton(index, QTabBar.ButtonPosition.RightSide)
         if button is not None:
-            button.setVisible(tab_bar.count() > 1)
+            button.setVisible(count > 1 and (roomy or (fits and index == tab_bar.currentIndex())))
 
 
 def _step_tab(step: int) -> None:
@@ -1392,6 +1413,8 @@ def _on_tab_changed(index: int, load: bool = True) -> None:
     if search_help is not None:
         search_help.hide()
     _sync_nav_buttons(view)
+    _show_close_buttons()
+    _show_load_state(view)
     on_webview_url_changed(view.url())
     if address_bar is not None and not sip.isdeleted(address_bar):
         address_bar.setModified(False)
@@ -1542,6 +1565,18 @@ def _save_tabs() -> None:
     _save_website_state(state)
 
 
+def _default_tab_icon(index: int, url: str = "") -> None:
+    """A globe (or a sheet for PDFs) until the page brings its own icon, so a
+    narrow tab is never blank."""
+    try:
+        name = "file" if url.lower().split("#")[0].split("?")[0].endswith(".pdf") else "globe"
+        icon = browser_chrome.icon(name, 14)
+        if icon is not None:
+            tab_bar.setTabIcon(index, icon)
+    except Exception as e:
+        print(f"WS Info: tab icon: {e}")
+
+
 def _update_tab_label(view) -> None:
     if tab_bar is None or sip.isdeleted(view):
         return
@@ -1558,8 +1593,10 @@ def _update_tab_label(view) -> None:
         title = "⧉ " + title
     tab_bar.setTabText(index, title)
     tab_bar.setTabToolTip(index, title)
-    if view._ss_icon is not None:
+    if view._ss_icon is not None and not view._ss_icon.isNull():
         tab_bar.setTabIcon(index, view._ss_icon)
+    elif tab_bar.tabIcon(index).isNull() or _is_local_pdf(url):
+        _default_tab_icon(index, url.toString())
 
 
 def _sync_nav_buttons(view) -> None:
@@ -1789,7 +1826,7 @@ def _search_help_style():
 
 
 def refresh_website_theme() -> None:
-    """Re-apply theme-aware button styles after a colour-theme change."""
+    """Re-apply the bars' colours and icons after a colour-theme change."""
     icon_style = _get_icon_button_style()
     if search_help is not None:
         search_help.setStyleSheet(_search_help_style())
@@ -1803,30 +1840,32 @@ def refresh_website_theme() -> None:
             button = sidebar_dock.findChild(QPushButton, name)
             if button is not None:
                 button.setStyleSheet(icon_style)
+                browser_chrome.refresh_icon(button)
     if home_button_widget is not None:
         try: home_button_widget.setStyleSheet(_get_raised_text_button_style())
         except Exception: pass
     if add_button_widget is not None:
-        try: add_button_widget.setStyleSheet(_get_raised_icon_button_style())
+        try:
+            add_button_widget.setStyleSheet(_get_raised_icon_button_style())
+            browser_chrome.refresh_icon(add_button_widget)
         except Exception: pass
     for _btn in (back_button, forward_button, refresh_button, window_button):
         if _btn is not None:
-            try: _btn.setStyleSheet(icon_style)
+            try:
+                _btn.setStyleSheet(icon_style)
+                browser_chrome.refresh_icon(_btn)
             except Exception: pass
     if window_button is not None:
         # Keep the "close window" variant while the embedded view is active.
         try: _apply_window_icon(window_button, active=(website_window is not None))
         except Exception: pass
-    # Re-paint the grey bar itself.
     try:
         if mw is not None:
             bar = mw.findChild(QWidget, "smartstudyWebToolbar")
             if bar is not None:
-                pal = _toolbar_palette()
-                bar.setStyleSheet(
-                    f"#smartstudyWebToolbar {{ background-color: {pal['bar']};"
-                    f" border-bottom: 1px solid {pal['line']}; }}"
-                )
+                bar.setStyleSheet(browser_chrome.toolbar())
+        if load_bar is not None and not sip.isdeleted(load_bar):
+            load_bar.update()
     except Exception: pass
     # Rebuild custom site buttons so their styles refresh too.
     try: rebuild_custom_buttons_ui()
@@ -1840,6 +1879,8 @@ def cleanup_website_sidebar():
     global custom_button_containers
     global website_main_layout, website_window, window_button
     global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
+    global load_bar
+    load_bar = None
 
     diagnostics.record('browser.cleanup')
     try: browser_layout.cleanup()

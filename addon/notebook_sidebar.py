@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .constants import is_night as _is_night
 from . import workspace_preferences
 
 import base64
@@ -741,7 +742,7 @@ def _apply_night_mode(html: str) -> str:
     explicit ``window.__SMARTSTUDY_NIGHT__`` flag for JS-side checks.
     """
     try:
-        night = bool(mw and mw.pm.night_mode())
+        night = bool(mw and _is_night())
     except Exception:
         night = False
 

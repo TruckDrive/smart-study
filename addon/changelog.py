@@ -7,6 +7,17 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.1",
+        "date": "November 11, 2026",
+        "items": [
+            {"tag": "New", "text": "Browser, new look: tabs on top that share the width (no more scroll arrows), sharp icons, a wide rounded address field, a slim favourites row, and a line that shows the page loading."},
+            {"tag": "New", "text": "Browser: Reload becomes Stop while a page loads; a middle click closes a tab or opens a favourite in a background tab; right-click a favourite to remove it."},
+            {"tag": "Fix", "text": "Touchpad scrolling in the browser and in PDFs: after a swipe the page now keeps gliding at the speed of your fingers. Before, it glided several times too slowly, so a hard swipe over a PDF stopped after about one page."},
+            {"tag": "Fix", "text": "Study plan animations need far less processor time (measured: switching views 81 % → 24 % of one core)."},
+            {"tag": "Fix", "text": "A favourite added while the browser was open no longer lands at the far right of its row."},
+        ],
+    },
+    {
         "version": "2.9.0",
         "date": "November 11, 2026",
         "items": [

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import os
 from typing import Any, Optional, Dict
 
@@ -41,7 +42,7 @@ except ImportError as e:
 # --- Night Mode Detection ---
 is_night_mode = False
 try:
-    if mw.pm.night_mode():
+    if _is_night():
         is_night_mode = True
 except Exception:
     pass

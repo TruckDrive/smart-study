@@ -10,6 +10,7 @@ Exported:
     ThemeEditorDialog – QDialog subclass
 """
 
+from .constants import is_night as _is_night
 from typing import Dict, Optional
 
 # ── Anki / PyQt imports ──────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ except ImportError:
 # ── Night-mode detection ──────────────────────────────────────────────────────
 is_night_mode = False
 try:
-    if mw and mw.pm.night_mode():
+    if mw and _is_night():
         is_night_mode = True
 except Exception:
     pass

@@ -13,6 +13,7 @@ Public API (used by __init__.py):
     .refresh_style()                      – re-apply theme after settings change
 """
 
+from .constants import is_night as _is_night
 import json
 import os
 import traceback
@@ -65,7 +66,7 @@ _HTML_PATH = os.path.join(
 
 def _is_night() -> bool:
     try:
-        return bool(mw and hasattr(mw, "pm") and mw.pm.night_mode())
+        return bool(mw and hasattr(mw, "pm") and _is_night())
     except Exception:
         return False
 

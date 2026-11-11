@@ -1,4 +1,5 @@
 """Small profile-local tool visibility dialog, independent of general settings."""
+from .constants import is_night as _is_night
 import json
 from pathlib import Path
 from .workspace_assets import atomic_write
@@ -36,7 +37,7 @@ def show(parent, group):
     dialog.setWindowTitle(_('Workspace settings'))
     from aqt import mw
     from .theme import dialog_palette
-    if mw and mw.pm.night_mode():
+    if mw and _is_night():
         c = dialog_palette(True)
         dialog.setStyleSheet(f"""
             QDialog {{background:{c['bg']};color:{c['text']};}}
@@ -93,7 +94,7 @@ def save(group, values):
 def popup_script(group):
     from aqt import mw
     from .theme import dialog_palette
-    c = dialog_palette(bool(mw.pm.night_mode()))
+    c = dialog_palette(bool(_is_night()))
     payload = dict(group=group, values=enabled(group), labels={k: _(LABELS[k]) for k in GROUPS[group]},
                    title=_('Workspace settings'), description=_('Choose which tabs are visible. Hiding a tab does not delete its data.'),
                    save=_('Save'), cancel=_('Cancel'), close=_('Close'), colors=c)

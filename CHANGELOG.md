@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.9.1 – 2026-11-11
+
+- **Browser, new look**: the bars were rebuilt. Tabs are on top and share the width of their row – few tabs are wide enough for their title, many get narrower together down to their icon, and the row never pushes the sidebar wider (the scroll arrows only come back when even icon-sized tabs do not fit). Below them: back, forward, reload, a wide rounded address field, and options, *open in browser* and layout as sharp line icons without the little menu arrows. Saved sites sit in a slim favourites row (Home, your sites, +). A thin line under the bars fills while the page loads
+- **Address field**: while you read it shows the short address (`youtube.com/watch?v=…`, a PDF by its file name; `http://` stays visible because it is not encrypted); a click shows the whole address, selected, to edit or copy
+- **Stop**: while a page loads, Reload is a Stop button
+- **Middle click**: on a tab closes it; on a favourite opens it in a background tab (Ctrl+click: in a new tab). Right-click a favourite for *Open in new tab* and *Remove* – the separate “-” buttons are gone
+- **Tabs**: a tab without an icon of its own shows a globe (a sheet for PDFs), so a narrow tab is never blank. While tabs are narrow only the current one shows its ×
+- **Fix – touchpad glide in pages and PDFs**: after a swipe the page keeps gliding at the speed your fingers had. The glide was measured in one unit and sent in another (QtWebEngine scrolls by `angleDelta`, not by `pixelDelta`, on Linux and Windows), which made it several times too slow: a hard swipe over a PDF stopped after about one page. Measured in a test with the same swipe: 850 px of glide before, 2,550 px now, as the speed at release predicts. The glide also takes one step per screen frame instead of two
+- **Fix – study plan animations and CPU**: 2.9.0 animated things that make the browser lay out or repaint large areas for every frame (every card of a view on its own, row heights, bar widths, a full-window confetti canvas, a blurred dialog backdrop, counting numbers, view transitions). Now only opacity and transform are animated, a view fades in as one layer, bars scale instead of changing width, rows fade instead of changing height, confetti gets a small canvas. Measured in the test profile with a 38-day plan: switching views eight times 81 % → 24 % of one core (14 % with motion off), ticking eight items 70 % → about 40 % (21 % with motion off)
+- **Fix**: a favourite added while the browser was open landed at the far right of its row
+- **Fix**: Anki's deprecated night-mode call is now really replaced in all of the add-on's own files (2.9.0 claimed so but had missed 15 files, among them the browser, which printed the warning on every repaint of its bars)
+
 ## 2.9.0 – 2026-11-11
 
 The study plan page was rebuilt around one idea: nothing is redrawn that did not change.

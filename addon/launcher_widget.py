@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import os
 import traceback
 import webbrowser
@@ -96,7 +97,7 @@ class SidebarWidget(QWidget):
                 pal = self.palette()
                 bg_color_hex = getattr(constants, 'SIDEBAR_BG_COLOR_HEX', '#FFFFFF')
                 
-                if mw and hasattr(mw, 'pm') and mw.pm.night_mode():
+                if mw and hasattr(mw, 'pm') and _is_night():
                     bg_color_hex = "#2C2C2C"
                 
                 pal.setColor(QPalette.ColorRole.Window, QColor(bg_color_hex))
@@ -575,7 +576,7 @@ class SidebarWidget(QWidget):
             return
         try:
             from .theme import palette
-            night = mw.pm.night_mode() if mw and hasattr(mw, 'pm') else False
+            night = _is_night() if mw and hasattr(mw, 'pm') else False
             color = palette(night).get("blue_accent", "#0071D3")
             data = self._get_settings_svg_bytes(color)
             if data:
@@ -588,7 +589,7 @@ class SidebarWidget(QWidget):
 
         self.update_logo()
 
-        night = bool(mw and hasattr(mw, 'pm') and mw.pm.night_mode())
+        night = bool(mw and hasattr(mw, 'pm') and _is_night())
         try:
             from .theme import palette as _tp
             c = _tp(night)

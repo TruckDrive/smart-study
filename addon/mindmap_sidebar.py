@@ -1,4 +1,5 @@
 
+from .constants import is_night as _is_night
 import json
 import math
 import os
@@ -475,7 +476,7 @@ class MindmapPanel(QWidget):
             # those first-run contents use the selected add-on language.
             try:
                 boot_i18n = json.dumps(_build_mindmap_i18n(), ensure_ascii=False).replace("</", "<\\/")
-                boot_dark = bool(mw and mw.pm.night_mode())
+                boot_dark = bool(mw and _is_night())
                 boot_accent = None
                 boot_pressed = None
                 try:
@@ -515,7 +516,7 @@ class MindmapPanel(QWidget):
         # otherwise the view flashes white in dark mode while loading.
         try:
             from .theme import palette
-            dark = bool(mw and mw.pm.night_mode())
+            dark = bool(mw and _is_night())
             self.web_view.page().setBackgroundColor(
                 QColor("#2c2c2c") if dark else QColor("#f8f9fa"))
         except Exception:
@@ -867,7 +868,7 @@ class MindmapPanel(QWidget):
         try:
             import json
             strings = _build_mindmap_i18n()
-            dark = bool(mw and mw.pm.night_mode())
+            dark = bool(mw and _is_night())
             js = (
                 workspace_io.boot_script() + f"window.__SMARTSTUDY_MM_I18N__ = {json.dumps(strings, ensure_ascii=False)};"
                 f"document.documentElement.classList.toggle('dark', {json.dumps(dark)});"
@@ -888,7 +889,7 @@ class MindmapPanel(QWidget):
             return
         try:
             from .theme import palette
-            c = palette(bool(mw and mw.pm.night_mode()))
+            c = palette(bool(mw and _is_night()))
             accent = c.get("blue_accent") or c.get("blue")
             pressed = c.get("blue_pressed") or accent
             js = ""
@@ -1131,7 +1132,7 @@ def refresh_workspace_settings():
             script.setRunsOnSubFrames(False)
             script.setSourceCode(workspace_io.boot_script() +
                 'window.__SMARTSTUDY_MM_I18N__=' + json.dumps(_build_mindmap_i18n()) + ';' +
-                'window.__SMARTSTUDY_MM_DARK__=' + json.dumps(bool(mw.pm.night_mode())) + ';')
+                'window.__SMARTSTUDY_MM_DARK__=' + json.dumps(bool(_is_night())) + ';')
             scripts.insert(script)
             panel._page_ready = False
             panel._prepare_roadmap_boot()
@@ -1148,7 +1149,7 @@ def refresh_workspace_theme():
     panel = mindmap_dock.widget()
     if not panel or not panel.web_view:
         return
-    dark = json.dumps(bool(mw and mw.pm.night_mode()))
+    dark = json.dumps(bool(mw and _is_night()))
     panel.web_view.page().runJavaScript(
         'window.__SMARTSTUDY_MM_DARK__='+dark+';document.documentElement.classList.toggle("dark",'+dark+');')
     panel._inject_theme_accent()

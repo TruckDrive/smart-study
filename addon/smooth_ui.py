@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import math
+import sys
 import time
 from collections import deque
 from typing import Optional
@@ -44,12 +45,13 @@ class _Kinetic(QObject):
     MIN_SPEED = 0.25    # px/ms at release needed to start gliding
     STOP_SPEED = 0.02   # px/ms: glide ends below this
     MAX_SPEED = 14.0    # fast swipes may cross several PDF pages
+    PX_PER_ANGLE = 0.5 if sys.platform != "darwin" else 1.0  # page pixels per angleDelta unit
 
     def __init__(self):
         super().__init__()
         self.samples = deque(maxlen=12)  # (time ms, dx, dy)
         self.timer = QTimer(self)
-        self.timer.setInterval(8)
+        self.timer.setInterval(16)  # one step per screen frame; 8 ms doubled the work for nothing visible
         self.timer.timeout.connect(self._tick)
         self.target = None
         self.sending = False
@@ -93,10 +95,21 @@ class _Kinetic(QObject):
             self.samples.clear()
             return False
         if phase == Qt.ScrollPhase.ScrollUpdate:
-            delta = event.pixelDelta()
-            if delta.isNull():
-                return False
-            self.samples.append((time.monotonic() * 1000.0, delta.x(), delta.y()))
+            # Measured in what the page really scrolls. On Linux and Windows
+            # QtWebEngine ignores pixelDelta and scrolls angleDelta * 0.5 px
+            # (120 units = 3 lines of 20 px). Measuring pixelDelta but gliding
+            # with it as angleDelta made the glide several times slower than
+            # the fingers had just scrolled: a hard swipe over a PDF stopped
+            # after about one page.
+            angle = event.angleDelta()
+            if angle.isNull() or (sys.platform == "darwin" and not event.pixelDelta().isNull()):
+                delta = event.pixelDelta()
+                if delta.isNull():
+                    return False
+                dx, dy = float(delta.x()), float(delta.y())
+            else:
+                dx, dy = angle.x() * self.PX_PER_ANGLE, angle.y() * self.PX_PER_ANGLE
+            self.samples.append((time.monotonic() * 1000.0, dx, dy))
             return False
         if phase == Qt.ScrollPhase.ScrollEnd:
             if not _kinetic_on():
@@ -138,7 +151,8 @@ class _Kinetic(QObject):
                 return
         except Exception:
             pass
-        event = QWheelEvent(self.pos, self.gpos, QPoint(dx, dy), QPoint(dx, dy),
+        k = self.PX_PER_ANGLE  # dx, dy are page pixels; the page reads them from angleDelta
+        event = QWheelEvent(self.pos, self.gpos, QPoint(dx, dy), QPoint(round(dx / k), round(dy / k)),
                             Qt.MouseButton.NoButton, self.mods, phase, self.inverted)
         self.sending = True
         try:

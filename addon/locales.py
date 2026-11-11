@@ -414,6 +414,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "Non-music parts of music videos": {"de": "Nicht-Musik-Teile in Musikvideos"},
     "New tab": {"de": "Neuer Tab"},
     "Close tab": {"de": "Tab schließen"},
+    "Stop loading": {"de": "Laden abbrechen"},
+    "Open in new tab": {"de": "In neuem Tab öffnen"},
     "Up to {} tabs": {"de": "Höchstens {} Tabs"},
     "Address bar": {"de": "Adresszeile"},
     "Search or enter address": {"de": "Suchen oder Adresse eingeben"},

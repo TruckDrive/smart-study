@@ -21,6 +21,7 @@ closes the dialog with accept(), making the result available via
 get_result().
 """
 
+from .constants import is_night as _is_night
 import os
 import json
 
@@ -129,7 +130,7 @@ if _QT_AVAILABLE:
             html_path = os.path.join(addon_path, "onboarding", "onboarding.html")
             if os.path.exists(html_path):
                 try:
-                    dark = bool(parent and parent.pm and parent.pm.night_mode())
+                    dark = bool(parent and parent.pm and _is_night())
                     self._page.setBackgroundColor(
                         QColor("#2c2c2c") if dark else QColor("#ffffff"))
                 except Exception:
@@ -164,7 +165,7 @@ if _QT_AVAILABLE:
                 for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa")
             }
             try:
-                dark = bool(self.parent() and self.parent().pm and self.parent().pm.night_mode())
+                dark = bool(self.parent() and self.parent().pm and _is_night())
             except Exception:
                 dark = False
             payload = json.dumps(

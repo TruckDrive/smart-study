@@ -23,6 +23,7 @@ can use either):
         new = dlg.get_new_settings()
 """
 
+from .constants import is_night as _is_night
 import os
 import json
 import base64
@@ -646,7 +647,7 @@ if _QT_AVAILABLE:
         # -- payload helpers -------------------------------------------------
         def _is_night(self) -> bool:
             try:
-                return bool(mw and hasattr(mw, "pm") and mw.pm.night_mode())
+                return bool(mw and hasattr(mw, "pm") and _is_night())
             except Exception:
                 return False
 

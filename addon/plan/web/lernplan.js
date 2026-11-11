@@ -60,20 +60,6 @@ function animate(el, frames, opts) {
   if (!motion() || !el.animate) return null;
   try { return el.animate(frames, Object.assign({ duration: 220, easing: EASE }, opts)); } catch { return null; }
 }
-// Numbers count to their new value instead of jumping.
-function tween(node, from, to) {
-  const id = node._tw = (node._tw || 0) + 1, t0 = performance.now(), dur = 480;
-  if (!motion()) { node.data = String(to); return; }
-  const step = now => {
-    if (node._tw !== id) return;
-    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
-    node.data = String(Math.round(from + (to - from) * e));
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-  setTimeout(() => { if (node._tw === id) node.data = String(to); }, dur + 120);  // also when frames are paused
-}
-
 // ---------- Morph ----------
 // render() builds a fresh tree; morph() makes the page look like it while keeping
 // the existing elements. So a refresh changes only what really changed: nothing
@@ -83,7 +69,7 @@ const keyOf = n => n.nodeType === 1 && n.dataset ? n.dataset.key : undefined;
 const sameKind = (a, b) => a.nodeType === b.nodeType && a.nodeName === b.nodeName;
 let morphBudget = 0;  // how many rows may still animate in this pass (a hundred at once would stutter)
 function morphInto(root, fresh) {
-  morphBudget = 14;
+  morphBudget = 6;
   morphKids(root, fresh);
 }
 function morphKids(from, to) {
@@ -108,11 +94,7 @@ function morphKids(from, to) {
 }
 function morphNode(from, to) {
   if (from.nodeType !== 1) {
-    if (from.data !== to.data) {
-      const p = from.parentNode;
-      if (p && p.dataset && "num" in p.dataset && /^\d+$/.test(from.data) && /^\d+$/.test(to.data)) tween(from, +from.data, +to.data);
-      else { from._tw = 0; from.data = to.data; }
-    }
+    if (from.data !== to.data) from.data = to.data;
     return;
   }
   for (const a of [...from.attributes]) if (!to.hasAttribute(a.name)) from.removeAttribute(a.name);
@@ -124,25 +106,18 @@ function morphNode(from, to) {
   else if (tag === "SELECT") { if (from.value !== to.value) from.value = to.value; }
   else if ((tag === "INPUT" || tag === "TEXTAREA") && from._v !== to._v) { from.value = to.value; from._v = to._v; }  // only what render() changed; typed text stays
 }
+// Rows fade in and out with opacity and transform only. (Animating their height
+// looked nicer, but the browser then lays out the whole page for every frame.)
 const SLIDES = ".item, .day, .card, .row, .topic, .src, .ms-row, .plan-card";
 function enter(n) {
-  if (n.nodeType !== 1 || !motion()) return;
-  if (n.matches(SLIDES) && morphBudget-- > 0) {
-    const hgt = n.getBoundingClientRect().height, cs = getComputedStyle(n);
-    if (hgt) return animate(n, [
-      { height: "0px", opacity: 0, marginTop: "0px", marginBottom: "0px", paddingTop: "0px", paddingBottom: "0px", overflow: "hidden" },
-      { height: hgt + "px", opacity: 1, marginTop: cs.marginTop, marginBottom: cs.marginBottom, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, overflow: "hidden" }], { duration: 260 });
-  }
-  animate(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+  if (n.nodeType !== 1 || !motion() || !n.matches(SLIDES) || morphBudget-- <= 0) return;
+  animate(n, [{ opacity: 0, transform: "translateY(-6px)" }, { opacity: 1, transform: "none" }], { duration: 180 });
 }
 function leave(n) {
   if (n.nodeType !== 1 || !motion() || !n.matches(SLIDES) || morphBudget-- <= 0) return n.remove();
-  const hgt = n.getBoundingClientRect().height, cs = getComputedStyle(n);
   n._leaving = true;
   n.style.pointerEvents = "none";
-  const a = animate(n, [
-    { height: hgt + "px", opacity: 1, marginTop: cs.marginTop, marginBottom: cs.marginBottom, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, overflow: "hidden" },
-    { height: "0px", opacity: 0, marginTop: "0px", marginBottom: "0px", paddingTop: "0px", paddingBottom: "0px", overflow: "hidden" }], { duration: 220, fill: "forwards" });
+  const a = animate(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
   if (!a) return n.remove();
   a.onfinish = a.oncancel = () => n.remove();
 }
@@ -311,12 +286,7 @@ async function go(view, pid) {
   S.view = view; S.pending.clear(); S.dayDone.clear();
   transition(back, () => { render(false); window.scrollTo(0, 0); });
 }
-// Views slide over each other (forwards from the right, back from the left).
-function transition(back, fn) {
-  if (!motion() || !document.startViewTransition) return fn();
-  document.documentElement.dataset.nav = back ? "back" : "fwd";
-  try { document.startViewTransition(fn); } catch { fn(); }
-}
+function transition(back, fn) { fn(); }
 function apply(kind, data) {
   if (kind !== S.view || (kind === "plan" && data.plan.id !== S.pid)) return false;
   S.data = data;
@@ -398,7 +368,7 @@ function planCard(p) {
       h("small", null, left == null ? L("Entwurf", "draft", "پیش‌نویس") : left > 0 ? days(left) : left === 0 ? L("Prüfung", "exam", "امتحان") : L("vorbei", "over", "تمام‌شده"))),
     h("div", { class: "grow" }, h("h2", null, p.title),
       h("div", { class: "muted small" }, p.exam ? `${L("Prüfung", "Exam", "امتحان")} ${fmt(p.exam)}${COMMA()}${dmy(p.exam)} · ${dn}/${tot} ${L("erledigt", "done", "انجام‌شده")}` : L("Entwurf – Prüfungsdatum fehlt noch", "Draft – exam date still missing", "پیش‌نویس – تاریخ امتحان هنوز وارد نشده است")),
-      h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `width:${tot ? 100 * dn / tot : 0}%` }))),
+      h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `--f:${tot ? (dn / tot).toFixed(4) : 0}` }))),
     td ? h("div", { class: "today-chip" + (td[0] === td[1] ? " done" : ""), title: L("Heutige Punkte", "Today's items", "موارد امروز") }, ring(td[0] / td[1], 30),
       h("small", null, td[0] === td[1] ? L("heute fertig", "done today", "امروز تمام") : `${td[0]}/${td[1]} ${L("heute", "today", "امروز")}`)) : null,
     h("span", { class: "chev", "aria-hidden": "true" }, "›"));
@@ -442,7 +412,7 @@ async function newPlan(from) {
 
 function tile(k, v, frac, sub) {
   const t = h("div", { class: "tile" }, h("div", { class: "k" }, k), h("div", { class: "v" }, h("span", { "data-num": "" }, v), sub ? h("small", null, " " + sub) : null));
-  if (frac != null) t.append(h("div", { class: "pbar" + (frac >= 1 ? " ok" : "") }, h("i", { style: `width:${Math.min(100, 100 * frac)}%` })));
+  if (frac != null) t.append(h("div", { class: "pbar" + (frac >= 1 ? " ok" : "") }, h("i", { style: `--f:${Math.max(0, Math.min(1, frac)).toFixed(4)}` })));
   return t;
 }
 
@@ -743,14 +713,14 @@ function mockPanel() {
   const card = h("div", { class: "card hl mock", key: "mock" });
   const end = m.started + m.minutes * 60e3, total = m.minutes * 60;
   const timer = h("div", { class: "timer", key: "timer", "data-morph": "keep" });
-  const bar = h("div", { class: "pbar", key: "timebar", "data-morph": "keep" }, h("i", { style: "width:100%" }));
+  const bar = h("div", { class: "pbar", key: "timebar", "data-morph": "keep" }, h("i", { style: "--f:1" }));
   // The clock is kept across renders; it looks its elements up in the page each second.
   const tick = () => {
     const live = document.querySelector(".mock .timer") || timer, liveBar = document.querySelector(".mock .pbar[data-key=timebar] i") || bar.firstChild;
     const s = Math.max(0, Math.round((end - Date.now()) / 1000));
     live.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
     live.classList.toggle("low", s <= 60);
-    liveBar.style.width = `${100 * s / total}%`;
+    liveBar.style.setProperty("--f", (s / total).toFixed(4));
     if (!s && S.mock === m && !m.timeUp) { m.timeUp = true; toast(L("Zeit abgelaufen – Auswertung.", "Time is up – evaluating.", "زمان تمام شد – ارزیابی."), 4000); mockStop(); }
   };
   tick(); clearInterval(S.simTimer); S.simTimer = setInterval(() => S.mock === m ? tick() : clearInterval(S.simTimer), 1000);
@@ -779,15 +749,21 @@ const PARTY = ["#2f7d4f", "#2f5d9e", "#e3a64a", "#b3372b", "#8db4ee", "#6cc18e"]
 function confetti(count, origin) {
   if (!motion()) return;
   const c = h("canvas", { class: "confetti" }); document.body.append(c);
-  const dpr = Math.min(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+  // A burst gets a small canvas around its origin: clearing the whole window 60 times a second is what costs.
+  const box = origin ? 320 : 0, W = origin ? box : innerWidth, H = origin ? box : innerHeight;
+  if (origin) {
+    c.style.cssText = `inset:auto;left:${Math.round(origin.x - box / 2)}px;top:${Math.round(origin.y - box / 2)}px;width:${box}px;height:${box}px`;
+    origin = { x: box / 2, y: box / 2 };
+  }
+  const dpr = 1;
   c.width = W * dpr; c.height = H * dpr;
   const x = c.getContext("2d"); x.scale(dpr, dpr);
   const ps = Array.from({ length: count }, () => {
-    const ang = origin ? -Math.PI / 2 + (Math.random() - .5) * 2.2 : Math.PI / 2 + (Math.random() - .5) * .6, v = origin ? 5 + Math.random() * 7 : 2 + Math.random() * 3;
+    const ang = origin ? -Math.PI / 2 + (Math.random() - .5) * 2.2 : Math.PI / 2 + (Math.random() - .5) * .6, v = origin ? 3 + Math.random() * 4 : 2 + Math.random() * 3;
     return { x: origin ? origin.x : Math.random() * W, y: origin ? origin.y : -20 - Math.random() * H / 2, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v,
       w: 5 + Math.random() * 5, hh: 3 + Math.random() * 5, rot: Math.random() * 6.3, vr: (Math.random() - .5) * .4, c: PARTY[Math.floor(Math.random() * PARTY.length)], ph: Math.random() * 6.3 };
   });
-  const t0 = performance.now(), life = origin ? 1500 : 3800;
+  const t0 = performance.now(), life = origin ? 900 : 2600;
   let last = t0;
   (function step(now) {
     const dt = Math.min(2.5, (now - last) / 16.7), age = now - t0; last = now;
@@ -806,13 +782,12 @@ function confetti(count, origin) {
 }
 function dayParty(el) {
   const r = (el.querySelector(".dprog") || el).getBoundingClientRect();
-  confetti(36, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
-  animate(el, [{ transform: "scale(1)" }, { transform: "scale(1.012)" }, { transform: "scale(1)" }], { duration: 420 });
+  confetti(22, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
 }
 function celebrate(pid) {
   if (store.get("party." + pid)) return;
   store.set("party." + pid, true);
-  confetti(160);
+  confetti(70);
   toast(L("Alles abgehakt – stark! 🎉", "Everything checked off – great job! 🎉", "همه تیک خورد – عالی بود! 🎉"), 3500);
 }
 

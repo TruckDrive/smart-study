@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """HTML configuration dialog for the dashboard statistics widget."""
 
+from .constants import is_night as _is_night
 import json
 import os
 from typing import Dict, Optional
@@ -63,7 +64,7 @@ class StatisticsSettingsDialog(QDialog):
         night = False
         try:
             from aqt import mw
-            night = bool(mw and mw.pm.night_mode())
+            night = bool(mw and _is_night())
         except Exception:
             pass
         try:
@@ -135,7 +136,7 @@ class StatisticsSettingsDialog(QDialog):
         night = False
         try:
             from aqt import mw
-            night = bool(mw and mw.pm.night_mode())
+            night = bool(mw and _is_night())
         except Exception:
             pass
         colors = palette(night)

@@ -11,7 +11,7 @@ html.night-mode {
 * { box-sizing: border-box; }
 :root { --ease: cubic-bezier(.2, .8, .2, 1); --fast: .14s; --mid: .28s; --shadow: 0 1px 2px rgb(0 0 0 / .05), 0 4px 14px rgb(0 0 0 / .05); }
 html.night-mode { --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .28); }
-html { scroll-behavior: smooth; scroll-padding-top: 14px; }
+html { scroll-padding-top: 14px; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 14.5px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
 #app { max-width: 900px; margin: 0 auto; padding: 22px 18px 80px; }
 h1 { font-size: 24px; margin: 0 0 2px; letter-spacing: -.01em; }
@@ -53,27 +53,27 @@ input[type=checkbox]:active:not(:disabled) { transform: scale(.82); }
 input[type=checkbox]:disabled { opacity: .45; cursor: default; }
 input[type=checkbox]:focus { box-shadow: 0 0 0 3px var(--ok-bg); }
 html.night-mode input[type=checkbox]:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.6 8.4l2.9 2.9 5.9-6.4' fill='none' stroke='%23171716' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
-  transition: border-color var(--mid), box-shadow var(--mid), background-color var(--mid), transform var(--mid) var(--ease); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
 .card.hl { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .card.warn { background: var(--warn-bg); border-color: var(--warn); }
 .card.warn h2 { color: var(--warn); }
 .card.okc { background: var(--ok-bg); border-color: var(--ok); }
 .card.okc h2 { color: var(--ok); }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0 18px; }
-.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 13px; transition: transform var(--mid) var(--ease), box-shadow var(--mid); }
-.tile:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 13px; }
 .tile .v { font-variant-numeric: tabular-nums; }
 .tile .k { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .tile .v { font-size: 22px; font-weight: 600; margin-top: 1px; }
 .tile .v small { font-size: 13px; font-weight: 400; color: var(--muted); }
 .pbar { height: 5px; background: var(--line); border-radius: 3px; margin-top: 7px; overflow: hidden; }
-.pbar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .6s var(--ease), background-color var(--mid); }
+/* The bar is always full width and scaled to its value: a transform needs no layout and no repaint */
+.pbar i { display: block; height: 100%; width: 100%; background: var(--accent); transform: scaleX(var(--f, 0)); transform-origin: 0 50%; transition: transform .2s var(--ease); }
+[dir="rtl"] .pbar i { transform-origin: 100% 50%; }
 .pbar.ok i { background: var(--ok); }
 .plans { display: grid; gap: 10px; }
 .plan-card { display: flex; gap: 14px; align-items: center; cursor: pointer; margin-bottom: 0; }
-.plan-card:hover, .plan-card:focus-visible { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-.plan-card:active { transform: scale(.992); }
+.plan-card { transition: transform var(--fast) var(--ease); }
+.plan-card:hover, .plan-card:focus-visible { border-color: var(--accent); transform: translateY(-1px); }
 .plan-card .chev { color: var(--muted); font-size: 22px; line-height: 1; transition: transform var(--mid) var(--ease), color var(--mid); }
 .plan-card:hover .chev { transform: translateX(4px); color: var(--accent); }
 [dir="rtl"] .plan-card .chev { scale: -1 1; }
@@ -85,16 +85,15 @@ html.night-mode input[type=checkbox]:checked { background-image: url("data:image
 .ring { flex: none; transform: rotate(-90deg); overflow: visible; }
 .ring circle { fill: none; stroke-width: 2.6; }
 .ring .bg { stroke: var(--line); }
-.ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .6s var(--ease), stroke var(--mid); }
+.ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .18s var(--ease); }
 .ring.full .fg { stroke: var(--ok); }
 .ring .tick { fill: none; stroke: var(--ok); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(90deg); transform-origin: 12px 12px;
-  stroke-dasharray: 14; animation: lp-draw .35s .25s var(--ease) both; }
+  stroke-dasharray: 14; animation: lp-draw .2s .1s var(--ease) both; }
 @keyframes lp-draw { from { stroke-dashoffset: 14; } to { stroke-dashoffset: 0; } }
 .plan-card .grow { flex: 1; min-width: 0; }
 .days-left { font-size: 22px; font-weight: 700; min-width: 64px; text-align: center; }
 .days-left small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
-.day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
-  transition: border-color var(--mid), box-shadow var(--mid), opacity var(--mid); }
+.day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; }
 .day[data-complete="1"]:not(.today) { border-color: color-mix(in srgb, var(--ok) 45%, var(--line)); }
 .day.past:hover { opacity: 1; }
 .day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -110,12 +109,12 @@ html.night-mode input[type=checkbox]:checked { background-image: url("data:image
 .row:first-of-type { margin-top: 8px; }
 .label { color: var(--muted); font-size: 12.5px; padding-top: 2px; overflow-wrap: anywhere; }
 .items { display: flex; flex-direction: column; gap: 3px; }
-.item { display: flex; gap: 8px; align-items: flex-start; border-radius: 6px; margin-inline: -6px; padding: 1px 6px; transition: background-color var(--fast); }
+.item { display: flex; gap: 8px; align-items: flex-start; border-radius: 6px; margin-inline: -6px; padding: 1px 6px; }
 .item:hover { background: var(--soft); }
 .item > input { margin-top: 3px; }
-.item .t { flex: 1; min-width: 0; overflow-wrap: anywhere; transition: color var(--mid); }
+.item .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 /* The line through a finished item is drawn from the start of the text to its end */
-.item .tx { background: linear-gradient(var(--muted), var(--muted)) no-repeat 0 58% / 0 1px; transition: background-size .38s var(--ease); }
+.item .tx { background: linear-gradient(var(--muted), var(--muted)) no-repeat 0 58% / 0 1px; transition: background-size .14s var(--ease); }
 [dir="rtl"] .item .tx { background-position: 100% 58%; }
 .item.checked .t, .item.moved .t { color: var(--muted); }
 .item.checked .tx, .item.moved .tx { background-size: 100% 1px; }
@@ -156,10 +155,9 @@ html.night-mode input[type=checkbox]:checked { background-image: url("data:image
 .tool p { margin: 2px 0 8px; font-size: 13px; color: var(--muted); }
 .weak-list { margin: 6px 0 0; padding-inline-start: 18px; }
 .heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); grid-auto-columns: 11px; gap: 3px; overflow-x: auto; padding-bottom: 4px; }
-.heat i { border-radius: 2px; background: var(--soft); transition: transform var(--fast) var(--ease), background-color var(--mid); }
-.heat i:hover { transform: scale(1.5); }
-#app.lp-in .heat i { animation: lp-pop .3s var(--ease) both; animation-delay: calc(var(--c, 0) * 12ms); }
-@keyframes lp-pop { from { opacity: 0; transform: scale(.3); } }
+.heat i { border-radius: 2px; background: var(--soft); }
+.heat i:hover { outline: 1px solid var(--fg); }
+
 .heat i.l1 { background: color-mix(in srgb, var(--ok) 30%, var(--soft)); }
 .heat i.l2 { background: color-mix(in srgb, var(--ok) 55%, var(--soft)); }
 .heat i.l3 { background: color-mix(in srgb, var(--ok) 80%, var(--soft)); }
@@ -174,7 +172,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
   box-shadow: 0 6px 24px rgb(0 0 0 / .25); pointer-events: auto; display: flex; gap: 12px; align-items: center; }
 .toast-act { background: transparent; border: 0; color: inherit; font-weight: 700; text-decoration: underline; padding: 0 2px; white-space: nowrap; }
 .toast-act:hover { opacity: .8; }
-.modal-bg { position: fixed; inset: 0; background: rgb(0 0 0 / .38); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 8; }
+.modal-bg { position: fixed; inset: 0; background: rgb(0 0 0 / .42); display: flex; align-items: center; justify-content: center; z-index: 8; }
 .modal { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; width: min(560px, 92vw); max-height: 86vh; overflow: auto;
   box-shadow: 0 18px 60px rgb(0 0 0 / .3); }
 .modal .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
@@ -198,31 +196,10 @@ html::before { content: ""; position: fixed; top: 0; inset-inline-start: 0; heig
   background: linear-gradient(90deg, transparent, var(--accent), transparent) 0 0 / 40% 100% no-repeat; transition: opacity .2s; }
 html.lp-busy::before { opacity: 1; animation: lp-busy 1s linear infinite; }
 @keyframes lp-busy { from { background-position: -40% 0; } to { background-position: 140% 0; } }
-/* A freshly drawn view: its blocks rise one after the other */
-#app.lp-in > * { animation: lp-rise .42s var(--ease) both; }
-#app.lp-in > :nth-child(1) { animation-delay: 0ms; } #app.lp-in > :nth-child(2) { animation-delay: 35ms; }
-#app.lp-in > :nth-child(3) { animation-delay: 70ms; } #app.lp-in > :nth-child(4) { animation-delay: 105ms; }
-#app.lp-in > :nth-child(5) { animation-delay: 140ms; } #app.lp-in > :nth-child(6) { animation-delay: 175ms; }
-#app.lp-in > :nth-child(7) { animation-delay: 210ms; } #app.lp-in > :nth-child(n+8) { animation-delay: 240ms; }
-#app.lp-in .plans > * { animation: lp-rise .42s var(--ease) both; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
-#app.lp-in .plans > :nth-child(2) { --i: 1; } #app.lp-in .plans > :nth-child(3) { --i: 2; } #app.lp-in .plans > :nth-child(4) { --i: 3; }
-#app.lp-in .plans > :nth-child(n+5) { --i: 4; }
-#app.lp-in .tile { animation: lp-rise .42s var(--ease) both; animation-delay: calc(60ms + var(--i, 0) * 40ms); }
-#app.lp-in .tile:nth-child(2) { --i: 1; } #app.lp-in .tile:nth-child(3) { --i: 2; } #app.lp-in .tile:nth-child(4) { --i: 3; }
-#app.lp-in .tile:nth-child(5) { --i: 4; } #app.lp-in .tile:nth-child(n+6) { --i: 5; }
-#app.lp-in .pbar i { animation: lp-grow .8s .15s var(--ease) both; transform-origin: 0 50%; }
-[dir="rtl"] #app.lp-in .pbar i { transform-origin: 100% 50%; }
-@keyframes lp-rise { from { opacity: 0; transform: translateY(10px); } }
-@keyframes lp-grow { from { transform: scaleX(0); } }
-/* Views slide over each other */
-::view-transition-old(root) { animation: lp-vt-out .14s ease-in both; }
-::view-transition-new(root) { animation: lp-vt-in .3s var(--ease) both; }
-html[data-nav="back"]::view-transition-old(root) { animation-name: lp-vt-out-back; }
-html[data-nav="back"]::view-transition-new(root) { animation-name: lp-vt-in-back; }
-@keyframes lp-vt-out { to { opacity: 0; transform: translateX(-16px); } }
-@keyframes lp-vt-in { from { opacity: 0; transform: translateX(24px); } }
-@keyframes lp-vt-out-back { to { opacity: 0; transform: translateX(16px); } }
-@keyframes lp-vt-in-back { from { opacity: 0; transform: translateX(-24px); } }
+/* A freshly drawn view fades in as one layer: only opacity and transform, which the
+   graphics card does alone. Animating every card on its own cost most of a CPU core. */
+#app.lp-in { animation: lp-rise .2s var(--ease) both; }
+@keyframes lp-rise { from { opacity: 0; transform: translateY(8px); } }
 /* Loading placeholder until the first data is there */
 .skel { border-radius: 10px; margin-bottom: 12px; background: linear-gradient(100deg, var(--soft) 30%, var(--line) 50%, var(--soft) 70%) 0 0 / 300% 100%; animation: lp-shimmer 1.3s linear infinite; }
 @keyframes lp-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
@@ -236,22 +213,17 @@ html[data-nav="back"]::view-transition-new(root) { animation-name: lp-vt-in-back
 .timer.low { color: var(--bad); animation: lp-pulse 1s ease-in-out infinite; }
 @keyframes lp-pulse { 50% { opacity: .55; } }
 .mock .pbar { margin: 4px 0 8px; }
-.mock .pbar i { transition: width 1s linear; }
+.mock .pbar i { transition: transform 1s linear; }
 .mock-q { font-size: 15.5px; margin: 12px 0 8px; }
 .mock-a { border-inline-start: 3px solid var(--ok); padding-inline-start: 10px; margin: 8px 0 10px; }
 details > summary { transition: color var(--fast); }
 details > summary:hover { color: var(--fg); }
-details[open] > summary ~ * { animation: lp-rise .3s var(--ease) both; }
 .deck-row { transition: background-color var(--fast); }
 .pill { transition: background-color var(--fast); }
-.topic, .src { transition: border-color var(--mid), box-shadow var(--mid); }
 .topic:focus-within, .src:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
-.cal .c { transition: opacity var(--mid), border-color var(--mid); }
-tr { transition: background-color var(--fast); }
 tr:hover td { background: var(--soft); }
 /* No motion where the system or Anki asks for calm */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
 }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }

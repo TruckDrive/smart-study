@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 from datetime import datetime, timedelta
 import time
 from aqt import mw
@@ -7,7 +8,7 @@ from aqt import mw
 # --- Night Mode Detection ---
 is_night_mode = False
 try:
-    if mw and mw.pm.night_mode():
+    if mw and _is_night():
         is_night_mode = True
 except Exception:
     pass
@@ -638,7 +639,7 @@ def show_statistics_info_dialog(parent=None, stats_days=7, chart_days=DEFAULT_CH
     dialog.setWindowTitle(_("Smart Study - Statistics"))
     dialog.resize(560, 640)
     dialog.setMinimumSize(320, 300)
-    night = bool(mw and mw.pm.night_mode())
+    night = bool(mw and _is_night())
     colors = _palette(night)
     dialog.setStyleSheet(f"""
         QDialog#smartstudyStatisticsInfo {{ background:{colors['bg']};color:{colors['text']}; }}
