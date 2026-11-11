@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.9.0 – 2026-11-11
+
+The study plan page was rebuilt around one idea: nothing is redrawn that did not change.
+
+- **Updates in place**: a refresh (after a card in Anki, a sync, a tick) changes only the parts of the page that differ. Nothing flickers, the scroll position stays, and the field you are typing in keeps its focus and text. Before, the whole page was rebuilt each time, which also threw away a half-typed custom item
+- **Animations**: views slide over each other (forwards from the right, back from the left), blocks of a new view rise one after the other, progress bars and rings glide to their value, numbers count up, the tick draws itself and the line through a finished item runs from its start to its end, added and removed rows slide in and out, dialogs and messages fade in and out. A day you complete yourself gets a small burst of confetti. All of it is off when the system or Anki (*Preferences → Reduce motion*) asks for calm
+- **Instant ticks**: a click on a box shows at once; Anki confirms in the background. If saving fails, the tick is taken back and a message says why
+- **Undo**: removing a custom item or a weak-spot item shows a message with *Undo* that puts it back where it was, including its tick
+- **Custom items**: *→ tomorrow* moves one to the next day; a duration at the end of the text (“… 45 min”, “… (1,5 h)”) is taken as its time. A year or a chapter number is not mistaken for a duration
+- **Today**: a *Today* button appears when today's card is out of sight (also key **t**); each day shows a progress ring and, today, the time still open; the overview shows today's items across all plans and per plan
+- **Mock exam**: Space or Enter shows the answer, **1**/→ marks it right, **2**/← wrong; a bar shows the time running out and the exam is evaluated by itself when it is up. A double click no longer skips a card, and a mock exam no longer shows up in another plan
+- **Unsaved changes**: leaving the editor with changes asks *Save / Discard / Keep editing*, and so does closing the window. Esc closes dialogs and leaves fields, but no longer the whole window
+- **Editor**: changing a date, the daily minutes or a page range no longer swallows the click into the next field; deck numbers are fetched once instead of on every redraw; removing a source asks in the add-on's own dialog
+- **Dialogs**: Enter takes the main button, Esc cancels, Tab stays inside, focus returns to where it was. Selecting text and letting go outside no longer closes a dialog. Messages stack instead of covering each other
+- **No stutter while reviewing**: with the study plan open, every answered card made Anki count the plan's cards on its main thread (about 0.2 s with 20,000 cards). The numbers are now collected in the background and handed to the page; while the window is minimised nothing is counted until it is shown again
+- **Faster overview**: the heatmap's year of reviews is counted by the database instead of row by row in Python (0.64 s → 0.01 s on 20,000 cards with a year of history); the same for the ratings per day of a plan
+- **Robust storage**: plan files are written completely before they replace the old one; a file that is no JSON anymore is renamed to `….broken-<time>` instead of being overwritten, and the copy in the collection restores the plan; plans with missing fields (older versions, scripts, another device) are completed when read, so neither the planner nor the page stumbles; a plan id that would point outside the plans folder is ignored; the list of deleted plans is trimmed after 400 days
+- **Planner**: when reviews (or other plans) leave no free minute before a date, the material is spread evenly over those days instead of all landing on the last one
+- **Fixes**: one broken plan no longer empties the overview or stops *Replan* for the others; an item that vanished meanwhile gives a clear message instead of an empty error; a deck that no longer exists no longer breaks the plan's numbers; opening the window while it is minimised brings it back; Anki's deprecated night-mode call (a warning on every use) is replaced everywhere in the add-on
+
 ## 2.8.3 – 2026-11-10
 
 - **Study plan finds moved PDFs**: if a PDF of the plan is no longer where it was (moved into another folder, renamed folder …), *open* looks for it by its file name – first next to the plan's other PDFs, then in your home folder – and opens it at the right page. If it can't be found, a window asks where you saved it

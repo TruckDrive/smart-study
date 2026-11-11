@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import os
 import re
 import html
@@ -18,7 +19,7 @@ from aqt import mw
 # --- Night Mode Detection ---
 is_night_mode = False
 try:
-    if mw and mw.pm.night_mode():
+    if mw and _is_night():
         is_night_mode = True
 except Exception:
     pass

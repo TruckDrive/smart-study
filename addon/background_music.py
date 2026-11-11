@@ -11,6 +11,7 @@ Bridge (Python -> JS):  initMusic(payload) / musicState(s) / userTracks(list)
                         / scState(s) / applyColors(c)
 """
 
+from .constants import is_night as _is_night
 import json
 import os
 import shutil
@@ -588,7 +589,7 @@ class MiniMusicPlayer(QDialog):
     @staticmethod
     def _is_night() -> bool:
         try:
-            if mw and mw.pm.night_mode(): return True
+            if mw and _is_night(): return True
         except Exception:
             pass
         return False

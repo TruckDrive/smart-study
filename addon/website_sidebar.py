@@ -1935,7 +1935,6 @@ def _execute_search_in_sidebar(text: str):
     """Internal helper – runs the actual search after the event loop has ticked."""
     if not text: return
 
-    query = urllib.parse.quote(text)
     search_url = browser_search.search_url(_search_engine(), text)
 
     global sidebar_dock, sidebar_webview

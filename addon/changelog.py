@@ -7,6 +7,21 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.0",
+        "date": "November 11, 2026",
+        "items": [
+            {"tag": "New", "text": "Study plan, reworked: the page now changes in place instead of being rebuilt – ticks appear at once, bars and rings glide, numbers count up, rows slide in and out, views slide over each other."},
+            {"tag": "New", "text": "Removed a custom item by mistake? The message offers “Undo”. Custom items can be moved to tomorrow, and “… 45 min” at the end sets their duration."},
+            {"tag": "New", "text": "A “Today” button jumps back to today's card, each day shows a progress ring, and the overview shows what is still open today."},
+            {"tag": "New", "text": "Mock exam: Space shows the answer, 1/→ right, 2/← wrong; it ends by itself when the time is up."},
+            {"tag": "New", "text": "Unsaved changes to a plan are no longer lost: leaving the editor or closing the window asks first. Esc no longer closes the window."},
+            {"tag": "Fix", "text": "Reviewing in Anki no longer stutters while the study plan is open: its numbers are collected in the background, and not at all while the window is minimised."},
+            {"tag": "Fix", "text": "Text you were typing into a plan no longer disappears when the plan refreshes; clicking into the next field of the editor works the first time."},
+            {"tag": "Fix", "text": "The overview opens much faster (a year of reviews is counted by the database), and a damaged plan file is put aside instead of breaking the page."},
+            {"tag": "Fix", "text": "On days whose time is used up by reviews, new material is spread evenly instead of piling up on the last day."},
+        ],
+    },
+    {
         "version": "2.8.3",
         "date": "November 10, 2026",
         "items": [

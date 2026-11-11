@@ -12,6 +12,7 @@ Only one embedded view can be active at a time (across all tools).
 
 from __future__ import annotations
 
+from .constants import is_night as _is_night
 from typing import Callable, List, Optional
 
 try:
@@ -109,7 +110,7 @@ def _build_header(title: str, on_close: Callable[[], None]) -> QWidget:
 
     night = False
     try:
-        night = bool(mw and hasattr(mw, "pm") and mw.pm.night_mode())
+        night = bool(mw and hasattr(mw, "pm") and _is_night())
     except Exception:
         night = False
     if night:
@@ -131,7 +132,7 @@ class _EmbeddedSurface(QWidget):
 
     def paintEvent(self, event):
         super().paintEvent(event)
-        night = bool(mw and getattr(mw, "pm", None) and mw.pm.night_mode())
+        night = bool(mw and getattr(mw, "pm", None) and _is_night())
         painter = QPainter(self)
         painter.fillRect(0, 0, 1, self.height(),
                          QColor("#555555" if night else "#D8D8D8"))

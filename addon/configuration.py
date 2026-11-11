@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import json
 import os
 import traceback
@@ -36,7 +37,7 @@ except ImportError:
 
 is_night_mode = False
 try:
-    if mw.pm.night_mode():
+    if _is_night():
         is_night_mode = True
 except Exception:
     pass

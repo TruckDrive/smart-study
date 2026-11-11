@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import json
 import os
 import re
@@ -21,7 +22,7 @@ except ImportError:
 # --- Night Mode Detection ---
 is_night_mode = False
 try:
-    if mw and mw.pm.night_mode():
+    if mw and _is_night():
         is_night_mode = True
 except Exception:
     pass
@@ -174,7 +175,7 @@ def _build_overview_style(night: bool) -> str:
 """
 
 def get_style():
-    is_night = mw.pm.night_mode()
+    is_night = _is_night()
     active_vars = _build_overview_style(is_night)
 
     return f"""
@@ -518,7 +519,7 @@ def _session_summary_inner():
 
         night = False
         try:
-            night = bool(mw.pm.night_mode())
+            night = bool(_is_night())
         except Exception:
             pass
         c = _palette(night)

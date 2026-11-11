@@ -7,7 +7,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "2.8.3"
+ADDON_VERSION = "2.9.0"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 
@@ -138,3 +138,18 @@ addon_path: str = ""
 icons_folder: str = ""
 sound_available: bool = False
 play_sound_function = lambda x: None
+
+
+def is_night() -> bool:
+    """Anki's dark mode, asked the current way (mw.pm.night_mode() is deprecated
+    and prints a warning on every call), with the old call as a fallback."""
+    try:
+        from aqt.theme import theme_manager
+        return bool(theme_manager.night_mode)
+    except Exception:
+        pass
+    try:
+        from aqt import mw
+        return bool(mw and mw.pm and mw.pm.night_mode())
+    except Exception:
+        return False

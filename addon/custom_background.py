@@ -8,6 +8,7 @@ backgrounds. An extra image copy is provided only for explicitly enabled glass.
 
 from __future__ import annotations
 
+from .constants import is_night as _is_night
 import base64
 import json
 import os
@@ -470,7 +471,7 @@ def canvas_script(active: bool, include_body: bool = True) -> str:
 
 def _set_page_transparency(active: bool) -> None:
     color = QColor(0, 0, 0, 0) if active else QColor(
-        "#2c2c2c" if mw and mw.pm.night_mode() else "#f5f5f5"
+        "#2c2c2c" if mw and _is_night() else "#f5f5f5"
     )
     views = (
         getattr(getattr(mw, "toolbar", None), "web", None),

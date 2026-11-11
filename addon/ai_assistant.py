@@ -9,6 +9,7 @@ Bridge: JS → Python via console.log("PYCALL:action:json")
         Python → JS via page.runJavaScript(...)
 """
 
+from .constants import is_night as _is_night
 import json
 import html
 import os
@@ -83,7 +84,7 @@ def _detect_night_mode() -> bool:
     """Detect Anki's current night mode setting (safe to call any time)."""
     try:
         if mw and hasattr(mw, 'pm') and mw.pm:
-            return bool(mw.pm.night_mode())
+            return bool(_is_night())
     except Exception:
         pass
     return False

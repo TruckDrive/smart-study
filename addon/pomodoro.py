@@ -1,6 +1,7 @@
 
 # -*- coding: utf-8 -*-
 
+from .constants import is_night as _is_night
 import os
 import time
 import traceback
@@ -66,7 +67,7 @@ _update_label_only_callback: Optional[Callable] = None
 # --- Night Mode Detection ---
 is_night_mode = False
 try:
-    if mw.pm.night_mode():
+    if _is_night():
         is_night_mode = True
 except Exception:
     pass
@@ -829,7 +830,7 @@ if _web_ok:
             # Match the page background to the theme BEFORE anything paints —
             # otherwise the view flashes white in dark mode while loading.
             try:
-                dark = bool(mw and mw.pm.night_mode())
+                dark = bool(mw and _is_night())
                 self._page.setBackgroundColor(
                     QColor("#2c2c2c") if dark else QColor("#f5f5f7"))
             except Exception:
