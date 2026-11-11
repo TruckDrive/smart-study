@@ -1242,12 +1242,85 @@ class _GestureRouter(QObject):
 _gesture_router: Optional[_GestureRouter] = None
 
 
+# ── Keys typed into a page belong to the page ─────────────────────────────
+
+class _KeysToPage(QObject):
+    """Anki has shortcuts made of a single key: Space and Enter show the answer,
+    1–4 rate a card, D opens the decks, A adds a card … They fire wherever the
+    keyboard focus is inside Anki's window. With the focus in a browser tab that is
+    wrong: Space is meant to pause the video, a letter may be the site's own shortcut.
+
+    Before Qt triggers a shortcut it asks the focused widget (ShortcutOverride)
+    whether it wants the key for itself. Here the browser's tabs answer yes for
+    every key without Ctrl, Alt or Meta – then the page gets the key and no Anki
+    shortcut runs. Shortcuts with a modifier keep working, and so do the browser's
+    own shortcuts from Settings → Browser, whatever keys they use."""
+
+    def eventFilter(self, obj, event):
+        try:
+            if event.type() != event.Type.ShortcutOverride or not isinstance(obj, QWidget):
+                return False
+            mods = event.modifiers()
+            block = (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
+                     | Qt.KeyboardModifier.MetaModifier)
+            if mods & block:
+                return False
+            key = event.key()
+            if key in (Qt.Key.Key_unknown, Qt.Key.Key_Shift, Qt.Key.Key_Escape) or Qt.Key.Key_F1 <= key <= Qt.Key.Key_F35:
+                return False  # Esc leaves full screen, function keys stay with Anki
+            if not self._in_tab(obj):
+                return False
+            if self._is_own_shortcut(key, mods):
+                return False
+            event.accept()
+            return True
+        except Exception as e:  # never break typing because of this
+            print(f"Smart Study browser: keys: {e}")
+            return False
+
+    @staticmethod
+    def _in_tab(widget) -> bool:
+        views = [v for v in _ws().all_tab_views() if _alive(v)]
+        if _pip is not None and _alive(getattr(_pip, "view", None)):
+            views.append(_pip.view)
+        if not views:
+            return False
+        w = widget
+        while w is not None:
+            if any(w is v for v in views):
+                return True
+            w = w.parentWidget()
+        return False
+
+    @staticmethod
+    def _is_own_shortcut(key, mods) -> bool:
+        try:
+            combo = int(key) | int(getattr(mods, "value", mods))
+        except Exception:
+            return False
+        for shortcut in _shortcuts:
+            try:
+                seq = shortcut.key()
+                if seq.count() == 1 and seq[0].toCombined() == combo and shortcut.isEnabled():
+                    return True
+            except Exception:
+                continue
+        return False
+
+
+_keys_to_page: Optional[_KeysToPage] = None
+
+
 def start() -> None:
     """When the browser has been created."""
     global _gesture_router
     if _gesture_router is None and QApplication.instance() is not None:
         _gesture_router = _GestureRouter()
         QApplication.instance().installEventFilter(_gesture_router)
+    global _keys_to_page
+    if _keys_to_page is None and QApplication.instance() is not None:
+        _keys_to_page = _KeysToPage()
+        QApplication.instance().installEventFilter(_keys_to_page)
     apply_shortcuts()
     _focus_changed(force=True)
     _focus_timer.start()

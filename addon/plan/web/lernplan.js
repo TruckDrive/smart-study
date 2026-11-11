@@ -333,6 +333,30 @@ function afterRender() {
   watchToday();
 }
 
+// ---------- Archive and delete (overview, plan and editor share these) ----------
+const ICON = {
+  archive: "M4 7.5h16v3H4zM5.5 10.5V19h13v-8.5M10 14h4",
+  restore: "M4 12a8 8 0 1 0 2.4-5.7M4 4.5V9h4.5",
+  trash: "M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.5 10.5v6M13.5 10.5v6",
+};
+const icon = name => svg("svg", { class: "ic", viewBox: "0 0 24 24", width: 18, height: 18, "aria-hidden": "true" }, svg("path", { d: ICON[name] }));
+async function archivePlan(id, on, then) {
+  await run(call("archive", { id, on }));
+  toast(on ? L("Archiviert.", "Archived.", "بایگانی شد.") : L("Wieder aktiv.", "Active again.", "دوباره فعال شد."), 6000,
+    [L("Rückgängig", "Undo", "واگرد"), async () => { await run(call("archive", { id, on: !on })); if (S.view === "home") refresh(); else go("home"); }]);
+  if (then) then(); else refresh();
+}
+async function deletePlan(id, title, then) {
+  const v = await modal(L("Plan löschen?", "Delete plan?", "برنامه حذف شود؟"), h("p", { style: "margin:0" }, L(`„${title || "Entwurf"}“ wird gelöscht. Deine Anki-Karten bleiben unberührt. Wenn du den Plan später noch einmal brauchst, archiviere ihn lieber.`, `“${title || "Draft"}” will be deleted. Your Anki cards stay untouched. If you may need the plan again later, archive it instead.`, `«${title || "پیش‌نویس"}» حذف می‌شود. کارت‌های Anki شما دست‌نخورده می‌مانند. اگر ممکن است بعداً دوباره به برنامه نیاز داشته باشید، بهتر است بایگانی‌اش کنید.`)),
+    [[L("Abbrechen", "Cancel", "انصراف"), null], [L("Archivieren", "Archive", "بایگانی"), "archive"], [L("Löschen", "Delete", "حذف"), "delete", "danger"]]);
+  if (v === "archive") return archivePlan(id, true, then);
+  if (v !== "delete") return;
+  const gone = await run(call("delete", { id }));
+  if (S.edit && S.edit.id === id) S.editBase = JSON.stringify(S.edit);  // nothing left to save
+  toast(L("Plan gelöscht.", "Plan deleted.", "برنامه حذف شد."), 8000, gone && gone.id ? [L("Rückgängig", "Undo", "واگرد"), async () => { await run(call("restorePlan", { plan: gone })); if (S.view === "home") refresh(); else go("home"); }] : undefined);
+  if (then) then(); else refresh();
+}
+
 // ---------- Overview ----------
 function renderHome(root) {
   const d = S.data;
@@ -371,6 +395,11 @@ function planCard(p) {
       h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `--f:${tot ? (dn / tot).toFixed(4) : 0}` }))),
     td ? h("div", { class: "today-chip" + (td[0] === td[1] ? " done" : ""), title: L("Heutige Punkte", "Today's items", "موارد امروز") }, ring(td[0] / td[1], 30),
       h("small", null, td[0] === td[1] ? L("heute fertig", "done today", "امروز تمام") : `${td[0]}/${td[1]} ${L("heute", "today", "امروز")}`)) : null,
+    h("div", { class: "card-acts", onclick: e => e.stopPropagation(), onkeydown: e => e.stopPropagation() },
+      h("button", { class: "ghost icon-btn", title: p.status === "active" ? L("Archivieren", "Archive", "بایگانی") : L("Wieder aktivieren", "Make active again", "فعال کردن دوباره"),
+        "aria-label": p.status === "active" ? L("Archivieren", "Archive", "بایگانی") : L("Wieder aktivieren", "Make active again", "فعال کردن دوباره"),
+        onclick: () => archivePlan(p.id, p.status === "active") }, icon(p.status === "active" ? "archive" : "restore")),
+      h("button", { class: "ghost icon-btn danger", title: L("Löschen", "Delete", "حذف"), "aria-label": L("Löschen", "Delete", "حذف"), onclick: () => deletePlan(p.id, p.title) }, icon("trash"))),
     h("span", { class: "chev", "aria-hidden": "true" }, "›"));
 }
 // Progress ring; a full ring shows a tick.
@@ -434,7 +463,9 @@ function renderPlan(root) {
       h("button", { onclick: () => go("edit") }, L("Bearbeiten", "Edit", "ویرایش")),
       h("button", { onclick: () => replan() }, L("Neu planen", "Replan", "برنامه‌ریزی دوباره")),
       h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")),
-      h("button", { onclick: () => shareDialog() }, L("Teilen", "Share", "اشتراک‌گذاری")))));
+      h("button", { onclick: () => shareDialog() }, L("Teilen", "Share", "اشتراک‌گذاری")),
+      h("button", { class: "with-icon", onclick: () => archivePlan(plan.id, plan.status !== "archived", () => go("home")) }, icon(plan.status === "archived" ? "restore" : "archive"), plan.status === "archived" ? L("Aktivieren", "Make active", "فعال کردن") : L("Archivieren", "Archive", "بایگانی")),
+      h("button", { class: "with-icon danger", onclick: () => deletePlan(plan.id, plan.title, () => go("home")) }, icon("trash"), L("Löschen", "Delete", "حذف")))));
 
   (plan.notes || []).forEach((n, i) => root.append(h("div", { class: "card warn", key: "note" + i }, n)));
 
@@ -873,7 +904,7 @@ function renderEdit(root) {
   // 3. Topics
   root.append(topicsCard(p));
   root.append(h("div", { class: "bar-actions", style: "justify-content:flex-end" },
-    p.days.length ? h("button", { class: "danger", onclick: delPlan }, L("Plan löschen", "Delete plan", "حذف برنامه")) : null,
+    h("button", { class: "with-icon danger", onclick: delPlan }, icon("trash"), L("Plan löschen", "Delete plan", "حذف برنامه")),
     h("button", { onclick: saveEdit }, L("Speichern", "Save", "ذخیره")), h("button", { class: "primary", onclick: () => saveEdit(true) }, saveLabel)));
 }
 
@@ -1166,9 +1197,8 @@ async function saveEdit(plan) {
   if (plan === true) { await replan(); } else toast(L("Gespeichert.", "Saved.", "ذخیره شد."));
 }
 async function delPlan() {
-  const v = await modal(L("Plan löschen?", "Delete plan?", "برنامه حذف شود؟"), h("p", null, L(`„${S.edit.title}“ wird endgültig gelöscht. Anki-Karten bleiben unberührt. Lieber archivieren? Das geht im Rückblick.`, `“${S.edit.title}” will be deleted for good. Your Anki cards stay untouched. Rather archive it? You can do that in the retrospective.`, `«${S.edit.title}» برای همیشه حذف می‌شود. کارت‌های Anki شما دست‌نخورده می‌مانند. ترجیح می‌دهید بایگانی‌اش کنید؟ این کار در جمع‌بندی ممکن است.`)), [[L("Abbrechen", "Cancel", "انصراف"), null], [L("Löschen", "Delete", "حذف"), true, "danger"]]);
-  if (!v) return;
-  await run(call("delete", { id: S.edit.id })); S.editBase = JSON.stringify(S.edit); go("home");
+  const id = S.edit.id;
+  await deletePlan(id, S.edit.title, () => { if (S.edit && S.edit.id === id) S.editBase = JSON.stringify(S.edit); go("home"); });
 }
 
 // ---------- Retrospective ----------

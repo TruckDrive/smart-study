@@ -459,7 +459,17 @@ def handle(cmd, a):
         store.save(plan)
         return True
     if cmd == "delete":
+        try:
+            gone = store.load(a["id"])  # handed back, so the page can offer "Undo"
+        except FileNotFoundError:
+            gone = None
         store.delete(a["id"])
+        return gone
+    if cmd == "restorePlan":  # undo of delete
+        plan = a["plan"]
+        if not isinstance(plan, dict) or not isinstance(plan.get("id"), str):
+            raise ValueError("no plan to restore")
+        store.save(store.normalize(plan))  # a newer savedAt than the deletion: every device takes it back
         return True
     if cmd == "shareCode":
         return {"code": share.encode(share.export_plan(store.load(a["id"])))}

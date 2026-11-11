@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9.3 – 2026-11-11
+
+- **Archive and Delete in sight**: every plan in the overview has an archive and a delete button on its card (an archived plan has *Make active again* instead), and an open plan has *Archive* and *Delete* in its bar. Before, deleting was a button at the very bottom of the editor and archiving sat in the retrospective. Deleting asks first and offers to archive instead; afterwards the message offers *Undo*, which brings the plan back with its ticks – also on your other devices. Archiving offers *Undo* too
+- **Drafts can be deleted**: the delete button used to appear only once a plan had been created; a draft without days could not be removed at all
+- **Fix – keys in a browser page triggered Anki's shortcuts**: Anki has shortcuts made of a single key (Space and Enter show the answer, 1–4 rate a card, D opens the decks, A adds a card …), and they fired wherever the focus was inside Anki's window – also in a browser tab. Pressing Space to pause a video showed the answer of the card behind the browser instead, most visibly with the browser in the main window. Now a browser tab (and the picture-in-picture window) keeps every key without Ctrl, Alt or Meta for its page. Shortcuts with a modifier work as before, and so do the browser's own shortcuts from *Settings → Browser*, whatever keys you gave them; Esc and the function keys stay with Anki. With the focus on a card, nothing changes
+
 ## 2.9.2 – 2026-11-11
 
 - **Address suggestions**: while you type in the browser's address field, it offers pages you visited, your favourites and the other open tabs – best match first (start of the address before a match inside it before a match in the title; among equals the page visited more often and more recently). Pick one with the arrow keys and Enter or a click. The history is kept only on this computer, in the Anki profile (`SmartStudy_Data/browser_history.json`, at most 800 pages). *Options → Suggest visited pages in the address field* switches it off (favourites and open tabs are still offered), *Clear browsing history* removes it together with the kept site icons

@@ -7,6 +7,14 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.3",
+        "date": "November 11, 2026",
+        "items": [
+            {"tag": "New", "text": "Study plan: Archive and Delete are always in sight – as buttons on every plan in the overview and in the bar of an open plan. Both offer Undo. Drafts can be deleted too."},
+            {"tag": "Fix", "text": "Browser: keys typed into a page stay in the page. Space pauses the video instead of showing the answer of a card, and letters or digits no longer trigger Anki's shortcuts while the focus is in a browser tab."},
+        ],
+    },
+    {
         "version": "2.9.2",
         "date": "November 11, 2026",
         "items": [
