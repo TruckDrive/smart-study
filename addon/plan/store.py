@@ -18,19 +18,94 @@ CONF_PROFILE = "lernplan_profile"
 
 
 def _write(path, data):
+    """Atomic: the old file stays intact until the new one is completely on disk."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
     os.replace(tmp, path)
 
 
 def _read(path):
     try:
         with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, ValueError):
+            data = json.load(f)
+    except OSError:
         return None
+    except ValueError:
+        _quarantine(path)
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _quarantine(path):
+    """A file that is no JSON anymore (power cut, full disk, hand edit) is put aside
+    instead of being overwritten, so its content can still be rescued."""
+    try:
+        os.replace(path, f"{path}.broken-{time.strftime('%Y%m%d-%H%M%S')}")
+    except OSError:
+        pass
+
+
+_LISTS = ("offWeekdays", "milestones", "sources", "topics", "days", "notes")
+_DICTS = ("dayMinutes", "dayNotes", "done", "autoDone")
+
+
+def normalize(plan):
+    """Fills in whatever a plan from an older version, another device or a script
+    may lack, so neither the planner nor the page stumbles over a missing field.
+    Changes the plan in place and returns it."""
+    for k in _LISTS:
+        if not isinstance(plan.get(k), list):
+            plan[k] = []
+    for k in _DICTS:
+        if not isinstance(plan.get(k), dict):
+            plan[k] = {}
+    for k in ("title", "exam", "examTime", "start"):
+        if not isinstance(plan.get(k), str):
+            plan[k] = "" if plan.get(k) is None else str(plan[k])
+    if plan.get("status") not in ("active", "archived"):
+        plan["status"] = "active"
+    if plan.get("order") not in ("auto", "manual"):
+        plan["order"] = "auto"
+    try:
+        plan["minutesPerDay"] = max(0, int(plan.get("minutesPerDay", 180)))
+    except (TypeError, ValueError):
+        plan["minutesPerDay"] = 180
+    plan["sources"] = [s for s in plan["sources"] if isinstance(s, dict) and s.get("id") and s.get("type") in planner.DEFAULT_RATES]
+    for s in plan["sources"]:
+        s.setdefault("name", "")
+        if s["type"] in ("videos", "tasks") and not isinstance(s.get(s["type"]), list):
+            s[s["type"]] = []
+    plan["topics"] = [t for t in plan["topics"] if isinstance(t, dict) and t.get("id")]
+    for t in plan["topics"]:
+        t.setdefault("name", "")
+        for k in ("pages", "videos", "tasks", "anki"):
+            if not isinstance(t.get(k), dict):
+                t[k] = {}
+    plan["milestones"] = [m for m in plan["milestones"] if isinstance(m, dict)]
+    for m in plan["milestones"]:
+        m.setdefault("id", planner.new_id("m"))
+        m.setdefault("name", "")
+    days = []
+    for d in plan["days"]:
+        if not isinstance(d, dict) or not isinstance(d.get("d"), str):
+            continue
+        items = [it for it in d.get("items") or [] if isinstance(it, dict)]
+        for it in items:
+            if not it.get("id"):
+                it["id"] = planner.new_id()
+            it.setdefault("kind", "custom")
+            it.setdefault("text", "")
+        d["items"] = items
+        days.append(d)
+    plan["days"] = sorted(days, key=lambda d: d["d"])
+    return plan
 
 
 def _path(pid):
@@ -67,8 +142,15 @@ def _set_conf(key, val):
             traceback.print_exc()
 
 
+def _num(x):
+    try:
+        return float(x or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def _stamp(x):
-    return -1 if x is None else float(x.get("savedAt") or 0)
+    return -1 if x is None else _num(x.get("savedAt"))
 
 
 def _files():
@@ -77,7 +159,7 @@ def _files():
         for f in sorted(os.listdir(PLANS)):
             if f.endswith(".json"):
                 p = _read(os.path.join(PLANS, f))
-                if p and p.get("id"):
+                if p and isinstance(p.get("id"), str) and re.fullmatch(r"[A-Za-z0-9_-]+", p["id"]):
                     out[p["id"]] = p
     return out
 
@@ -87,15 +169,20 @@ def _reconcile():
     files = _files()
     conf = _get_conf(CONF_PLANS)
     if conf is None and not _col():
-        return files
-    conf = dict(conf or {})
-    deleted = _get_conf(CONF_DELETED) or {}
+        return {pid: normalize(p) for pid, p in files.items()}
+    conf = {pid: p for pid, p in (conf if isinstance(conf, dict) else {}).items()
+            if isinstance(p, dict) and re.fullmatch(r"[A-Za-z0-9_-]+", str(pid))}
+    deleted = _get_conf(CONF_DELETED)
+    deleted = deleted if isinstance(deleted, dict) else {}
     out, changed = {}, False
     for pid in sorted(set(files) | set(conf)):
         f, c = files.get(pid), conf.get(pid)
-        if pid in deleted and max(_stamp(f), _stamp(c)) <= float(deleted[pid]):
+        if pid in deleted and max(_stamp(f), _stamp(c)) <= _num(deleted[pid]):
             if f:
-                os.remove(_path(pid))
+                try:
+                    os.remove(_path(pid))
+                except OSError:
+                    pass
             if c:
                 del conf[pid]
                 changed = True
@@ -111,7 +198,7 @@ def _reconcile():
             out[pid] = f
     if changed:
         _set_conf(CONF_PLANS, conf)
-    return out
+    return {pid: normalize(p) for pid, p in out.items()}
 
 
 def list_plans():
@@ -142,6 +229,8 @@ def delete(pid):
         conf.pop(pid, None)
         _set_conf(CONF_PLANS, conf)
         deleted = dict(_get_conf(CONF_DELETED) or {})
+        cutoff = time.time() - 400 * 86400  # other devices have long synced by then
+        deleted = {k: v for k, v in deleted.items() if _num(v) >= cutoff}
         deleted[pid] = time.time()
         _set_conf(CONF_DELETED, deleted)
 
@@ -164,8 +253,13 @@ def profile():
         if f is not None and _col() and _stamp(f) > _stamp(c):
             _set_conf(CONF_PROFILE, f)
         p = f or {}
-    p.setdefault("rates", dict(planner.DEFAULT_RATES))
-    p.setdefault("history", [])
+    if not isinstance(p.get("rates"), dict):
+        p["rates"] = {}
+    for k, v in planner.DEFAULT_RATES.items():
+        if not isinstance(p["rates"].get(k), (int, float)) or p["rates"][k] <= 0:
+            p["rates"][k] = v
+    if not isinstance(p.get("history"), list):
+        p["history"] = []
     return p
 
 

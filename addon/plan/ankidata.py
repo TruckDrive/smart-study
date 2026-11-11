@@ -29,6 +29,34 @@ def day_start_ms(col, d):
     return (col.sched.day_cutoff - 86400 * ((today(col) - d).days + 1)) * 1000
 
 
+def ratings_per_day(col, since_ms, cids=None):
+    """{ISO date: number of ratings} since a moment, counted by Anki days.
+    The database does the counting, so a year of reviews costs a few milliseconds."""
+    cutoff, t = col.sched.day_cutoff, today(col)
+    out = {}
+
+    def run(where):
+        for ago, n in col.db.all(f"select (? - 1 - id / 1000) / 86400, count() from revlog "
+                                 f"where id >= ? and ease > 0 {where} group by 1", cutoff, since_ms):
+            k = (t - timedelta(days=int(ago))).isoformat()
+            out[k] = out.get(k, 0) + n
+
+    if cids is None:
+        run("")
+    else:
+        cids = list(cids)
+        for i in range(0, len(cids), 20000):  # keeps the statement at a sane size for huge decks
+            run(f"and cid in {ids2str(cids[i:i + 20000])}")
+    return out
+
+
+def _date(s, fallback):
+    try:
+        return planner.s2d(s)
+    except (TypeError, ValueError):
+        return fallback
+
+
 def deck_names(col):
     return sorted(d.name for d in col.decks.all_names_and_ids() if not col.decks.is_filtered(d.id))
 
@@ -58,18 +86,21 @@ def stats(col, plan):
     if not q:
         return st
     rq = planner.review_query(plan, t.isoformat())
-    st["due"] = len(col.find_cards(f"{rq} is:due -is:suspended -is:buried")) if rq else 0
+    try:
+        st["due"] = len(col.find_cards(f"{rq} is:due -is:suspended -is:buried")) if rq else 0
+    except Exception:
+        st["due"] = 0
     st["counts"] = counts(col, planner.queries(plan))
     for s in planner.anki_sources(plan):
         if planner.src_query(s):
             st["decks"][s["id"]] = st["counts"].get(planner.src_query(s), {"total": 0, "new": 0})
-    start = min(planner.s2d(plan["start"]), t)
-    cids = col.find_cards(q)
+    start = min(_date(plan.get("start"), t), t)
+    try:
+        cids = col.find_cards(q)
+    except Exception:  # a deck name the search can't read
+        cids = []
     if cids:
-        for ms, in col.db.all(f"select id from revlog where id >= ? and ease > 0 and cid in {ids2str(cids)}",
-                              day_start_ms(col, start)):
-            k = day_of(col, ms).isoformat()
-            st["rated"][k] = st["rated"].get(k, 0) + 1
+        st["rated"] = ratings_per_day(col, day_start_ms(col, start), cids)
     return st
 
 
@@ -112,7 +143,7 @@ def deck_info(col, deck):
 
 def weak(col, plan):
     """Per topic: mistakes (Again) since the plan started, lapses, number of weak cards."""
-    since = day_start_ms(col, min(planner.s2d(plan["start"]), today(col)))
+    since = day_start_ms(col, min(_date(plan.get("start"), today(col)), today(col)))
     out = []
     for t in plan.get("topics", []):
         cids = set()
@@ -139,7 +170,7 @@ def weak(col, plan):
 
 
 def weak_search(col, plan, topic_ids=None):
-    days = (today(col) - planner.s2d(plan["start"])).days + 1
+    days = (today(col) - _date(plan.get("start"), today(col))).days + 1
     parts = []
     for t in plan.get("topics", []):
         if topic_ids and t["id"] not in topic_ids:
@@ -199,7 +230,10 @@ def sim_result(col, plan, sim):
         for src in planner.anki_sources(plan):
             q = planner.topic_query(plan, t, src)
             if q:
-                ids.update(col.find_cards(q))
+                try:
+                    ids.update(col.find_cards(q))
+                except Exception:
+                    pass
         hit = [c for c in answers if c in ids]
         if hit:
             per.append({"name": t["name"], "n": len(hit), "ok": sum(1 for c in hit if answers[c])})
@@ -243,7 +277,7 @@ def time_stats(col, plan):
     cids = col.find_cards(q)
     if not cids:
         return None
-    since = day_start_ms(col, planner.s2d(plan["start"]))
+    since = day_start_ms(col, _date(plan.get("start"), today(col)))
     s = ids2str(cids)
     secs = col.db.scalar(f"select coalesce(sum(time), 0) from revlog where id >= ? and cid in {s}", since) / 1000
     introduced = col.db.scalar(
@@ -254,12 +288,7 @@ def time_stats(col, plan):
 
 def activity(col, days=371):
     """Ratings per day across the whole collection (for heatmap and streak)."""
-    t = today(col)
-    out = {}
-    for ms, in col.db.all("select id from revlog where id >= ? and ease > 0", day_start_ms(col, t - timedelta(days=days))):
-        k = day_of(col, ms).isoformat()
-        out[k] = out.get(k, 0) + 1
-    return out
+    return ratings_per_day(col, day_start_ms(col, today(col) - timedelta(days=days)))
 
 
 def find_decks(col, title, query, exclude=()):
@@ -268,8 +297,8 @@ def find_decks(col, title, query, exclude=()):
     out = planner.rank_decks(title, names, query)
     for r in out:
         q = planner.deck_query(r["name"])
-        r["total"] = len(col.find_cards(q))
-        r["new"] = len(col.find_cards(f"{q} is:new -is:suspended")) if r["total"] else 0
+        c = counts(col, [q])[q]
+        r["total"], r["new"] = c["total"], c["new"]
     return out
 
 

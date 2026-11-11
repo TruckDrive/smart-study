@@ -402,6 +402,11 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                                 "study time (reviews already subtracted). Add more time per day or cut material.",
                                 f"برنامه تا {label} بیش از حد پر است: {round((work - budget_total) / 60, 1)} ساعت مطلب بیشتر از زمان مطالعه "
                                 "(مرورها از قبل کم شده‌اند). زمان بیشتری در روز وارد کنید یا از مطالب کم کنید."))
+            if not budget_total:
+                # No free minute in this window (reviews or other plans fill it): still
+                # spread the material evenly instead of piling it all onto the last day.
+                cap = [1.0] * len(cap)
+                budget_total = float(len(cap))
             scale = work / budget_total if budget_total else 0
             budget_ = [c * scale for c in cap]
             st = {"i": 0, "rem": budget_[0] if budget_ else 0}
@@ -648,7 +653,7 @@ def norm(s):
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
 
-STOP = {"und", "der", "die", "das", "des", "mit", "von", "im", "in", "teil", "the", "and", "of", "a", "m", "a"}
+STOP = {"und", "der", "die", "das", "des", "mit", "von", "im", "in", "teil", "the", "and", "of", "a", "m"}
 ROMAN = {r: str(i) for i, r in enumerate(
     "i ii iii iv v vi vii viii ix x xi xii xiii xiv xv xvi xvii xviii xix xx".split(), 1) if r != "i"}
 GENERIC = {"testat", "pruefung", "prufung", "klausur", "lernplan", "smart", "plan", "exam", "sip", "anki", "deck",
@@ -774,6 +779,16 @@ def parse_minutes(s):
         v = float(m.group(1).replace(",", "."))
         return round(v * 60) if m.group(2) in ("h", "std") else round(v)
     return None
+
+
+def split_minutes(text):
+    """'Altfragen 2023 45 min' -> (45, 'Altfragen 2023'); (None, text) without a duration.
+    Only an explicit unit counts, so a year or a chapter number stays part of the text."""
+    m = re.match(r"(.+?)[\s,;|(]+(\d+(?:[.,]\d+)?)\s*(min|minuten|minutes|h|std)\.?\)?$", text.strip(), re.I)
+    if not m:
+        return None, text.strip()
+    mins = parse_minutes(m.group(2) + m.group(3).lower())
+    return (mins, m.group(1).strip()) if mins else (None, text.strip())
 
 
 def parse_list(text):

@@ -1,6 +1,7 @@
 # Smart Study study plan: plans up to the exam from books, videos, tasks and Anki decks.
 # Open it via Tools → Smart Study → Study Plan or the "Study Plan" link in the top bar.
 # The plan checks off Anki items by itself; everything else with a click.
+import copy
 import json
 import os
 import shutil
@@ -10,7 +11,7 @@ import traceback
 
 from anki.lang import current_lang
 from aqt import dialogs, gui_hooks, mw
-from aqt.qt import QAction, QApplication, QDesktopServices, QDialog, QFileDialog, QTimer, QUrl, QVBoxLayout, Qt
+from aqt.qt import QApplication, QDesktopServices, QDialog, QFileDialog, QMessageBox, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
 from aqt.webview import AnkiWebView
 
@@ -39,10 +40,22 @@ def today():
     return ankidata.today(mw.col)
 
 
-def view(pid):
-    """Everything the page needs for one plan."""
+def _item(plan, iid):
+    """An item of the plan by id; a clear message if it is gone (e.g. after replanning on another device)."""
+    for _, it in planner.all_items(plan):
+        if it["id"] == iid:
+            return it
+    raise ValueError(tr("Diesen Punkt gibt es nicht mehr – der Plan wurde inzwischen geändert.",
+                        "This item no longer exists – the plan has changed in the meantime.",
+                        "این مورد دیگر وجود ندارد – برنامه در این فاصله تغییر کرده است."))
+
+
+def view(pid, st=None):
+    """Everything the page needs for one plan. st: Anki numbers that were already
+    collected in the background (otherwise they are collected now)."""
     plan = store.load(pid)
-    st = ankidata.stats(mw.col, plan)
+    if st is None:
+        st = ankidata.stats(mw.col, plan)
     ev = planner.evaluate(plan, st)
     t = st["today"]
     now = time.strftime("%Y-%m-%dT%H:%M")
@@ -54,14 +67,13 @@ def view(pid):
     if changed:
         store.save(plan)
     done, tot = planner.progress(plan, ev)
-    phase = "after" if t > plan["exam"] else ("early" if tot and done == tot else "active")
-    if not plan.get("days"):
+    phase = "after" if plan["exam"] and t > plan["exam"] else ("early" if tot and done == tot else "active")
+    if not plan.get("days") or not plan["exam"]:
         phase = "setup"
     out = {"plan": plan, "ev": ev, "stats": {k: st[k] for k in ("today", "due", "decks")},
            "progress": [done, tot], "overdue": planner.overdue(plan, ev, t), "phase": phase}
     out["files"] = {s["id"]: files.known(plan, s) for s in plan.get("sources", []) if s.get("type") == "pages"}
-    if plan.get("sim", {}).get("started"):
-        out["simResult"] = ankidata.sim_result(mw.col, plan, plan["sim"])
+    out["profile"] = store.profile()
     return out
 
 
@@ -107,17 +119,45 @@ def ask_for_pdf(plan, src):
     return path
 
 
-def home():
+def _today_load(plan, ev, t):
+    """[done, total, open minutes] of today's checkable items – for the overview."""
+    done = tot = mins = 0
+    for day in plan.get("days", []):
+        if day["d"] != t:
+            continue
+        for it in day["items"]:
+            if it.get("kind") in planner.NO_CHECK or it.get("moved"):
+                continue
+            tot += 1
+            if planner.is_done(plan, it, ev):
+                done += 1
+            else:
+                mins += it.get("min", 0) or 0
+    return [done, tot, mins]
+
+
+def home(stats=None, act=None):
+    """The overview. stats {plan id: Anki numbers} and act (ratings per day) may
+    come from the background; whatever is missing is collected now."""
     t = today().isoformat()
     plans = []
     active = set()
     for p in store.list_plans():
-        ev = planner.evaluate(p, ankidata.stats(mw.col, p)) if p.get("status") == "active" else {}
+        ev = {}
+        if p.get("status") == "active":
+            try:
+                st = (stats or {}).get(p["id"]) or ankidata.stats(mw.col, p)
+                ev = planner.evaluate(p, st)
+            except Exception:  # one broken plan must not hide all the others
+                traceback.print_exc()
         plans.append({"id": p["id"], "title": p["title"], "exam": p["exam"], "status": p.get("status", "active"),
-                      "progress": planner.progress(p, ev), "start": p["start"]})
+                      "progress": planner.progress(p, ev), "start": p["start"], "today": _today_load(p, ev, t),
+                      "draft": not p.get("days")})
         for ts in list(p.get("done", {}).values()) + list(p.get("autoDone", {}).values()):
-            active.add(ts[:10])
-    act = ankidata.activity(mw.col)
+            if isinstance(ts, str):
+                active.add(ts[:10])
+    if act is None:
+        act = ankidata.activity(mw.col)
     heat = dict(act)
     for d in active:
         heat[d] = heat.get(d, 0) + 1
@@ -132,14 +172,23 @@ def generate_all(pid):
     Returns the notes of the requested plan."""
     t = today()
     budget = store.profile().get("budget")
+    if not store.load(pid).get("exam"):
+        raise ValueError(tr("Bitte zuerst das Prüfungsdatum eintragen.", "Please enter the exam date first.",
+                            "لطفاً ابتدا تاریخ امتحان را وارد کنید."))
     plans = [p for p in store.list_plans() if p["id"] == pid or (
         p.get("status") == "active" and p.get("days") and p.get("exam") and p["exam"] >= t.isoformat())]
     plans.sort(key=lambda p: (p["exam"], p["id"]))
     taken, notes = {}, []
     for plan in plans:
-        st = ankidata.stats(mw.col, plan)
-        n = planner.build(plan, st["counts"], t, planner.evaluate(plan, st),
-                          forecast=ankidata.forecast(mw.col, plan), taken=taken, budget=budget)
+        try:
+            st = ankidata.stats(mw.col, plan)
+            n = planner.build(plan, st["counts"], t, planner.evaluate(plan, st),
+                              forecast=ankidata.forecast(mw.col, plan), taken=taken, budget=budget)
+        except Exception:
+            if plan["id"] == pid:
+                raise
+            traceback.print_exc()  # another plan is broken: the requested one is still planned
+            continue
         store.save(plan)
         for d, m in planner.day_load(plan, t).items():
             taken[d] = taken.get(d, 0) + m
@@ -197,6 +246,7 @@ def handle(cmd, a):
         return {"notes": generate_all(a["id"])}
     if cmd == "toggle":
         plan = store.load(a["id"])
+        _item(plan, a["item"])
         if a["on"]:
             plan.setdefault("done", {})[a["item"]] = time.strftime("%Y-%m-%dT%H:%M")
         else:
@@ -205,21 +255,70 @@ def handle(cmd, a):
         return True
     if cmd == "addCustom":
         plan = store.load(a["id"])
+        planner.s2d(a["day"])  # refuses anything that is not a date
+        text = " ".join(str(a.get("text", "")).split())[:500]
+        if not text:
+            return None
+        mins, text = planner.split_minutes(text)
         day = next((d for d in plan["days"] if d["d"] == a["day"]), None)
         if not day:
             day = {"d": a["day"], "items": []}
             plan["days"].append(day)
             plan["days"].sort(key=lambda d: d["d"])
-        day["items"].append({"id": planner.new_id(), "kind": "custom", "custom": True, "text": a["text"],
-                             "min": int(a.get("min") or 0)})
+        it = {"id": planner.new_id(), "kind": "custom", "custom": True, "text": text,
+              "min": max(0, min(24 * 60, int(a.get("min") or mins or 0)))}
+        day["items"].append(it)
         store.save(plan)
-        return True
+        return it["id"]
     if cmd == "delItem":
         plan = store.load(a["id"])
+        gone = None
         for d in plan["days"]:
-            d["items"] = [it for it in d["items"] if it["id"] != a["item"]]
+            for ix, it in enumerate(d["items"]):
+                if it["id"] == a["item"] and (it.get("custom") or it.get("kind") == "weak"):
+                    gone = {"day": d["d"], "index": ix, "item": it, "done": plan.get("done", {}).pop(it["id"], None)}
+            d["items"] = [it for it in d["items"] if not (gone and it is gone["item"])]
+        if gone:
+            store.save(plan)
+        return gone
+    if cmd == "restoreItem":  # undo of delItem
+        plan = store.load(a["id"])
+        g = a["gone"]
+        it = g["item"]
+        if not isinstance(it, dict) or not (it.get("custom") or it.get("kind") == "weak"):
+            raise ValueError("only removed items can be restored")
+        if any(i["id"] == it.get("id") for _, i in planner.all_items(plan)):
+            return True
+        planner.s2d(g["day"])
+        day = next((d for d in plan["days"] if d["d"] == g["day"]), None)
+        if not day:
+            day = {"d": g["day"], "items": []}
+            plan["days"].append(day)
+            plan["days"].sort(key=lambda d: d["d"])
+        day["items"].insert(max(0, min(len(day["items"]), int(g.get("index") or 0))), it)
+        if g.get("done"):
+            plan.setdefault("done", {})[it["id"]] = g["done"]
         store.save(plan)
         return True
+    if cmd == "moveItem":  # a custom item to another day
+        plan = store.load(a["id"])
+        planner.s2d(a["day"])
+        it = _item(plan, a["item"])
+        if not it.get("custom"):
+            raise ValueError("only custom items can be moved")
+        for d in plan["days"]:
+            d["items"] = [i for i in d["items"] if i is not it]
+        day = next((d for d in plan["days"] if d["d"] == a["day"]), None)
+        if not day:
+            day = {"d": a["day"], "items": []}
+            plan["days"].append(day)
+            plan["days"].sort(key=lambda d: d["d"])
+        day["items"].append(it)
+        store.save(plan)
+        return True
+    if cmd == "simResult":
+        plan = store.load(a["id"])
+        return ankidata.sim_result(col, plan, plan.get("sim") or {})
     if cmd == "candidates":
         plan = a["plan"]
         return {s["id"]: ankidata.candidates(col, planner.src_decks(s)) for s in planner.anki_sources(plan)
@@ -265,14 +364,20 @@ def handle(cmd, a):
         return {"ok": True}
     if cmd == "mockStart":
         plan = store.load(a["id"])
-        cards = ankidata.mock_cards(col, plan, int(a.get("n", 50)))
-        minutes = int(a.get("minutes", 30))
+        cards = ankidata.mock_cards(col, plan, max(1, min(500, int(a.get("n") or 50))))
+        minutes = max(1, min(600, int(a.get("minutes") or 30)))
+        if not cards:
+            return {"cards": [], "minutes": minutes}
         plan["sim"] = {"started": int(time.time() * 1000), "cards": [c["cid"] for c in cards], "answers": {}, "minutes": minutes}
         store.save(plan)
         return {"cards": cards, "minutes": minutes}
     if cmd == "mockAnswer":
         plan = store.load(a["id"])
-        plan["sim"]["answers"][str(a["cid"])] = bool(a["ok"])
+        sim = plan.get("sim") or {}
+        if not sim.get("started"):
+            raise ValueError(tr("Die Probeprüfung läuft nicht mehr.", "The mock exam is no longer running.",
+                                "امتحان آزمایشی دیگر در جریان نیست."))
+        sim.setdefault("answers", {})[str(int(a["cid"]))] = bool(a["ok"])
         store.save(plan)
         return True
     if cmd == "openLink":
@@ -286,7 +391,7 @@ def handle(cmd, a):
         return True
     if cmd == "studyItem":
         plan = store.load(a["id"])
-        it = next(i for _, i in planner.all_items(plan) if i["id"] == a["item"])
+        it = _item(plan, a["item"])
         did, n = ankidata.study_target(col, plan, it)
         if not did:
             return {"ok": False}
@@ -295,8 +400,11 @@ def handle(cmd, a):
         cmd = "study"
     if cmd == "openPages":
         plan = store.load(a["id"])
-        it = next(i for _, i in planner.all_items(plan) if i["id"] == a["item"])
-        src = next(s for s in plan["sources"] if s["id"] == it["source"])
+        it = _item(plan, a["item"])
+        src = next((s for s in plan["sources"] if s["id"] == it.get("source")), None)
+        if not src or not it.get("pages"):
+            raise ValueError(tr("Zu diesem Punkt gehört keine PDF-Quelle mehr.", "This item no longer has a PDF source.",
+                                "این مورد دیگر منبع PDF ندارد."))
         path = files.resolve(plan, src)
         if not path:
             path = ask_for_pdf(plan, src)
@@ -315,10 +423,15 @@ def handle(cmd, a):
         return True
     if cmd == "mockStop":
         plan = store.load(a["id"])
-        res = ankidata.sim_result(col, plan, plan["sim"])
-        plan["sim"]["result"] = res
-        plan.setdefault("simHistory", []).append({"at": time.strftime("%Y-%m-%d"), "result": res})
-        plan["sim"]["started"] = None
+        sim = plan.get("sim") or {}
+        if not sim.get("started"):
+            return sim.get("result")
+        res = ankidata.sim_result(col, plan, sim)
+        sim["result"] = res
+        if res and res.get("answered"):
+            plan.setdefault("simHistory", []).append({"at": today().isoformat(), "result": res})
+        sim["started"] = None
+        plan["sim"] = sim
         store.save(plan)
         return res
     if cmd == "review":
@@ -333,9 +446,9 @@ def handle(cmd, a):
         plan["review"] = a["review"]
         prof = store.profile()
         for k, v in (a.get("rates") or {}).items():
-            if v:
+            if k in planner.DEFAULT_RATES and v and float(v) > 0:
                 prof["rates"][k] = float(v)
-        if a.get("minutesPerDay"):
+        if a.get("minutesPerDay") and int(a["minutesPerDay"]) > 0:
             prof["minutesPerDay"] = int(a["minutesPerDay"])
         prof["history"] = [h for h in prof["history"] if h.get("plan") != plan["id"]] + [
             {"plan": plan["id"], "title": plan["title"], "exam": plan["exam"], "rates": a.get("rates"),
@@ -409,6 +522,11 @@ def handle(cmd, a):
 
 
 class StudyPlanWindow(QDialog):
+    # Defaults on the class: Qt already sends events while __init__ is still running.
+    current = None  # plan the page shows; None = overview
+    _showing = "home"
+    _busy = _stale = _close_checked = _close_asking = False
+
     def __init__(self):
         _sync_lang()
         super().__init__(None, Qt.WindowType.Window)
@@ -421,31 +539,158 @@ class StudyPlanWindow(QDialog):
         lay.addWidget(self.web)
         restoreGeom(self, "lernplan", default_size=(980, 860))
         base = f"/_addons/{FOLDER}/plan/web/"
-        self.web.stdHtml(f'<div id="app" data-lang="{planner.LANG}"></div>', css=[base + "lernplan.css"], js=[base + "lernplan.js"], context=self)
+        skeleton = ('<div class="skel" style="height:54px;width:55%"></div><div class="skel" style="height:64px"></div>'
+                    '<div class="skel" style="height:110px"></div><div class="skel" style="height:86px"></div>')
+        self.web.stdHtml(f'<div id="app" data-lang="{planner.LANG}">{skeleton}</div>', css=[base + "lernplan.css"],
+                         js=[base + "lernplan.js"], context=self)
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
-        self._timer.timeout.connect(lambda: self.web.eval("window.LP && LP.refresh()"))
+        self._timer.timeout.connect(self._refresh)
 
     def on_bridge(self, msg):
         if not msg.startswith("lp:"):
             return None
-        data = json.loads(msg[3:])
         try:
-            return {"ok": True, "data": handle(data["cmd"], data.get("args") or {})}
+            data = json.loads(msg[3:])
+            cmd, args = data["cmd"], data.get("args") or {}
+            if not mw.col:
+                raise ValueError(tr("Die Sammlung ist gerade nicht geöffnet.", "The collection is not open right now.",
+                                    "مجموعه در حال حاضر باز نیست."))
+            out = handle(cmd, args)
+            if cmd in ("open", "home", "review"):
+                self._showing = cmd
+                self.current = args.get("id") if cmd != "home" else None
+            return {"ok": True, "data": out}
         except Exception as e:
             traceback.print_exc()
-            return {"ok": False, "error": str(e)}
+            return {"ok": False, "error": str(e) or type(e).__name__}
 
     def refresh_soon(self):
+        """Anki changed something. While the window is minimised nothing is computed;
+        it catches up as soon as it is shown again."""
+        if self.isMinimized() or not self.isVisible():
+            self._stale = True
+            return
         self._timer.start(1500)
 
+    def changeEvent(self, evt):
+        super().changeEvent(evt)
+        if self._stale and not self.isMinimized() and self.isVisible():
+            self._stale = False
+            self._timer.start(150)
+
+    def _refresh(self):
+        """Collects the Anki numbers in the background, so reviewing never stutters
+        because of the plan window, and hands the finished data to the page."""
+        if not mw.col or self._showing == "review":
+            return
+        if self._busy:
+            self._stale = True
+            return
+        pid, showing = self.current, self._showing
+        try:
+            plans = [store.load(pid)] if pid else [p for p in store.list_plans() if p.get("status") == "active"]
+        except FileNotFoundError:
+            return
+        except Exception:
+            traceback.print_exc()
+            return
+        snap = copy.deepcopy(plans)  # the background thread reads only its own copy
+        stamps = {p["id"]: p.get("savedAt") for p in plans}
+
+        def collect(col):
+            return ({p["id"]: ankidata.stats(col, p) for p in snap}, None if pid else ankidata.activity(col))
+
+        def done(res):
+            self._busy = False
+            try:
+                if not mw.col or not self.isVisible() or (self.current, self._showing) != (pid, showing):
+                    return
+                stats, act = res
+                if pid:
+                    if store.load(pid).get("savedAt") != stamps[pid]:
+                        return self._timer.start(300)  # the plan changed meanwhile: count again
+                    data = view(pid, st=stats[pid])
+                else:
+                    data = home(stats=stats, act=act)
+                self.web.eval(f"window.LP && LP.push({json.dumps('plan' if pid else 'home')}, {json.dumps(data)})")
+            except RuntimeError:  # window closed meanwhile
+                pass
+            except Exception:
+                traceback.print_exc()
+            finally:
+                if self._stale and not self._busy:
+                    self._stale = False
+                    self.refresh_soon()
+
+        def failed(exc):
+            self._busy = False
+            print("Smart Study: refresh failed:", exc)
+
+        try:
+            from aqt.operations import QueryOp
+            self._busy = True
+            QueryOp(parent=self, op=collect, success=done).failure(failed).run_in_background()
+        except Exception:  # very old Anki: ask the page to fetch the data itself
+            self._busy = False
+            traceback.print_exc()
+            self.web.eval("window.LP && LP.refresh()")
+
+    def keyPressEvent(self, evt):
+        if evt.key() == Qt.Key.Key_Escape:  # Esc belongs to the page (dialogs, fields), it must not close the window
+            evt.accept()
+            return
+        super().keyPressEvent(evt)
+
     def reject(self):
-        saveGeom(self, "lernplan")
-        super().reject()
+        self.close()
 
     def closeEvent(self, evt):
-        saveGeom(self, "lernplan")
-        super().closeEvent(evt)
+        """Asks before unsaved edits of a plan are lost."""
+        if self._close_checked or not mw.col:
+            saveGeom(self, "lernplan")
+            evt.accept()
+            QDialog.reject(self)  # hides and emits finished → _closed()
+            return
+        evt.ignore()
+        if self._close_asking:
+            return
+        self._close_asking = True
+        answered = []
+
+        def go(edit):
+            if answered:
+                return
+            answered.append(True)
+            self._close_asking = False
+            if isinstance(edit, dict) and edit.get("id"):
+                box = QMessageBox(self)
+                box.setWindowTitle(NAME)
+                box.setIcon(QMessageBox.Icon.Question)
+                box.setText(tr("Du hast diesen Plan bearbeitet, aber noch nicht gespeichert.",
+                               "You have edited this plan but not saved it yet.",
+                               "این برنامه را ویرایش کرده‌اید اما هنوز ذخیره نکرده‌اید."))
+                save = box.addButton(tr("Speichern", "Save", "ذخیره"), QMessageBox.ButtonRole.AcceptRole)
+                drop = box.addButton(tr("Verwerfen", "Discard", "دور ریختن"), QMessageBox.ButtonRole.DestructiveRole)
+                box.addButton(tr("Weiter bearbeiten", "Keep editing", "ادامهٔ ویرایش"), QMessageBox.ButtonRole.RejectRole)
+                box.exec()
+                if box.clickedButton() is save:
+                    try:
+                        handle("savePlan", {"plan": edit})
+                    except Exception as e:
+                        traceback.print_exc()
+                        QMessageBox.warning(self, NAME, str(e))
+                        return
+                elif box.clickedButton() is not drop:
+                    return
+            self._close_checked = True
+            self.close()
+
+        try:
+            self.web.evalWithCallback("window.LP && LP.dirty ? LP.dirty() : null", go)
+            QTimer.singleShot(1500, lambda: go(None))  # a page that does not answer must not keep the window open
+        except Exception:
+            go(None)
 
 
 _win = None
@@ -458,6 +703,8 @@ def open_window():
     if _win is None or not _win.isVisible():
         _win = StudyPlanWindow()
         _win.finished.connect(_closed)
+    if _win.isMinimized():
+        _win.showNormal()
     _win.show()
     _win.raise_()
     _win.activateWindow()
@@ -472,8 +719,11 @@ def _closed(*_):
 
 
 def _changed(*_):
-    if _win is not None and _win.isVisible():
-        _win.refresh_soon()
+    try:
+        if _win is not None and _win.isVisible():
+            _win.refresh_soon()
+    except RuntimeError:  # the window is already gone
+        pass
 
 
 def _toolbar(links, toolbar):
@@ -487,7 +737,11 @@ def _toolbar(links, toolbar):
 
 def _profile_closing():
     if _win is not None:
-        _win.close()
+        try:
+            _win._close_checked = True  # no question while Anki is shutting down
+            _win.close()
+        except RuntimeError:
+            pass
 
 
 gui_hooks.top_toolbar_did_init_links.append(_toolbar)

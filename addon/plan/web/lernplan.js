@@ -19,18 +19,132 @@ const WD_MO = () => [0, 1, 2, 3, 4, 5, 6].map(n => [WD()[(n + 1) % 7], n]); // P
 const TYPES = () => ({ pages: L("Seiten", "Pages", "صفحه‌ها"), videos: L("Videos", "Videos", "ویدیوها"), tasks: L("Aufgaben", "Tasks", "تکلیف‌ها"), anki: "Anki" });
 const UNIT = () => ({ pages: L("min/Seite", "min/page", "دقیقه/صفحه"), videos: L("min/video", "min/video", "دقیقه/ویدیو"), tasks: L("min/Aufgabe", "min/task", "دقیقه/تکلیف"), anki: L("min/neue Karte", "min/new card", "دقیقه/کارت جدید") });
 
+// Listeners live in e._on and are reached through one forwarding listener per
+// event type. morph() can then hand a kept element the handlers of its fresh
+// twin, so no handler ever works with data of an earlier render.
+function listen(e, type, fn) {
+  if (!e._on) e._on = {};
+  if (!(type in e._on)) e.addEventListener(type, ev => { const f = e._on[type]; if (f) return f.call(e, ev); });
+  e._on[type] = fn;
+}
 function h(tag, attrs, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {
     if (v == null || v === false) continue;
     if (k === "class") e.className = v;
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else if (k === "value") e.value = v;
+    else if (k === "key") e.dataset.key = v;
+    else if (k.startsWith("on")) listen(e, k.slice(2), v);
+    else if (k === "value") { e.value = v; e._v = String(v); }
     else if (k === "checked") e.checked = !!v;
     else e.setAttribute(k, v === true ? "" : v);
   }
   for (const c of kids.flat(9)) if (c != null && c !== false) e.append(c.nodeType ? c : String(c));
   return e;
+}
+function svg(tag, attrs, ...kids) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) if (v != null && v !== false) e.setAttribute(k, v);
+  for (const c of kids.flat(9)) if (c) e.append(c);
+  return e;
+}
+
+// ---------- Motion ----------
+const EASE = "cubic-bezier(.2, .8, .2, 1)";
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+function motion() {
+  return !reducedMotion.matches && !document.hidden
+    && !document.documentElement.classList.contains("reduce-motion")
+    && !(document.body && document.body.classList.contains("reduce-motion"));
+}
+function animate(el, frames, opts) {
+  if (!motion() || !el.animate) return null;
+  try { return el.animate(frames, Object.assign({ duration: 220, easing: EASE }, opts)); } catch { return null; }
+}
+// Numbers count to their new value instead of jumping.
+function tween(node, from, to) {
+  const id = node._tw = (node._tw || 0) + 1, t0 = performance.now(), dur = 480;
+  if (!motion()) { node.data = String(to); return; }
+  const step = now => {
+    if (node._tw !== id) return;
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    node.data = String(Math.round(from + (to - from) * e));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  setTimeout(() => { if (node._tw === id) node.data = String(to); }, dur + 120);  // also when frames are paused
+}
+
+// ---------- Morph ----------
+// render() builds a fresh tree; morph() makes the page look like it while keeping
+// the existing elements. So a refresh changes only what really changed: nothing
+// flickers, the field you type in keeps focus and text, bars and rings glide to
+// their new value, and added or removed rows slide in and out.
+const keyOf = n => n.nodeType === 1 && n.dataset ? n.dataset.key : undefined;
+const sameKind = (a, b) => a.nodeType === b.nodeType && a.nodeName === b.nodeName;
+let morphBudget = 0;  // how many rows may still animate in this pass (a hundred at once would stutter)
+function morphInto(root, fresh) {
+  morphBudget = 14;
+  morphKids(root, fresh);
+}
+function morphKids(from, to) {
+  const keyed = new Map();
+  for (const n of from.childNodes) { const k = keyOf(n); if (k !== undefined && !n._leaving) keyed.set(k, n); }
+  let cursor = from.firstChild;
+  for (const want of [...to.childNodes]) {
+    const k = keyOf(want);
+    let match = null;
+    if (k !== undefined) { const c = keyed.get(k); if (c && sameKind(c, want)) match = c; }
+    else {
+      let c = cursor;
+      while (c && c._leaving) c = c.nextSibling;
+      if (c && keyOf(c) === undefined && sameKind(c, want)) match = c;
+    }
+    if (!match) { from.insertBefore(want, cursor); enter(want); continue; }
+    if (match === cursor) cursor = cursor.nextSibling; else from.insertBefore(match, cursor);
+    if (want.nodeType === 1 && want.dataset.morph === "replace") match.replaceWith(want);
+    else if (!(want.nodeType === 1 && want.dataset.morph === "keep")) morphNode(match, want);
+  }
+  while (cursor) { const next = cursor.nextSibling; if (!cursor._leaving) leave(cursor); cursor = next; }
+}
+function morphNode(from, to) {
+  if (from.nodeType !== 1) {
+    if (from.data !== to.data) {
+      const p = from.parentNode;
+      if (p && p.dataset && "num" in p.dataset && /^\d+$/.test(from.data) && /^\d+$/.test(to.data)) tween(from, +from.data, +to.data);
+      else { from._tw = 0; from.data = to.data; }
+    }
+    return;
+  }
+  for (const a of [...from.attributes]) if (!to.hasAttribute(a.name)) from.removeAttribute(a.name);
+  for (const a of to.attributes) if (from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+  for (const type of new Set([...Object.keys(from._on || {}), ...Object.keys(to._on || {})])) listen(from, type, (to._on || {})[type] || null);
+  morphKids(from, to);
+  const tag = from.nodeName;
+  if (tag === "INPUT" && (from.type === "checkbox" || from.type === "radio")) { if (from.checked !== to.checked) from.checked = to.checked; }
+  else if (tag === "SELECT") { if (from.value !== to.value) from.value = to.value; }
+  else if ((tag === "INPUT" || tag === "TEXTAREA") && from._v !== to._v) { from.value = to.value; from._v = to._v; }  // only what render() changed; typed text stays
+}
+const SLIDES = ".item, .day, .card, .row, .topic, .src, .ms-row, .plan-card";
+function enter(n) {
+  if (n.nodeType !== 1 || !motion()) return;
+  if (n.matches(SLIDES) && morphBudget-- > 0) {
+    const hgt = n.getBoundingClientRect().height, cs = getComputedStyle(n);
+    if (hgt) return animate(n, [
+      { height: "0px", opacity: 0, marginTop: "0px", marginBottom: "0px", paddingTop: "0px", paddingBottom: "0px", overflow: "hidden" },
+      { height: hgt + "px", opacity: 1, marginTop: cs.marginTop, marginBottom: cs.marginBottom, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, overflow: "hidden" }], { duration: 260 });
+  }
+  animate(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+}
+function leave(n) {
+  if (n.nodeType !== 1 || !motion() || !n.matches(SLIDES) || morphBudget-- <= 0) return n.remove();
+  const hgt = n.getBoundingClientRect().height, cs = getComputedStyle(n);
+  n._leaving = true;
+  n.style.pointerEvents = "none";
+  const a = animate(n, [
+    { height: hgt + "px", opacity: 1, marginTop: cs.marginTop, marginBottom: cs.marginBottom, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, overflow: "hidden" },
+    { height: "0px", opacity: 0, marginTop: "0px", marginBottom: "0px", paddingTop: "0px", paddingBottom: "0px", overflow: "hidden" }], { duration: 220, fill: "forwards" });
+  if (!a) return n.remove();
+  a.onfinish = a.oncancel = () => n.remove();
 }
 const dt = s => new Date(s + "T12:00:00");
 const fmt = s => { const d = dt(s); return LANG === "de" ? `${WD()[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.` : `${WD()[d.getDay()]} ${d.getDate()} ${MON()[d.getMonth()]}`; };
@@ -43,8 +157,8 @@ const dmy = s => s ? `${s.slice(8, 10)}.${s.slice(5, 7)}.${s.slice(0, 4)}` : "";
 // Own input fields instead of <input type=date> so it's always DD.MM.YYYY and 24 h
 function dateInput(val, onset, attrs) {
   const e = h("input", Object.assign({ type: "text", value: dmy(val), placeholder: L("TT.MM.JJJJ", "DD.MM.YYYY", "DD.MM.YYYY"), style: "width:118px", inputmode: "numeric" }, attrs || {}));
-  e.addEventListener("change", () => {
-    const v = e.value.trim();
+  listen(e, "change", ev => {
+    const e = ev.currentTarget, v = e.value.trim();
     if (!v) { onset(""); return; }
     const m = v.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-]?(\d{2}|\d{4})?$/);
     const y = m && (m[3] ? (m[3].length === 2 ? "20" + m[3] : m[3]) : String(new Date().getFullYear()));
@@ -56,8 +170,8 @@ function dateInput(val, onset, attrs) {
 }
 function timeInput(val, onset) {
   const e = h("input", { type: "text", value: val || "", placeholder: "HH:MM", style: "width:70px", inputmode: "numeric" });
-  e.addEventListener("change", () => {
-    const v = e.value.trim();
+  listen(e, "change", ev => {
+    const e = ev.currentTarget, v = e.value.trim();
     if (!v) { onset(""); return; }
     const m = v.match(/^(\d{1,2})(?:[:.h ]?(\d{2}))?$/);
     if (!m || +m[1] > 23 || +(m[2] || 0) > 59) { toast(L("Uhrzeit bitte als HH:MM, z. B. 13:15", "Please enter the time as HH:MM, e.g. 13:15", "لطفاً ساعت را به‌صورت HH:MM وارد کنید، مثلاً 13:15")); e.value = val || ""; return; }
@@ -67,28 +181,90 @@ function timeInput(val, onset) {
 }
 const hm = m => { const H = L("h", "h", "ساعت"), M = L("min", "min", "دقیقه"); return m >= 60 ? `${Math.floor(m / 60)} ${H}${m % 60 ? " " + (m % 60) + " " + M : ""}` : `${m} ${M}`; };
 
+// A thin bar at the top shows that Anki is working (only if it takes noticeably long).
+let busyCount = 0, busyTimer = null;
+function busy(on) {
+  busyCount = Math.max(0, busyCount + (on ? 1 : -1));
+  clearTimeout(busyTimer);
+  if (busyCount) busyTimer = setTimeout(() => document.documentElement.classList.add("lp-busy"), 180);
+  else document.documentElement.classList.remove("lp-busy");
+}
 function call(cmd, args) {
+  busy(true);
   return new Promise((res, rej) => {
     const go = () => pycmd("lp:" + JSON.stringify({ cmd, args }), r => r && r.ok ? res(r.data) : rej(new Error(r ? r.error : L("keine Antwort", "no response", "پاسخی دریافت نشد"))));
     if (typeof pycmd === "function") go();
-    else { const t = setInterval(() => { if (typeof pycmd === "function") { clearInterval(t); go(); } }, 30); }
-  });
+    else { let n = 0; const t = setInterval(() => { if (typeof pycmd === "function") { clearInterval(t); go(); } else if (++n > 400) { clearInterval(t); rej(new Error(L("keine Verbindung zu Anki", "no connection to Anki", "ارتباط با Anki برقرار نیست"))); } }, 30); }
+  }).finally(() => busy(false));
 }
-function toast(msg, ms = 2600) {
-  const t = h("div", { class: "toast" }, msg);
-  document.body.append(t);
-  setTimeout(() => t.remove(), ms);
+// Toasts stack above each other; one may carry an action (e.g. undo).
+function toast(msg, ms = 2600, action) {
+  let box = document.querySelector(".toasts");
+  if (!box) { box = h("div", { class: "toasts", role: "status", "aria-live": "polite" }); document.body.append(box); }
+  for (const old of box.children) if (old._msg === msg && !old._closing) old._close();  // the same message twice: show it once
+  const t = h("div", { class: "toast" }, h("span", null, msg));
+  t._msg = msg;
+  let timer = null;
+  t._close = () => {
+    if (t._closing) return;
+    t._closing = true; clearTimeout(timer);
+    const a = animate(t, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(8px) scale(.96)" }], { duration: 180, fill: "forwards" });
+    if (a) a.onfinish = a.oncancel = () => t.remove(); else t.remove();
+  };
+  if (action) t.append(h("button", { class: "toast-act", onclick: () => { t._close(); action[1](); } }, action[0]));
+  box.append(t);
+  animate(t, [{ opacity: 0, transform: "translateY(14px) scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 240 });
+  const arm = () => { timer = setTimeout(t._close, ms); };
+  listen(t, "mouseenter", () => clearTimeout(timer));
+  listen(t, "mouseleave", arm);
+  arm();
+  while (box.children.length > 4) box.firstChild.remove();
+  return t;
 }
-async function run(p) { try { return await p; } catch (e) { toast(L("Fehler: ", "Error: ", "خطا: ") + e.message, 5000); throw e; } }
+async function run(p) { try { return await p; } catch (e) { toast(L("Fehler: ", "Error: ", "خطا: ") + (e && e.message || e), 5000); throw e; } }
+// Dialog: Esc cancels, Enter takes the primary button, Tab stays inside, focus returns afterwards.
 function modal(title, body, buttons) {
   return new Promise(res => {
+    const before = document.activeElement;
     const bg = h("div", { class: "modal-bg" });
-    const close = v => { bg.remove(); res(v); };
-    bg.append(h("div", { class: "modal" }, h("h2", null, title), h("div", { style: "margin-top:10px" }, body),
-      h("div", { class: "foot" }, (buttons || [[L("Abbrechen", "Cancel", "انصراف"), null], [L("OK", "OK", "تأیید"), true, "primary"]]).map(([l, v, c]) => h("button", { class: c, onclick: () => close(typeof v === "function" ? v() : v) }, l)))));
-    bg.addEventListener("click", e => { if (e.target === bg) close(null); });
+    let closed = false;
+    const close = v => {
+      if (closed) return;
+      closed = true;
+      document.removeEventListener("keydown", onKey, true);
+      const done = () => { bg.remove(); if (before && before.focus && document.contains(before)) before.focus(); };
+      const a = animate(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: "forwards" });
+      animate(box, [{ transform: "none" }, { transform: "translateY(8px) scale(.97)" }], { duration: 150, fill: "forwards" });
+      if (a) a.onfinish = a.oncancel = done; else done();
+      res(v);
+    };
+    const btns = (buttons || [[L("Abbrechen", "Cancel", "انصراف"), null], [L("OK", "OK", "تأیید"), true, "primary"]]).map(([l, v, c]) => h("button", { class: c, onclick: () => close(typeof v === "function" ? v() : v) }, l));
+    const box = h("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title }, h("h2", null, title), h("div", { style: "margin-top:10px" }, body), h("div", { class: "foot" }, btns));
+    bg.append(box);
+    const onKey = e => {
+      if (document.querySelectorAll(".modal-bg").length && bg !== [...document.querySelectorAll(".modal-bg")].pop()) return;  // only the top dialog
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(null); }
+      else if (e.key === "Enter" && !e.shiftKey && !(e.target && (e.target.nodeName === "TEXTAREA" || e.target.nodeName === "BUTTON"))) {
+        const prim = btns.find(b => b.classList.contains("primary")) || (btns.length === 1 ? btns[0] : null);
+        if (prim) { e.preventDefault(); if (e.target && e.target.blur) e.target.blur(); prim.click(); }
+      } else if (e.key === "Tab") {
+        const f = [...box.querySelectorAll("input,textarea,select,button,a[href]")].filter(x => !x.disabled && x.offsetParent);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        else if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener("keydown", onKey, true);
+    let downOnBg = false;  // a drag that starts in a field and ends outside must not close the dialog
+    bg.addEventListener("mousedown", e => { downOnBg = e.target === bg; });
+    bg.addEventListener("click", e => { if (e.target === bg && downOnBg) close(null); });
     document.body.append(bg);
-    const f = bg.querySelector("input,textarea,select"); if (f) f.focus();
+    animate(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 160 });
+    animate(box, [{ transform: "translateY(14px) scale(.96)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 240 });
+    const f = box.querySelector("input,textarea,select") || btns.find(b => b.classList.contains("primary")) || btns[0];
+    if (f) f.focus();
   });
 }
 const store = {
@@ -97,34 +273,94 @@ const store = {
 };
 
 // ---------- State ----------
-const S = { view: "home", pid: null, data: null, edit: null, showPast: false, simTimer: null, cands: {}, sugg: {} };
+const S = { view: "home", pid: null, data: null, edit: null, editBase: null, showPast: false, simTimer: null, cands: {}, sugg: {},
+  deckInfo: {}, epoch: 0, nav: 0, seq: 0, pending: new Map(), mock: null, dayDone: new Map(), cheer: false };
 const app = () => document.getElementById("app");
+const DEPTH = { home: 0, plan: 1, edit: 2, review: 2 };
+
+const dirty = () => S.view === "edit" && !!S.edit && JSON.stringify(S.edit) !== S.editBase;
+async function leaveEdit() {
+  if (!dirty()) return true;
+  const v = await modal(L("Änderungen speichern?", "Save your changes?", "تغییرات ذخیره شوند؟"),
+    h("p", { style: "margin:0" }, L("Du hast diesen Plan bearbeitet, aber noch nicht gespeichert.", "You have edited this plan but not saved it yet.", "این برنامه را ویرایش کرده‌اید اما هنوز ذخیره نکرده‌اید.")),
+    [[L("Weiter bearbeiten", "Keep editing", "ادامهٔ ویرایش"), null], [L("Verwerfen", "Discard", "دور ریختن"), "drop", "danger"], [L("Speichern", "Save", "ذخیره"), "save", "primary"]]);
+  if (v === "save") { await run(call("savePlan", { plan: S.edit })); S.editBase = JSON.stringify(S.edit); }
+  return !!v;
+}
 
 async function go(view, pid) {
-  S.view = view; if (pid !== undefined) S.pid = pid;
-  if (view === "home") S.data = await run(call("home"));
-  if (view === "plan") S.data = await run(call("open", { id: S.pid }));
+  if (S.view === "edit" && !(await leaveEdit())) return;
+  const nav = ++S.nav, target = pid !== undefined ? pid : S.pid;
+  let data = S.data, edit = S.edit;
+  if (view === "home") data = await run(call("home"));
+  if (view === "plan") data = await run(call("open", { id: target }));
   if (view === "edit") {
-    const d = await run(call("open", { id: S.pid }));
-    S.edit = clone(d.plan); S.cands = {}; S.sugg = {};
-    for (const s of S.edit.sources) if (s.type === "pages" && d.files && d.files[s.id]) s.file = d.files[s.id];  // the path on this device
-    for (const s of S.edit.sources) if (s.type === "anki" && !s.decks) { s.decks = s.deck ? [s.deck] : []; delete s.deck; }
-    await loadCands();
+    const d = await run(call("open", { id: target }));
+    data = d;
+    edit = clone(d.plan);
+    for (const s of edit.sources) if (s.type === "pages" && d.files && d.files[s.id]) s.file = d.files[s.id];  // the path on this device
+    for (const s of edit.sources) if (s.type === "anki" && !s.decks) { s.decks = s.deck ? [s.deck] : []; delete s.deck; }
   }
-  if (view === "review") S.data = await run(call("review", { id: S.pid }));
+  if (view === "review") data = await run(call("review", { id: target }));
+  if (nav !== S.nav) return;  // another click was faster
+  if (view === "plan" && data.phase === "setup") return go("edit", target);  // nothing scheduled yet
+  const back = DEPTH[view] < DEPTH[S.view];
+  S.pid = target; S.data = data;
+  if (S.mock && S.mock.pid !== target) { clearInterval(S.simTimer); S.mock = null; }
+  if (view === "edit") { S.edit = edit; S.editBase = JSON.stringify(edit); S.cands = {}; S.sugg = {}; S.deckInfo = {}; S.epoch++; await loadCands(); if (nav !== S.nav) return; }
+  S.view = view; S.pending.clear(); S.dayDone.clear();
+  transition(back, () => { render(false); window.scrollTo(0, 0); });
+}
+// Views slide over each other (forwards from the right, back from the left).
+function transition(back, fn) {
+  if (!motion() || !document.startViewTransition) return fn();
+  document.documentElement.dataset.nav = back ? "back" : "fwd";
+  try { document.startViewTransition(fn); } catch { fn(); }
+}
+function apply(kind, data) {
+  if (kind !== S.view || (kind === "plan" && data.plan.id !== S.pid)) return false;
+  S.data = data;
   render();
-  window.scrollTo(0, 0);
+  return true;
 }
-async function refresh() {
-  if (S.view === "plan") { S.data = await call("open", { id: S.pid }); const y = window.scrollY; render(); window.scrollTo(0, y); }
-  else if (S.view === "home") { S.data = await call("home"); render(); }
+// Fetches the current view again. after(): runs once the answer is there, before drawing.
+async function refresh(after) {
+  if (S.view !== "plan" && S.view !== "home") { if (after) after(); return; }
+  const kind = S.view, seq = ++S.seq, nav = S.nav;
+  let data;
+  try { data = await call(kind === "plan" ? "open" : "home", { id: S.pid }); }
+  finally { if (after) after(); }
+  if (seq !== S.seq || nav !== S.nav) return;  // a newer answer is on its way or the view changed
+  apply(kind, data);
 }
-window.LP = { refresh, go };
+// Python hands over data it collected in the background (after reviews in Anki, a sync …).
+function push(kind, data) { apply(kind, data); }
+window.LP = { refresh, go, push, dirty: () => dirty() ? S.edit : null, saved: () => { if (S.edit) S.editBase = JSON.stringify(S.edit); } };
 
-function render() {
+// morph = keep the page and change only what differs (default); false = draw anew (after navigation).
+function render(morph = true) {
   const root = app();
-  root.replaceChildren();
-  ({ home: renderHome, plan: renderPlan, edit: renderEdit, review: renderReview })[S.view](root);
+  const fresh = document.createDocumentFragment();
+  const view = S.view;
+  ({ home: renderHome, plan: renderPlan, edit: renderEdit, review: renderReview })[view](fresh);
+  if (morph && root.dataset.view === view && view !== "review") morphInto(root, fresh);
+  else {
+    root.replaceChildren(fresh);
+    root.dataset.view = view;
+    root.classList.remove("lp-in");
+    if (motion()) { void root.offsetWidth; root.classList.add("lp-in"); }
+  }
+  afterRender();
+}
+function afterRender() {
+  // A day that just became complete through your own tick gets a little party.
+  for (const el of document.querySelectorAll("#app .day[data-key]")) {
+    const k = el.dataset.key, done = el.dataset.complete === "1", was = S.dayDone.get(k);
+    if (S.cheer && was === false && done) dayParty(el);
+    S.dayDone.set(k, done);
+  }
+  S.cheer = false;
+  watchToday();
 }
 
 // ---------- Overview ----------
@@ -136,9 +372,11 @@ function renderHome(root) {
       h("button", { onclick: () => importDialog(), title: L("Plan von Freunden übernehmen (Code oder Datei)", "Use a plan from friends (code or file)", "استفاده از برنامهٔ دوستان (کد یا فایل)") }, L("Importieren", "Import", "وارد کردن")),
       h("button", { class: "primary", onclick: () => newPlan() }, L("+ Neuer Plan", "+ New plan", "+ برنامهٔ جدید")))));
 
+  const open = d.plans.filter(p => p.status === "active" && p.today).reduce((a, p) => [a[0] + p.today[0], a[1] + p.today[1], a[2] + p.today[2]], [0, 0, 0]);
   const tiles = h("div", { class: "tiles" },
-    tile(L("Lern-Serie", "Study streak", "روزهای پیاپی مطالعه"), String(d.streak), null, days(d.streak)),
-    tile(L("Aktive Pläne", "Active plans", "برنامه‌های فعال"), String(d.plans.filter(p => p.status === "active").length)));
+    tile(L("Lern-Serie", "Study streak", "روزهای پیاپی مطالعه"), String(d.streak), null, days(d.streak) + (d.streak >= 3 ? " 🔥" : "")),
+    tile(L("Aktive Pläne", "Active plans", "برنامه‌های فعال"), String(d.plans.filter(p => p.status === "active").length)),
+    open[1] ? tile(L("Heute", "Today", "امروز"), String(open[0]), open[0] / open[1], "/ " + open[1] + (open[2] ? ` · ≈ ${hm(open[2])} ${L("offen", "left", "مانده")}` : " ✓")) : null);
   root.append(tiles, heatmap(d.heat, d.today));
 
   const act = d.plans.filter(p => p.status === "active"), arch = d.plans.filter(p => p.status !== "active");
@@ -146,18 +384,32 @@ function renderHome(root) {
   if (!act.length) root.append(h("div", { class: "card muted" }, L("Noch kein Plan. Leg mit „+ Neuer Plan“ los.", "No plan yet. Get started with “+ New plan”.", "هنوز برنامه‌ای ندارید. با «+ برنامهٔ جدید» شروع کنید.")));
   root.append(h("div", { class: "plans" }, act.map(planCard)));
   if (arch.length) {
-    root.append(h("details", null, h("summary", null, `${L("Archiv", "Archive", "بایگانی")} (${arch.length})`), h("div", { class: "plans" }, arch.map(planCard))));
+    root.append(h("details", { open: store.get("archOpen") || null, ontoggle: e => store.set("archOpen", e.target.open) }, h("summary", null, `${L("Archiv", "Archive", "بایگانی")} (${arch.length})`), h("div", { class: "plans" }, arch.map(planCard))));
   }
   root.append(h("p", { class: "muted small", style: "margin-top:30px" }, `Smart Study ${d.version} · ${L("Pläne liegen im Add-on-Ordner unter user_files/plans.", "Plans are stored in the add-on folder under user_files/plans.", "برنامه‌ها در پوشهٔ افزونه، در مسیر user_files/plans ذخیره می‌شوند.")}`));
 }
 function planCard(p) {
   const left = p.exam ? daysBetween(S.data.today, p.exam) : null, [dn, tot] = p.progress;
-  return h("div", { class: "card plan-card", onclick: () => go("plan", p.id) },
+  const td = p.status === "active" && p.today && p.today[1] ? p.today : null;
+  const openIt = () => go("plan", p.id);
+  return h("div", { class: "card plan-card" + (left != null && left >= 0 && left <= 3 && p.status === "active" ? " soon" : ""), key: p.id, tabindex: 0, role: "button", onclick: openIt,
+    onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openIt(); } } },
     h("div", { class: "days-left" }, left == null ? "?" : left > 0 ? String(left) : left === 0 ? L("heute", "today", "امروز") : "✓",
       h("small", null, left == null ? L("Entwurf", "draft", "پیش‌نویس") : left > 0 ? days(left) : left === 0 ? L("Prüfung", "exam", "امتحان") : L("vorbei", "over", "تمام‌شده"))),
     h("div", { class: "grow" }, h("h2", null, p.title),
       h("div", { class: "muted small" }, p.exam ? `${L("Prüfung", "Exam", "امتحان")} ${fmt(p.exam)}${COMMA()}${dmy(p.exam)} · ${dn}/${tot} ${L("erledigt", "done", "انجام‌شده")}` : L("Entwurf – Prüfungsdatum fehlt noch", "Draft – exam date still missing", "پیش‌نویس – تاریخ امتحان هنوز وارد نشده است")),
-      h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `width:${tot ? 100 * dn / tot : 0}%` }))));
+      h("div", { class: "pbar" + (tot && dn === tot ? " ok" : "") }, h("i", { style: `width:${tot ? 100 * dn / tot : 0}%` }))),
+    td ? h("div", { class: "today-chip" + (td[0] === td[1] ? " done" : ""), title: L("Heutige Punkte", "Today's items", "موارد امروز") }, ring(td[0] / td[1], 30),
+      h("small", null, td[0] === td[1] ? L("heute fertig", "done today", "امروز تمام") : `${td[0]}/${td[1]} ${L("heute", "today", "امروز")}`)) : null,
+    h("span", { class: "chev", "aria-hidden": "true" }, "›"));
+}
+// Progress ring; a full ring shows a tick.
+function ring(frac, size = 22) {
+  const r = 9, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, frac || 0));
+  return svg("svg", { class: "ring" + (f >= 1 ? " full" : ""), viewBox: "0 0 24 24", width: size, height: size, "aria-hidden": "true" },
+    svg("circle", { cx: 12, cy: 12, r, class: "bg" }),
+    svg("circle", { cx: 12, cy: 12, r, class: "fg", "stroke-dasharray": c.toFixed(2), style: `stroke-dashoffset:${(c * (1 - f)).toFixed(2)}` }),
+    f >= 1 ? svg("path", { d: "M7.6 12.4l3 3 5.8-6.4", class: "tick" }) : null);
 }
 function heatmap(heat, today) {
   const vals = Object.values(heat).filter(v => v > 0).sort((a, b) => a - b);
@@ -165,9 +417,10 @@ function heatmap(heat, today) {
   const lv = v => !v ? "" : v <= q(.25) ? "l1" : v <= q(.5) ? "l2" : v <= q(.8) ? "l3" : "l4";
   const end = dt(today), start = new Date(end); start.setDate(end.getDate() - 7 * 26 - ((end.getDay() + 6) % 7));
   const grid = h("div", { class: "heat" });
+  let n = 0;
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const s = iso(d), v = heat[s] || 0;
-    grid.append(h("i", { class: lv(v) + (s === today ? " td" : ""), title: `${fmt(s)}: ${v} ${L("Bewertungen/Häkchen", "ratings/checkmarks", "ارزیابی/تیک")}` }));
+    grid.append(h("i", { class: lv(v) + (s === today ? " td" : ""), style: `--c:${Math.floor(n++ / 7)}`, title: `${fmt(s)}: ${v} ${L("Bewertungen/Häkchen", "ratings/checkmarks", "ارزیابی/تیک")}` }));
   }
   return h("div", { class: "card" }, h("div", { class: "muted small", style: "margin-bottom:6px" }, L("Letzte 6 Monate (Anki-Bewertungen + abgehakte Punkte)", "Last 6 months (Anki ratings + checked items)", "6 ماه گذشته (ارزیابی‌های Anki + موارد تیک‌خورده)")), grid);
 }
@@ -188,18 +441,22 @@ async function newPlan(from) {
 }
 
 function tile(k, v, frac, sub) {
-  const t = h("div", { class: "tile" }, h("div", { class: "k" }, k), h("div", { class: "v" }, v, sub ? h("small", null, " " + sub) : null));
+  const t = h("div", { class: "tile" }, h("div", { class: "k" }, k), h("div", { class: "v" }, h("span", { "data-num": "" }, v), sub ? h("small", null, " " + sub) : null));
   if (frac != null) t.append(h("div", { class: "pbar" + (frac >= 1 ? " ok" : "") }, h("i", { style: `width:${Math.min(100, 100 * frac)}%` })));
   return t;
 }
 
 // ---------- Plan view ----------
-function itemDone(it) { const d = S.data; return !!(d.plan.done[it.id] || (d.ev[it.id] && d.ev[it.id].done)); }
+function itemDone(it) {
+  const d = S.data;
+  if (S.pending.has(it.id)) return S.pending.get(it.id) || !!(d.ev[it.id] && d.ev[it.id].done);  // your click counts at once
+  return !!(d.plan.done[it.id] || (d.ev[it.id] && d.ev[it.id].done));
+}
 
 function renderPlan(root) {
   const { plan, stats, progress, phase, overdue } = S.data;
   const today = stats.today, left = daysBetween(today, plan.exam);
-  if (phase === "setup") { S.view = "edit"; return go("edit"); }
+  if (phase === "setup") { setTimeout(() => { if (S.view === "plan") go("edit"); }); return; }
   root.append(h("div", { class: "top" },
     h("div", null, h("a", { class: "small", onclick: () => go("home") }, L("← Alle Pläne", "← All plans", "→ همهٔ برنامه‌ها")), h("h1", null, plan.title),
       h("p", { class: "sub" }, `${L("Prüfung", "Exam", "امتحان")} ${fmt(plan.exam)} ${plan.exam.slice(0, 4)}${plan.examTime ? COMMA() + plan.examTime + L(" Uhr", "", "") : ""}${plan.subtitle ? " · " + plan.subtitle : ""}`)),
@@ -209,7 +466,7 @@ function renderPlan(root) {
       h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")),
       h("button", { onclick: () => shareDialog() }, L("Teilen", "Share", "اشتراک‌گذاری")))));
 
-  for (const n of plan.notes || []) root.append(h("div", { class: "card warn" }, n));
+  (plan.notes || []).forEach((n, i) => root.append(h("div", { class: "card warn", key: "note" + i }, n)));
 
   // Tiles
   const tiles = h("div", { class: "tiles" });
@@ -237,31 +494,31 @@ function renderPlan(root) {
 
   if (S.mock) root.append(mockPanel());
 
-  if (overdue.length) root.append(h("div", { class: "card warn" }, h("h2", null, L(`${overdue.length} Punkte von vergangenen Tagen offen`, `${overdue.length} items from past days still open`, `${overdue.length} مورد از روزهای گذشته هنوز باز است`)),
+  if (overdue.length) root.append(h("div", { class: "card warn", key: "overdue" }, h("h2", null, L(`${overdue.length} Punkte von vergangenen Tagen offen`, `${overdue.length} items from past days still open`, `${overdue.length} مورد از روزهای گذشته هنوز باز است`)),
     h("p", { class: "small", style: "margin:4px 0 8px" }, L("„Neu planen“ verteilt sie (und alles andere, was noch offen ist) auf die Tage bis zur Prüfung.", "“Replan” spreads them (and everything else still open) over the days until the exam.", "«برنامه‌ریزی دوباره» آن‌ها را (و هر چیز دیگری که هنوز باز است) روی روزهای باقی‌مانده تا امتحان پخش می‌کند.")),
     h("button", { class: "primary", onclick: () => replan() }, L("Jetzt neu planen", "Replan now", "همین حالا دوباره برنامه‌ریزی کنید"))));
 
   if (phase === "early") {
-    root.append(h("div", { class: "card okc" }, h("h2", null, L(`Alles geschafft – noch ${left} ${days(left)} bis zur Prüfung 🎉`, `All done – ${left} ${days(left)} left until the exam 🎉`, `همه‌چیز انجام شد – ${left} ${days(left)} تا امتحان مانده است 🎉`)),
+    root.append(h("div", { class: "card okc", key: "early" }, h("h2", null, L(`Alles geschafft – noch ${left} ${days(left)} bis zur Prüfung 🎉`, `All done – ${left} ${days(left)} left until the exam 🎉`, `همه‌چیز انجام شد – ${left} ${days(left)} تا امتحان مانده است 🎉`)),
       h("p", { class: "small", style: "margin:4px 0 0" }, L("Jetzt nicht ausruhen auf dem Plan, sondern festigen:", "Don't rest on the plan now, consolidate instead:", "حالا به برنامه بسنده نکنید، آموخته‌ها را تثبیت کنید:")), toolsPanel(true)));
     celebrate(plan.id);
   } else if (phase === "after") {
-    root.append(h("div", { class: "card hl" }, h("h2", null, L("Die Prüfung ist vorbei", "The exam is over", "امتحان تمام شد")),
+    root.append(h("div", { class: "card hl", key: "after" }, h("h2", null, L("Die Prüfung ist vorbei", "The exam is over", "امتحان تمام شد")),
       h("p", { class: "small", style: "margin:4px 0 8px" }, L("Schau dir den Rückblick an: Was hat geklappt, wie schnell warst du wirklich? Das Tempo fließt in den nächsten Plan ein.", "Have a look at the retrospective: what worked, how fast were you really? Your pace feeds into the next plan.", "نگاهی به جمع‌بندی بیندازید: چه چیزی خوب پیش رفت و سرعت واقعی شما چقدر بود؟ این سرعت در برنامهٔ بعدی لحاظ می‌شود.")),
       h("div", { class: "bar-actions" }, h("button", { class: "primary", onclick: () => go("review") }, L("Zum Rückblick", "Open retrospective", "رفتن به جمع‌بندی")),
         h("button", { onclick: async () => { await run(call("archive", { id: plan.id, on: true })); toast(L("Archiviert.", "Archived.", "بایگانی شد.")); go("home"); } }, L("Archivieren", "Archive", "بایگانی")))));
   } else {
-    root.append(h("details", { open: store.get("toolsOpen") || null, ontoggle: e => store.set("toolsOpen", e.target.open) },
+    root.append(h("details", { key: "tools", open: store.get("toolsOpen") || null, ontoggle: e => store.set("toolsOpen", e.target.open) },
       h("summary", null, L("Werkzeuge: Schwachstellen · Probeprüfung", "Tools: weak spots · mock exam", "ابزارها: نقاط ضعف · امتحان آزمایشی")), toolsPanel(false)));
   }
   if (progress[1] && progress[0] === progress[1] && phase !== "after") celebrate(plan.id);
 
   // Days
   const past = plan.days.filter(d => d.d < today), rest = plan.days.filter(d => d.d >= today);
-  if (past.length) root.append(h("p", null, h("a", { class: "small", onclick: () => { S.showPast = !S.showPast; render(); } },
+  if (past.length) root.append(h("p", { key: "pasttoggle" }, h("a", { class: "small", onclick: () => { S.showPast = !S.showPast; render(); } },
     S.showPast ? L("Vergangene Tage ausblenden", "Hide past days", "پنهان کردن روزهای گذشته") : `${L("Vergangene Tage zeigen", "Show past days", "نمایش روزهای گذشته")} (${past.length})`)));
   for (const day of S.showPast ? plan.days : rest) root.append(dayCard(day, today));
-  root.append(h("p", { class: "muted small", style: "margin-top:20px" }, L("Punkte mit ", "Items marked ", "مواردی که با "), h("span", { class: "chip ok" }, "Anki"),
+  root.append(h("p", { class: "muted small", key: "legend", style: "margin-top:20px" }, L("Punkte mit ", "Items marked ", "مواردی که با "), h("span", { class: "chip ok" }, "Anki"),
     L(" hakt der Plan selbst ab, sobald du in Anki lernst. Alles andere per Klick.", " are checked off by the plan as soon as you study in Anki. Everything else with a click.", " مشخص شده‌اند، به‌محض مطالعه در Anki خودکار تیک می‌خورند. بقیه را با یک کلیک تیک بزنید.")));
 }
 function allItems(plan) { return plan.days.flatMap(d => d.items.map(it => [d, it])); }
@@ -275,7 +532,7 @@ function groupLabel(it, plan) {
 function dayCard(day, today) {
   const { plan } = S.data;
   const isToday = day.d === today, isExam = day.d === plan.exam;
-  const sec = h("section", { class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d && !m.prep) ? " exam" : "") });
+  const sec = h("section", { key: day.d, class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d && !m.prep) ? " exam" : "") });
   const mins = day.items.filter(it => !it.moved && it.kind !== "note").reduce((a, it) => a + (it.min || 0), 0);
   const note = [plan.dayNotes && plan.dayNotes[day.d], mins ? "≈ " + hm(mins) : null].filter(Boolean).join(" · ");
   const msDay = (plan.milestones || []).find(m => m.date === day.d);
@@ -286,39 +543,55 @@ function dayCard(day, today) {
   const groups = new Map();
   for (const it of day.items) { const g = groupLabel(it, plan); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(it); }
   let tot = 0, dn = 0;
+  let openMin = 0;
   for (const [g, its] of groups) {
     const box = h("div", { class: "items" });
     for (const it of its) {
       box.append(itemEl(it, day));
-      if (!["note", "weakround", "sim"].includes(it.kind) && !it.moved) { tot++; if (itemDone(it)) dn++; }
+      if (!["note", "weakround", "sim"].includes(it.kind) && !it.moved) { tot++; if (itemDone(it)) dn++; else openMin += it.min || 0; }
     }
-    sec.append(h("div", { class: "row" }, h("div", { class: "label" }, g), box));
+    sec.append(h("div", { class: "row", key: "g:" + g }, h("div", { class: "label" }, g), box));
   }
-  if (tot) head.append(h("span", { class: "dprog" + (dn === tot ? " done" : "") }, dn === tot ? L("✓ alles erledigt", "✓ all done", "✓ همه انجام شد") : `${dn}/${tot} ${L("erledigt", "done", "انجام‌شده")}`));
+  if (tot) {
+    sec.dataset.complete = dn === tot ? "1" : "0";
+    head.append(h("span", { class: "dprog" + (dn === tot ? " done" : ""), key: "prog" }, ring(dn / tot),
+      h("span", null, dn === tot ? L("alles erledigt", "all done", "همه انجام شد") : `${dn}/${tot} ${L("erledigt", "done", "انجام‌شده")}${isToday && openMin ? ` · ≈ ${hm(openMin)} ${L("offen", "left", "مانده")}` : ""}`)));
+  }
   if (day.d >= today) {
-    const inp = h("input", { type: "text", placeholder: L("Eigener Punkt, z. B. „Altfragen 2023 durchgehen“", "Custom item, e.g. “Go through the 2023 past questions”", "مورد دلخواه، مثلاً «مرور سؤال‌های سال 2023»") });
-    const add = async () => { if (!inp.value.trim()) return; await run(call("addCustom", { id: plan.id, day: day.d, text: inp.value.trim() })); refresh(); };
-    inp.addEventListener("keydown", e => { if (e.key === "Enter") add(); });
-    sec.append(h("div", { class: "add-row" }, inp, h("button", { onclick: add }, "+")));
+    // The field belongs to the page, not to this render: read it from the event.
+    const add = async e => {
+      const inp = e.currentTarget.closest(".add-row").querySelector("input"), text = inp.value.trim();
+      if (!text || inp.disabled) return;
+      inp.disabled = true;
+      try { await run(call("addCustom", { id: plan.id, day: day.d, text })); inp.value = ""; await refresh(); }
+      finally { inp.disabled = false; inp.focus(); }
+    };
+    sec.append(h("div", { class: "add-row", key: "add" },
+      h("input", { type: "text", maxlength: 500, onkeydown: e => { if (e.key === "Enter") add(e); }, placeholder: L("Eigener Punkt, z. B. „Altfragen 2023 durchgehen 45 min“", "Custom item, e.g. “Go through the 2023 past questions 45 min”", "مورد دلخواه، مثلاً «مرور سؤال‌های سال 2023 45 min»") }),
+      h("button", { onclick: add, title: L("Hinzufügen", "Add", "افزودن") }, "+")));
   }
   return sec;
 }
 
 function itemEl(it, day) {
   const { plan, ev } = S.data;
-  if (it.kind === "note") return h("div", { class: "plain" }, it.text);
-  if (it.kind === "weakround") return h("div", null, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
+  if (it.kind === "note") return h("div", { class: "plain", key: it.id }, it.text);
+  if (it.kind === "weakround") return h("div", { key: it.id }, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
     h("button", { onclick: () => weakDialog() }, L("Schwachstellen ansehen & einplanen", "View & schedule weak spots", "دیدن و برنامه‌ریزی نقاط ضعف")), h("button", { onclick: () => weakBrowse() }, L("Schwache Karten lernen", "Study weak cards", "مطالعهٔ کارت‌های ضعیف"))));
-  if (it.kind === "sim") return h("div", null, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
+  if (it.kind === "sim") return h("div", { key: it.id }, h("div", { class: "plain" }, it.text), h("div", { class: "bar-actions", style: "margin-top:5px" },
     h("button", { class: "primary", onclick: () => simStart() }, L("Probeprüfung starten", "Start mock exam", "شروع امتحان آزمایشی"))));
   const r = ev[it.id], auto = !!it.auto, done = itemDone(it);
-  const cb = h("input", { type: "checkbox", checked: done, disabled: it.moved || null });
-  cb.addEventListener("change", async () => {
-    if (auto && r && r.done && !plan.done[it.id]) { cb.checked = true; return toast(L("Das hakt Anki ab.", "Anki checks this off.", "این مورد را Anki خودش تیک می‌زند.")); }
-    await run(call("toggle", { id: plan.id, item: it.id, on: cb.checked }));
-    refresh();
-  });
-  const t = h("span", { class: "t" }, it.text);
+  const cb = h("input", { type: "checkbox", checked: done, disabled: it.moved || null, onchange: async e => {
+    const box = e.currentTarget, on = box.checked;
+    if (auto && r && r.done && !plan.done[it.id]) { box.checked = true; return toast(L("Das hakt Anki ab.", "Anki checks this off.", "این مورد را Anki خودش تیک می‌زند.")); }
+    S.pending.set(it.id, on); S.cheer = on;
+    render();  // shows the tick at once; Anki confirms right after
+    try { await call("toggle", { id: plan.id, item: it.id, on }); }
+    catch (err) { S.pending.delete(it.id); render(); toast(L("Fehler: ", "Error: ", "خطا: ") + err.message, 5000); refresh(); return; }
+    S.cheer = on;
+    await refresh(() => S.pending.delete(it.id));
+  } });
+  const t = h("span", { class: "t" }, h("span", { class: "tx" }, it.text));
   if (auto) t.append(h("span", { class: "chip" + (r && r.done ? " ok" : "") }, r && r.text ? "Anki · " + r.text : "Anki"));
   if (it.moved) t.append(h("span", { class: "chip info" }, L("→ neu eingeplant", "→ rescheduled", "← دوباره برنامه‌ریزی شد")));
   if (it.min && !auto && !it.moved) t.append(h("span", { class: "chip info" }, hm(it.min)));
@@ -330,9 +603,17 @@ function itemEl(it, day) {
   });
   const psrc = it.kind === "pages" && plan.sources.find(s => s.id === it.source);
   if (psrc && (psrc.file || psrc.fileName)) act(L("📖 öffnen", "📖 open", "📖 باز کردن"), async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r && r.cancelled) return; if (r && r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
-  if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); call("openLink", { url: it.url, id: plan.id, item: it.id }); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
-  const row = h("label", { class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
-  if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => { e.preventDefault(); await run(call("delItem", { id: plan.id, item: it.id })); refresh(); } }, "✕"));
+  if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); run(call("openLink", { url: it.url, id: plan.id, item: it.id })); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
+  if (it.custom && !done && day.d >= S.data.stats.today && day.d < plan.exam) act(L("→ morgen", "→ tomorrow", "← فردا"), async () => {
+    await run(call("moveItem", { id: plan.id, item: it.id, day: addDays(day.d, 1) })); refresh();
+  });
+  const row = h("label", { key: it.id, class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
+  if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => {
+    e.preventDefault();
+    const gone = await run(call("delItem", { id: plan.id, item: it.id }));
+    await refresh();
+    if (gone) toast(L("Punkt entfernt.", "Item removed.", "مورد حذف شد."), 6000, [L("Rückgängig", "Undo", "واگرد"), async () => { await run(call("restoreItem", { id: plan.id, gone })); refresh(); }]);
+  } }, "✕"));
   return row;
 }
 
@@ -396,7 +677,10 @@ async function importDialog() {
 }
 
 async function replan() {
-  const r = await run(call("generate", { id: S.pid }));
+  if (S.replanning) return;
+  S.replanning = true;
+  let r;
+  try { r = await run(call("generate", { id: S.pid })); } finally { S.replanning = false; }
   toast(r.notes.length ? L("Neu geplant – mit Hinweis, siehe oben.", "Replanned – with a note, see above.", "دوباره برنامه‌ریزی شد – با یک نکته، بالا را ببینید.") : L("Neu geplant: offener Stoff ist auf die Tage bis zur Prüfung verteilt.", "Replanned: open material is spread over the days until the exam.", "دوباره برنامه‌ریزی شد: مطالب باز روی روزهای باقی‌مانده تا امتحان پخش شدند."));
   go("plan");
 }
@@ -432,35 +716,53 @@ async function simStart() {
   if (!ok) return;
   const r = await run(call("mockStart", { id: S.pid, n: +n.value, minutes: +m.value }));
   if (!r.cards.length) return toast(L("Noch keine gelernten Karten in den Plan-Decks.", "No studied cards in the plan decks yet.", "هنوز کارت مطالعه‌شده‌ای در دسته‌های برنامه نیست."));
-  S.mock = { cards: r.cards, i: 0, shown: false, ok: 0, started: Date.now(), minutes: r.minutes };
+  S.mock = { pid: S.pid, cards: r.cards, i: 0, shown: false, ok: 0, started: Date.now(), minutes: r.minutes };
   render();
+  const el = document.querySelector(".mock"); if (el) el.scrollIntoView({ behavior: motion() ? "smooth" : "auto", block: "start" });
 }
 async function mockAnswer(cur, right) {
-  await run(call("mockAnswer", { id: S.pid, cid: cur.cid, ok: right }));
-  S.mock.i++; S.mock.shown = false; if (right) S.mock.ok++;
+  const m = S.mock;
+  if (!m || m.busy || m.cards[m.i] !== cur) return;  // a double click must not skip a card
+  m.busy = true;
+  try { await run(call("mockAnswer", { id: m.pid, cid: cur.cid, ok: right })); } finally { m.busy = false; }
+  if (S.mock !== m) return;
+  m.i++; m.shown = false; if (right) m.ok++;
   render();
 }
 async function mockStop() {
-  const r = await run(call("mockStop", { id: S.pid }));
+  const m = S.mock;
+  if (!m || m.stopping) return;
+  m.stopping = true;
+  let r;
+  try { r = await run(call("mockStop", { id: m.pid })); } catch (e) { m.stopping = false; throw e; }
   clearInterval(S.simTimer); S.mock = null; render();
   modal(L("Probeprüfung – Ergebnis", "Mock exam – result", "امتحان آزمایشی – نتیجه"), simTable(r), [[L("OK", "OK", "تأیید"), true, "primary"]]);
 }
 function mockPanel() {
   const m = S.mock, cur = m.cards[m.i];
-  const card = h("div", { class: "card hl" });
-  const end = m.started + m.minutes * 60e3;
-  const timer = h("div", { class: "timer" });
-  const tick = () => { const s = Math.max(0, Math.round((end - Date.now()) / 1000)); timer.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; if (!s) timer.style.color = "var(--bad)"; };
-  tick(); clearInterval(S.simTimer); S.simTimer = setInterval(() => document.body.contains(timer) ? tick() : clearInterval(S.simTimer), 1000);
+  const card = h("div", { class: "card hl mock", key: "mock" });
+  const end = m.started + m.minutes * 60e3, total = m.minutes * 60;
+  const timer = h("div", { class: "timer", key: "timer", "data-morph": "keep" });
+  const bar = h("div", { class: "pbar", key: "timebar", "data-morph": "keep" }, h("i", { style: "width:100%" }));
+  // The clock is kept across renders; it looks its elements up in the page each second.
+  const tick = () => {
+    const live = document.querySelector(".mock .timer") || timer, liveBar = document.querySelector(".mock .pbar[data-key=timebar] i") || bar.firstChild;
+    const s = Math.max(0, Math.round((end - Date.now()) / 1000));
+    live.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    live.classList.toggle("low", s <= 60);
+    liveBar.style.width = `${100 * s / total}%`;
+    if (!s && S.mock === m && !m.timeUp) { m.timeUp = true; toast(L("Zeit abgelaufen – Auswertung.", "Time is up – evaluating.", "زمان تمام شد – ارزیابی."), 4000); mockStop(); }
+  };
+  tick(); clearInterval(S.simTimer); S.simTimer = setInterval(() => S.mock === m ? tick() : clearInterval(S.simTimer), 1000);
   card.append(h("h2", null, L("Probeprüfung läuft", "Mock exam running", "امتحان آزمایشی در حال انجام است")), timer,
-    h("div", { class: "small muted" }, cur ? L(`Karte ${m.i + 1} von ${m.cards.length} · ${m.ok} richtig bisher`, `Card ${m.i + 1} of ${m.cards.length} · ${m.ok} right so far`, `کارت ${m.i + 1} از ${m.cards.length} · تا اینجا ${m.ok} درست`) : L(`Alle ${m.cards.length} Karten durch · ${m.ok} richtig`, `All ${m.cards.length} cards done · ${m.ok} right`, `هر ${m.cards.length} کارت تمام شد · ${m.ok} درست`)));
+    bar, h("div", { class: "small muted" }, cur ? L(`Karte ${m.i + 1} von ${m.cards.length} · ${m.ok} richtig bisher`, `Card ${m.i + 1} of ${m.cards.length} · ${m.ok} right so far`, `کارت ${m.i + 1} از ${m.cards.length} · تا اینجا ${m.ok} درست`) : L(`Alle ${m.cards.length} Karten durch · ${m.ok} richtig`, `All ${m.cards.length} cards done · ${m.ok} right`, `هر ${m.cards.length} کارت تمام شد · ${m.ok} درست`)));
   if (cur) {
-    card.append(h("p", { style: "white-space:pre-wrap" }, cur.q));
-    if (m.shown) card.append(h("p", { style: "white-space:pre-wrap" }, cur.a), h("div", { class: "bar-actions" },
-      h("button", { class: "primary", onclick: () => mockAnswer(cur, true) }, L("Richtig", "Right", "درست")), h("button", { onclick: () => mockAnswer(cur, false) }, L("Falsch", "Wrong", "نادرست"))));
-    else card.append(h("div", { class: "bar-actions" }, h("button", { class: "primary", onclick: () => { m.shown = true; render(); } }, L("Antwort zeigen", "Show answer", "نمایش پاسخ"))));
+    card.append(h("p", { class: "mock-q", key: "q" + m.i, style: "white-space:pre-wrap" }, cur.q));
+    if (m.shown) card.append(h("p", { class: "mock-a", key: "a" + m.i, style: "white-space:pre-wrap" }, cur.a), h("div", { class: "bar-actions", key: "rate" },
+      h("button", { class: "primary", onclick: () => mockAnswer(cur, true), title: L("Taste 1 oder →", "Key 1 or →", "کلید 1 یا →") }, L("Richtig", "Right", "درست")), h("button", { onclick: () => mockAnswer(cur, false), title: L("Taste 2 oder ←", "Key 2 or ←", "کلید 2 یا ←") }, L("Falsch", "Wrong", "نادرست"))));
+    else card.append(h("div", { class: "bar-actions", key: "show" }, h("button", { class: "primary", onclick: () => { m.shown = true; render(); }, title: L("Leertaste", "Space", "کلید فاصله") }, L("Antwort zeigen", "Show answer", "نمایش پاسخ"))));
   }
-  card.append(h("div", { class: "bar-actions" }, h("button", { onclick: mockStop }, L("Beenden & auswerten", "Finish & evaluate", "پایان و ارزیابی"))));
+  card.append(h("div", { class: "bar-actions", key: "stop", style: "margin-top:10px" }, h("button", { onclick: mockStop }, L("Beenden & auswerten", "Finish & evaluate", "پایان و ارزیابی"))));
   return card;
 }
 
@@ -472,20 +774,66 @@ function simTable(r) {
 }
 
 // ---------- Confetti ----------
+const PARTY = ["#2f7d4f", "#2f5d9e", "#e3a64a", "#b3372b", "#8db4ee", "#6cc18e"];
+// Paper snippets with gravity, drag and spin. origin: {x, y} in px for a burst; none = rain from the top.
+function confetti(count, origin) {
+  if (!motion()) return;
+  const c = h("canvas", { class: "confetti" }); document.body.append(c);
+  const dpr = Math.min(2, window.devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+  c.width = W * dpr; c.height = H * dpr;
+  const x = c.getContext("2d"); x.scale(dpr, dpr);
+  const ps = Array.from({ length: count }, () => {
+    const ang = origin ? -Math.PI / 2 + (Math.random() - .5) * 2.2 : Math.PI / 2 + (Math.random() - .5) * .6, v = origin ? 5 + Math.random() * 7 : 2 + Math.random() * 3;
+    return { x: origin ? origin.x : Math.random() * W, y: origin ? origin.y : -20 - Math.random() * H / 2, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v,
+      w: 5 + Math.random() * 5, hh: 3 + Math.random() * 5, rot: Math.random() * 6.3, vr: (Math.random() - .5) * .4, c: PARTY[Math.floor(Math.random() * PARTY.length)], ph: Math.random() * 6.3 };
+  });
+  const t0 = performance.now(), life = origin ? 1500 : 3800;
+  let last = t0;
+  (function step(now) {
+    const dt = Math.min(2.5, (now - last) / 16.7), age = now - t0; last = now;
+    x.clearRect(0, 0, W, H);
+    x.globalAlpha = Math.max(0, Math.min(1, (life - age) / 500));
+    let alive = false;
+    for (const p of ps) {
+      p.vy += (origin ? .32 : .05) * dt; p.vx *= Math.pow(.985, dt); p.vy *= Math.pow(.992, dt);
+      p.x += (p.vx + Math.sin(age / 260 + p.ph) * .6) * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      if (p.y < H + 20) alive = true;
+      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.scale(1, Math.cos(age / 130 + p.ph)); x.fillStyle = p.c; x.fillRect(-p.w / 2, -p.hh / 2, p.w, p.hh); x.restore();
+    }
+    if (alive && age < life) requestAnimationFrame(step); else c.remove();
+  })(t0);
+  setTimeout(() => c.remove(), life + 2000);  // also if the window was hidden meanwhile
+}
+function dayParty(el) {
+  const r = (el.querySelector(".dprog") || el).getBoundingClientRect();
+  confetti(36, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  animate(el, [{ transform: "scale(1)" }, { transform: "scale(1.012)" }, { transform: "scale(1)" }], { duration: 420 });
+}
 function celebrate(pid) {
   if (store.get("party." + pid)) return;
   store.set("party." + pid, true);
-  const c = h("canvas", { class: "confetti" }); document.body.append(c);
-  const x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
-  const cols = ["#2f7d4f", "#2f5d9e", "#e3a64a", "#b3372b", "#8db4ee"];
-  const ps = Array.from({ length: 140 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height / 2, vy: 2 + Math.random() * 3, vx: Math.random() * 2 - 1, r: Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], a: Math.random() * 6 }));
-  let f = 0;
-  (function step() {
-    x.clearRect(0, 0, c.width, c.height);
-    for (const p of ps) { p.y += p.vy; p.x += p.vx + Math.sin((f + p.a) / 12); x.fillStyle = p.c; x.fillRect(p.x, p.y, 6, 3 + p.r); }
-    if (++f < 220) requestAnimationFrame(step); else c.remove();
-  })();
+  confetti(160);
   toast(L("Alles abgehakt – stark! 🎉", "Everything checked off – great job! 🎉", "همه تیک خورد – عالی بود! 🎉"), 3500);
+}
+
+// "Today" button: appears when today's card is out of sight.
+let todayWatch = null;
+function watchToday() {
+  if (todayWatch) { todayWatch.disconnect(); todayWatch = null; }
+  let fab = document.querySelector(".fab-today");
+  const card = S.view === "plan" ? document.querySelector("#app .day.today") : null;
+  if (!card) { if (fab) fab.remove(); return; }
+  if (!fab) {
+    fab = h("button", { class: "fab-today", onclick: () => { const c = document.querySelector("#app .day.today"); if (c) c.scrollIntoView({ behavior: motion() ? "smooth" : "auto", block: "start" }); } });
+    document.body.append(fab);
+  }
+  if (!("IntersectionObserver" in window)) return;
+  todayWatch = new IntersectionObserver(es => {
+    const e = es[es.length - 1];
+    fab.textContent = (e.boundingClientRect.top < 0 ? "↑ " : "↓ ") + L("Heute", "Today", "امروز");
+    fab.classList.toggle("show", !e.isIntersecting);
+  });
+  todayWatch.observe(card);
 }
 
 // ---------- Edit ----------
@@ -502,7 +850,7 @@ function renderEdit(root) {
   const p = S.edit;
   const saveLabel = p.days.length ? L("Speichern & neu planen", "Save & replan", "ذخیره و برنامه‌ریزی دوباره") : L("Plan erstellen", "Create plan", "ساخت برنامه");
   root.append(h("div", { class: "top" },
-    h("div", null, h("a", { class: "small", onclick: () => go(p.days.length ? "plan" : "home") }, p.days.length ? L("← Zurück zum Plan", "← Back to the plan", "→ بازگشت به برنامه") : L("← Alle Pläne", "← All plans", "→ همهٔ برنامه‌ها")), h("h1", null, p.title || L("Neuer Plan", "New plan", "برنامهٔ جدید")),
+    h("div", null, h("a", { class: "small", onclick: () => go(p.days.length && p.exam ? "plan" : "home") }, p.days.length ? L("← Zurück zum Plan", "← Back to the plan", "→ بازگشت به برنامه") : L("← Alle Pläne", "← All plans", "→ همهٔ برنامه‌ها")), h("h1", null, p.title || L("Neuer Plan", "New plan", "برنامهٔ جدید")),
       h("p", { class: "sub" }, L("1. Eckdaten → 2. Quellen → 3. Themen → Plan erstellen", "1. Basics → 2. Sources → 3. Topics → Create plan", "1. اطلاعات پایه ← 2. منابع ← 3. موضوع‌ها ← ساخت برنامه"))),
     h("div", { class: "bar-actions" }, h("button", { onclick: saveEdit }, L("Speichern", "Save", "ذخیره")), h("button", { class: "primary", onclick: () => saveEdit(true) }, saveLabel))));
 
@@ -542,7 +890,7 @@ function milestonesEl(p) {
   const box = h("div", { style: "margin-top:12px" }, h("h3", null, L("Etappen / Testate vor der Prüfung", "Milestones / tests before the exam", "مرحله‌ها / آزمون‌های پیش از امتحان")),
     h("p", { class: "muted small", style: "margin:0 0 6px" }, L("Zwischentermine (Testate, Teilprüfungen) hier eintragen und bei jedem Thema wählen, wozu es gehört: der Stoff ist dann vor dem Termin fertig – egal in welcher Reihenfolge er im Buch steht. Mit „Präpsaal“ markierte Termine sind weich: bis dahin nur Lesen + Video, die Karten laufen bis zum nächsten Testat weiter.", "Enter intermediate dates (tests, partial exams) here and pick for each topic where it belongs: its material is then finished before that date – no matter where it is in the book. Dates marked “Lab” are soft: only reading + video until then, the cards keep running until the next test.", "تاریخ‌های میانی (آزمون‌ها، امتحان‌های بخشی) را اینجا وارد کنید و برای هر موضوع مشخص کنید به کدام‌یک تعلق دارد: مطالب آن پیش از همان مهلت تمام می‌شود – هر جای کتاب که باشد. تاریخ‌هایی که با «جلسهٔ عملی» مشخص شده‌اند انعطاف‌پذیرند: تا آن موقع فقط خواندن + ویدیو، و کارت‌ها تا آزمون بعدی ادامه دارند.")));
   for (const m of p.milestones.slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""))) {
-    box.append(h("div", { class: "inline", style: "margin-bottom:5px" },
+    box.append(h("div", { class: "inline ms-row", key: m.id, style: "margin-bottom:5px" },
       h("input", { type: "text", value: m.name, placeholder: L("z. B. Testat Becken", "e.g. Pelvis test", "مثلاً آزمون لگن"), style: "flex:1;min-width:180px", onchange: e => { m.name = e.target.value; } }),
       dateInput(m.date, v => { m.date = v; render(); }),
       timeInput(m.time, v => { m.time = v; }),
@@ -561,13 +909,13 @@ function calendar(p) {
     const wd = (dt(d).getDay() + 6) % 7, has = d in p.dayMinutes;
     const val = has ? p.dayMinutes[d] : (p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay);
     const exam = d === p.exam, ms = (p.milestones || []).find(m => m.date === d);
-    cal.append(h("div", { class: "c" + (val ? "" : " off") + (exam || ms ? " exam" : "") },
+    cal.append(h("div", { key: d, class: "c" + (val ? "" : " off") + (exam || ms ? " exam" : "") },
       h("div", null, h("b", null, fmt(d)), exam ? " · " + L("Prüfung", "Exam", "امتحان") : ms ? " · " + (ms.name || L("Etappe", "Milestone", "مرحله")) : ""),
       exam ? null : h("div", { class: "inline" }, h("input", { type: "number", min: 0, step: 15, value: val, title: L("Minuten an diesem Tag", "Minutes on this day", "دقیقه در این روز"),
         onchange: e => { const v = +e.target.value; const def = p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay; if (v === def) delete p.dayMinutes[d]; else p.dayMinutes[d] = v; render(); } }), h("span", { class: "muted" }, L("min", "min", "دقیقه"))),
       h("input", { type: "text", placeholder: L("Notiz", "Note", "یادداشت"), value: (p.dayNotes || {})[d] || "", onchange: e => { p.dayNotes = p.dayNotes || {}; if (e.target.value) p.dayNotes[d] = e.target.value; else delete p.dayNotes[d]; } })));
   }
-  return h("details", { open: true }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
+  return h("details", { key: "cal", open: store.get("calOpen") === false ? null : true, ontoggle: e => store.set("calOpen", e.target.open) }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
 }
 
 function addSource(type) {
@@ -580,8 +928,13 @@ function addSource(type) {
 
 function sourceEl(s) {
   const p = S.edit;
-  const rm = () => { if (!confirm(L(`Quelle „${s.name || TYPES()[s.type]}“ entfernen?`, `Remove source “${s.name || TYPES()[s.type]}”?`, `منبع «${s.name || TYPES()[s.type]}» حذف شود؟`))) return; p.sources = p.sources.filter(x => x !== s); for (const t of p.topics) for (const k of ["pages", "videos", "tasks", "anki"]) if (t[k]) delete t[k][s.id]; render(); };
-  const box = h("div", { class: "src" }, h("div", { class: "src-head" }, h("span", { class: "type" }, TYPES()[s.type]),
+  const rm = async () => {
+    const ok = await modal(L("Quelle entfernen?", "Remove source?", "منبع حذف شود؟"), h("p", { style: "margin:0" }, L(`„${s.name || TYPES()[s.type]}“ und ihre Verknüpfungen in den Themen werden entfernt.`, `“${s.name || TYPES()[s.type]}” and its links in the topics will be removed.`, `«${s.name || TYPES()[s.type]}» و پیوندهای آن در موضوع‌ها حذف می‌شوند.`)),
+      [[L("Abbrechen", "Cancel", "انصراف"), null], [L("Entfernen", "Remove", "حذف"), true, "danger"]]);
+    if (!ok) return;
+    p.sources = p.sources.filter(x => x !== s); for (const t of p.topics) for (const k of ["pages", "videos", "tasks", "anki"]) if (t[k]) delete t[k][s.id]; render();
+  };
+  const box = h("div", { class: "src", key: s.id }, h("div", { class: "src-head" }, h("span", { class: "type" }, TYPES()[s.type]),
     h("input", { class: "name", type: "text", value: s.name, placeholder: L("Name", "Name", "نام"), onchange: e => { s.name = e.target.value; } }),
     h("button", { class: "ghost danger", onclick: rm }, L("Entfernen", "Remove", "حذف"))));
   const rate = h("span", { class: "inline small" }, h("input", { type: "number", step: "0.5", min: 0, value: s.minPerUnit ?? "", placeholder: String(defaultRate(s.type)),
@@ -590,24 +943,17 @@ function sourceEl(s) {
     const file = h("input", { type: "text", value: s.file || "", placeholder: L("PDF-Datei (optional) – dann öffnet der Plan direkt die richtige Seite", "PDF file (optional) – then the plan opens the right page directly", "فایل PDF (اختیاری) – در این صورت برنامه مستقیم صفحهٔ درست را باز می‌کند"), style: "flex:1;min-width:240px", onchange: e => { s.file = e.target.value.trim(); } });
     box.append(h("div", { class: "inline small" }, L("Tempo:", "Pace:", "سرعت:"), rate, h("span", { class: "muted" }, L("· Seitenbereiche trägst du bei den Themen ein.", "· Page ranges go into the topics.", "· بازهٔ صفحه‌ها را در موضوع‌ها وارد می‌کنید."))),
       h("div", { class: "inline small", style: "margin-top:6px" }, file,
-        h("button", { onclick: async () => { const p = await call("pickFile"); if (p) { s.file = p; file.value = p; } } }, L("Datei wählen …", "Choose file …", "انتخاب فایل …"))),
+        h("button", { onclick: async () => { const f = await run(call("pickFile")); if (f) { s.file = f; render(); } } }, L("Datei wählen …", "Choose file …", "انتخاب فایل …"))),
       h("div", { class: "inline small", style: "margin-top:4px" }, L("PDF-Seite = Buchseite +", "PDF page = book page +", "صفحهٔ PDF = صفحهٔ کتاب +"),
         h("input", { type: "number", value: s.pageOffset || 0, style: "width:60px", onchange: e => { s.pageOffset = +e.target.value || 0; } }),
         h("span", { class: "muted" }, L("(z. B. 4, wenn Buchseite 17 im PDF auf Seite 21 liegt)", "(e.g. 4 if book page 17 is page 21 in the PDF)", "(مثلاً 4، اگر صفحهٔ 17 کتاب در PDF صفحهٔ 21 باشد)"))));
   }
   if (s.type === "anki") {
-    const info = h("div", { class: "small muted", style: "margin-top:4px" });
+    const info = h("div", { class: "small muted", style: "margin-top:4px" }, deckInfoText(s));
     const mx = h("input", { type: "number", min: 0, value: s.maxNew ?? "", placeholder: "∞", onchange: e => { s.maxNew = e.target.value ? +e.target.value : null; } });
     const chips = h("div", null, s.decks.map(d => h("span", { class: "pill", title: d }, h("span", { class: "muted" }, d.split("::").slice(0, -1).join(" › ") + (d.includes("::") ? " › " : "")), d.split("::").pop(),
       h("button", { title: L("Deck entfernen", "Remove deck", "حذف دسته"), onclick: () => { s.decks = s.decks.filter(x => x !== d); delete S.cands[s.id]; render(); } }, "×"))));
     box.append(chips, deckPicker(s), h("div", { class: "inline small", style: "margin-top:6px" }, L("Tempo:", "Pace:", "سرعت:"), rate, h("span", { class: "muted" }, L("· max. neue/Tag:", "· max. new/day:", "· حداکثر جدید/روز:")), mx), info);
-    (async () => {
-      if (!s.decks.length) return;
-      let n = 0, tot = 0, per = [];
-      for (const d of s.decks) { const i = await call("deckInfo", { deck: d }); if (!i) continue; n += i.new; tot += i.total; if (i.perDay) per.push(i.perDay); }
-      info.textContent = L(`${n} neue von ${tot} Karten`, `${n} new of ${tot} cards`, `${n} کارت جدید از ${tot} کارت`) + (per.length ? L(` · Anki-Limit ${Math.min(...per)} neue/Tag`, ` · Anki limit ${Math.min(...per)} new/day`, ` · محدودیت Anki: ${Math.min(...per)} جدید/روز`) : "");
-      if (s.maxNew == null && per.length) { s.maxNew = Math.min(...per); mx.value = s.maxNew; }
-    })();
   }
   if (s.type === "videos" || s.type === "tasks") {
     const key = s.type, list = s[key];
@@ -615,8 +961,9 @@ function sourceEl(s) {
       ? L("Ein Video pro Zeile, Dauer und Link optional:\nBauchsitus 1 – Allgemeines | 25\nNiere Histologie (18 min)\nVMC Endokrinologie 1 | 40 | https://…", "One video per line, duration and link optional:\nAbdomen 1 – Overview | 25\nKidney histology (18 min)\nEndocrinology lecture 1 | 40 | https://…", "هر ویدیو در یک خط، مدت و لینک اختیاری:\nشکم 1 – کلیات | 25\nبافت‌شناسی کلیه (18 min)\nکلاس غدد 1 | 40 | https://…")
       : L("Ein Eintrag pro Zeile, Dauer und Link optional:\nVMC-Modul Niere | 45 | https://…\nAltfragen Embryo 2023 | 60", "One entry per line, duration and link optional:\nKidney module | 45 | https://…\nEmbryology past questions 2023 | 60", "هر مورد در یک خط، مدت و لینک اختیاری:\nدورهٔ کلیه | 45 | https://…\nسؤال‌های جنین‌شناسی 2023 | 60") });
     ta.value = list.map(v => v.name + (v.min ? " | " + v.min : "") + (v.url ? " | " + v.url : "")).join("\n");
-    ta.addEventListener("change", async () => {
-      const parsed = await call("parseList", { text: ta.value });
+    ta._v = ta.value;
+    listen(ta, "change", async ev => {
+      const parsed = await run(call("parseList", { text: ev.currentTarget.value }));
       const old = new Map(list.map(v => [v.name, v]));
       s[key] = parsed.map(x => Object.assign(old.get(x.name) || { id: uid(key === "videos" ? "v" : "t") }, { name: x.name, min: x.min, url: x.url || null }));
       const ids = new Set(s[key].map(v => v.id));
@@ -628,14 +975,40 @@ function sourceEl(s) {
   }
   return box;
 }
-// Deck picker: without search text suggestions matching the plan name, otherwise search results
+// Numbers of an Anki source's decks. They are fetched once and kept in S.deckInfo,
+// so a redraw shows them again without asking Anki.
+function deckInfoText(s) {
+  if (!s.decks.length) return "";
+  const infos = s.decks.map(d => S.deckInfo[d]);
+  if (infos.some(i => i === undefined)) { loadDeckInfo(s); return "…"; }
+  let n = 0, tot = 0; const per = [];
+  for (const i of infos) { if (!i) continue; n += i.new; tot += i.total; if (i.perDay) per.push(i.perDay); }
+  return L(`${n} neue von ${tot} Karten`, `${n} new of ${tot} cards`, `${n} کارت جدید از ${tot} کارت`) + (per.length ? L(` · Anki-Limit ${Math.min(...per)} neue/Tag`, ` · Anki limit ${Math.min(...per)} new/day`, ` · محدودیت Anki: ${Math.min(...per)} جدید/روز`) : "");
+}
+const infoLoading = new Set();
+async function loadDeckInfo(s) {
+  if (infoLoading.has(s.id)) return;
+  infoLoading.add(s.id);
+  const epoch = S.epoch;
+  try {
+    for (const d of s.decks.slice()) if (S.deckInfo[d] === undefined) { const i = await call("deckInfo", { deck: d }).catch(() => null); if (epoch !== S.epoch) return; S.deckInfo[d] = i || null; }
+    const per = s.decks.map(d => S.deckInfo[d]).filter(i => i && i.perDay).map(i => i.perDay);
+    if (s.maxNew == null && per.length) { const was = dirty(); s.maxNew = Math.min(...per); if (!was) S.editBase = JSON.stringify(S.edit); }  // Anki's own limit as the default is no edit of yours
+  } finally { infoLoading.delete(s.id); }
+  if (S.view === "edit" && epoch === S.epoch) render();
+}
+// Deck picker: without search text suggestions matching the plan name, otherwise search results.
+// It loads its list by itself, so a redraw keeps the live one (data-morph=keep) until the decks change.
 function deckPicker(s) {
-  const wrap = h("div", { style: "margin-top:6px" });
+  const wrap = h("div", { style: "margin-top:6px", key: `pick|${S.epoch}|${s.decks.join("\u0001")}`, "data-morph": "keep" });
   const q = h("input", { type: "text", placeholder: s.decks.length ? L("+ weiteres Deck suchen …", "+ search another deck …", "+ جستجوی دستهٔ دیگر …") : L("Deck suchen, z. B. „altfragen pm“ …", "Search a deck, e.g. “past questions” …", "جستجوی دسته، مثلاً «سؤال‌های سال‌های قبل» …"), style: "width:100%" });
   const list = h("div", { class: "deck-list" });
   let timer = null, open = !!s.pick || !s.decks.length;
+  let asked = 0;
   const load = async () => {
-    const r = await call("findDecks", { title: S.edit.title, q: q.value, exclude: s.decks });
+    const mine = ++asked;
+    const r = await call("findDecks", { title: S.edit.title, q: q.value, exclude: s.decks }).catch(() => []);
+    if (mine !== asked) return;  // an answer to an older search text
     list.replaceChildren();
     if (!q.value.trim() && r.length) list.append(h("div", { class: "muted small", style: "padding:2px 4px" }, L(`Passend zu „${S.edit.title}“:`, `Matching “${S.edit.title}”:`, `متناسب با «${S.edit.title}»:`)));
     if (!r.length) list.append(h("div", { class: "muted small", style: "padding:2px 4px" }, q.value.trim() ? L("Kein Deck gefunden.", "No deck found.", "دسته‌ای پیدا نشد.") : L("Kein passendes Deck zum Namen – einfach oben suchen.", "No deck matches the name – just search above.", "دسته‌ای با این نام هماهنگ نیست – کافی است بالا جستجو کنید.")));
@@ -646,8 +1019,8 @@ function deckPicker(s) {
         h("span", { class: "muted small" }, L(`${d.new} neu / ${d.total}`, `${d.new} new / ${d.total}`, `${d.new} جدید / ${d.total}`)), h("span", { class: "add" }, "+")));
     }
   };
-  q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(load, 200); });
-  q.addEventListener("focus", () => { if (!list.childElementCount) load(); });
+  listen(q, "input", () => { clearTimeout(timer); timer = setTimeout(load, 200); });
+  listen(q, "focus", () => { if (!list.childElementCount) load(); });
   wrap.append(q, list);
   if (open) load();
   return wrap;
@@ -684,7 +1057,7 @@ function sortedTopics(p) {
 function topicEl(t, ix, n) {
   const p = S.edit, manual = p.order !== "auto";
   const move = d => { const i = p.topics.indexOf(t), j = i + d; if (j < 0 || j >= p.topics.length) return; [p.topics[i], p.topics[j]] = [p.topics[j], p.topics[i]]; render(); };
-  const box = h("div", { class: "topic" }, h("div", { class: "topic-head" }, h("span", { class: "muted small" }, String(ix + 1) + "."),
+  const box = h("div", { class: "topic", key: t.id }, h("div", { class: "topic-head" }, h("span", { class: "muted small" }, String(ix + 1) + "."),
     h("input", { type: "text", value: t.name, placeholder: L("Thema, z. B. Leistenkanal", "Topic, e.g. Inguinal canal", "موضوع، مثلاً کانال اینگوینال"), onchange: e => { t.name = e.target.value; S.sugg = {}; } }),
     manual ? h("button", { class: "ghost", onclick: () => move(-1), title: L("nach oben", "move up", "انتقال به بالا") }, "↑") : null,
     manual ? h("button", { class: "ghost", onclick: () => move(1), title: L("nach unten", "move down", "انتقال به پایین") }, "↓") : null,
@@ -698,8 +1071,8 @@ function topicEl(t, ix, n) {
       t.pages = t.pages || {};
       const r = t.pages[s.id] || ["", ""];
       const upd = (i, v) => { const cur = t.pages[s.id] || ["", ""]; cur[i] = v ? +v : ""; if (cur[0] && !cur[1]) cur[1] = cur[0]; t.pages[s.id] = cur[0] ? [cur[0], Math.max(cur[0], cur[1] || cur[0])] : null; if (!t.pages[s.id]) delete t.pages[s.id]; };
-      tl.append(h("span", null, s.name || L("Seiten", "Pages", "صفحه‌ها")), h("div", { class: "inline" }, L("S.", "pp.", "ص."), h("input", { type: "number", min: 0, value: r[0], onchange: e => upd(0, e.target.value) }), "–",
-        h("input", { type: "number", min: 0, value: r[1], onchange: e => { upd(1, e.target.value); if (p.order === "auto") render(); } })));
+      tl.append(h("span", null, s.name || L("Seiten", "Pages", "صفحه‌ها")), h("div", { class: "inline" }, L("S.", "pp.", "ص."), h("input", { type: "number", min: 0, value: r[0], onchange: e => { upd(0, e.target.value); render(); } }), "–",
+        h("input", { type: "number", min: 0, value: r[1], onchange: e => { upd(1, e.target.value); render(); } })));
     } else if (s.type === "anki") {
       t.anki = t.anki || {};
       const cands = S.cands[s.id] || [], cur = t.anki[s.id] || "";
@@ -730,7 +1103,7 @@ function topicEl(t, ix, n) {
 async function autoAssign() {
   await suggestNow();
   const r = await run(call("suggest", { plan: S.edit, apply: true }));
-  S.edit = r.plan;
+  S.edit = r.plan; S.epoch++;
   toast(r.changed ? L(`${r.changed} Zuordnungen übernommen – bitte kurz prüfen (★ = Vorschlag).`, `${r.changed} links applied – please check them quickly (★ = suggestion).`, `${r.changed} پیوند اعمال شد – لطفاً سریع بررسی کنید (★ = پیشنهاد).`) : L("Keine neuen Treffer gefunden. Namen von Themen, Unterdecks und Videos ähneln sich zu wenig.", "No new matches found. The names of topics, subdecks and videos are too different.", "مورد جدیدی پیدا نشد. نام موضوع‌ها، زیردسته‌ها و ویدیوها زیادی با هم فرق دارند."), 4000);
   render();
 }
@@ -794,13 +1167,16 @@ async function saveEdit(plan) {
   const p = S.edit;
   for (const t of p.topics) if (!t.name.trim()) t.name = L("Thema", "Topic", "موضوع");
   if (plan === true) { const err = validate(p); if (err) return toast(err, 4000); }
-  await run(call("savePlan", { plan: p }));
+  if (S.saving) return;
+  S.saving = true;
+  try { await run(call("savePlan", { plan: p })); } finally { S.saving = false; }
+  S.editBase = JSON.stringify(p);
   if (plan === true) { await replan(); } else toast(L("Gespeichert.", "Saved.", "ذخیره شد."));
 }
 async function delPlan() {
   const v = await modal(L("Plan löschen?", "Delete plan?", "برنامه حذف شود؟"), h("p", null, L(`„${S.edit.title}“ wird endgültig gelöscht. Anki-Karten bleiben unberührt. Lieber archivieren? Das geht im Rückblick.`, `“${S.edit.title}” will be deleted for good. Your Anki cards stay untouched. Rather archive it? You can do that in the retrospective.`, `«${S.edit.title}» برای همیشه حذف می‌شود. کارت‌های Anki شما دست‌نخورده می‌مانند. ترجیح می‌دهید بایگانی‌اش کنید؟ این کار در جمع‌بندی ممکن است.`)), [[L("Abbrechen", "Cancel", "انصراف"), null], [L("Löschen", "Delete", "حذف"), true, "danger"]]);
   if (!v) return;
-  await run(call("delete", { id: S.edit.id })); go("home");
+  await run(call("delete", { id: S.edit.id })); S.editBase = JSON.stringify(S.edit); go("home");
 }
 
 // ---------- Retrospective ----------
@@ -858,14 +1234,38 @@ function renderReview(root) {
       h("button", { class: "primary", onclick: async () => { S.data.today = (await call("home")).today; newPlan(S.pid); } }, L("Nächsten Plan anlegen", "Create next plan", "ساخت برنامهٔ بعدی"))))));
 }
 
+// ---------- Keys ----------
+function onKey(e) {
+  if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+  const typing = e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.nodeName);
+  if (e.key === "Escape") {
+    e.preventDefault();  // Esc must not close the whole window
+    if (typing) e.target.blur();
+    return;
+  }
+  if (typing || document.querySelector(".modal-bg")) return;
+  const m = S.view === "plan" && S.mock;
+  if (m && m.cards[m.i]) {
+    const cur = m.cards[m.i];
+    if (!m.shown && (e.key === " " || e.key === "Enter")) { e.preventDefault(); m.shown = true; return render(); }
+    if (m.shown && (e.key === "1" || e.key === "ArrowRight")) { e.preventDefault(); return mockAnswer(cur, true); }
+    if (m.shown && (e.key === "2" || e.key === "ArrowLeft")) { e.preventDefault(); return mockAnswer(cur, false); }
+  }
+  if (S.view === "plan" && (e.key === "t" || e.key === "h")) { const c = document.querySelector("#app .day.today"); if (c) { e.preventDefault(); c.scrollIntoView({ behavior: motion() ? "smooth" : "auto", block: "start" }); } }
+}
+
 // ---------- Start ----------
 function start() {
   const lang = app().dataset.lang || "";
   LANG = lang.startsWith("de") ? "de" : lang.startsWith("fa") ? "fa" : "en";
   document.documentElement.lang = LANG;
   if (LANG === "fa") document.documentElement.dir = "rtl";
-  go("home");
-  setInterval(() => { if (!document.hidden && S.view === "plan" && !document.querySelector(".modal-bg")) refresh(); }, 60000);
+  document.addEventListener("keydown", onKey);
+  window.addEventListener("unhandledrejection", e => e.preventDefault());  // run() already told the user
+  go("home").catch(() => app().replaceChildren(h("div", { class: "card warn" }, L("Der Lernplan konnte nicht geladen werden. Fenster schließen und erneut öffnen.", "The study plan could not be loaded. Close the window and open it again.", "برنامهٔ مطالعه بارگیری نشد. پنجره را ببندید و دوباره باز کنید."))));
+  // Once a minute (a new day may have begun); the page keeps what you are typing.
+  setInterval(() => { if (!document.hidden && (S.view === "plan" || S.view === "home") && !document.querySelector(".modal-bg") && !S.pending.size) refresh().catch(() => {}); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && (S.view === "plan" || S.view === "home")) refresh().catch(() => {}); });
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
