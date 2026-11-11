@@ -7,6 +7,18 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.2",
+        "date": "November 11, 2026",
+        "items": [
+            {"tag": "New", "text": "Browser: the address field suggests pages you visited, your favourites and open tabs while you type. Switch it off or clear the history under the options button."},
+            {"tag": "New", "text": "Browser: tabs restored after a restart show their site's icon at once."},
+            {"tag": "New", "text": "Study plan: drag a custom item onto another day to move it (with Undo)."},
+            {"tag": "New", "text": "Study plan on two devices: ticks made on both before syncing are merged instead of one device's ticks being lost."},
+            {"tag": "Fix", "text": "The AI assistant's empty chat no longer keeps the processor busy (its background glows stand still now), and the gamification sidebar's glow pulses once instead of three times."},
+            {"tag": "Fix", "text": "Study plan: new cards no longer exceed the daily limit on the last study day while earlier days still had room."},
+        ],
+    },
+    {
         "version": "2.9.1",
         "date": "November 11, 2026",
         "items": [

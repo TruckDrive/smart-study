@@ -100,6 +100,34 @@ def test_no_free_time():
     print("no free time: spread evenly ok")
 
 
+def test_last_day_limit():
+    """Cards that end up on the last day must not break the daily limit while earlier days had room."""
+    plan = store.new_plan("Limit", "2026-11-23", "2026-11-11", {})
+    plan["minutesPerDay"] = 60
+    plan["sources"] = [{"id": "hb", "type": "pages", "name": "Buch", "minPerUnit": 5},
+                       {"id": "ab", "type": "anki", "name": "Karten", "decks": ["X"], "minPerUnit": 1, "maxNew": 10}]
+    plan["topics"] = [{"id": "t1", "name": "A", "pages": {"hb": [1, 48]}, "videos": {}, "tasks": {}, "anki": {}}]
+    q = P.rest_query(plan, plan["sources"][1])
+    notes = P.build(plan, {q: {"total": 30, "new": 11}}, P.s2d("2026-11-11"))
+    cards = [(d["d"], it) for d in plan["days"] for it in d["items"] if it["kind"] == "cards"]
+    per_day = {}
+    for d, it in cards:
+        per_day[d] = per_day.get(d, 0) + it["cards"]
+    assert sum(per_day.values()) == 11 and max(per_day.values()) <= 10, per_day
+    assert not any("Tageslimit" in n for n in notes), notes
+    targets = [it["auto"]["target"] for _, it in sorted(cards, key=lambda x: x[0])]
+    assert targets == sorted(targets) and targets[-1] == 30, targets  # 19 seen before + 11 new
+    assert all(it["text"].startswith(f"{it['cards']} neue Karten") and it["min"] == it["cards"] for _, it in cards)
+    # with more cards than the limit allows in total, the last day still takes the rest and the plan says so
+    plan2 = store.new_plan("Limit2", "2026-11-14", "2026-11-11", {})
+    plan2["sources"] = [dict(plan["sources"][1])]
+    q2 = P.rest_query(plan2, plan2["sources"][0])
+    notes2 = P.build(plan2, {q2: {"total": 100, "new": 100}}, P.s2d("2026-11-11"))
+    assert sum(it["cards"] for d in plan2["days"] for it in d["items"] if it["kind"] == "cards") == 100
+    assert any("Tageslimit" in n for n in notes2), notes2
+    print("last day keeps the daily limit where it can ok")
+
+
 def test_ratings_per_day():
     col = Collection(os.path.join(base, "r.anki2"))
     m = col.models.by_name("Basic")
@@ -144,5 +172,6 @@ if __name__ == "__main__":
     test_broken_file()
     test_split_minutes()
     test_no_free_time()
+    test_last_day_limit()
     test_ratings_per_day()
     print("ALL TESTS OK")

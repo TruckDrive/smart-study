@@ -17,7 +17,7 @@ from . import browser_search
 from .browser_adblock import AdBlocker, FilteringPage, install_youtube_pruner
 from . import browser_features, web_sleep
 from . import browser_layout, browser_passwords
-from . import browser_chrome
+from . import browser_chrome, browser_history
 
 try:
     from .locales import _
@@ -33,7 +33,8 @@ try:
                         QMenu, QAction, QIcon, QPixmap, QPainter, QUrl, QTimer,
                         QSize, Qt, QByteArray, QDesktopServices, QEvent, QObject,
                         QTabBar, QStackedWidget, QShortcut, QKeySequence,
-                        QLineEdit, QFileDialog, QStandardPaths, QApplication)
+                        QLineEdit, QFileDialog, QStandardPaths, QApplication,
+                        QCompleter, QStandardItemModel, QStandardItem, QModelIndex)
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage, QWebEngineSettings
     from PyQt6 import sip
@@ -52,6 +53,7 @@ except ImportError as e:
     QTabBar = QStackedWidget = QShortcut = QKeySequence = object
     QLineEdit = QFileDialog = QStandardPaths = object
     QApplication = object
+    QCompleter = QStandardItemModel = QStandardItem = QModelIndex = object
 
 # QtSvg is optional – used only to render crisp toolbar icons. A failure here
 # must never break the rest of the module, so it gets its own guarded import.
@@ -392,6 +394,88 @@ def _open_browser_settings() -> None:
         print(f"WS Warn: settings not opened: {e}")
 
 
+def _history_on() -> bool:
+    return bool(_load_website_state().get("history", True))
+
+
+def _clear_history() -> None:
+    browser_history.clear()
+    tooltip(_("Browsing history cleared."))
+
+
+_history_timer = None
+
+
+def _remember_visit(view, ok: bool = True) -> None:
+    """A loaded page goes into the history (if that is switched on); saved a few seconds later."""
+    global _history_timer
+    try:
+        if not ok or sip.isdeleted(view) or not _history_on():
+            return
+        browser_history.add(view.url().toString(), getattr(view, "_ss_title", "") or "")
+        if _history_timer is None:
+            _history_timer = QTimer(mw)
+            _history_timer.setSingleShot(True)
+            _history_timer.setInterval(5000)
+            qconnect(_history_timer.timeout, browser_history.save)
+        _history_timer.start()
+    except Exception as e:
+        print(f"WS Info: history: {e}")
+
+
+_URL_ROLE = 0x0100 + 1  # Qt.ItemDataRole.UserRole + 1
+
+
+def _suggestion_style() -> str:
+    c = _toolbar_palette()
+    return f"""
+    QListView {{ background: {c['field']}; color: {c['text']}; border: 1px solid {c['line']}; border-radius: 8px;
+        padding: 4px; outline: 0; font-size: 12.5px; }}
+    QListView::item {{ padding: 5px 8px; border-radius: 6px; }}
+    QListView::item:selected, QListView::item:hover {{ background: {c['hover']}; color: {c['text']}; }}
+    """
+
+
+def _setup_suggestions(bar) -> None:
+    """While you type, the address field offers pages you visited, favourites and open tabs."""
+    if QCompleter is object:
+        return
+    model = QStandardItemModel(bar)
+    completer = QCompleter(model, bar)
+    completer.setCompletionMode(QCompleter.CompletionMode.UnfilteredPopupCompletion)  # we do the matching
+    completer.setCompletionRole(_URL_ROLE)
+    completer.setMaxVisibleItems(7)
+    completer.popup().setStyleSheet(_suggestion_style())
+    bar.setCompleter(completer)
+    bar._ss_completer = completer
+
+    def fill(text: str) -> None:
+        model.clear()
+        extra = [{"url": s.get("url", ""), "title": s.get("name", "")} for s in load_custom_sites()]
+        for view in all_tab_views():
+            if view is not None and view is not sidebar_webview and not sip.isdeleted(view):
+                extra.append({"url": getattr(view, "_ss_pending", None) or view.url().toString(), "title": getattr(view, "_ss_title", "")})
+        for hit in browser_history.suggest(text, extra, history=_history_on()):
+            shown = browser_history.short(hit["url"])
+            item = QStandardItem(f"{hit['title']}  —  {shown}" if hit["title"] else shown)
+            item.setData(hit["url"], _URL_ROLE)
+            item.setToolTip(hit["url"])
+            icon = browser_history.load_icon(hit["url"]) or browser_chrome.icon("globe", 14)
+            if icon is not None:
+                item.setIcon(icon)
+            model.appendRow(item)
+
+    def chosen(index) -> None:
+        url = index.data(_URL_ROLE)
+        if url:
+            bar.setText(url)
+            bar.setModified(True)
+            QTimer.singleShot(0, _address_entered)
+
+    qconnect(bar.textEdited, fill)
+    completer.activated[QModelIndex].connect(chosen)
+
+
 def _fill_options_menu(menu) -> None:
     menu.clear()
     menu.addAction(_("Browser settings…")).triggered.connect(lambda: QTimer.singleShot(0, _open_browser_settings))
@@ -405,6 +489,12 @@ def _fill_options_menu(menu) -> None:
         action.setChecked(key == current)
         qconnect(action.triggered, lambda _=False, k=key: _choose_search_engine(k))
     browser_passwords.menu_entries(menu)
+    menu.addSeparator()
+    remember = menu.addAction(_("Suggest visited pages in the address field"))
+    remember.setCheckable(True)
+    remember.setChecked(_history_on())
+    qconnect(remember.toggled, lambda on: _set_browser_option("history", bool(on)))
+    menu.addAction(_("Clear browsing history")).triggered.connect(_clear_history)
     if ad_blocker is not None:
         menu.addSeparator()
         block = menu.addAction(_("Block ads and trackers"))
@@ -979,6 +1069,12 @@ def create_website_dock() -> Optional[QDockWidget]:
         address_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         address_bar.setStyleSheet(_address_style())
         qconnect(address_bar.returnPressed, _address_entered)
+        try:
+            _state_path = _website_state_path()
+            browser_history.set_folder(os.path.dirname(_state_path) if _state_path else None)
+            _setup_suggestions(address_bar)
+        except Exception as e_sugg:
+            print(f"WS Warn: no address suggestions: {e_sugg}")
         nav_button_layout.addSpacing(4)
         nav_button_layout.addWidget(address_bar, 1)
         nav_button_layout.addSpacing(4)
@@ -1249,8 +1345,11 @@ def _make_tab_view():
     # Kept from the signals: asking a page that is waking up from Discarded
     # for its icon crashed Qt (WebContentsAdapter::icon).
     view._ss_title, view._ss_icon = "", None
-    qconnect(view.titleChanged, lambda t: (setattr(view, "_ss_title", t), _update_tab_label(view)))
-    qconnect(view.iconChanged, lambda i: (setattr(view, "_ss_icon", i), _update_tab_label(view)))
+    qconnect(view.titleChanged, lambda t: (setattr(view, "_ss_title", t), _update_tab_label(view),
+                                           browser_history.set_title(view.url().toString(), t)))
+    qconnect(view.iconChanged, lambda i: (setattr(view, "_ss_icon", i), _update_tab_label(view),
+                                          browser_history.save_icon(view.url().toString(), i)))
+    qconnect(view.loadFinished, lambda ok: _remember_visit(view, ok))
     qconnect(view.urlChanged, lambda url: sidebar_webview is view and on_webview_url_changed(url))
     qconnect(view.urlChanged, lambda *_a: show_address(view))
     view._urlChangedConnected_ws = True
@@ -1570,7 +1669,7 @@ def _default_tab_icon(index: int, url: str = "") -> None:
     narrow tab is never blank."""
     try:
         name = "file" if url.lower().split("#")[0].split("?")[0].endswith(".pdf") else "globe"
-        icon = browser_chrome.icon(name, 14)
+        icon = browser_history.load_icon(url) or browser_chrome.icon(name, 14)  # the site's icon from last time
         if icon is not None:
             tab_bar.setTabIcon(index, icon)
     except Exception as e:
@@ -1832,6 +1931,9 @@ def refresh_website_theme() -> None:
         search_help.setStyleSheet(_search_help_style())
     if address_bar is not None and not sip.isdeleted(address_bar):
         address_bar.setStyleSheet(_address_style())
+        completer = getattr(address_bar, "_ss_completer", None)
+        if completer is not None:
+            completer.popup().setStyleSheet(_suggestion_style())
     if sidebar_dock is not None:
         row = sidebar_dock.findChild(QWidget, "smartstudyWebTabs")
         if row is not None:
@@ -1881,6 +1983,8 @@ def cleanup_website_sidebar():
     global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
     global load_bar
     load_bar = None
+    try: browser_history.save()
+    except Exception: pass
 
     diagnostics.record('browser.cleanup')
     try: browser_layout.cleanup()

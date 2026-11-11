@@ -247,10 +247,7 @@ def handle(cmd, a):
     if cmd == "toggle":
         plan = store.load(a["id"])
         _item(plan, a["item"])
-        if a["on"]:
-            plan.setdefault("done", {})[a["item"]] = time.strftime("%Y-%m-%dT%H:%M")
-        else:
-            plan.get("done", {}).pop(a["item"], None)
+        store.set_done(plan, a["item"], bool(a["on"]))
         store.save(plan)
         return True
     if cmd == "addCustom":

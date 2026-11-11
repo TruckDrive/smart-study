@@ -73,8 +73,73 @@ def test_sync(base):
     col.close()
 
 
+def test_merge(base):
+    """Ticks made on two devices before they synced are both kept; an untick made later stays."""
+    col = Collection(os.path.join(base, "merge.anki2"))
+    sys.modules["aqt"].mw = types.SimpleNamespace(col=col)
+    a, b = device("pc2", base, col), device("laptop2", base, col)
+    plan = a.new_plan("Merge", "2026-12-01", "2026-11-01", {})
+    plan["days"] = [{"d": "2026-11-12", "items": [{"id": i, "kind": "custom", "custom": True, "text": i} for i in ("x1", "x2", "x3")]}]
+    a.save(plan)
+    pid = plan["id"]
+    b.load(pid)  # the laptop has its copy
+
+    # the laptop ticks x2 while offline: only its file knows
+    lap = json.load(open(b._path(pid), encoding="utf-8"))
+    lap["done"]["x2"] = "2026-11-10T10:00:00"
+    lap["savedAt"] = time.time() - 60
+    json.dump(lap, open(b._path(pid), "w", encoding="utf-8"))
+    # meanwhile the pc ticks x1 and syncs: the collection carries the pc's (newer) plan
+    p = a.load(pid)
+    a.set_done(p, "x1", True)
+    a.save(p)
+    merged = b.load(pid)
+    assert set(merged["done"]) == {"x1", "x2"}, merged["done"]
+    assert set(a.load(pid)["done"]) == {"x1", "x2"}, "and the pc gets the laptop's tick back"
+    print("ticks from two devices are both kept ok")
+
+    # the pc unticks x2; an old laptop copy that still has the tick must not bring it back
+    stale = json.load(open(b._path(pid), encoding="utf-8"))
+    time.sleep(1.1)
+    p = a.load(pid)
+    a.set_done(p, "x2", False)
+    a.save(p)
+    stale["savedAt"] = time.time() - 30
+    json.dump(stale, open(b._path(pid), "w", encoding="utf-8"))
+    merged = b.load(pid)
+    assert set(merged["done"]) == {"x1"}, merged["done"]
+    print("an untick is not undone by an older copy ok")
+
+    # the laptop unticks x1 offline (older copy, but its untick is later than the tick)
+    lap = json.load(open(b._path(pid), encoding="utf-8"))
+    time.sleep(1.1)
+    b.set_done(lap, "x1", False)
+    lap["savedAt"] = time.time() - 5
+    json.dump(lap, open(b._path(pid), "w", encoding="utf-8"))
+    p = a.load(pid)
+    p["title"] = "Merge 2"  # the pc changes something else and is the newer copy
+    time.sleep(0.01)
+    a.save(p)
+    merged = b.load(pid)
+    assert merged["title"] == "Merge 2" and merged["done"] == {}, merged["done"]
+    print("an untick from the other device arrives ok")
+
+    # ticks of items the newer plan no longer has (replanned) are not carried over
+    lap = json.load(open(b._path(pid), encoding="utf-8"))
+    lap["done"]["gone"] = "2026-11-12T11:00:00"
+    lap["savedAt"] = time.time() - 5
+    json.dump(lap, open(b._path(pid), "w", encoding="utf-8"))
+    p = a.load(pid)
+    time.sleep(0.01)
+    a.save(p)
+    assert "gone" not in b.load(pid)["done"]
+    col.close()
+    print("ticks of removed items are dropped ok")
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2 or os.listdir(sys.argv[1]):
         sys.exit("usage: python -I tests/test_store.py <empty folder>")
     test_sync(sys.argv[1])
+    test_merge(sys.argv[1])
     print("ALL TESTS OK")

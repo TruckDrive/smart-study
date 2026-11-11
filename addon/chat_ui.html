@@ -120,7 +120,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
   white-space:nowrap;flex-shrink:0;transition:color .12s,border-color .12s}
 .chip-manage-btn:hover{color:var(--text);border-color:var(--text-muted)}
 
-/* ── Animated orb background (empty state only) ── */
+/* ── Orb background (empty state only) ──
+   The two glows stand still. They used to drift forever; moving a 72 px blur
+   of half the page repaints it on every frame, which kept a processor core
+   busy (measured: about 40 % of one core) for as long as the empty chat was open. */
 @keyframes orb-float-1{
   0%,100%{transform:translate(0,0) scale(1)}
   50%    {transform:translate(12vw,10vh) scale(1.12)}
@@ -135,12 +138,10 @@ body.empty #bg-anim{display:block}
 html.dark .bg-orb,body.dark .bg-orb{opacity:.18;}
 .bg-orb-1{
   width:68vw;height:62vh;left:-20vw;top:-18vh;
-  background:var(--accent-glow);
-  animation:orb-float-1 18s ease-in-out infinite}
+  background:var(--accent-glow)}
 .bg-orb-2{
   width:58vw;height:54vh;right:-18vw;bottom:-12vh;
-  background:var(--accent-glow-2);
-  animation:orb-float-2 24s ease-in-out infinite}
+  background:var(--accent-glow-2)}
 
 /* ── Empty state center ── */
 #start-center{display:none;flex-direction:column;align-items:center;

@@ -502,7 +502,20 @@ function groupLabel(it, plan) {
 function dayCard(day, today) {
   const { plan } = S.data;
   const isToday = day.d === today, isExam = day.d === plan.exam;
-  const sec = h("section", { key: day.d, class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d && !m.prep) ? " exam" : "") });
+  // A custom item can be dragged onto another day (today or later).
+  const canDrop = day.d >= today && day.d <= plan.exam;
+  const sec = h("section", { key: day.d, class: "day" + (isToday ? " today" : day.d < today ? " past" : "") + (isExam || (plan.milestones || []).some(m => m.date === day.d && !m.prep) ? " exam" : ""),
+    ondragover: canDrop ? e => { if (!S.drag || S.drag.day === day.d) return; e.preventDefault(); e.dataTransfer.dropEffect = "move"; e.currentTarget.classList.add("drop"); } : null,
+    ondragleave: canDrop ? e => { if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove("drop"); } : null,
+    ondrop: canDrop ? async e => {
+      const d = S.drag; S.drag = null;
+      e.currentTarget.classList.remove("drop");
+      if (!d || d.day === day.d) return;
+      e.preventDefault();
+      await run(call("moveItem", { id: plan.id, item: d.id, day: day.d }));
+      await refresh();
+      toast(L(`Verschoben auf ${fmt(day.d)}.`, `Moved to ${fmt(day.d)}.`, `به ${fmt(day.d)} منتقل شد.`), 5000, [L("Rückgängig", "Undo", "واگرد"), async () => { await run(call("moveItem", { id: plan.id, item: d.id, day: d.day })); refresh(); }]);
+    } : null });
   const mins = day.items.filter(it => !it.moved && it.kind !== "note").reduce((a, it) => a + (it.min || 0), 0);
   const note = [plan.dayNotes && plan.dayNotes[day.d], mins ? "≈ " + hm(mins) : null].filter(Boolean).join(" · ");
   const msDay = (plan.milestones || []).find(m => m.date === day.d);
@@ -577,7 +590,11 @@ function itemEl(it, day) {
   if (it.custom && !done && day.d >= S.data.stats.today && day.d < plan.exam) act(L("→ morgen", "→ tomorrow", "← فردا"), async () => {
     await run(call("moveItem", { id: plan.id, item: it.id, day: addDays(day.d, 1) })); refresh();
   });
-  const row = h("label", { key: it.id, class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") }, cb, t);
+  const drag = it.custom && !it.moved;
+  const row = h("label", { key: it.id, class: "item" + (done ? " checked" : "") + (it.moved ? " moved" : "") + (drag ? " drag" : ""), draggable: drag ? "true" : null,
+    title: drag ? L("Auf einen anderen Tag ziehen, um zu verschieben", "Drag onto another day to move it", "برای جابه‌جایی، روی روز دیگری بکشید") : null,
+    ondragstart: drag ? e => { S.drag = { id: it.id, day: day.d }; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", it.text); e.currentTarget.classList.add("dragging"); document.documentElement.classList.add("lp-dragging"); } : null,
+    ondragend: drag ? e => { S.drag = null; e.currentTarget.classList.remove("dragging"); document.documentElement.classList.remove("lp-dragging"); for (const x of document.querySelectorAll(".day.drop")) x.classList.remove("drop"); } : null }, cb, t);
   if (it.custom || it.kind === "weak") row.append(h("button", { class: "ghost", title: L("Entfernen", "Remove", "حذف"), onclick: async e => {
     e.preventDefault();
     const gone = await run(call("delItem", { id: plan.id, item: it.id }));

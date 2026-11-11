@@ -53,7 +53,54 @@ def _quarantine(path):
 
 
 _LISTS = ("offWeekdays", "milestones", "sources", "topics", "days", "notes")
-_DICTS = ("dayMinutes", "dayNotes", "done", "autoDone")
+_DICTS = ("dayMinutes", "dayNotes", "done", "autoDone", "undone")
+
+
+def now_stamp():
+    return time.strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def set_done(plan, item_id, on):
+    """Ticks or unticks an item. An untick is remembered with its time, so a tick that
+    another device made earlier does not come back when the two copies meet."""
+    if on:
+        plan.setdefault("done", {})[item_id] = now_stamp()
+        plan.get("undone", {}).pop(item_id, None)
+    else:
+        plan.get("done", {}).pop(item_id, None)
+        plan.setdefault("undone", {})[item_id] = now_stamp()
+
+
+def merge_ticks(newer, older):
+    """Two copies of a plan were changed on two devices. The newer one stays, and
+    it takes over the ticks of the older one that it does not know – unless it
+    unticked that item after the other tick was made. Only items the newer plan
+    still has count. Returns True if the newer copy was changed."""
+    ids = {it["id"] for d in newer.get("days") or [] if isinstance(d, dict)
+           for it in d.get("items") or [] if isinstance(it, dict) and it.get("id")}
+    done, undone = newer.setdefault("done", {}), newer.setdefault("undone", {})
+    if not isinstance(done, dict) or not isinstance(undone, dict):
+        return False
+    changed = False
+    other_undone = older.get("undone") if isinstance(older.get("undone"), dict) else {}
+    for iid, stamp in (older.get("done") if isinstance(older.get("done"), dict) else {}).items():
+        if iid in ids and iid not in done and isinstance(stamp, str) and str(undone.get(iid, "")) < stamp:
+            done[iid] = stamp
+            undone.pop(iid, None)
+            changed = True
+    for iid, stamp in other_undone.items():  # the other device unticked later than this tick
+        if iid in done and isinstance(stamp, str) and str(done[iid]) < stamp:
+            del done[iid]
+            undone[iid] = stamp
+            changed = True
+    auto = newer.setdefault("autoDone", {})
+    for iid, stamp in (older.get("autoDone") if isinstance(older.get("autoDone"), dict) else {}).items():
+        if iid in ids and isinstance(auto, dict) and iid not in auto:
+            auto[iid] = stamp
+            changed = True
+    for iid in [i for i in undone if i not in ids]:  # tidy up notes on items that are gone
+        del undone[iid]
+    return changed
 
 
 def normalize(plan):
@@ -187,7 +234,19 @@ def _reconcile():
                 del conf[pid]
                 changed = True
             continue
-        if _stamp(f) > _stamp(c):
+        if f is not None and c is not None and _stamp(f) != _stamp(c):
+            # changed here and on another device: keep the newer plan, add the other one's ticks
+            newer, older = (f, c) if _stamp(f) > _stamp(c) else (c, f)
+            try:
+                if merge_ticks(newer, older):
+                    newer["savedAt"] = time.time()
+            except Exception:
+                traceback.print_exc()
+            _write(_path(pid), newer)
+            conf[pid] = newer
+            changed = True
+            out[pid] = newer
+        elif _stamp(f) > _stamp(c):
             conf[pid] = f
             changed = True
             out[pid] = f
@@ -240,7 +299,7 @@ def new_plan(title, exam, start, profile):
         "id": planner.new_id("p"), "title": title, "exam": exam, "examTime": "", "start": start,
         "status": "active", "minutesPerDay": int(profile.get("minutesPerDay", 180)), "offWeekdays": [],
         "dayMinutes": {}, "dayNotes": {}, "order": "auto", "milestones": [], "sources": [], "topics": [], "days": [],
-        "done": {}, "autoDone": {}, "notes": [],
+        "done": {}, "autoDone": {}, "undone": {}, "notes": [],
     }
 
 

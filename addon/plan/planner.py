@@ -382,7 +382,62 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
 
         generated, reserve_map, used = {}, {}, {}
         new_per_day, seen_so_far, returns = {}, {}, {}
+        seen_base = {}  # {search: cards already studied before this plan run}
         notes = []
+
+        def card_text(k, topic_id):
+            t = topics.get(topic_id)
+            return tr(f"{k} neue Karten", f"{k} new cards", f"{k} کارت جدید") + (
+                f" · {t['name']}" if t else tr(" · übrige Karten", " · remaining cards", " · کارت‌های باقی‌مانده"))
+
+        def retarget(query):
+            """Card items of one search count up in day order: each is done once that many cards were seen."""
+            running = seen_base.get(query, 0)
+            for day in sorted(generated):
+                for it in generated[day]:
+                    if it.get("kind") == "cards" and it["auto"]["query"] == query:
+                        running += it["cards"]
+                        it["auto"]["target"] = running
+
+        def relieve_last_day(content, m):
+            """The last day of a window takes whatever did not fit before. If that puts
+            more new cards on it than the daily limit allows while earlier days still
+            had room under the limit, the surplus moves back to those days (nearest first)."""
+            last = d2s(content[-1])
+            until = m["date"] if plan.get("onceOnly") else plan["exam"]
+            for sid in dict.fromkeys(it["source"] for it in generated.get(last, []) if it.get("kind") == "cards"):
+                mx = srcs[sid].get("maxNew")
+                if not mx:
+                    continue
+                surplus = new_per_day.get((last, sid), 0) - int(mx)
+                j = len(content) - 2
+                while surplus > 0 and j >= 0:
+                    day = d2s(content[j])
+                    free = int(mx) - new_per_day.get((day, sid), 0)
+                    src_it = next((it for it in generated[last] if it.get("kind") == "cards" and it["source"] == sid), None)
+                    if free <= 0 or src_it is None:
+                        j -= 1
+                        continue
+                    k = min(free, surplus, src_it["cards"])
+                    cost = float(srcs[sid].get("minPerUnit") or DEFAULT_RATES["anki"])
+                    query = src_it["auto"]["query"]
+                    dst = next((it for it in generated.get(day, []) if it.get("kind") == "cards"
+                                and it["auto"]["query"] == query), None)
+                    if dst is None:
+                        dst = dict(src_it, id=new_id(), cards=0, auto=dict(src_it["auto"]))
+                        generated.setdefault(day, []).append(dst)
+                    for it, n in ((dst, dst["cards"] + k), (src_it, src_it["cards"] - k)):
+                        it["cards"] = n
+                        it["min"] = round(n * cost)
+                        it["text"] = card_text(n, it["topic"])
+                    if not src_it["cards"]:
+                        generated[last].remove(src_it)
+                    for d_, sign in ((day, 1), (last, -1)):
+                        new_per_day[(d_, sid)] = new_per_day.get((d_, sid), 0) + sign * k
+                        used[d_] = used.get(d_, 0) + sign * k * cost
+                        returns[(d_, until)] = returns.get((d_, until), 0) + sign * k
+                    retarget(query)
+                    surplus -= k
 
         def fill(units, content, cap, m):
             budget_total = sum(cap)
@@ -442,11 +497,11 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                         it["url"] = x["url"]
                 else:
                     base = seen_so_far.setdefault(u["query"], u["seen"])
+                    seen_base.setdefault(u["query"], u["seen"])
                     seen_so_far[u["query"]] = base + k
                     it["cards"] = k
                     it["auto"] = {"type": "seen", "query": u["query"], "target": base + k}
-                    it["text"] = tr(f"{k} neue Karten", f"{k} new cards", f"{k} کارت جدید") + (
-                        f" · {tname}" if tname else tr(" · übrige Karten", " · remaining cards", " · کارت‌های باقی‌مانده"))
+                    it["text"] = card_text(k, u["topic"])
                     new_per_day[(day, u["source"])] = new_per_day.get((day, u["source"]), 0) + k
                     until = m["date"] if plan.get("onceOnly") else plan["exam"]
                     returns[(day, until)] = returns.get((day, until), 0) + k
@@ -477,6 +532,7 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
                         emit(u, 1)
                         if st["rem"] <= 0:
                             next_day()
+            relieve_last_day(content, m)
 
         def caps(content):
             return [max(0, room(d) - rev.get(d2s(d), 0) * rev_min - (used_today if d == start else 0) - used.get(d2s(d), 0))

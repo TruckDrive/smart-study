@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.9.2 – 2026-11-11
+
+- **Address suggestions**: while you type in the browser's address field, it offers pages you visited, your favourites and the other open tabs – best match first (start of the address before a match inside it before a match in the title; among equals the page visited more often and more recently). Pick one with the arrow keys and Enter or a click. The history is kept only on this computer, in the Anki profile (`SmartStudy_Data/browser_history.json`, at most 800 pages). *Options → Suggest visited pages in the address field* switches it off (favourites and open tabs are still offered), *Clear browsing history* removes it together with the kept site icons
+- **Site icons are kept**: a site's icon is stored as a small picture (`SmartStudy_Data/favicons/`), so tabs restored after a restart – which load only when you open them – show their icon at once instead of a globe
+- **Drag custom items**: in the study plan, drag a custom item onto another day (today or later) to move it there; the day lights up while you hover. The message afterwards offers *Undo*
+- **Ticks from two devices are merged**: if you tick items on two computers before they sync, the newer copy of the plan used to replace the older one completely, and the other computer's ticks were gone. Now the newer plan takes over the ticks it does not know. An untick is remembered with its time, so a tick you removed does not come back from an older copy, and an untick made on the other device arrives too. Ticks of items that no longer exist (after replanning) are dropped
+- **Fix – AI assistant kept a processor core busy**: the two glows behind the empty chat drifted forever; moving a 72 px blur of half the page repaints it on every frame. They stand still now. Measured in the test profile with only that sidebar open and nothing happening: about 40 % of one core before, 2 % now
+- **Fix – gamification sidebar**: the glow behind the badge pulsed three times (24 s) every time the sidebar opened, at a similar cost while it ran; it pulses once
+- **Fix – daily limit on the last day**: the last study day before a date takes whatever did not fit before. If that put more new cards on it than the deck's daily limit while earlier days still had room under the limit, the plan complained that the limit was too low. The surplus now moves back to those days (nearest first). Plans whose last day was within the limit are scheduled exactly as before
+
 ## 2.9.1 – 2026-11-11
 
 - **Browser, new look**: the bars were rebuilt. Tabs are on top and share the width of their row – few tabs are wide enough for their title, many get narrower together down to their icon, and the row never pushes the sidebar wider (the scroll arrows only come back when even icon-sized tabs do not fit). Below them: back, forward, reload, a wide rounded address field, and options, *open in browser* and layout as sharp line icons without the little menu arrows. Saved sites sit in a slim favourites row (Home, your sites, +). A thin line under the bars fills while the page loads

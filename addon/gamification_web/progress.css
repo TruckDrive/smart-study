@@ -38,7 +38,7 @@ html.dark {--accent-bright:#64b5ff;}
 html.dark .hero {--hero-light-strength:20%;}
 .hero::before {content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
   background:radial-gradient(ellipse 175px 150px at 80px 88px,color-mix(in srgb,var(--accent) var(--hero-light-strength),transparent),transparent 100%);
-  opacity:.85;animation:hero-light-breathe 8s ease-in-out 3;}
+  opacity:.85;animation:hero-light-breathe 8s ease-in-out 1;}  /* once, not three times: it costs CPU while it runs */
 @keyframes hero-light-breathe {0%,100%{opacity:.85;}50%{opacity:.6;}}
 @media(prefers-reduced-motion:reduce) {
 .hero::before {animation:none;opacity:.85;}
