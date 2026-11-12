@@ -7,6 +7,13 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.8",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Controller: \"Toggle IO Masks\" also works with Image Occlusion Enhanced cards again (2.9.7 only handled Anki's own image occlusion)."},
+        ],
+    },
+    {
         "version": "2.9.7",
         "date": "November 12, 2026",
         "items": [

@@ -549,8 +549,14 @@ def get_debug_str() -> str:
 
 
 def toggle_image_occlusion_masks() -> None:
-    """Toggles the image occlusion masks (Anki's "Toggle Masks" button on the back)."""
+    """Toggles the image occlusion masks: Anki's own image occlusion (button
+    #toggle) and Image Occlusion Enhanced (button #io-revl-btn / toggle())."""
     mw.web.eval(
-        "(function() { const b = document.getElementById('toggle');"
-        " if (b && b.style.display !== 'none') b.click(); })()"
+        "(function() {"
+        " const b = document.getElementById('toggle');"
+        " if (b && b.style.display !== 'none') { b.click(); return; }"
+        " const e = document.getElementById('io-revl-btn');"
+        " if (e) { e.click(); return; }"
+        " if (typeof window.toggle === 'function') window.toggle();"
+        " })()"
     )

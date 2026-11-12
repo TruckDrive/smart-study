@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.8 – 2026-11-12
+
+- **Fix – "Toggle IO Masks" with Image Occlusion Enhanced**: 2.9.7 made the controller action press the *Toggle Masks* button of Anki's own image occlusion cards, but cards of the Image Occlusion Enhanced add-on have a different button (`io-revl-btn`, calling `toggle()`), so the action did nothing there. It now handles both kinds
+
 ## 2.9.7 – 2026-11-12
 
 - **Controller layouts sync**: the button layouts of the built-in controller support (profiles, which profile belongs to which controller, and the answers to *Which controller is this?*) are mirrored into the collection like the other Smart Study settings, so AnkiWeb takes them to your other computers. The newer copy wins; layouts that exist only on one computer are added, nothing is deleted
