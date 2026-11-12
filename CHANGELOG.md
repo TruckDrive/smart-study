@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.6 – 2026-11-12
+
+- **Fix – 8BitDo Zero 2 on Linux had A/B and X/Y swapped**: over Bluetooth on Linux the pad identifies itself as a Microsoft Xbox One S controller (045e:02e0), the kernel's `hid-microsoft` driver takes it, and its face buttons arrive in the order of their labels (A, B, X, Y). The built-in definition expected Xbox positions (B, A, Y, X), so every face button did what was set for its neighbour – e.g. A did nothing on the question side while B flipped the card. Such a pad now gets its own definition, *8BitDo Zero (Bluetooth, Linux)*, chosen automatically (and selectable under *Which controller is this?*). A profile you made for it before is moved over once with A/B and X/Y exchanged, so every action stays on the button you meant; the old file is kept in `user_files/integrations/contanki/profile_backups/`. The D-pad (which this pad sends as its left stick) works as before
+
 ## 2.9.5 – 2026-11-12
 
 - **Fix – notebook**: *open* on a PDF in the notebook handed whatever path the page sent to the system's opener (`xdg-open`, `open`, `startfile`); a path from an imported notebook could so start any file. Now only existing files ending in `.pdf` are opened

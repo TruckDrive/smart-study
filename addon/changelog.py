@@ -7,6 +7,13 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.6",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Controller: the 8BitDo Zero 2 over Bluetooth on Linux is recognised with its own button layout. Before, A did what was set for B, and X what was set for Y. Your existing profile is moved over once, so every action stays on the button you chose."},
+        ],
+    },
+    {
         "version": "2.9.5",
         "date": "November 12, 2026",
         "items": [

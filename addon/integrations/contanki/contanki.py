@@ -195,7 +195,7 @@ class Contanki(AnkiWebView):
         assert self.profile is not None
         # Smart Study: without the browser's standard layout a pad reports fewer than
         # 16 buttons; the D-pad lines below then failed on every poll (IndexError).
-        if self.profile.controller.parent == "8BitDo Zero (X Input)":
+        if str(self.profile.controller.parent) in ("8BitDo Zero (X Input)", "8BitDo Zero (Bluetooth, Linux)"):
             buttons += [False] * (16 - len(buttons))
             axes += [0.0] * (4 - len(axes))
 
@@ -203,7 +203,7 @@ class Contanki(AnkiWebView):
             self.buttons.append(buttons[len(self.buttons)])
 
         if (
-            self.profile.controller.parent == "8BitDo Zero (X Input)"
+            str(self.profile.controller.parent) in ("8BitDo Zero (X Input)", "8BitDo Zero (Bluetooth, Linux)")
             and any(axes)
             and not any(buttons[12:16])
         ):
@@ -429,7 +429,7 @@ class Contanki(AnkiWebView):
         """Lets the user say which controller this is; remembered per controller ID."""
         from ..strings import tr
         names = list(CHOOSABLE_CONTROLLERS)
-        labels = [tr("8BitDo Zero 2") if n == "8BitDo Zero (X Input)" else n for n in names]
+        labels = [tr("8BitDo Zero 2") if n == "8BitDo Zero (X Input)" else tr("8BitDo Zero 2 (Bluetooth on Linux)") if n == "8BitDo Zero (Bluetooth, Linux)" else n for n in names]
         labels.append(tr("Something else (keep automatic detection)"))
         current = names.index(guess) if guess in names else len(names)
         choice, ok = QInputDialog.getItem(

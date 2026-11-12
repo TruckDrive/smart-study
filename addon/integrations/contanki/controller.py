@@ -449,6 +449,7 @@ CHOICES_FILE = os.path.join(user_files_path, "controller_choices.json")
 # Names offered when the browser cannot tell controllers apart.
 CHOOSABLE_CONTROLLERS = [
     "8BitDo Zero (X Input)",
+    "8BitDo Zero (Bluetooth, Linux)",
     "8BitDo Lite",
     "8BitDo Micro",
     "8BitDo Pro",
@@ -507,4 +508,21 @@ def resolve_controller(
         name = "8BitDo Zero (X Input)"
     if name not in get_controller_data() and name.startswith("8BitDo Zero"):
         name = "8BitDo Zero (X Input)" if "X Input" in name else "8BitDo Zero (D Input)"
+    if name == "8BitDo Zero (X Input)" and _label_order_pad(id_, mapping):
+        name = "8BitDo Zero (Bluetooth, Linux)"
     return name
+
+
+def _label_order_pad(id_: str, mapping: str) -> bool:
+    """The 8BitDo Zero 2 in X-Input mode connected over Bluetooth on Linux.
+
+    It identifies itself as a Microsoft Xbox One S pad (045e:02e0), the kernel's
+    hid-microsoft driver takes it, and its face buttons arrive in the order of
+    their labels: A = 0, B = 1, X = 2, Y = 3 (measured 2026-11-12, kernel 7.3,
+    bluez 5.88). The X-Input definition expects them in Xbox positions
+    (B = 0, A = 1, Y = 2, X = 3), so every face button did the action of its
+    neighbour. The D-pad arrives as the left stick in both cases."""
+    import sys
+    lowered = id_.lower()
+    return (sys.platform.startswith("linux") and mapping == "standard"
+            and parse_controller_id(id_) == ("045e", "02e0") and "zero 2" in lowered)

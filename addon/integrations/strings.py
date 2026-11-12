@@ -39,6 +39,7 @@ DE: Dict[str, str] = {
     "Done. You will be asked again when the controller connects.": "Erledigt. Beim nächsten Verbinden wirst du wieder gefragt.",
     "Copied as image – paste it with {keys}.": "Als Bild kopiert – mit {keys} einfügen.",
     "8BitDo Zero 2": "8BitDo Zero 2",
+    "8BitDo Zero 2 (Bluetooth on Linux)": "8BitDo Zero 2 (Bluetooth unter Linux)",
     "Something else (keep automatic detection)": "Etwas anderes (automatische Erkennung behalten)",
     "Which controller is this?": "Welcher Controller ist das?",
     "Your controller reports itself as\n{id}\n\nMany controllers use this name, so it cannot be recognised reliably. Which one is it?": "Dein Controller meldet sich als\n{id}\n\nDiesen Namen verwenden viele Controller, deshalb kann er nicht sicher erkannt werden. Welcher ist es?",

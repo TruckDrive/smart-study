@@ -274,6 +274,8 @@ def find_profile(controller: str, buttons: int, axes: int) -> str:
     """Find a profile that matches the controller."""
     dbg(f"Finding profile for {controller} with {buttons} buttons and {axes} axes")
 
+    _adopt_label_order_profile(controller)
+
     # Check if a profile is already assigned to this controller
     profile = get_assigned_profile(controller)
     if profile is not None:
@@ -395,3 +397,41 @@ def profile_is_valid(profile: Profile | dict | str | None) -> bool:
         dbg(f"Profile '{profile}' returned error: {err}")
         return False
     return True
+
+
+LABEL_ORDER_PAD = "8BitDo Zero (Bluetooth, Linux)"
+
+
+def _adopt_label_order_profile(controller: str) -> None:
+    """Smart Study: the 8BitDo Zero 2 on Linux was handled with the X-Input
+    definition, whose face buttons sit one place off for this pad (see
+    controller._label_order_pad). A profile the user made for it then is moved
+    over once: its A/B and X/Y bindings are exchanged so every action stays on
+    the button it was meant for, and it is assigned to the corrected definition.
+    The old file is kept in user_files/profile_backups/ (not among the profiles,
+    so it does not show up twice in the list)."""
+    if controller != LABEL_ORDER_PAD:
+        return
+    try:
+        assigned = get_assigned_profiles()
+        if LABEL_ORDER_PAD in assigned or "8BitDo Zero (X Input)" not in assigned:
+            return
+        name = assigned["8BitDo Zero (X Input)"]
+        path = join(user_profile_path, slugify(name))
+        if not exists(path):
+            return
+        with open(path, encoding="utf8") as f:
+            data = json.load(f)
+        backups = join(user_files_path, "profile_backups")
+        os.makedirs(backups, exist_ok=True)
+        shutil.copy(path, join(backups, slugify(name) + ".before-label-order"))
+        for binds in data.get("bindings", {}).values():
+            for x, y in (("0", "1"), ("2", "3")):
+                binds[x], binds[y] = binds.get(y, ""), binds.get(x, "")
+        data["controller"] = LABEL_ORDER_PAD
+        with open(path, "w", encoding="utf8") as f:
+            json.dump(data, f)
+        update_assigned_profiles(LABEL_ORDER_PAD, name)
+        dbg(f"Moved profile {name} to {LABEL_ORDER_PAD}")
+    except Exception as err:  # never keep the controller from connecting
+        print(f"Contanki: profile not moved to {LABEL_ORDER_PAD}: {err}")
