@@ -192,10 +192,16 @@ class Contanki(AnkiWebView):
             self.on_error("No buttons")
             return
 
+        assert self.profile is not None
+        # Smart Study: without the browser's standard layout a pad reports fewer than
+        # 16 buttons; the D-pad lines below then failed on every poll (IndexError).
+        if self.profile.controller.parent == "8BitDo Zero (X Input)":
+            buttons += [False] * (16 - len(buttons))
+            axes += [0.0] * (4 - len(axes))
+
         while len(self.buttons) < len(buttons):
             self.buttons.append(buttons[len(self.buttons)])
 
-        assert self.profile is not None
         if (
             self.profile.controller.parent == "8BitDo Zero (X Input)"
             and any(axes)

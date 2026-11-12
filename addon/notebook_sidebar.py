@@ -2193,7 +2193,12 @@ class NotebookPanel(QWidget):
             self._add_pdf_dialog()
         elif payload.startswith("pdf:open:"):
             file_path = payload[len("pdf:open:"):]
-            _open_file_externally(file_path)
+            # The path comes from the page (and so possibly from an imported notebook):
+            # hand the system only real PDF files, never a program or a shortcut.
+            if file_path.lower().endswith(".pdf") and os.path.isfile(file_path):
+                _open_file_externally(file_path)
+            else:
+                showInfo(_("Could not open file: {}").format(file_path))
         elif payload.startswith("pdf:render:"):
             file_path = payload[len("pdf:render:"):]
             self._render_pdf_inline(file_path)

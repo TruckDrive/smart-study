@@ -99,7 +99,7 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 |---|---|
 | ![Basics](screenshots/edit-basics.png) | ![Sources](screenshots/edit-sources.png) |
 
-| Topics with linked pages, lectures and subdecks | Tools: weak spots, study ahead, mock exam |
+| Topics with linked pages, lectures and subdecks | Tools: weak spots, mock exam |
 |---|---|
 | ![Topics](screenshots/edit-topics.png) | ![Tools](screenshots/tools.png) |
 
@@ -107,17 +107,17 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 
 ![Retrospective](screenshots/review.png)
 
-**Workspace**: notebook with PDF viewer, mind maps, AI assistant and website sidebar, all next to your Anki cards
+**Workspace**: notebook with PDF viewer, mind maps, AI assistant and browser, all next to your Anki cards
 
 | Notebook with PDF viewer | Mind maps |
 |---|---|
 | ![Notebook](screenshots/workspace-notebook.png) | ![Mind map](screenshots/workspace-mindmap.png) |
 
-| AI assistant | Website sidebar (DuckDuckGo) |
+| AI assistant | Browser: tabs, address field, favourites |
 |---|---|
 | ![AI assistant](screenshots/workspace-ai-assistant.png) | ![Website](screenshots/workspace-website.png) |
 
-**Study plan window**: all your plans, streak and activity at a glance
+**Study plan window**: today's items, progress, and Archive / Delete in reach
 
 ![Study plan window](screenshots/workspace-study-plan.png)
 

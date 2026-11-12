@@ -210,6 +210,7 @@ button.icon-btn { display: inline-flex; align-items: center; justify-content: ce
 button.icon-btn:hover { background: var(--soft); color: var(--fg); border-color: transparent; }
 button.icon-btn.danger:hover { color: var(--bad); }
 button.with-icon { display: inline-flex; align-items: center; gap: 6px; }
+.dhead > .dprog { margin-inline-start: auto; }
 .rest-btn { border: 1px solid var(--line); color: var(--muted); padding: 1px 9px; border-radius: 999px; white-space: nowrap; }
 .rest-btn:hover { color: var(--fg); border-color: var(--accent); }
 /* Dragging a custom item onto another day */
