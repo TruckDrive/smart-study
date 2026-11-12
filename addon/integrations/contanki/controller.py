@@ -5,7 +5,7 @@ import json
 import os
 import re
 
-from .utils import dbg, int_keys, get_file, user_files_path
+from .utils import dbg, int_keys, get_file, user_files_path, push_sync
 
 
 def get_controller_data() -> dict[str, dict]:
@@ -488,6 +488,7 @@ def save_controller_choice(id_: str, name: str | None) -> None:
     os.makedirs(os.path.dirname(CHOICES_FILE), exist_ok=True)
     with open(CHOICES_FILE, "w", encoding="utf-8") as file:
         json.dump(choices, file, indent=2)
+    push_sync()
 
 
 def resolve_controller(

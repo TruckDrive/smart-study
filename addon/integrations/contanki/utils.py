@@ -92,3 +92,24 @@ def slugify(value, allow_unicode=False):
         )
     value = re.sub(r"[^\w\s-]", "", value.lower())
     return re.sub(r"[-\s]+", "-", value).strip("-_")
+
+
+def push_sync() -> None:
+    """Smart Study: mirrors the changed layouts into the collection (AnkiWeb sync)."""
+    try:
+        from ... import settings_sync
+        settings_sync.push_controller()
+    except Exception as err:  # pylint: disable=broad-except
+        print(f"Contanki: controller sync failed: {err}")
+
+
+def reload_after_sync() -> None:
+    """Smart Study: loads layouts that arrived from another device."""
+    from aqt import mw
+    contanki = getattr(mw, "contanki", None)
+    if contanki is None or contanki.profile is None:
+        return
+    from .profile import get_profile
+    profile = get_profile(contanki.profile.name)
+    if profile is not None:
+        contanki.profile = profile

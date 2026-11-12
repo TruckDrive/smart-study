@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.9.7 – 2026-11-12
+
+- **Controller layouts sync**: the button layouts of the built-in controller support (profiles, which profile belongs to which controller, and the answers to *Which controller is this?*) are mirrored into the collection like the other Smart Study settings, so AnkiWeb takes them to your other computers. The newer copy wins; layouts that exist only on one computer are added, nothing is deleted
+- **Fix – "Toggle IO Masks" did nothing**: the controller action called a JavaScript function that Anki's image occlusion cards do not have. It now presses the card's own *Toggle Masks* button, so it works on the answer side like the M key
+
 ## 2.9.6 – 2026-11-12
 
 - **Fix – 8BitDo Zero 2 on Linux had A/B and X/Y swapped**: over Bluetooth on Linux the pad identifies itself as a Microsoft Xbox One S controller (045e:02e0), the kernel's `hid-microsoft` driver takes it, and its face buttons arrive in the order of their labels (A, B, X, Y). The built-in definition expected Xbox positions (B, A, Y, X), so every face button did what was set for its neighbour – e.g. A did nothing on the question side while B flipped the card. Such a pad now gets its own definition, *8BitDo Zero (Bluetooth, Linux)*, chosen automatically (and selectable under *Which controller is this?*). A profile you made for it before is moved over once with A/B and X/Y exchanged, so every action stays on the button you meant; the old file is kept in `user_files/integrations/contanki/profile_backups/`. The D-pad (which this pad sends as its left stick) works as before

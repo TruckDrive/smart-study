@@ -549,5 +549,8 @@ def get_debug_str() -> str:
 
 
 def toggle_image_occlusion_masks() -> None:
-    """Toggles the image occlusion masks."""
-    mw.web.eval("toggle()")
+    """Toggles the image occlusion masks (Anki's "Toggle Masks" button on the back)."""
+    mw.web.eval(
+        "(function() { const b = document.getElementById('toggle');"
+        " if (b && b.style.display !== 'none') b.click(); })()"
+    )

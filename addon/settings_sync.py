@@ -123,3 +123,112 @@ def pull_integrations(state: Dict[str, Any]) -> bool:
         return changed
     push_integrations(state)
     return False
+
+
+# --- controller profiles (built-in Contanki) ----------------------------------
+# The button layouts live as files in user_files/integrations/contanki.  The
+# same newer-wins rule applies; the local stamp is kept in a file next to them.
+CONTROLLER_KEY = "controller"
+CONTROLLER_AT = "controllerAt"
+_CONTROLLER_FILES = ("controllers", "controller_choices.json")
+_CONTROLLER_DIRS = ("profiles", "custom_controllers")
+
+
+def _controller_dir() -> str:
+    import os
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "user_files", "integrations", "contanki")
+
+
+def _read_controller_files() -> Dict[str, str]:
+    import os
+    base = _controller_dir()
+    files: Dict[str, str] = {}
+    names = list(_CONTROLLER_FILES)
+    for folder in _CONTROLLER_DIRS:
+        path = os.path.join(base, folder)
+        if os.path.isdir(path):
+            names += [f"{folder}/{n}" for n in sorted(os.listdir(path))
+                      if os.path.isfile(os.path.join(path, n))]
+    for name in names:
+        try:
+            with open(os.path.join(base, name), encoding="utf-8") as f:
+                files[name] = f.read()
+        except OSError:
+            pass
+    return files
+
+
+def _stamp_path() -> str:
+    import os
+    return os.path.join(_controller_dir(), ".synced_at")
+
+
+def _local_controller_stamp() -> float:
+    try:
+        with open(_stamp_path(), encoding="utf-8") as f:
+            return float(f.read().strip() or 0)
+    except (OSError, ValueError):
+        return 0.0
+
+
+def _set_local_controller_stamp(value: float) -> None:
+    import os
+    os.makedirs(_controller_dir(), exist_ok=True)
+    with open(_stamp_path(), "w", encoding="utf-8") as f:
+        f.write(repr(value))
+
+
+def push_controller() -> None:
+    """Puts the controller layouts into the collection if they changed here."""
+    import os
+    if not os.path.isdir(_controller_dir()):
+        return
+    remote = _remote()
+    if remote is None:
+        return
+    files = _read_controller_files()
+    if not files or remote.get(CONTROLLER_KEY) == files:
+        return
+    now = time.time()
+    remote[CONTROLLER_KEY] = files
+    remote[CONTROLLER_AT] = now
+    _store(remote)
+    _set_local_controller_stamp(now)
+
+
+def pull_controller() -> bool:
+    """Takes newer controller layouts from the collection; True if files changed."""
+    import os
+    remote = _remote()
+    if remote is None:
+        return False
+    files = remote.get(CONTROLLER_KEY)
+    remote_at = float(remote.get(CONTROLLER_AT) or 0)
+    if not isinstance(files, dict) or remote_at <= _local_controller_stamp():
+        push_controller()
+        return False
+    base = _controller_dir()
+    changed = False
+    for name, text in files.items():
+        parts = name.split("/")
+        allowed = (name in _CONTROLLER_FILES or
+                   (len(parts) == 2 and parts[0] in _CONTROLLER_DIRS and parts[1] not in ("", ".", "..")))
+        if not allowed or not isinstance(text, str):
+            continue
+        path = os.path.join(base, *parts)
+        try:
+            with open(path, encoding="utf-8") as f:
+                if f.read() == text:
+                    continue
+        except OSError:
+            pass
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+        changed = True
+    _set_local_controller_stamp(remote_at)
+    # Layouts that exist only here are added to the synced copy.
+    if _read_controller_files() != files:
+        push_controller()
+    return changed

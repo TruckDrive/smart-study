@@ -1004,6 +1004,14 @@ def _pull_synced_settings() -> Dict[str, Any]:
                 tooltip(integrations.tr("Built-in add-ons were changed on another device. Restart Anki to apply."))
             elif settings_sync.STAMP_KEY in state:
                 integrations.save_state(state, push=False)  # keep the new sync stamp
+        # Controller button layouts of the built-in Contanki.
+        if settings_sync.pull_controller():
+            try:
+                if getattr(mw, "contanki", None) is not None:
+                    from .integrations.contanki.utils import reload_after_sync
+                    reload_after_sync()
+            except Exception as e:
+                print(f"SmartStudy: controller reload failed: {e}")
     except Exception as e:
         print(f"SmartStudy: settings sync failed: {e}")
         traceback.print_exc()
