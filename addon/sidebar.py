@@ -64,11 +64,6 @@ _HTML_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "gamification_web", "sidebar.html")
 
 
-def _is_night() -> bool:
-    try:
-        return bool(mw and hasattr(mw, "pm") and _is_night())
-    except Exception:
-        return False
 
 
 def _file_url(path: Optional[str]) -> str:

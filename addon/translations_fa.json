@@ -2291,5 +2291,9 @@
  "Open in new tab": "باز کردن در زبانهٔ جدید",
  "Suggest visited pages in the address field": "پیشنهاد صفحه‌های بازدیدشده در نوار نشانی",
  "Clear browsing history": "پاک کردن تاریخچهٔ مرور",
- "Browsing history cleared.": "تاریخچهٔ مرور پاک شد."
+ "Browsing history cleared.": "تاریخچهٔ مرور پاک شد.",
+ "Save this page as a favourite": "ذخیرهٔ این صفحه در علاقه‌مندی‌ها",
+ "Add another address…": "افزودن نشانی دیگر…",
+ "More favourites": "علاقه‌مندی‌های بیشتر",
+ "Rename favourite": "تغییر نام علاقه‌مندی"
 }

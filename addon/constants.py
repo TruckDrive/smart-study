@@ -7,7 +7,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "2.9.3"
+ADDON_VERSION = "2.9.4"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 
@@ -100,7 +100,7 @@ ADDON_NAME_WEBSITE = "Website_Sidebar"
 CONFIG_KEY_CUSTOM_SITES = f"addon_{ADDON_NAME_LAUNCHER}_{ADDON_NAME_WEBSITE}_custom_sites_v2"
 DEFAULT_CUSTOM_SITES: list = []
 WEBSITE_NOTION_URL = "https://www.notion.so"; WEBSITE_YOUTUBE_URL = "https://www.youtube.com"
-MAX_CUSTOM_SITES = 4
+MAX_CUSTOM_SITES = 20
 try:
     _p = _TL["blue"]; _pb = _TL["blue_border"].replace("none","1px solid #0056A4")
     WEBSITE_BUTTON_STYLE = f"""

@@ -7,6 +7,15 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.4",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "New", "text": "Browser favourites: the + saves the page you are on with one click, favourites show their site's icon, can be renamed, and up to 20 fit – those that do not fit into the row are under »."},
+            {"tag": "New", "text": "Study plan: “Not today anymore” on today's card spreads whatever is still open over the days until the exam (with Undo)."},
+            {"tag": "Fix", "text": "The gamification sidebar follows Anki's dark mode again (it stayed light since 2.9.1)."},
+        ],
+    },
+    {
         "version": "2.9.3",
         "date": "November 11, 2026",
         "items": [

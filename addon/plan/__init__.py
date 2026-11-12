@@ -313,6 +313,28 @@ def handle(cmd, a):
         day["items"].append(it)
         store.save(plan)
         return True
+    if cmd == "restToday":
+        # "Not today anymore": today's study time becomes what is already done, and
+        # everything still open is spread over the days until the exam.
+        plan = store.load(a["id"])
+        t = today().isoformat()
+        ev = planner.evaluate(plan, ankidata.stats(col, plan))
+        used = sum(int(it.get("min", 0) or 0) for d in plan["days"] if d["d"] == t for it in d["items"]
+                   if it.get("kind") not in planner.NO_CHECK and it.get("kind") != "reviews"
+                   and not it.get("moved") and planner.is_done(plan, it, ev))
+        previous = plan["dayMinutes"].get(t)
+        plan["dayMinutes"][t] = used
+        store.save(plan)
+        return {"notes": generate_all(a["id"]), "day": t, "previous": previous, "minutes": used}
+    if cmd == "setDayMinutes":  # undo of restToday
+        plan = store.load(a["id"])
+        planner.s2d(a["day"])
+        if a.get("minutes") is None:
+            plan["dayMinutes"].pop(a["day"], None)
+        else:
+            plan["dayMinutes"][a["day"]] = max(0, min(24 * 60, int(a["minutes"])))
+        store.save(plan)
+        return {"notes": generate_all(a["id"])}
     if cmd == "simResult":
         plan = store.load(a["id"])
         return ankidata.sim_result(col, plan, plan.get("sim") or {})

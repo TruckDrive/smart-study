@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.9.4 – 2026-11-12
+
+- **Favourites, one click**: the + in the favourites row saves the page you are looking at, named after its title (“Herz – Wikipedia” becomes “Herz”). On an empty tab, the start page or a page that is already saved it asks for an address as before; a right click on + offers both
+- **Favourites with icons, more of them**: each favourite shows its site's icon. Up to 20 instead of 4; those that do not fit into the row are in the » menu at its end, and the row re-fits when the browser gets wider or narrower. Right-click a favourite to rename it
+- **“Not today anymore”**: today's card in the study plan has this button while planned items are open. It sets today's study time to what you have already done and replans: everything still open is spread over the days until the exam, finished and custom items stay. *Undo* in the message puts today's time back
+- **Fix – gamification sidebar stayed light in dark mode**: since 2.9.1 the sidebar's own dark-mode check called itself instead of asking Anki, failed, and answered “light”. It follows Anki's theme again
+
 ## 2.9.3 – 2026-11-11
 
 - **Archive and Delete in sight**: every plan in the overview has an archive and a delete button on its card (an archived plan has *Make active again* instead), and an open plan has *Archive* and *Delete* in its bar. Before, deleting was a button at the very bottom of the editor and archiving sat in the retrospective. Deleting asks first and offers to archive instead; afterwards the message offers *Undo*, which brings the plan back with its ticks – also on your other devices. Archiving offers *Undo* too

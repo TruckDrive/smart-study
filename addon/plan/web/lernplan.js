@@ -571,6 +571,18 @@ function dayCard(day, today) {
     head.append(h("span", { class: "dprog" + (dn === tot ? " done" : ""), key: "prog" }, ring(dn / tot),
       h("span", null, dn === tot ? L("alles erledigt", "all done", "همه انجام شد") : `${dn}/${tot} ${L("erledigt", "done", "انجام‌شده")}${isToday && openMin ? ` · ≈ ${hm(openMin)} ${L("offen", "left", "مانده")}` : ""}`)));
   }
+  if (isToday && tot && dn < tot && day.d < plan.exam && day.items.some(it => !it.moved && !it.custom && !["note", "weakround", "sim", "reviews"].includes(it.kind) && !itemDone(it))) {
+    head.append(h("button", { class: "ghost small rest-btn", key: "rest", title: L("Was heute noch offen ist, wird auf die Tage bis zur Prüfung verteilt. Erledigtes und eigene Punkte bleiben.", "Whatever is still open today is spread over the days until the exam. Finished and custom items stay.", "هر چه امروز باز مانده روی روزهای باقی‌مانده تا امتحان پخش می‌شود. موارد انجام‌شده و شخصی می‌مانند."),
+      onclick: async () => {
+        if (S.replanning) return;
+        S.replanning = true;
+        let r;
+        try { r = await run(call("restToday", { id: plan.id })); } finally { S.replanning = false; }
+        await refresh();
+        toast(L("Rest von heute auf die nächsten Tage verteilt.", "The rest of today is spread over the next days.", "باقی‌ماندهٔ امروز روی روزهای بعد پخش شد."), 8000,
+          [L("Rückgängig", "Undo", "واگرد"), async () => { await run(call("setDayMinutes", { id: plan.id, day: r.day, minutes: r.previous })); refresh(); }]);
+      } }, L("Heute nicht mehr", "Not today anymore", "امروز دیگر نه")));
+  }
   if (day.d >= today) {
     // The field belongs to the page, not to this render: read it from the event.
     const add = async e => {

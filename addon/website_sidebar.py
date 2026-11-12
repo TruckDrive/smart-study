@@ -539,6 +539,53 @@ def open_add_site_dialog():
     tooltip(_("Site '{}' added.").format(new_name))
     rebuild_custom_buttons_ui()
 
+def _favourite_name(title: str, url: str) -> str:
+    """A short name for a page: the first part of its title ("Herz – Wikipedia" → "Herz"),
+    otherwise the site's name without www."""
+    import re
+    part = re.split(r"\s+[–—|·:-]\s+", (title or "").strip())[0].strip()
+    if not part or len(part) > 40:
+        host = QUrl(url).host()
+        part = host[4:] if host.startswith("www.") else host
+    return (part[:22].rstrip() + "…") if len(part) > 23 else part
+
+
+def add_current_page() -> None:
+    """The + of the favourites row: saves the page you are looking at with one click.
+    On an empty tab, the start page or a page that is already saved it asks for an address instead."""
+    view = sidebar_webview
+    url = view.url().toString() if view is not None and not sip.isdeleted(view) else ""
+    sites = load_custom_sites()
+    plain = lambda u: u.rstrip("/")
+    if (not url.startswith(("http://", "https://")) or plain(url) == plain(_home_url())
+            or any(plain(s.get("url", "")) == plain(url) for s in sites)):
+        open_add_site_dialog()
+        return
+    if len(sites) >= constants.MAX_CUSTOM_SITES:
+        showWarning(_("Limit of {} custom sites reached.").format(constants.MAX_CUSTOM_SITES))
+        return
+    name = _favourite_name(getattr(view, "_ss_title", ""), url) or _("New tab")
+    sites.append({"name": name, "url": url})
+    save_custom_sites(sites)
+    try:
+        browser_history.save_icon(url, getattr(view, "_ss_icon", None))
+    except Exception:
+        pass
+    tooltip(_("Site '{}' added.").format(name))
+    rebuild_custom_buttons_ui()
+
+
+def rename_custom_site(index: int) -> None:
+    sites = load_custom_sites()
+    if not (0 <= index < len(sites)) or QInputDialog is object:
+        return
+    name, ok = QInputDialog.getText(mw, _("Rename favourite"), _("Name for the new button:"), text=sites[index].get("name", ""))
+    if ok and name.strip():
+        sites[index]["name"] = name.strip()[:40]
+        save_custom_sites(sites)
+        rebuild_custom_buttons_ui()
+
+
 def delete_custom_site(index_to_delete: int):
     current_sites = load_custom_sites()
     if 0 <= index_to_delete < len(current_sites):
@@ -840,6 +887,14 @@ def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
         return None
     site_button = QPushButton(name)
     site_button.setObjectName("smartstudySiteChip")
+    try:
+        chip_icon = browser_history.load_icon(url) or browser_chrome.icon("globe", 14)
+        if chip_icon is not None:
+            site_button.setIcon(chip_icon)
+            site_button.setIconSize(QSize(14, 14))
+    except Exception:
+        pass
+    site_button._ss_site = (name, url)
     site_button.setStyleSheet(_get_raised_text_button_style())
     site_button.setToolTip(url)
     site_button.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -856,6 +911,7 @@ def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
     def menu(pos):
         m = QMenu(site_button)
         m.addAction(_("Open in new tab"), lambda: new_tab(url))
+        m.addAction(_("Rename…"), lambda: QTimer.singleShot(0, lambda: rename_custom_site(index)))
         m.addSeparator()
         m.addAction(_("Remove '{}'").format(name), partial(delete_custom_site, index_to_delete=index))
         m.exec(site_button.mapToGlobal(pos))
@@ -916,7 +972,62 @@ def rebuild_custom_buttons_ui():
         can_add_more = len(custom_sites) < constants.MAX_CUSTOM_SITES
         add_button_widget.setVisible(can_add_more)
         add_button_widget.setEnabled(can_add_more)
-        add_button_widget.setToolTip(_("Add new website") if can_add_more else _("Maximum {} custom sites reached").format(constants.MAX_CUSTOM_SITES))
+        add_button_widget.setToolTip(_("Save this page as a favourite") if can_add_more else _("Maximum {} custom sites reached").format(constants.MAX_CUSTOM_SITES))
+    _fit_favourites()
+
+
+more_button = None  # "»": the favourites that do not fit into the row
+
+
+def _fit_favourites() -> None:
+    """Shows as many favourites as fit into the row; the rest go into the » menu."""
+    try:
+        if not button_container_layout or more_button is None or sip.isdeleted(more_button):
+            return
+        bar = more_button.parentWidget()
+        if bar is None:
+            return
+        room = bar.width() - 20
+        for fixed in (home_button_widget, add_button_widget):
+            if fixed is not None and not sip.isdeleted(fixed) and not fixed.isHidden():
+                room -= fixed.sizeHint().width() + 2
+        chips = [c for c in custom_button_containers if not sip.isdeleted(c)]
+        widths = [c.sizeHint().width() + 2 for c in chips]
+        if sum(widths) > room:
+            room -= more_button.sizeHint().width() + 2
+        hidden = []
+        for chip, width in zip(chips, widths):
+            fits = not hidden and width <= room
+            if fits:
+                room -= width
+            else:
+                hidden.append(chip)
+            chip.setVisible(fits)
+        more_button._ss_hidden = [c._ss_site for c in hidden if hasattr(c, "_ss_site")]
+        more_button.setVisible(bool(hidden))
+    except Exception as e:
+        print(f"WS Info: favourites row: {e}")
+
+
+def _fill_more_menu(menu) -> None:
+    menu.clear()
+    for name, url in getattr(more_button, "_ss_hidden", []):
+        action = menu.addAction(name)
+        icon = browser_history.load_icon(url) or browser_chrome.icon("globe", 14)
+        if icon is not None:
+            action.setIcon(icon)
+        action.setToolTip(url)
+        qconnect(action.triggered, lambda _=False, u=url: load_url_in_webview(sidebar_webview, u) if sidebar_webview is not None else new_tab(u))
+
+
+class _RowResize(QObject if QObject is not object else object):
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.Resize:
+            QTimer.singleShot(0, _fit_favourites)
+        return False
+
+
+_row_resize = _RowResize() if QObject is not object else None
 
 
 # --- Main Dock Creation ---
@@ -1036,8 +1147,28 @@ def create_website_dock() -> Optional[QDockWidget]:
         browser_chrome.set_icon(add_button_widget, "plus", 13)
         add_button_widget.setToolTip(_("Add new website"))
         add_button_widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        if qconnect: qconnect(add_button_widget.clicked, open_add_site_dialog)
+        if qconnect: qconnect(add_button_widget.clicked, add_current_page)
         else: add_button_widget.setEnabled(False)
+        add_button_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+
+        def _add_menu(pos):
+            m = QMenu(add_button_widget)
+            m.addAction(_("Save this page as a favourite"), add_current_page)
+            m.addAction(_("Add another address…"), lambda: QTimer.singleShot(0, open_add_site_dialog))
+            m.exec(add_button_widget.mapToGlobal(pos))
+        qconnect(add_button_widget.customContextMenuRequested, _add_menu)
+
+        global more_button
+        more_button = QPushButton("»", toolbar_widget)
+        more_button.setObjectName("smartstudyMoreSites")
+        more_button.setStyleSheet(_get_raised_icon_button_style())
+        more_button.setToolTip(_("More favourites"))
+        more_button.setAccessibleName(_("More favourites"))
+        more_menu = QMenu(more_button)
+        qconnect(more_menu.aboutToShow, lambda: _fill_more_menu(more_menu))
+        more_button.setMenu(more_menu)
+        more_button.hide()
+        toolbar_widget.installEventFilter(_row_resize)
 
         home_button_widget = QPushButton(_("Home"))
         home_button_widget.setObjectName("HomeButton")
@@ -1210,6 +1341,7 @@ def create_website_dock() -> Optional[QDockWidget]:
              home_button_widget.setEnabled(False)
 
         button_container_layout.addWidget(home_button_widget)
+        button_container_layout.addWidget(more_button)
         button_container_layout.addWidget(add_button_widget)
         button_container_layout.addStretch(1)
         rebuild_custom_buttons_ui()
@@ -1946,6 +2078,8 @@ def refresh_website_theme() -> None:
     if home_button_widget is not None:
         try: home_button_widget.setStyleSheet(_get_raised_text_button_style())
         except Exception: pass
+    if more_button is not None and not sip.isdeleted(more_button):
+        more_button.setStyleSheet(_get_raised_icon_button_style())
     if add_button_widget is not None:
         try:
             add_button_widget.setStyleSheet(_get_raised_icon_button_style())
@@ -1983,6 +2117,8 @@ def cleanup_website_sidebar():
     global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
     global load_bar
     load_bar = None
+    global more_button
+    more_button = None
     try: browser_history.save()
     except Exception: pass
 

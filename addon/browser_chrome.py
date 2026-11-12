@@ -141,6 +141,7 @@ QPushButton {{ background: transparent; color: {c['soft']}; border: none; border
     padding: 0; min-width: 22px; max-width: 22px; min-height: 22px; max-height: 22px; font-size: 13px; }}
 QPushButton:hover {{ background: {c['hover']}; color: {c['text']}; }}
 QPushButton:pressed {{ background: {c['pressed']}; }}
+QPushButton::menu-indicator {{ image: none; width: 0; height: 0; }}
 """
 
 
