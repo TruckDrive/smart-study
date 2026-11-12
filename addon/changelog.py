@@ -7,6 +7,14 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.5",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Notebook: opening a PDF hands the system only real PDF files."},
+            {"tag": "Fix", "text": "Controller: a pad that reports fewer than 16 buttons no longer fails on every poll."},
+        ],
+    },
+    {
         "version": "2.9.4",
         "date": "November 12, 2026",
         "items": [

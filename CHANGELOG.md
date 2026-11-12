@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9.5 – 2026-11-12
+
+- **Fix – notebook**: *open* on a PDF in the notebook handed whatever path the page sent to the system's opener (`xdg-open`, `open`, `startfile`); a path from an imported notebook could so start any file. Now only existing files ending in `.pdf` are opened
+- **Fix – controller**: with a pad that reports fewer than 16 buttons in the browser (no “standard” layout), the D-pad handling for the 8BitDo Zero read past the end of the button list and failed on every poll
+- **README**: a “New in 2.9” section and new screenshots of the study plan and the browser
+
 ## 2.9.4 – 2026-11-12
 
 - **Favourites, one click**: the + in the favourites row saves the page you are looking at, named after its title (“Herz – Wikipedia” becomes “Herz”). On an empty tab, the start page or a page that is already saved it asks for an address as before; a right click on + offers both

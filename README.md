@@ -24,9 +24,30 @@ Changelog and release notes: [CHANGELOG.md](CHANGELOG.md) · [Releases](https://
 
 You tell Smart Study what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
 
-![Plan view](screenshots/plan.png)
+![Plan view](screenshots/plan-2.9.png)
 
 *An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
+
+## New in 2.9
+
+**Study plan, rebuilt.** The page now changes only what changed: ticks appear instantly, bars and rings glide, nothing flickers, and text you are typing survives a refresh. Reviewing in Anki no longer stutters while the plan is open.
+
+- **Archive and Delete** right on every plan and in the plan's bar, both with **Undo** (drafts can be deleted too)
+- **Undo** after removing an item, **drag** a custom item onto another day, **→ tomorrow**, and **“Not today anymore”** spreads the rest of today over the coming days
+- **Today** button, a progress ring per day, today's open time on the overview, mock exam by keyboard (Space, 1, 2)
+- Ticks made on **two devices** before syncing are merged instead of lost; unsaved edits ask before they are discarded
+
+**Browser, new look.** Tabs on top that share the width, sharp icons, a wide address field that **suggests visited pages, favourites and open tabs**, a load line, Stop while loading, middle click to close a tab.
+
+- **Favourites**: the + saves the page you are on with one click, with site icons, renaming and room for 20
+- **Keys stay in the page**: Space pauses a video instead of showing the answer of the card behind it
+- **Touchpad**: a swipe over a page or PDF keeps gliding at the speed of your fingers (it stopped after about one page before)
+
+Also: much less processor load (the AI assistant's empty chat used about 40 % of a core, now 2 %), the gamification sidebar follows dark mode again. Details in the [changelog](CHANGELOG.md).
+
+| Study plan | Browser |
+|---|---|
+| ![Study plan 2.9](screenshots/plan-2.9.png) | ![Browser 2.9](screenshots/workspace-website-2.9.png) |
 
 ## Features
 
@@ -39,20 +60,21 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Milestones** (partial tests, quizzes) get their material done first. **Lab sessions** are soft milestones: read and watch before, cards continue afterwards
 - **Reserve days** before the exam: weak spots round → mock exam → light review
 - **Several plans at once**, optionally sharing one daily time budget (`"budget": {"minutesPerDay": 360}` in `plan/user_files/profile.json`): the nearest exam gets scheduled first, later ones get what's left
-- **Replan** moves everything still open (and your own custom items) onto the remaining days. Finished items stay where they were
+- **Replan** moves everything still open (and your own custom items) onto the remaining days. Finished items stay where they were. **Not today anymore** does the same for the rest of one day
 
 **While studying**
 - **Auto checkmarks**: card and review items are checked off from your Anki activity, everything else with a click
 - **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **📖 open** opens the PDF at the right page in a Smart Study browser tab (or Okular/Evince)
 - **Weak spots round**: finds the topics with the most mistakes and schedules the pages, video and weak cards for them again
 - **Weak cards** open in Anki's browser with a search, nothing gets moved
-- **Mock exam** runs in the plan window: random studied cards against the clock, show the answer, mark it right or wrong, with a per-topic result
+- **Mock exam** runs in the plan window: random studied cards against the clock, show the answer, mark it right or wrong (or Space, 1, 2), with a per-topic result
+- **Custom items**: add them to any day (“… 45 min” sets the duration), drag them to another day, remove them with Undo
 
 **Afterwards**
 - **Retrospective**: planned vs. done, on time vs. late, per source, time spent in Anki and your measured pace, which becomes the default for your next plan
 - **Maintenance mode**: keeps the decks running without new cards and with capped reviews (restores your old deck options when switched off)
-- **Archive** and **next plan** in one click, plus a **study streak** and a **6-month heatmap** on the overview
-- Plans **sync between devices** through your Anki collection (AnkiWeb sync); each device finds its own copy of the PDFs (by name, or it asks once)
+- **Archive**, **Delete** (with Undo) and **next plan** in one click, plus a **study streak** and a **6-month heatmap** on the overview
+- Plans **sync between devices** through your Anki collection (AnkiWeb sync); ticks made on two devices are merged, and each device finds its own copy of the PDFs (by name, or it asks once)
 - **Share with friends**: Share copies a code for WhatsApp & co. or saves the plan as a file; Import takes it over. Your progress and file paths stay private
 
 ### Workspace
@@ -63,7 +85,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Pomodoro and session timers** with study-time analytics by deck
 - **Music player** for local audio, optional SoundCloud, plus a Streaming sidebar with YouTube Music (Spotify opens in its app)
 - **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
-- **Browser** with tabs, address bar, PDF viewer (PDFs open right in the tab), ad blocker and your own study sites
+- **Browser** with tabs, an address field that suggests visited pages, favourites with icons, PDF viewer (PDFs open right in the tab), ad blocker, saved passwords, and layouts: sidebar, split view, main window or its own window
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - **Dashboard**: statistics, deadlines and countdowns, daily facts, custom deck overview
 - Light and dark mode, color themes, custom backgrounds, eleven interface languages
@@ -93,19 +115,19 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 
 | Overview: streak, heatmap, plans | Dark mode |
 |---|---|
-| ![Overview](screenshots/home.png) | ![Plan in dark mode](screenshots/plan-dark.png) |
+| ![Overview](screenshots/home-2.9.png) | ![Plan in dark mode](screenshots/plan-dark-2.9.png) |
 
 | Basics, milestones and single days | Sources |
 |---|---|
-| ![Basics](screenshots/edit-basics.png) | ![Sources](screenshots/edit-sources.png) |
+| ![Basics](screenshots/edit-basics-2.9.png) | ![Sources](screenshots/edit-sources-2.9.png) |
 
 | Topics with linked pages, lectures and subdecks | Tools: weak spots, mock exam |
 |---|---|
-| ![Topics](screenshots/edit-topics.png) | ![Tools](screenshots/tools.png) |
+| ![Topics](screenshots/edit-topics-2.9.png) | ![Tools](screenshots/tools-2.9.png) |
 
 **Retrospective**: what worked, and your real pace for the next plan
 
-![Retrospective](screenshots/review.png)
+![Retrospective](screenshots/review-2.9.png)
 
 **Workspace**: notebook with PDF viewer, mind maps, AI assistant and browser, all next to your Anki cards
 
@@ -115,11 +137,11 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 
 | AI assistant | Browser: tabs, address field, favourites |
 |---|---|
-| ![AI assistant](screenshots/workspace-ai-assistant.png) | ![Website](screenshots/workspace-website.png) |
+| ![AI assistant](screenshots/workspace-ai-assistant.png) | ![Website](screenshots/workspace-website-2.9.png) |
 
 **Study plan window**: today's items, progress, and Archive / Delete in reach
 
-![Study plan window](screenshots/workspace-study-plan.png)
+![Study plan window](screenshots/workspace-study-plan-2.9.png)
 
 ## Usage
 
