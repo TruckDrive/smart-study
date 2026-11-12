@@ -28,27 +28,6 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 *An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
 
-## New in 2.9
-
-**Study plan, rebuilt.** The page now changes only what changed: ticks appear instantly, bars and rings glide, nothing flickers, and text you are typing survives a refresh. Reviewing in Anki no longer stutters while the plan is open.
-
-- **Archive and Delete** right on every plan and in the plan's bar, both with **Undo** (drafts can be deleted too)
-- **Undo** after removing an item, **drag** a custom item onto another day, **→ tomorrow**, and **“Not today anymore”** spreads the rest of today over the coming days
-- **Today** button, a progress ring per day, today's open time on the overview, mock exam by keyboard (Space, 1, 2)
-- Ticks made on **two devices** before syncing are merged instead of lost; unsaved edits ask before they are discarded
-
-**Browser, new look.** Tabs on top that share the width, sharp icons, a wide address field that **suggests visited pages, favourites and open tabs**, a load line, Stop while loading, middle click to close a tab.
-
-- **Favourites**: the + saves the page you are on with one click, with site icons, renaming and room for 20
-- **Keys stay in the page**: Space pauses a video instead of showing the answer of the card behind it
-- **Touchpad**: a swipe over a page or PDF keeps gliding at the speed of your fingers (it stopped after about one page before)
-
-Also: much less processor load (the AI assistant's empty chat used about 40 % of a core, now 2 %), the gamification sidebar follows dark mode again. Details in the [changelog](CHANGELOG.md).
-
-| Study plan | Browser |
-|---|---|
-| ![Study plan 2.9](screenshots/plan-2.9.png) | ![Browser 2.9](screenshots/workspace-website-2.9.png) |
-
 ## Features
 
 ### Study plan
