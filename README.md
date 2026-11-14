@@ -58,7 +58,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 ### Workspace
 
-- **Launcher bar** on the left with keyboard shortcuts for every tool
+- **Side panel** on the right: a slim rail with tabs for every tool (each with an optional keyboard shortcut), Pomodoro and music
 - **Notebook** with nested pages, task lists and a built-in **PDF viewer** (PDF.js bundled, nothing loaded from a CDN), plus a PDF card creator for basic, reversed and cloze cards
 - **Mind maps** and FreeMap diagrams with images, icons and links to Anki cards
 - **Pomodoro and session timers** with study-time analytics by deck
@@ -66,7 +66,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
 - **Browser** with tabs, an address field that suggests visited pages, favourites with icons, PDF viewer (PDFs open right in the tab), ad blocker, saved passwords, and layouts: sidebar, split view, main window or its own window
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
-- **Dashboard**: statistics, deadlines and countdowns, daily facts, custom deck overview
+- **Today**: countdown to the next exam, today's plan items to tick off, daily challenge, and charts for due cards, reviews and memory; daily facts and a custom deck overview
 - Light and dark mode, color themes, custom backgrounds, eleven interface languages
 
 ### Built-in add-ons
