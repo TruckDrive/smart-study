@@ -417,7 +417,7 @@ _TOOLBAR_CSS = """<style id="ss-toolbar-narrow">
 @media (max-width: 900px) {
   /* Anki's three equal columns squeeze the links: give them the middle. */
   .header { grid-template-columns: auto minmax(0, 1fr) auto !important; }
-  .toolbar { display: flex !important; justify-content: safe center !important; justify-self: stretch !important;
+  .toolbar { display: flex !important; justify-content: safe center !important; justify-self: center !important;
              min-width: 0 !important; width: auto !important; max-width: 100% !important;
              white-space: nowrap; overflow-x: auto !important; scrollbar-width: none; }
   .toolbar::-webkit-scrollbar { display: none; }
