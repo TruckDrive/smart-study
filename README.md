@@ -75,7 +75,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 |---|---|---|
 | **Copy selections with pictures as an image** | Select part of a card with pictures (mouse, Ctrl+A, Shift+arrows): it is copied as one image, so ChatGPT, Claude or a chat get the pictures when you paste. Text-only selections are not touched | on |
 | **Review heatmap** | Calendar of your reviews and your streak on the deck list, deck overview and statistics | on |
-| **Controller support** | Study with a gamepad such as the 8BitDo Zero 2; buttons for every screen. If a controller cannot be recognised reliably (e.g. any X-Input pad on Windows), you are asked once which one it is | on |
+| **Controller support** | Study with a gamepad such as the 8BitDo Zero 2; buttons for every screen. If a controller cannot be recognised reliably (e.g. any X-Input pad on Windows), you are asked once which one it is. Your button layouts sync to your other computers through AnkiWeb | on |
 | **Life Drain** | A life bar that drains while you think and refills when you answer | off |
 
 Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or *Tools → Smart Study → Built-in add-ons…*. Changes take effect after restarting Anki, and the switches sync to your other devices with AnkiWeb. Settings are kept in `user_files/integrations/` (the heatmap and Life Drain also in the collection, like the originals), so updates do not reset them.

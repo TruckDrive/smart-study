@@ -23,6 +23,7 @@ from .utils import (
     user_profile_path,
     default_profile_path,
     slugify,
+    push_sync,
 )
 from .controller import Controller, get_updated_controller_list
 
@@ -173,6 +174,7 @@ class Profile:
         path = os.path.join(user_profile_path, slugify(self.name))
         with open(dbg(path), "w", encoding="utf8") as file:
             json.dump(self.to_dict(), file)
+        push_sync()
 
     def copy(self):
         """Returns a deep copy of the profile."""
@@ -236,6 +238,7 @@ def delete_profile(profile: str | Profile) -> None:
     if exists(path):
         dbg(f"Deleting profile {name} from {path}")
         os.remove(path)
+        push_sync()
     else:
         dbg(f"Tried to delete profile {name}, but not found at {path}")
         path = join(default_profile_path, name)
@@ -318,6 +321,7 @@ def update_assigned_profiles(controller: Controller | str, profile: Profile | st
         del controllers[controller]
     with open(join(user_files_path, "controllers"), "w", encoding="utf8") as file:
         json.dump(controllers, file)
+    push_sync()
 
 
 def get_assigned_profile(controller: Controller | str) -> Profile | None:

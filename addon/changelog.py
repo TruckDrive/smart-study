@@ -7,6 +7,21 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "2.9.8",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Controller: \"Toggle IO Masks\" also works with Image Occlusion Enhanced cards again (2.9.7 only handled Anki's own image occlusion)."},
+        ],
+    },
+    {
+        "version": "2.9.7",
+        "date": "November 12, 2026",
+        "items": [
+            {"tag": "New", "text": "Controller: your button layouts now sync through AnkiWeb with the rest of Smart Study's settings, so a change on one computer arrives on the others after the next sync."},
+            {"tag": "Fix", "text": "Controller: the action \"Toggle IO Masks\" now really shows and hides the masks of an image occlusion card (on the answer side)."},
+        ],
+    },
+    {
         "version": "2.9.6",
         "date": "November 12, 2026",
         "items": [

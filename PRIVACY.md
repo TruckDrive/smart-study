@@ -69,7 +69,9 @@ image" only writes to the local clipboard.
 - Smart Study's general settings and the on/off switches of the built-in
   add-ons are also mirrored into the collection configuration
   (`smartstudy_settings`), so AnkiWeb sync takes them to your other devices.
-  They contain no API keys, history or personal content.
+  They contain no API keys, history or personal content. The controller
+  button layouts (`user_files/integrations/contanki/`) are mirrored there as
+  well.
 - If you switch on add-on sync, the AnkiWeb codes and names of your installed
   add-ons are kept in the collection configuration (`smartstudy_addons`).
   Missing add-ons are downloaded from AnkiWeb only after you confirm.
