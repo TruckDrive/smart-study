@@ -43,14 +43,17 @@ GLYPHS = {"back": "←", "forward": "→", "reload": "↻", "stop": "✕", "plus
 
 
 def palette() -> dict:
-    """Colours of the bars for Anki's light and dark mode."""
-    if is_night():
-        return {"bar": "#1f1f1f", "line": "rgba(255,255,255,0.09)", "text": "#ececec", "soft": "#b4b4b4",
+    """Colours of the bars for Anki's light and dark mode (Smart Study's own look)."""
+    from . import design
+    night = is_night()
+    t = design.tokens(night)
+    if night:
+        return {"bar": t["page"], "line": "rgba(255,255,255,0.09)", "text": t["ink"], "soft": t["muted"],
                 "hover": "rgba(255,255,255,0.09)", "pressed": "rgba(255,255,255,0.16)", "muted": "#6f6f6f",
-                "select_bg": "#343434", "field": "#2b2b2b", "accent": ACCENT}
-    return {"bar": "#f3f3f1", "line": "rgba(0,0,0,0.09)", "text": "#2f2e2b", "soft": "#5f5e5a",
+                "select_bg": t["raised"], "field": t["card"], "accent": t["accent"]}
+    return {"bar": t["page"], "line": "rgba(0,0,0,0.09)", "text": t["ink"], "soft": t["muted"],
             "hover": "rgba(0,0,0,0.06)", "pressed": "rgba(0,0,0,0.11)", "muted": "#b0aea8",
-            "select_bg": "#ffffff", "field": "#ffffff", "accent": ACCENT}
+            "select_bg": t["card"], "field": t["card"], "accent": t["accent"]}
 
 
 def _pixmap(name: str, color: str, size: int) -> Optional[QPixmap]:

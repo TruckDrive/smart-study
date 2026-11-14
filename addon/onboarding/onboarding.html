@@ -489,26 +489,26 @@ h2.screen-title {
 /* Anki night mode. Screenshots keep their original colours, while every
    interactive surface and text colour receives a dark counterpart. */
 html.dark { color-scheme: dark; }
-html.dark body, html.dark .dialog { background: #2c2c2c; color: #ffffff; }
-html.dark .right-panel { background: #2c2c2c; }
+html.dark body, html.dark .dialog { background: #26282B; color: #ffffff; }
+html.dark .right-panel { background: #26282B; }
 html.dark h1.brand, html.dark h2.screen-title, html.dark .support-content h2,
 html.dark .support-p strong, html.dark .tos-modal-header h3,
 html.dark .tos-modal-body h4 { color: #ffffff; }
 html.dark .welcome-eyebrow, html.dark .welcome-tagline, html.dark .tip-text,
 html.dark .support-p, html.dark .tos-row label, html.dark .tos-modal-body p,
-html.dark .tos-modal-body ul li { color: #b0b0b0; }
+html.dark .tos-modal-body ul li { color: #B4B4B4; }
 html.dark .screen-subtitle, html.dark .progress-label,
-html.dark .loading-label, html.dark .tos-last-updated { color: #b0b0b0; }
-html.dark .progress-track, html.dark .loading-track { background: #414141; }
-html.dark .opt { background: #252525; border-color: #414141; color: #ffffff; }
-html.dark .opt:hover { background: #414141; border-color: #60a5fa; }
-html.dark .opt.selected { background: #414141; border-color: #60a5fa; color: #ffffff; }
-html.dark .theme-card { background: #252525; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
+html.dark .loading-label, html.dark .tos-last-updated { color: #B4B4B4; }
+html.dark .progress-track, html.dark .loading-track { background: #34373C; }
+html.dark .opt { background: #1D1F22; border-color: #34373C; color: #ffffff; }
+html.dark .opt:hover { background: #34373C; border-color: #60a5fa; }
+html.dark .opt.selected { background: #34373C; border-color: #60a5fa; color: #ffffff; }
+html.dark .theme-card { background: #1D1F22; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
 html.dark .theme-card.selected { border-color: #60a5fa; }
-html.dark .tos-row, html.dark .support-text-box { background: #252525; border-color: #414141; }
-html.dark .tos-modal { background: #2c2c2c; box-shadow: 0 24px 64px rgba(0,0,0,.55); }
-html.dark .tos-modal-header { border-color: #414141; }
-html.dark .tos-close { background: #414141; color: #b0b0b0; }
+html.dark .tos-row, html.dark .support-text-box { background: #1D1F22; border-color: #34373C; }
+html.dark .tos-modal { background: #26282B; box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+html.dark .tos-modal-header { border-color: #34373C; }
+html.dark .tos-close { background: #34373C; color: #B4B4B4; }
 html.dark .tos-close:hover { background: #505050; color: #fff; }
 html.dark .tos-row a { color: #93c5fd; }
 </style>
@@ -1185,9 +1185,9 @@ function finish() {
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
                 + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
-                + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
+                + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
-                + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
+                + (dark ? 'background:#2B2E32;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'
                 + (dark ? 'background:#404040;border:1px solid #555;' : 'background:#f5f5f5;border:1px solid #ccc;');

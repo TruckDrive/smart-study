@@ -307,7 +307,7 @@ class SettingsDialog(QDialog):
         changelog_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {_c.get("grey_light", "#E5E5EA")};
-                color: {_c.get("text", "#1D1D1F")};
+                color: {_c.get("text", "#1C1D1F")};
                 border-radius: 6px;
                 border: none;
                 font-size: 12px;
@@ -537,7 +537,7 @@ class SettingsDialog(QDialog):
         edit_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {c.get("grey_light","#E5E5EA")};
-                color: {c.get("text","#1D1D1F")};
+                color: {c.get("text","#1C1D1F")};
                 border-radius: 8px; border: none; font-size: 12px; padding: 4px 14px;
             }}
             QPushButton:hover {{ background-color: {c.get("grey_mid","#D1D1D6")}; }}
@@ -568,7 +568,7 @@ class SettingsDialog(QDialog):
         self.visual_theme_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.populate_themes()
         layout.addWidget(self.visual_theme_combo)
-        self._custom_bg_light=self.current_config.get("custom_bg_light", "#f5f5f7")
+        self._custom_bg_light=self.current_config.get("custom_bg_light", "#F1F1EF")
         self._custom_bg_dark=self.current_config.get("custom_bg_dark", "#1f1f21")
         self.solid_background_panel=QWidget()
         colors_layout=QVBoxLayout(self.solid_background_panel)
@@ -576,7 +576,7 @@ class SettingsDialog(QDialog):
             button=QPushButton();colors_layout.addWidget(button)
             def update_color(button=button,key=key,label=label):
                 color=QColor(getattr(self,"_"+key))
-                if not color.isValid():color=QColor("#f5f5f7" if key.endswith("light") else "#1f1f21")
+                if not color.isValid():color=QColor("#F1F1EF" if key.endswith("light") else "#1f1f21")
                 setattr(self,"_"+key,color.name())
                 button.setText(label+": "+color.name())
                 button.setStyleSheet("background:"+color.name()+";color:"+("#fff" if color.lightness()<128 else "#222")+";padding:8px;border-radius:6px;")
@@ -1033,7 +1033,7 @@ class SettingsDialog(QDialog):
             # regardless of the displayed translation.
             "fact_theme": self.fact_theme_combo.currentData() or "Medical",
             "active_theme": self.visual_theme_combo.currentData() or "medical_theme.css",
-            "custom_bg_light": getattr(self,"_custom_bg_light",self.current_config.get("custom_bg_light","#f5f5f7")),
+            "custom_bg_light": getattr(self,"_custom_bg_light",self.current_config.get("custom_bg_light","#F1F1EF")),
             "custom_bg_dark": getattr(self,"_custom_bg_dark",self.current_config.get("custom_bg_dark","#1f1f21")),
             "active_color_theme":  getattr(self, "_color_theme_value", "blue"),
             "custom_theme_colors": getattr(self, "_custom_theme_colors", {}),

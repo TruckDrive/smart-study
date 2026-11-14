@@ -731,7 +731,7 @@ def _pomo_web_payload() -> dict:
             "isToday": day == today,
         })
 
-    accent = "#0071D3"
+    accent = "#0B6570"
     try:
         accent = _palette(is_night_mode).get("blue_accent", accent)
     except Exception:
@@ -832,7 +832,7 @@ if _web_ok:
             try:
                 dark = bool(mw and _is_night())
                 self._page.setBackgroundColor(
-                    QColor("#2c2c2c") if dark else QColor("#f5f5f7"))
+                    QColor("#26282B") if dark else QColor("#F1F1EF"))
             except Exception:
                 pass
             self._page.message.connect(self._on_message)

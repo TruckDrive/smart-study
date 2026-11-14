@@ -72,7 +72,7 @@ def render_preview(events, *, dark=False, accent="#397cf6", reduced_motion=False
     document = '''<!doctype html><html DIR_ATTRIBUTE><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
     :root{color-scheme:light;--bg:#edf0f5;--surface:#fffdfa;--text:#242737;--muted:#646979;--border:#dedfe7;--halo:ACCENT18;--accent:ACCENT}
-    html.dark{color-scheme:dark;--bg:#2c2c2c;--surface:#252525;--text:#ffffff;--muted:#b0b0b0;--border:#414141;--halo:ACCENT28}
+    html.dark{color-scheme:dark;--bg:#26282B;--surface:#1D1F22;--text:#ffffff;--muted:#B4B4B4;--border:#34373C;--halo:ACCENT28}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     .preview-label{text-align:center;color:var(--muted);font-size:11px;margin:18px 16px;line-height:1.5}
     #preview{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:12px 18px 25px}

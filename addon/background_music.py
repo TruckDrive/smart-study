@@ -422,17 +422,17 @@ def _save_user_tracks(tracks: list) -> None:
 def _build_add_dialog_style(night: bool) -> str:
     c = _palette(night)
     return f"""
-    QDialog {{ background-color: {c.get('bg', '#F5F5F7')}; font-family: {_FONT_FAMILY};
-               color: {c.get('text', '#1D1D1F')}; }}
-    QLabel {{ color: {c.get('text', '#1D1D1F')}; font-weight: 600; font-size: 13px; }}
+    QDialog {{ background-color: {c.get('bg', '#F1F1EF')}; font-family: {_FONT_FAMILY};
+               color: {c.get('text', '#1C1D1F')}; }}
+    QLabel {{ color: {c.get('text', '#1C1D1F')}; font-weight: 600; font-size: 13px; }}
     QLineEdit {{
-        background-color: {c.get('surface', '#FFF')}; color: {c.get('text', '#1D1D1F')};
+        background-color: {c.get('surface', '#FFF')}; color: {c.get('text', '#1C1D1F')};
         border: 1px solid {c.get('grey_mid', '#D1D1D6')};
         border-radius: 8px; padding: 4px 8px; min-height: 20px; font-size: 12px;
     }}
     QPushButton {{
         background-color: {c.get('surface', '#FFF')}; border: 1px solid {c.get('grey_mid', '#D1D1D6')};
-        border-radius: 8px; padding: 6px; min-width: 30px; color: {c.get('text', '#1D1D1F')};
+        border-radius: 8px; padding: 6px; min-width: 30px; color: {c.get('text', '#1C1D1F')};
     }}
     QPushButton:hover {{ background-color: {c.get('grey_light', '#E5E5EA')}; }}
     """
@@ -584,7 +584,7 @@ class MiniMusicPlayer(QDialog):
     def _apply_dialog_style(self):
         night = self._is_night()
         c = _palette(night)
-        self.setStyleSheet(f"QDialog {{ background-color: {c.get('bg', '#F5F5F7')}; }}")
+        self.setStyleSheet(f"QDialog {{ background-color: {c.get('bg', '#F1F1EF')}; }}")
 
     @staticmethod
     def _is_night() -> bool:
@@ -862,12 +862,12 @@ class MiniMusicPlayer(QDialog):
         night = self._is_night()
         c = _palette(night)
         return {
-            "accent": c.get("blue_accent", c.get("blue", "#0071D3")),
-            "bg": c.get("bg", "#191919" if night else "#F5F5F7"),
-            "card": c.get("surface", "#2C2C2C" if night else "#FFFFFF"),
-            "text": c.get("text", "#E0E0E0" if night else "#1D1D1F"),
-            "muted": c.get("text_muted", "#AAAAAA" if night else "#86868B"),
-            "track": c.get("grey_light", "#303030" if night else "#E5E5EA"),
+            "accent": c.get("blue_accent", c.get("blue", "#0B6570")),
+            "bg": c.get("bg", "#191919" if night else "#F1F1EF"),
+            "card": c.get("surface", "#26282B" if night else "#FFFFFF"),
+            "text": c.get("text", "#E0E0E0" if night else "#1C1D1F"),
+            "muted": c.get("text_muted", "#AAAAAA" if night else "#55585C"),
+            "track": c.get("grey_light", "#2B2E32" if night else "#E5E5EA"),
         }
 
     def _send_init(self):

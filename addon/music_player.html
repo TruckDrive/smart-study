@@ -13,14 +13,14 @@
 <style>
   :root{
     color-scheme:light;
-    --accent:#0071D3; --accent-bright:#007AFF;
-    --bg:#F5F5F7; --card:#FFFFFF; --border:rgba(0,0,0,0.08);
-    --text:#1D1D1F; --muted:#86868B; --track:#E5E5EA;
+    --accent:#0B6570; --accent-bright:#1A8A98;
+    --bg:#F1F1EF; --card:#FFFFFF; --border:rgba(0,0,0,0.08);
+    --text:#1C1D1F; --muted:#55585C; --track:#E5E5EA;
   }
   html.dark{
     color-scheme:dark;
-    --bg:#2C2C2C; --card:#252525; --border:rgba(255,255,255,0.09);
-    --text:#FFFFFF; --muted:#B0B0B0; --track:#414141;
+    --bg:#26282B; --card:#1D1F22; --border:rgba(255,255,255,0.09);
+    --text:#FFFFFF; --muted:#B4B4B4; --track:#34373C;
   }
   *{box-sizing:border-box;-webkit-user-select:none;user-select:none;}
   html,body{height:100%;margin:0;}
@@ -39,9 +39,9 @@
   }
   .seg button.on{background:var(--card);color:var(--text);}
   .seg button:disabled{opacity:.4;cursor:default;}
-  html.dark .seg{background:#252525;}
-  html.dark .seg button{color:#7e7e7e;}
-  html.dark .seg button.on{background:#414141;color:#fff;}
+  html.dark .seg{background:#1D1F22;}
+  html.dark .seg button{color:#8A8A8A;}
+  html.dark .seg button.on{background:#34373C;color:#fff;}
   html.dark .seg button:hover:not(:disabled){color:#fff;}
 
 
@@ -204,7 +204,7 @@
 <style id="smartstudy-keyboard-focus">
 body button:focus-visible, body input:focus-visible, body select:focus-visible,
 body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-visible {
-  outline: 2px solid var(--accent, var(--primary-color, #0071d3));
+  outline: 2px solid var(--accent, var(--primary-color, #0B6570));
   outline-offset: 2px;
 }
 /* RTL */

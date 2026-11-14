@@ -471,7 +471,7 @@ def canvas_script(active: bool, include_body: bool = True) -> str:
 
 def _set_page_transparency(active: bool) -> None:
     color = QColor(0, 0, 0, 0) if active else QColor(
-        "#2c2c2c" if mw and _is_night() else "#f5f5f5"
+        "#26282B" if mw and _is_night() else "#f5f5f5"
     )
     views = (
         getattr(getattr(mw, "toolbar", None), "web", None),
@@ -626,7 +626,7 @@ html:has(body.nightMode.smartstudy-custom-background.top-toolbar) #header:has(a#
         studied_color = "#ffffff"
         studied_shadow = "0 1px 3px rgba(0,0,0,0.58)"
     else:
-        studied_color = "#1d1d1f"
+        studied_color = "#1C1D1F"
         studied_shadow = "0 1px 2px rgba(255,255,255,0.32)"
     web_content.head += (
         '<style id="smartstudy-custom-background-text-style">'

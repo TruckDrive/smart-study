@@ -10,19 +10,19 @@
        dropdown popup of <select>). Without it the popup can appear with
        mismatched colours / odd styling, especially in dark mode. */
     color-scheme:light;
-    --accent:#0071D3; --accent-press:#004990;
-    --win-bg:#ffffff; --side-bg:#f5f5f7; --content-bg:#ffffff;
+    --accent:#0B6570; --accent-press:#084A52;
+    --win-bg:#ffffff; --side-bg:#F1F1EF; --content-bg:#ffffff;
     --group-bg:#ffffff; --group-border:rgba(0,0,0,0.08);
-    --hairline:rgba(0,0,0,0.08); --text:#1d1d1f; --muted:#6e6e73;
+    --hairline:rgba(0,0,0,0.08); --text:#1C1D1F; --muted:#55585C;
     --chip-hover:rgba(0,0,0,0.05); --field-bg:#f0f0f2; --switch-off:#d8d8dd;
     --green:#34A853; --green-soft:rgba(52,168,83,0.12); --green-border:rgba(52,168,83,0.35);
   }
   html.dark, body.dark{
     color-scheme:dark;
-    --win-bg:#2c2c2c; --side-bg:#252525; --content-bg:#2c2c2c;
-    --group-bg:#252525; --group-border:rgba(255,255,255,0.08);
-    --hairline:rgba(255,255,255,0.10); --text:#ffffff; --muted:#b0b0b0;
-    --chip-hover:rgba(255,255,255,0.07); --field-bg:#414141; --switch-off:#414141;
+    --win-bg:#26282B; --side-bg:#1D1F22; --content-bg:#26282B;
+    --group-bg:#1D1F22; --group-border:rgba(255,255,255,0.08);
+    --hairline:rgba(255,255,255,0.10); --text:#ffffff; --muted:#B4B4B4;
+    --chip-hover:rgba(255,255,255,0.07); --field-bg:#34373C; --switch-off:#34373C;
     --green:#41C463; --green-soft:rgba(65,196,99,0.14); --green-border:rgba(65,196,99,0.4);
   }
   *{box-sizing:border-box;}
@@ -155,8 +155,8 @@
   .counter-color-panel.open{display:block;}
   .counter-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
   .counter-preview{padding:12px 14px;border-radius:10px;border:1px solid var(--group-border);}
-  .counter-preview.light{background:#fff;color:#1d1d1f;}
-  .counter-preview.dark{background:#2c2c2e;color:#f5f5f7;border-color:rgba(255,255,255,.10);}
+  .counter-preview.light{background:#fff;color:#1C1D1F;}
+  .counter-preview.dark{background:#2c2c2e;color:#F1F1EF;border-color:rgba(255,255,255,.10);}
   .counter-preview-title{font-size:11px;font-weight:650;opacity:.62;margin-bottom:9px;}
   .counter-preview-values{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;}
   .counter-preview-values b{display:block;font-size:13px;color:inherit;margin-bottom:3px;}
@@ -353,6 +353,56 @@
 [dir=rtl] .switch input:checked + .slider::before{transform:translateX(-16px);}
   [dir=rtl] .surface-preview-table .preview-deck::before{transform:rotate(225deg);}
   [dir=rtl] .dd-btn{background-position:left 10px center;}
+  /* ── Smart Study's own look: tabs on top, neutral surfaces, round controls ── */
+  :root{--accent:#0B6570;--accent-press:#084A52;--accent-ink:var(--accent);
+    --win-bg:#F1F1EF;--side-bg:#FFFFFF;--content-bg:#F1F1EF;--group-bg:#FFFFFF;--group-border:#D9D9D5;
+    --hairline:#D9D9D5;--text:#1C1D1F;--muted:#55585C;--field-bg:#E8E8E5;--switch-off:#B4B7BB;}
+  html.dark, body.dark{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);
+    --win-bg:#26282B;--side-bg:#1D1F22;--content-bg:#26282B;--group-bg:#1D1F22;--group-border:#3A3D42;
+    --hairline:#3A3D42;--text:#F0F0F0;--muted:#B4B4B4;--field-bg:#34373C;--switch-off:#5A5D62;}
+  body{font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;}
+  .body{flex-direction:column;}
+  .sidebar{width:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:0 16px;
+    padding:16px max(24px,calc((100% - 820px)/2)) 0;border-inline-end:0;border-bottom:1px solid var(--hairline);}
+  .brand{padding:0 0 12px;cursor:pointer;}
+  .brand img{width:28px;height:28px;}
+  .brand .name{font-size:19px;font-weight:700;}
+  .brand .ver{display:none;}
+  .settings-search{margin-inline-start:auto;margin-bottom:12px;width:min(280px,45%);height:38px;padding:0 16px;border:1px solid transparent;
+    border-radius:19px;background:var(--field-bg);color:var(--text);font:inherit;font-size:14px;outline:none;}
+  .settings-search:focus{border-color:var(--accent-ink);}
+  .settings-search::placeholder{color:var(--muted);}
+  .nav{flex:1 1 100%;flex-direction:row;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav-item{flex:none;padding:9px 12px 10px;border-radius:0;border-bottom:2px solid transparent;color:var(--muted);font-size:14.5px;font-weight:500;white-space:nowrap;}
+  .nav-item .ic{display:none;}
+  .nav-item:hover{background:none;color:var(--text);}
+  .nav-item.active{background:none;color:var(--accent-ink);border-bottom-color:var(--accent-ink);font-weight:600;}
+  .nav-item.active .ic{color:inherit;}
+  .nav-sep{flex:1;min-width:16px;}
+  .page{max-width:820px;margin:0 auto;padding:22px 24px 34px;}
+  .page-title{font-size:17px;margin-bottom:2px;}
+  .page-sub{font-size:14px;max-width:none;margin-bottom:12px;}
+  .group-label{font-size:16px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--text);margin:22px 0 2px;}
+  .group-note{font-size:14px;color:var(--muted);margin:0 0 10px;}
+  .group{border-radius:14px;}
+  .row{padding:12px 18px;}
+  .row .rt{font-size:15px;font-weight:600;letter-spacing:0;}
+  .row .rd{font-size:13.5px;}
+  .row .rc{display:flex;align-items:center;gap:12px;}
+  .switch input:checked + .slider{background:var(--accent-ink);}
+  html.dark .switch input:checked + .slider::before, body.dark .switch input:checked + .slider::before{background:#1D1F22;}
+  .dd-btn{border-radius:19px;min-height:38px;padding-inline:16px 34px;font-size:14px;min-width:150px;}
+  .dd-btn:focus{border-color:var(--accent-ink);}
+  .dd-menu{border-radius:12px;}
+  .dd-item{border-radius:8px;font-size:14px;}
+  .btn{border-radius:19px;min-height:38px;padding:0 18px;font-size:14px;}
+  .code-input,.shortcut-btn,.bchip,.btextarea{border-radius:12px;}
+  .footer{padding:12px max(24px,calc((100% - 820px)/2));}
+  body.searching .page{display:block;animation:none;padding-bottom:0;}
+  body.searching .page.no-hit, body.searching .search-hide{display:none !important;}
+  .search-empty{display:none;max-width:820px;margin:0 auto;padding:28px 24px;color:var(--muted);}
+  body.searching.nothing .search-empty{display:block;}
 </style>
 <script>
   var TR = {};
@@ -402,13 +452,14 @@
             <div class="ver" id="brandVer">Version</div>
           </div>
         </div>
+        <input type="search" class="settings-search" id="settingsSearch" placeholder="Search settings" aria-label="Search settings" autocomplete="off">
         <nav class="nav" id="nav">
           <div class="nav-item active" data-page="general"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2.3"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="15" cy="17" r="2.3"/></svg></span>General</div>
           <div class="nav-item" data-page="news"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-6v14L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span>News</div>
           <div class="nav-item" data-page="appearance"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" stroke="none"/></svg></span>Appearance</div>
-          <div class="nav-item" data-page="dashboard"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</div>
+          <div class="nav-item" data-page="dashboard"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Home</div>
           <div class="nav-item" data-page="deck"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Deck Overview</div>
-          <div class="nav-item" data-page="sidebar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg></span>Sidebar</div>
+          <div class="nav-item" data-page="sidebar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg></span>Side panel</div>
           <div class="nav-item" data-page="browser"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg></span>Browser</div>
           <div class="nav-item" data-page="addons" id="addonsNav"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4a2 2 0 1 0 4 0h2v6h-2a2 2 0 1 0 0 4h2v4H3V3h2a2 2 0 1 0 4 0z"/></svg></span><span id="addonsNavLabel">Add-ons</span></div>
           <div class="nav-sep"></div>
@@ -418,6 +469,7 @@
       </aside>
 
       <main class="content" id="content">
+        <p class="search-empty" id="searchEmpty">No setting matches your search.</p>
         <!-- HOME -->
         <!-- NEWS -->
         <section class="page" data-page="news">
@@ -448,7 +500,7 @@
             <div class="row">
               <div class="rl"><div class="rt">Statistics Time Range</div><div class="rd">Period covered by the statistics widget.</div></div>
               <div class="rc"><select class="field" id="stats_time_range">
-                <option value="1">Last 24 Hours</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option>
+                <option value="1">Last 24 Hours</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option><option value="90">Last 90 Days</option><option value="365">Last year</option>
               </select></div>
             </div>
             <div class="row">
@@ -488,7 +540,7 @@
             </div>
           </div>
           <div class="group" id="solidBackgroundControls" hidden>
-            <div class="row"><div class="rl"><label class="rt" for="custom_bg_light">Light background color</label></div><div class="rc"><input type="color" id="custom_bg_light" aria-label="Light background color" value="#f5f5f7"><output id="custom_bg_light_value" for="custom_bg_light">#f5f5f7</output></div></div>
+            <div class="row"><div class="rl"><label class="rt" for="custom_bg_light">Light background color</label></div><div class="rc"><input type="color" id="custom_bg_light" aria-label="Light background color" value="#F1F1EF"><output id="custom_bg_light_value" for="custom_bg_light">#F1F1EF</output></div></div>
             <div class="row"><div class="rl"><label class="rt" for="custom_bg_dark">Dark background color</label></div><div class="rc"><input type="color" id="custom_bg_dark" aria-label="Dark background color" value="#1f1f21"><output id="custom_bg_dark_value" for="custom_bg_dark">#1f1f21</output></div></div>
           </div>
           <div class="group-label">Dashboard Surfaces</div>
@@ -599,12 +651,34 @@
 
         <!-- DASHBOARD -->
         <section class="page" data-page="dashboard">
-          <h1 class="page-title">Dashboard</h1>
-          <p class="page-sub">Widgets shown on the Anki home screen (the deck list).</p>
-          <div class="group" id="minimalGroup"></div>
-          <div style="height:12px"></div>
-          <div class="group" id="dashGroup"></div>
-          <p class="dashboard-lock-note" id="dashboardLockNote">Individual dashboard widgets are unavailable while Minimalist Dashboard is enabled.</p>
+          <h1 class="page-title">Home</h1>
+          <p class="page-sub">What Smart Study shows next to your decks. The deck list itself always stays.</p>
+          <div class="group">
+            <div class="row">
+              <div class="rl"><div class="rt">Layout</div><div class="rd">Side panel on the right, or the classic widgets above the deck list. Applies after restarting Anki.</div></div>
+              <div class="rc"><select class="field" id="home_layout">
+                <option value="panel">Side panel</option><option value="classic">Classic</option>
+              </select></div>
+            </div>
+          </div>
+          <div id="panelHome">
+            <div class="group-label">Today panel</div>
+            <p class="group-note">The first tab of the side panel.</p>
+            <div class="group" id="todayGroup"></div>
+            <div class="group-label">Overview</div>
+            <p class="group-note">The three charts under the plan. Each one has its own period.</p>
+            <div class="group" id="overviewGroup"></div>
+          </div>
+          <div id="classicHome">
+            <div class="group-label">Classic widgets</div>
+            <div class="group" id="minimalGroup"></div>
+            <div style="height:12px"></div>
+            <div class="group" id="dashGroup"></div>
+            <p class="dashboard-lock-note" id="dashboardLockNote">Individual dashboard widgets are unavailable while Minimalist Dashboard is enabled.</p>
+          </div>
+          <select id="panel_plan_items" hidden><option value="3">3 items</option><option value="4">4 items</option><option value="5">5 items</option><option value="6">6 items</option><option value="8">8 items</option></select>
+          <select id="panel_due_days" hidden><option value="7">Next 7 days</option><option value="14">Next 14 days</option><option value="30">Next 30 days</option></select>
+          <select id="stats_consistency_days" hidden><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="365">Last year</option></select>
           <div class="group-label">Facts or Tasks Widget</div>
           <div class="group" id="contentWidgetGroup">
             <div class="row">
@@ -641,8 +715,8 @@
 
         <!-- SIDEBAR -->
         <section class="page" data-page="sidebar">
-          <h1 class="page-title">Sidebar</h1>
-          <p class="page-sub">Tools available in the launcher bar on the side of Anki.</p>
+          <h1 class="page-title">Side panel</h1>
+          <p class="page-sub">The tabs of the side panel, the timer and the music player.</p>
           <div class="group" id="sideGroup"></div>
           <p class="rd" style="margin:12px 4px 0;">Shortcuts apply immediately after saving. Restart Anki after enabling or disabling sidebar tools.</p>
         </section>
@@ -743,6 +817,7 @@
 
 <script>
   var PRESETS = [
+    ['petrol','Petrol','#0B6570','#084A52'],
     ['ocean','Ocean','#0071D3','#004990'],
     ['orchid','Orchid','#E95ACC','#CB51B3'],
     ['forest','Forest','#619971','#477154'],
@@ -777,7 +852,7 @@
   var _shortcutValues = {}, _shortcutDisplays = {};
   var _exampleWallpapers = [];
   var COUNTER_DEFAULTS = {
-    deck_counter_new_light:'#0071D3', deck_counter_learn_light:'#E60012', deck_counter_due_light:'#00A000',
+    deck_counter_new_light:'#0B6570', deck_counter_learn_light:'#E60012', deck_counter_due_light:'#00A000',
     deck_counter_new_dark:'#4FACFE', deck_counter_learn_dark:'#FF6B6B', deck_counter_due_dark:'#63D471'
   };
 
@@ -915,6 +990,88 @@
       });
     }
   }
+
+  /* Home page: the side-panel groups or the classic widgets, never both, so
+     every setting has exactly one switch on the page. */
+  var _homeCfg = {};
+  var TODAY = [
+    ['deadline_bar_enabled','Countdown to the next exam','Days left, taken from your study plan.'],
+    ['panel_show_plan',"Today's plan",'Tick off plan items without opening the study plan.','panel_plan_items'],
+    ['gamification_widgets_enabled','Level and streak','Small, next to the countdown.'],
+    ['panel_show_challenge','Daily challenge','Your goal for today with its progress.'],
+    ['panel_show_fact','Daily fact','One short fact per day under the plan.'],
+  ];
+  var OVERVIEW = [
+    ['panel_show_due','Due','Cards coming up, one bar per day.','panel_due_days'],
+    ['stats_show_consistency','Reviews','Cards you answered per day.','stats_consistency_days'],
+    ['stats_show_retention','Memory','Share you remembered, and share of cards still unseen.','stats_time_range'],
+  ];
+  function rememberHome(){
+    document.querySelectorAll('section[data-page="dashboard"] input[type=checkbox][data-key]').forEach(function(cb){ _homeCfg[cb.dataset.key]=cb.checked; });
+  }
+  function homeSelect(row, id){
+    var source=document.getElementById(id); if(!source) return;
+    var sel=document.createElement('select');
+    Array.prototype.forEach.call(source.options,function(o){ var c=document.createElement('option'); c.value=o.value; c.textContent=tr(o.textContent); sel.appendChild(c); });
+    sel.value=source.value; sel.className='home-select';
+    var btn=document.createElement('button'); btn.type='button'; btn.className='dd-btn'; btn.style.minWidth='0';
+    function label(){ btn.textContent=sel.options[sel.selectedIndex].textContent; }
+    btn.addEventListener('click',function(){ sel.selectedIndex=(sel.selectedIndex+1)%sel.options.length; source.value=sel.value; if(source._ddBtn) source._ddBtn.textContent=ddLabel(source); label(); });
+    label();
+    row.querySelector('.rc').insertBefore(btn,row.querySelector('.rc').firstChild);
+  }
+  function renderHome(){
+    var panel=document.getElementById('home_layout').value!=='classic';
+    document.getElementById('panelHome').style.display=panel?'':'none';
+    document.getElementById('classicHome').style.display=panel?'none':'';
+    ['todayGroup','overviewGroup','minimalGroup','dashGroup'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
+    if(panel){
+      renderToggles('todayGroup', TODAY, _homeCfg);
+      renderToggles('overviewGroup', OVERVIEW, _homeCfg);
+      TODAY.concat(OVERVIEW).forEach(function(d){
+        if(!d[3]) return;
+        var cb=document.querySelector('input[data-key="'+d[0]+'"]');
+        if(cb) homeSelect(cb.closest('.row'), d[3]);
+      });
+    }else{
+      renderToggles('minimalGroup', MINIMAL_DASH, _homeCfg);
+      renderToggles('dashGroup', DASH, _homeCfg);
+      var minimal=document.querySelector('input[data-key="minimal_dashboard_enabled"]');
+      if(minimal) minimal.addEventListener('change', syncMinimalDashboardControls);
+    }
+  }
+
+  /* Search: shows the matching rows of every tab on one page. */
+  (function(){
+    var input=document.getElementById('settingsSearch');
+    function run(){
+      var q=input.value.trim().toLowerCase(), any=false;
+      document.body.classList.toggle('searching', !!q);
+      document.querySelectorAll('.search-hide').forEach(function(el){ el.classList.remove('search-hide'); });
+      document.querySelectorAll('.page').forEach(function(page){
+        page.classList.remove('no-hit');
+        if(!q) return;
+        var hit=false;
+        page.querySelectorAll('.row').forEach(function(row){
+          if(row.offsetParent===null && !document.body.classList.contains('searching')) return;
+          var match=row.textContent.toLowerCase().indexOf(q)>=0;
+          row.classList.toggle('search-hide', !match);
+          if(match) hit=true;
+        });
+        page.querySelectorAll('.group').forEach(function(group){
+          var rows=group.querySelectorAll('.row');
+          if(rows.length && !group.querySelector('.row:not(.search-hide)')) group.classList.add('search-hide');
+        });
+        page.querySelectorAll(':scope > p:not(.page-title),.group-label,.group-note,.page-sub,.community-strip,.dashboard-lock-note').forEach(function(el){ el.classList.add('search-hide'); });
+        if(!hit && page.querySelector('.page-title').textContent.toLowerCase().indexOf(q)<0) page.classList.add('no-hit');
+        else any=true;
+      });
+      document.body.classList.toggle('nothing', !!q && !any);
+    }
+    input.addEventListener('input', run);
+    input.addEventListener('keydown', function(e){ if(e.key==='Escape'){ input.value=''; run(); } });
+    document.getElementById('nav').addEventListener('click', function(){ if(input.value){ input.value=''; run(); } });
+  })();
 
   function syncMinimalDashboardControls(){
     var minimal = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
@@ -1229,10 +1386,10 @@
       document.getElementById('brandVer').textContent = ver;
 
       _logos = data.logos || {};
-      _activeTheme = cfg.active_color_theme || 'ocean';
+      _activeTheme = cfg.active_color_theme || 'petrol';
       _shortcutValues = (cfg.sidebar_shortcuts && typeof cfg.sidebar_shortcuts === 'object') ? Object.assign({}, cfg.sidebar_shortcuts) : {};
       _shortcutDisplays = (data.shortcutDisplays && typeof data.shortcutDisplays === 'object') ? Object.assign({}, data.shortcutDisplays) : {};
-      applyAccent(data.accent || '#0071D3', data.accentPress || '#004990');
+      applyAccent(data.accent || '#0B6570', data.accentPress || '#084A52');
 
       // Background styles include Anki's unmodified default background.
       var bg = document.getElementById('background_style');
@@ -1274,7 +1431,7 @@
       if(!Array.from(bg.options).some(function(option){return option.value===configuredBackground;}))configuredBackground=Array.from(bg.options).find(function(option){return option.value!=='none.css';})?.value||configuredBackground;
       setSelect('background_style', configuredBackground);
       updateBackgroundChoiceColor();
-      ['custom_bg_light','custom_bg_dark'].forEach(function(id){var input=document.getElementById(id),value=cfg[id];input.value=/^#[0-9a-f]{6}$/i.test(value||'')?value:(id==='custom_bg_light'?'#f5f5f7':'#1f1f21');input.oninput=function(){document.getElementById(id+'_value').textContent=input.value;};input.oninput();});
+      ['custom_bg_light','custom_bg_dark'].forEach(function(id){var input=document.getElementById(id),value=cfg[id];input.value=/^#[0-9a-f]{6}$/i.test(value||'')?value:(id==='custom_bg_light'?'#F1F1EF':'#1f1f21');input.oninput=function(){document.getElementById(id+'_value').textContent=input.value;};input.oninput();});
       var customEnabled = document.getElementById('custom_background_enabled');
       customEnabled.checked = !!cfg.custom_background_enabled;
       document.getElementById('custom_background_review_enabled').checked=cfg.custom_background_review_enabled===true;
@@ -1305,8 +1462,13 @@
       syncDeckCounterControls();
 
       // toggles
-      renderToggles('minimalGroup', MINIMAL_DASH, cfg);
-      renderToggles('dashGroup', DASH, cfg);
+      setSelect('home_layout', cfg.home_layout === 'classic' ? 'classic' : 'panel');
+      setSelect('panel_plan_items', cfg.panel_plan_items || 4);
+      setSelect('panel_due_days', cfg.panel_due_days || 7);
+      setSelect('stats_consistency_days', cfg.stats_consistency_days || 30);
+      _homeCfg = Object.assign({}, cfg);
+      renderHome();
+      document.getElementById('home_layout').addEventListener('change', function(){ rememberHome(); renderHome(); syncMinimalDashboardControls(); });
       renderToggles('celebrationGroup', [
         ['gamification_popups_enabled','Celebration popups','Show celebrations on the dashboard.'],
         ['gamification_popup_rank','New Rank!',''],
@@ -1416,7 +1578,7 @@
       stats_time_range: Number(val('stats_time_range')) || 7,
       sidebar_visibility_mode: val('sidebar_visibility'),
       active_theme: val('background_style'),
-      active_color_theme: _activeTheme || 'ocean',
+      active_color_theme: _activeTheme || 'petrol',
       custom_bg_light: val('custom_bg_light'),
       custom_bg_dark: val('custom_bg_dark'),
       custom_background_enabled: !!document.getElementById('custom_background_enabled').checked,
@@ -1437,7 +1599,16 @@
       deck_counter_due_dark: counterColorValue('deck_counter_due_dark'),
       sidebar_shortcuts: Object.assign({}, _shortcutValues)
     };
+    rememberHome();
+    ['deadline_bar_enabled','gamification_widgets_enabled','panel_show_plan','panel_show_challenge','panel_show_fact','panel_show_due',
+     'stats_show_consistency','stats_show_retention','minimal_dashboard_enabled','dashboard_wide_deck_list','statistics_widget_enabled'].forEach(function(k){
+      if(k in _homeCfg) out[k]=!!_homeCfg[k];
+    });
     document.querySelectorAll('input[type=checkbox][data-key]').forEach(function(cb){ out[cb.dataset.key]=cb.checked; });
+    out.home_layout = val('home_layout')==='classic' ? 'classic' : 'panel';
+    out.panel_plan_items = Number(val('panel_plan_items')) || 4;
+    out.panel_due_days = Number(val('panel_due_days')) || 7;
+    out.stats_consistency_days = Number(val('stats_consistency_days')) || 30;
     Object.assign(out, collectDeckOverviewSettings());
     if(_browser) out.browser_settings = collectBrowser();
     return out;
@@ -1600,9 +1771,9 @@
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
                 + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
-                + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
+                + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
-                + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
+                + (dark ? 'background:#2B2E32;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'
                 + (dark ? 'background:#404040;border:1px solid #555;' : 'background:#f5f5f5;border:1px solid #ccc;');

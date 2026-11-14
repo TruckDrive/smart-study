@@ -45,7 +45,7 @@ BRIDGE = "sspanel:"
 
 DUE_CHOICES = (7, 14, 30)
 REVIEW_CHOICES = (7, 30, 365)
-MEMORY_CHOICES = (7, 30, 90, 365)
+MEMORY_CHOICES = (1, 7, 30, 90, 365)
 
 # Which setting shows which part of the Today page.
 SHOW_KEYS = {
@@ -350,7 +350,7 @@ class Panel(QObject):
         self._watcher = _DockWatcher(self)
         self._hooks = [
             (gui_hooks.reviewer_did_answer_card, lambda *_a: self.refresh(4000)),
-            (gui_hooks.state_did_change, lambda *_a: self.refresh(150)),
+            (gui_hooks.state_did_change, lambda *_a: (self.sync(), self.refresh(150))),
             (gui_hooks.sync_did_finish, lambda *_a: self.refresh(300)),
             (gui_hooks.operation_did_execute, lambda *_a: self.refresh(1500)),
             (gui_hooks.theme_did_change, self.restyle),
@@ -506,7 +506,9 @@ class Panel(QObject):
             return
         try:
             key = self.active()
-            self.today_dock.setVisible(self._open and key == "today")
+            resting = (self.settings.get("sidebar_visibility_mode") == "hide_review"
+                       and getattr(mw, "state", "") == "review")
+            self.today_dock.setVisible(self._open and key == "today" and not resting)
             for header in self._alive_headers():
                 for name, button in header.tab_buttons.items():
                     button.setChecked(name == key)
@@ -759,7 +761,7 @@ def texts() -> Dict[str, str]:
         "more": _("more, open plan"), "openPlan": _("Open study plan"), "noPlan": _("No study plan yet"),
         "noPlanHint": _("Create a plan and today's items appear here."), "nothing": _("Nothing planned for today."),
         "allDone": _("Everything for today is done."), "due": _("Due"), "reviews": _("Reviews"),
-        "memory": _("Memory"), "next": _("next {} days"), "last": _("last {} days"), "lastYear": _("last year"),
+        "memory": _("Memory"), "next": _("next {} days"), "last": _("last {} days"), "lastYear": _("last year"), "lastDay": _("last 24 hours"),
         "todayLower": _("today"), "remembered": _("remembered"), "unseen": _("still unseen"),
         "challenge": _("Daily challenge"), "claim": _("Claim"), "claimed": _("Done"), "fact": _("Daily fact"),
         "choose": _("Choose what this page shows"), "info": _("What do these numbers mean?"),

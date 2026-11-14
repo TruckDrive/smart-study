@@ -15,7 +15,7 @@ try:
 except ImportError as e:
     print(f"Launcher Widget CRITICAL ERROR: Failed to import constants or study_plan_trigger: {e}")
     class MockConstants:
-        icons_folder = "."; SIDEBAR_BG_COLOR_HEX="#FFFFFF"; BUTTON_HOVER_PRESSED_COLOR="#0071D3"; BUTTON_ACTIVE_BG_COLOR="#0071D3"; DEFAULT_TEXT_COLOR="#333333"; SEPARATOR_LINE_COLOR="#888888"; TIMER_LABEL_COLOR="#888888"; TIMER_BUTTON_HOVER_COLOR="#d0d0d0"; TIMER_BUTTON_PRESSED_COLOR="#b0b0b0"; SIDEBAR_WIDTH = 55; BUTTON_ICON_SIZE = 30; TIMER_BUTTON_ICON_SIZE = 18; BUTTON_BORDER_RADIUS = 8; LOGO_FILENAME = "logo.svg"; START_ICON_FILENAME = "start.svg"; PAUSE_ICON_FILENAME = "pause.svg"; RESET_ICON_FILENAME = "reset.svg"; SKIP_ICON_FILENAME = "skip.svg"; AI_TOOL_ICON_FILENAME = "ai_tool.svg"; WEBSITE_ICON_FILENAME = "website.svg"; NOTEBOOK_ICON_FILENAME = "notes.svg"; MINDMAP_ICON_FILENAME = "mindmap.svg"; GAME_ICON_FILENAME = "game.svg"; STUDY_PLAN_ICON_FILENAME = "study_plan.svg"; TIMER_ICON_FILENAME = "timer.svg"; MUSIC_ICON_FILENAME = "music.svg";
+        icons_folder = "."; SIDEBAR_BG_COLOR_HEX="#FFFFFF"; BUTTON_HOVER_PRESSED_COLOR="#0071D3"; BUTTON_ACTIVE_BG_COLOR="#0071D3"; DEFAULT_TEXT_COLOR="#333333"; SEPARATOR_LINE_COLOR="#888888"; TIMER_LABEL_COLOR="#888888"; TIMER_BUTTON_HOVER_COLOR="#d0d0d0"; TIMER_BUTTON_PRESSED_COLOR="#B4B4B4"; SIDEBAR_WIDTH = 55; BUTTON_ICON_SIZE = 30; TIMER_BUTTON_ICON_SIZE = 18; BUTTON_BORDER_RADIUS = 8; LOGO_FILENAME = "logo.svg"; START_ICON_FILENAME = "start.svg"; PAUSE_ICON_FILENAME = "pause.svg"; RESET_ICON_FILENAME = "reset.svg"; SKIP_ICON_FILENAME = "skip.svg"; AI_TOOL_ICON_FILENAME = "ai_tool.svg"; WEBSITE_ICON_FILENAME = "website.svg"; NOTEBOOK_ICON_FILENAME = "notes.svg"; MINDMAP_ICON_FILENAME = "mindmap.svg"; GAME_ICON_FILENAME = "game.svg"; STUDY_PLAN_ICON_FILENAME = "study_plan.svg"; TIMER_ICON_FILENAME = "timer.svg"; MUSIC_ICON_FILENAME = "music.svg";
         AI_ASSISTANT_DOCK_OBJECT_NAME = "AIAssistantSidebarDock_Integrated_v1"; WEBSITE_DOCK_OBJECT_NAME = "IntegratedWebsiteSidebarDock_SmartStudy_v1"; NOTEBOOK_DOCK_OBJECT_NAME = "IntegratedNotebookSidebarDock_SmartStudy_v1"; MINDMAP_DOCK_OBJECT_NAME = "IntegratedMindmapSidebarDock_SmartStudy_v1"; HOSPITAL_GAME_DOCK_OBJECT_NAME = "hospitalClickerGameDock"; DEFAULT_POMODORO_CONFIG = {"work_minutes": 25}; STATE_IDLE = 0; STATE_WORK = 1; STATE_SHORT_BREAK = 2; STATE_LONG_BREAK = 3; STATE_PAUSED = 4; addon_package_name = "Study Suite Addon"; ADDON_VERSION = "Unknown Version"; INFO_IMAGE_FILENAME = "news-banner.png"; INFO_IMAGE_WIDTH = 200
     constants = MockConstants()
     class MockStudyPlanTrigger:
@@ -98,7 +98,7 @@ class SidebarWidget(QWidget):
                 bg_color_hex = getattr(constants, 'SIDEBAR_BG_COLOR_HEX', '#FFFFFF')
                 
                 if mw and hasattr(mw, 'pm') and _is_night():
-                    bg_color_hex = "#2C2C2C"
+                    bg_color_hex = "#26282B"
                 
                 pal.setColor(QPalette.ColorRole.Window, QColor(bg_color_hex))
                 self.setPalette(pal)
@@ -601,12 +601,12 @@ class SidebarWidget(QWidget):
             timer_press = c['grey_dark']
             sep         = c['sep_accent']
         except Exception:
-            bg          = "#2C2C2C" if night else getattr(constants, 'SIDEBAR_BG_COLOR_HEX', '#FFFFFF')
+            bg          = "#26282B" if night else getattr(constants, 'SIDEBAR_BG_COLOR_HEX', '#FFFFFF')
             hover       = getattr(constants, 'BUTTON_HOVER_PRESSED_COLOR', '#0071D3')
             active      = getattr(constants, 'BUTTON_ACTIVE_BG_COLOR', '#0071D3')
             timer_text  = getattr(constants, 'TIMER_LABEL_COLOR', '#577B9A')
             timer_hover = getattr(constants, 'TIMER_BUTTON_HOVER_COLOR', '#D0D0D0')
-            timer_press = getattr(constants, 'TIMER_BUTTON_PRESSED_COLOR', '#B0B0B0')
+            timer_press = getattr(constants, 'TIMER_BUTTON_PRESSED_COLOR', '#B4B4B4')
             sep         = getattr(constants, 'SEPARATOR_LINE_COLOR', '#577A9A')
 
         radius = constants.BUTTON_BORDER_RADIUS

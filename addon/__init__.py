@@ -164,9 +164,9 @@ def get_default_settings() -> Dict[str, Any]:
         "stats_show_new_cards": True,
         "sidebar_shortcuts": {},
         "language": "auto",  # UI language: "auto", "en", "de", "es"
-        "active_color_theme": "ocean",   # Colour theme: "ocean","orchid","forest","deluge","horizon","dusty","orange","custom"
+        "active_color_theme": "petrol",   # Colour theme: "ocean","orchid","forest","deluge","horizon","dusty","orange","custom"
         "custom_theme_colors": {},       # Used when active_color_theme == "custom"
-        "custom_bg_light": "#f5f5f7",    # Custom solid background (light mode)
+        "custom_bg_light": "#F1F1EF",    # Custom solid background (light mode)
         "custom_bg_dark":  "#1f1f21",    # Custom solid background (dark mode)
         "dashboard_surface_opacity": 100,
         "dashboard_wide_deck_list": True,
@@ -208,9 +208,9 @@ def write_custom_solid_css() -> None:
     Safe no-op if the template is missing or the colours are invalid.
     """
     try:
-        light = addon_settings.get("custom_bg_light", "#f5f5f7")
+        light = addon_settings.get("custom_bg_light", "#F1F1EF")
         dark = addon_settings.get("custom_bg_dark", "#1f1f21")
-        if not _is_valid_hex(light): light = "#f5f5f7"
+        if not _is_valid_hex(light): light = "#F1F1EF"
         if not _is_valid_hex(dark):  dark = "#1f1f21"
         base_dir = os.path.join(addon_path, "theme", "user_files")
         template_path = os.path.join(base_dir, "none.css")
@@ -219,7 +219,7 @@ def write_custom_solid_css() -> None:
             return
         with open(template_path, "r", encoding="utf-8") as f:
             css = f.read()
-        css = css.replace("#f5f5f5", light).replace("#2c2c2c", dark)
+        css = css.replace("#f5f5f5", light).replace("#26282B", dark)
         css = "/* custom_solid.css — auto-generated, edits will be overwritten */\n" + css
         with open(os.path.join(base_dir, "custom_solid.css"), "w", encoding="utf-8") as f:
             f.write(css)
@@ -243,6 +243,14 @@ def load_addon_settings():
         pass  # First run / no settings yet — defaults are correct.
     except json.JSONDecodeError as e:
         print(f"SmartStudy1: settings file corrupt, falling back to defaults: {e}")
+    # Smart Study's own look (3.0): whoever still has the old defaults gets the
+    # new ones once; a theme or accent the user picked themselves stays.
+    if not defaults.get("own_look_migrated"):
+        if defaults.get("active_theme") == "medical_theme.css":
+            defaults["active_theme"] = "standard.css"
+        if defaults.get("active_color_theme") == "ocean":
+            defaults["active_color_theme"] = "petrol"
+        defaults["own_look_migrated"] = True
     addon_settings = defaults
 
 def save_addon_settings():
@@ -651,7 +659,7 @@ def _apply_saved_settings(new_settings, message=None):
     # Apply colour theme immediately so all widgets reflect the change.
     try:
         from .theme import set_active_theme, set_custom_theme_colors
-        _theme_name = addon_settings.get("active_color_theme", "ocean")
+        _theme_name = addon_settings.get("active_color_theme", "petrol")
         if _theme_name == "custom":
             set_custom_theme_colors(addon_settings.get("custom_theme_colors", {}))
         set_active_theme(_theme_name)
@@ -665,12 +673,6 @@ def _apply_saved_settings(new_settings, message=None):
         print(f"SmartStudy: workspace refresh failed: {error}")
 
     # Refresh the launcher sidebar (always-visible icon bar on the side).
-    try:
-        from . import design
-        design.set_theme(addon_settings.get("active_theme", design.STANDARD_THEME)
-                         if addon_settings.get("theme_enabled", True) else design.STANDARD_THEME)
-    except Exception:
-        pass
     if sidebar_widget_instance:
         try:
             sidebar_widget_instance.apply_stylesheet()
@@ -833,7 +835,7 @@ def _sync_webview_bg_colors():
                     if (getattr(mw,"state","")=="review"
                             and addon_settings.get("active_theme")=="none.css"
                             and wv is getattr(getattr(mw,"toolbar",None),"web",None)):
-                        page_color=QColor("#303030" if night else "#ffffff")
+                        page_color=QColor("#2B2E32" if night else "#ffffff")
                     wv.page().setBackgroundColor(page_color)
             except Exception:
                 pass
@@ -1123,9 +1125,7 @@ def _init_panel() -> None:
     """The side panel replaces the launcher dock and the widgets above the deck list."""
     global panel_instance, sidebar_widget_instance
     try:
-        from . import design, panel
-        design.set_theme(addon_settings.get("active_theme", design.STANDARD_THEME)
-                         if addon_settings.get("theme_enabled", True) else design.STANDARD_THEME)
+        from . import panel
         study_plan_trigger.set_gamification_sidebar_trigger_function(toggle_gamification_sidebar)
         study_plan_trigger.set_study_plan_trigger_function(show_configuration_dialog)
         old = mw.findChild(QDockWidget, "SmartStudyLauncherSidebarDock_v2")
@@ -1263,7 +1263,7 @@ def on_profile_open():
     # Apply colour theme so all subsequent palette() calls use the right tokens.
     try:
         from .theme import set_active_theme, set_custom_theme_colors
-        theme_name = addon_settings.get("active_color_theme", "ocean")
+        theme_name = addon_settings.get("active_color_theme", "petrol")
         if theme_name == "custom":
             set_custom_theme_colors(addon_settings.get("custom_theme_colors", {}))
         set_active_theme(theme_name)
@@ -1750,7 +1750,7 @@ def inject_theme_assets(web_content: WebContent, context: Optional[Any]):
                 )
                 if addon_settings.get("deck_counter_colors_enabled", False):
                     counter_defaults = {
-                        "new_light": "#0071D3", "learn_light": "#E60012", "due_light": "#00A000",
+                        "new_light": "#0B6570", "learn_light": "#E60012", "due_light": "#00A000",
                         "new_dark": "#4FACFE", "learn_dark": "#FF6B6B", "due_dark": "#63D471",
                     }
 

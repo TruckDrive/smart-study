@@ -1686,7 +1686,7 @@ def _setup_sidebar() -> bool:
         try:
             from aqt.qt import QColor
             page.setBackgroundColor(
-                QColor("#2c2c2c") if _detect_night_mode() else QColor("#ffffff"))
+                QColor("#26282B") if _detect_night_mode() else QColor("#ffffff"))
         except Exception:
             pass
 
@@ -1788,7 +1788,7 @@ def refresh_ai_assistant_theme() -> None:
         from aqt.qt import QColor
         page = _webview.page()
         if page:
-            page.setBackgroundColor(QColor("#2c2c2c" if is_dark else "#ffffff"))
+            page.setBackgroundColor(QColor("#26282B" if is_dark else "#ffffff"))
     except Exception:
         pass
 

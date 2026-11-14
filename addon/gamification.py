@@ -43,7 +43,7 @@ except Exception:
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
 except ImportError:
-    def _palette(night): return {"blue": "#0071D3", "blue_bright": "#098BFF" if night else "#007AFF", "text": "#1D1D1F", "text_muted": "#86868B", "grey_light": "#e9ecef"}  # type: ignore
+    def _palette(night): return {"blue": "#0B6570", "blue_bright": "#098BFF" if night else "#1A8A98", "text": "#1C1D1F", "text_muted": "#55585C", "grey_light": "#e9ecef"}  # type: ignore
     _FONT_FAMILY = "sans-serif"
 
 ADDON_NAME = "GamificationPlusDailyWidgets_" + ADDON_FOLDER_NAME

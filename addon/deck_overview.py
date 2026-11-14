@@ -30,7 +30,7 @@ except Exception:
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
 except ImportError:
-    def _palette(night): return {"blue": "#0071D3", "blue_bright": "#4da3ff" if night else "#007AFF", "surface": "#212121" if night else "#ffffff", "bg": "#191919" if night else "#F5F5F7", "text": "#e0e0e0" if night else "#1d1d1f", "text_muted": "#aaaaaa" if night else "#86868b", "grey_light": "#333333" if night else "#e5e5e5", "grey_mid": "#444444" if night else "#d1d1d6"}  # type: ignore
+    def _palette(night): return {"blue": "#0B6570", "blue_bright": "#4da3ff" if night else "#1A8A98", "surface": "#212121" if night else "#ffffff", "bg": "#191919" if night else "#F1F1EF", "text": "#e0e0e0" if night else "#1C1D1F", "text_muted": "#aaaaaa" if night else "#55585C", "grey_light": "#333333" if night else "#e5e5e5", "grey_mid": "#444444" if night else "#d1d1d6"}  # type: ignore
     _FONT_FAMILY = "sans-serif"
 
 ADDON_PACKAGE = __name__.split('.')[0]
@@ -523,11 +523,11 @@ def _session_summary_inner():
         except Exception:
             pass
         c = _palette(night)
-        bg = c.get("surface", "#2c2c2c" if night else "#ffffff")
-        text = c.get("text", "#f5f5f7" if night else "#1d1d1f")
+        bg = c.get("surface", "#26282B" if night else "#ffffff")
+        text = c.get("text", "#F1F1EF" if night else "#1C1D1F")
         muted = c.get("text_muted", "#8e8e93")
         border = c.get("grey_mid" if night else "grey_light", "#d1dce5")
-        accent = c.get("blue_bright" if night else "blue", "#0071D3")
+        accent = c.get("blue_bright" if night else "blue", "#0B6570")
 
         remaining_html = ""
         try:

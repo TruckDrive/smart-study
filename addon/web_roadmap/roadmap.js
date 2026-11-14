@@ -75,7 +75,7 @@
                 if(o.ankiLinks!==undefined&&!window.workspaceValidLinks(o.ankiLinks))throw Error(t('Invalid Anki link.'));
                 if(o.image&&!/^[a-f0-9]{64}\.(png|jpg)$/.test(o.image))throw Error(t('Could not load image.'));
                 if(o.kind==='image'&&!o.image)throw Error(t('Could not load image.'));
-                o.stroke=/^#[0-9a-f]{6}$/i.test(o.stroke)?o.stroke:'#252525';
+                o.stroke=/^#[0-9a-f]{6}$/i.test(o.stroke)?o.stroke:'#1D1F22';
                 o.fill=o.fill==='none'?'none':/^#[0-9a-f]{6}$/i.test(o.fill)?o.fill:'#ffffff';
                 if(o.kind!=='arrow') {
                     for(const k of ['x','y','w','h','rotation'])if(!Number.isFinite(o[k])||Math.abs(o[k])>1e7)throw Error(t("Invalid position."));
@@ -351,7 +351,7 @@
     // the stored shape stroke. Explicit user text colors remain authoritative.
     const darkText=o=>document.documentElement.classList.contains('dark') &&
         o.kind==='text' && !/(?:^|[;\s"'])color\s*:/i.test(o.html||'');
-    const darkDefault=o=>document.documentElement.classList.contains('dark') && o.customStyle!==true && o.fill==='#ffffff' && o.stroke==='#252525' && !/(?:^|[;\s"'])color\s*:/i.test(o.html||'');
+    const darkDefault=o=>document.documentElement.classList.contains('dark') && o.customStyle!==true && o.fill==='#ffffff' && o.stroke==='#1D1F22' && !/(?:^|[;\s"'])color\s*:/i.test(o.html||'');
     new MutationObserver(()=>{shapeCache.clear();arrowCache.clear();layer.replaceChildren();$('#defs').replaceChildren();drawSoon();}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
     function editAnkiLinks(o) {
         if(readOnly)return;
@@ -394,7 +394,7 @@
         },g);
         else {
             const style= {
-                fill:darkDefault(o)?'#2c2c2c':o.fill||'#fff',stroke:darkDefault(o)?'#555555':o.stroke||'#252525','stroke-width':2
+                fill:darkDefault(o)?'#26282B':o.fill||'#fff',stroke:darkDefault(o)?'#555555':o.stroke||'#1D1F22','stroke-width':2
             };
             if(['circle','oval'].includes(o.shape))shape=el('ellipse', {
                 cx:o.w/2,cy:o.h/2,rx:o.w/2,ry:o.h/2,...style
@@ -413,7 +413,7 @@
             x:a.x,y:a.y,width:a.w,height:a.h
         },g),box=document.createElementNS(XHTML,'div');
         box.className='shape-text';
-        box.style.color=(darkDefault(o)||darkText(o))?'#ffffff':'#303030';
+        box.style.color=(darkDefault(o)||darkText(o))?'#ffffff':'#2B2E32';
         box.style.fontSize=(o.fontSize||20)+'px';
         const text=document.createElementNS(XHTML,'div');
         text.innerHTML=safeHTML(o.html);
@@ -432,7 +432,7 @@
     function renderArrow(o) {
         const g=el('g', {
             'data-id':o.id
-        },layer),d=arrowPath(o),color=document.documentElement.classList.contains('dark')&&o.stroke==='#252525'&&!o.customStyle?'#c7c7c7':o.stroke||'#252525';
+        },layer),d=arrowPath(o),color=document.documentElement.classList.contains('dark')&&o.stroke==='#1D1F22'&&!o.customStyle?'#c7c7c7':o.stroke||'#1D1F22';
         const marker=el('marker', {
             id:'tip-'+o.id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'
         },$('#defs'));
@@ -614,7 +614,7 @@
             x:(workspace.clientWidth/2-view.x)/view.scale,y:(workspace.clientHeight/2-view.y)/view.scale
         };
         const o= {
-            id:uid(),kind:kind==='text'?'text':'shape',shape:SHAPES[kind]?kind:'rect',x:p.x-90,y:p.y-50,w:['square','circle'].includes(kind)?120:180,h:['square','circle'].includes(kind)?120:100,rotation:0,html:'',fontSize:20,fill:'#ffffff',stroke:'#252525'
+            id:uid(),kind:kind==='text'?'text':'shape',shape:SHAPES[kind]?kind:'rect',x:p.x-90,y:p.y-50,w:['square','circle'].includes(kind)?120:180,h:['square','circle'].includes(kind)?120:100,rotation:0,html:'',fontSize:20,fill:'#ffffff',stroke:'#1D1F22'
         };
         objects().push(o);
         selected=new Set([o.id]);
@@ -981,8 +981,8 @@
         box.className='shape-text editing';
         box.contentEditable='true';
         box.style.cssText=`position:absolute;left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px;transform:rotate(${o.rotation}deg);font-size:${o.fontSize||20}px;`;
-        box.style.color=(darkDefault(o)||darkText(o))?'#ffffff':'#303030';
-        box.style.background=(darkDefault(o)||darkText(o))?'#2c2c2c':o.fill==='none'?'#ffffff':o.fill;
+        box.style.color=(darkDefault(o)||darkText(o))?'#ffffff':'#2B2E32';
+        box.style.background=(darkDefault(o)||darkText(o))?'#26282B':o.fill==='none'?'#ffffff':o.fill;
         box.innerHTML=safeHTML(o.html);
         overlay.append(box);
         workspace.append(overlay);
@@ -1152,7 +1152,7 @@
                 id:uid(),kind:'arrow',a:target.dataset.anchor? {
                     node:id,side:target.dataset.anchor
                 }
-                :snap(p),b:p,route:'rounded',stroke:'#252525',tip:'triangle',dash:'solid',label:'',labelSize:14
+                :snap(p),b:p,route:'rounded',stroke:'#1D1F22',tip:'triangle',dash:'solid',label:'',labelSize:14
             };
             objects().push(o);
             selected=new Set([o.id]);

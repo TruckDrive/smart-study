@@ -402,7 +402,7 @@ class DeadlineViewerDialog(QDialog):
                     if dl.get("id") == pinned_id:
                         pin_lbl = QLabel(_("default"))
                         pin_lbl.setStyleSheet(
-                            f"color: {c.get('blue_bright','#007AFF')}; font-size: 11px; "
+                            f"color: {c.get('blue_bright','#1A8A98')}; font-size: 11px; "
                             f"background: {c.get('hover_subtle','#e8f0fe')}; "
                             f"border-radius: 4px; padding: 2px 6px;"
                         )
@@ -436,7 +436,7 @@ class DeadlineViewerDialog(QDialog):
                     bar.setFixedHeight(10)
                     bar.setStyleSheet(
                         f"QProgressBar {{ background: {c.get('grey_light','#e0e0e0')}; border-radius: 5px; border: none; }}"
-                        f"QProgressBar::chunk {{ background: {c.get('blue','#007AFF')}; border-radius: 5px; }}"
+                        f"QProgressBar::chunk {{ background: {c.get('blue','#1A8A98')}; border-radius: 5px; }}"
                     )
                     card_layout.addWidget(bar)
 

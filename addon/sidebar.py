@@ -264,7 +264,7 @@ class GamificationSidebar(QDockWidget):
         try:
             c = _palette(_is_night())
             self._page.setBackgroundColor(
-                QColor(c.get("bg", "#1c1c1e" if _is_night() else "#f5f5f7")))
+                QColor(c.get("bg", "#1c1c1e" if _is_night() else "#F1F1EF")))
         except Exception:
             pass
 

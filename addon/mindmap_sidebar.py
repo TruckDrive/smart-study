@@ -518,7 +518,7 @@ class MindmapPanel(QWidget):
             from .theme import palette
             dark = bool(mw and _is_night())
             self.web_view.page().setBackgroundColor(
-                QColor("#2c2c2c") if dark else QColor("#f8f9fa"))
+                QColor("#26282B") if dark else QColor("#f8f9fa"))
         except Exception:
             pass
 

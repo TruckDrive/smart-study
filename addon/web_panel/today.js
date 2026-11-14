@@ -122,7 +122,7 @@
     var sel = h("select", { class: "chip", "aria-label": label,
       onchange: function (e) { send("period", { which: which, days: Number(e.currentTarget.value) }); } });
     choices.forEach(function (n) {
-      var text = n === 365 ? data.t.lastYear : (which === "due" ? data.t.next : data.t.last).replace("{}", n);
+      var text = n === 365 ? data.t.lastYear : n === 1 ? data.t.lastDay : (which === "due" ? data.t.next : data.t.last).replace("{}", n);
       sel.append(h("option", { value: n, selected: n === value }, text));
     });
     return sel;

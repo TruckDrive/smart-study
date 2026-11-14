@@ -27,25 +27,25 @@
             --code-bg: #f7f6f3;
             --callout-bg: #f1f1ef;
             --callout-text: #37352f;
-            --btn-blue: #0071D3;
+            --btn-blue: #0B6570;
             --divider-color: rgba(0,0,0,0.08);
             --table-border: #e0e0e0;
         }
 
         body.nightMode {
-            --bg: #2c2c2c; 
-            --sidebar-bg: #252525; 
-            --header-bg: #252525; 
+            --bg: #26282B; 
+            --sidebar-bg: #1D1F22; 
+            --header-bg: #1D1F22; 
             --text: #ffffff;
-            --text-gray: #b0b0b0; 
-            --hover-bg: #414141; 
+            --text-gray: #B4B4B4; 
+            --hover-bg: #34373C; 
             --border: rgba(255,255,255,0.1);
             --selection: #3d4c53;
-            --code-bg: #2c2c2c;
-            --callout-bg: #262626;
+            --code-bg: #26282B;
+            --callout-bg: #202225;
             --callout-text: #ffffff;
             --divider-color: rgba(255,255,255,0.15);
-            --table-border: #414141;
+            --table-border: #34373C;
         }
         
         /* (OS-based prefers-color-scheme fallback removed — the theme is
@@ -104,7 +104,7 @@
             opacity: 0.8;
         }
         body.nightMode .top-search-input {
-            background: #414141;
+            background: #34373C;
             color: #ffffff;
             box-shadow: none;
             border: 1px solid var(--border);
@@ -129,7 +129,7 @@
             flex-shrink: 0;
         }
         .toggle-btn:hover, .toggle-btn:active { 
-            background: var(--smartstudy-primary, #0071D3); 
+            background: var(--smartstudy-primary, #0B6570); 
             color: #ffffff; 
         }
 
@@ -155,7 +155,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: background 0.2s;
         }
-        .sidebar-close-btn:hover, .sidebar-close-btn:active { background: var(--smartstudy-primary, #0071D3); }
+        .sidebar-close-btn:hover, .sidebar-close-btn:active { background: var(--smartstudy-primary, #0B6570); }
 
         .sidebar-list { overflow-y: auto; flex: 1; padding: 0 4px; display: flex; flex-direction: column; gap: 1px; margin-top: 5px; }
         .sidebar-item {
@@ -366,7 +366,7 @@
             border-radius: 6px; padding: 4px; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             align-items: center;
         }
-        body.nightMode #format-toolbar { background: #252525; color: #ffffff; border: 1px solid #414141; }
+        body.nightMode #format-toolbar { background: #1D1F22; color: #ffffff; border: 1px solid #34373C; }
         
         .fmt-btn {
             background: transparent; border: none; color: inherit; padding: 4px 8px; cursor: pointer; 
@@ -528,7 +528,7 @@
             display: none;
             align-items: center;
         }
-        body.nightMode #block-toolbar { background: #252525; color: #ffffff; border: 1px solid #414141; }
+        body.nightMode #block-toolbar { background: #1D1F22; color: #ffffff; border: 1px solid #34373C; }
         .blk-btn {
             background: transparent; border: none; color: inherit;
             padding: 5px 10px; cursor: pointer; border-radius: 4px;
@@ -568,7 +568,7 @@
         /* --- DARKMODE MENU & CLOSE BUTTON OVERRIDES --- */
         body.nightMode .toggle-btn,
         body.nightMode .sidebar-close-btn {
-            background: #414141;
+            background: #34373C;
         }
         body.nightMode .toggle-btn:hover,
         body.nightMode .toggle-btn:active,
@@ -611,7 +611,7 @@
 <style id="smartstudy-keyboard-focus">
 body button:focus-visible, body input:focus-visible, body select:focus-visible,
 body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-visible {
-  outline: 2px solid var(--accent, var(--primary-color, #0071d3));
+  outline: 2px solid var(--accent, var(--primary-color, #0B6570));
   outline-offset: 2px;
 }
         /* These overlays do not change note dimensions, typography or wrapping. */
@@ -3590,9 +3590,9 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
                 + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
-                + (dark ? 'background:#2c2c2c;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
+                + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'
-                + (dark ? 'background:#303030;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
+                + (dark ? 'background:#2B2E32;color:#e0e0e0;border:1px solid #555;' : 'background:#fff;color:#333;border:1px solid #ccc;');
             var preCss = 'display:none;max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-word;'
                 + 'font-size:11px;border-radius:6px;padding:8px;margin:0 0 8px 0;'
                 + (dark ? 'background:#404040;border:1px solid #555;' : 'background:#f5f5f5;border:1px solid #ccc;');

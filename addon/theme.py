@@ -38,7 +38,7 @@ Adding a new theme
 # ─────────────────────────────────────────────────────────────────────────────
 
 FONT_FAMILY: str = (
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+    '"Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -150,6 +150,24 @@ DARK: dict = {
 
 #  Structure:  COLOR_THEMES[theme_name][night_mode_bool] = {overrides}
 COLOR_THEMES: dict = {
+    "petrol": {
+        False: {
+            "blue":         "#0B6570",
+            "blue_hover":   "#0A5A64",
+            "blue_pressed": "#084A52",
+            "blue_border":  "none",
+            "blue_bright":  "#1A8A98",
+            "blue_accent":  "#0B6570",
+        },
+        True: {
+            "blue":         "#1F7A87",
+            "blue_hover":   "#1B6C78",
+            "blue_pressed": "#155660",
+            "blue_border":  "none",
+            "blue_bright":  "#56BAC6",
+            "blue_accent":  "#56BAC6",
+        },
+    },
     "ocean": {
         False: {
             "blue":         "#0071D3",
@@ -282,7 +300,7 @@ COLOR_THEMES: dict = {
 # Active theme state  (set at profile-open time by __init__.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
-_ACTIVE_THEME: str = "ocean"
+_ACTIVE_THEME: str = "petrol"
 
 # Custom theme: stores the 4 user-chosen colour keys.
 # Only populated when _ACTIVE_THEME == "custom".
@@ -326,6 +344,17 @@ def get_active_theme() -> str:
 # Public API
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _neutral(night_mode: bool) -> dict:
+    """Backgrounds, greys and text of Smart Study's own look (see design.py)."""
+    from . import design
+    t = design.DARK if night_mode else design.LIGHT
+    return {
+        "bg": t["page"], "surface": t["card"], "grey_light": t["raised"], "grey_mid": t["line"],
+        "grey_dark": t["barmute"], "hover_subtle": t["hover"], "selection_bg": t["raised"],
+        "text": t["ink"], "text_muted": t["muted"], "text_faint": t["zero"], "text_browser": t["ink"],
+    }
+
+
 def palette(night_mode: bool) -> dict:
     """Return the colour-token dict for *night_mode* with the active theme applied.
 
@@ -338,6 +367,7 @@ def palette(night_mode: bool) -> dict:
     once at startup; no individual UI file needs to be modified.
     """
     base = (DARK if night_mode else LIGHT).copy()
+    base.update(_neutral(night_mode))
 
     if _ACTIVE_THEME == "custom" and _CUSTOM_COLORS:
         # Derive all six tokens from the four user-chosen values.
@@ -366,13 +396,4 @@ def palette(night_mode: bool) -> dict:
 
 def dialog_palette(night_mode: bool) -> dict:
     """Neutral menu/dialog palette; main feature surfaces retain palette()."""
-    colors = palette(night_mode)
-    if night_mode:
-        colors.update({
-            "bg": "#2C2C2C", "surface": "#252525",
-            "grey_light": "#414141", "grey_mid": "#414141", "grey_dark": "#505050",
-            "hover_subtle": "#414141", "selection_bg": "#414141",
-            "text": "#FFFFFF", "text_muted": "#B0B0B0", "text_faint": "#7E7E7E",
-            "text_browser": "#FFFFFF",
-        })
-    return colors
+    return palette(night_mode)

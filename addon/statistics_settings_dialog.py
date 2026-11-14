@@ -68,7 +68,7 @@ class StatisticsSettingsDialog(QDialog):
         except Exception:
             pass
         try:
-            self._page.setBackgroundColor(QColor("#2c2c2c" if night else "#ffffff"))
+            self._page.setBackgroundColor(QColor("#26282B" if night else "#ffffff"))
         except Exception:
             pass
 
@@ -142,7 +142,7 @@ class StatisticsSettingsDialog(QDialog):
         colors = palette(night)
         payload = {
             "isDark": night,
-            "accent": colors.get("blue", "#0071D3"),
+            "accent": colors.get("blue", "#0B6570"),
             "translations": {source: _(source) for source in _UI_STRINGS},
             "config": {
                 "stats_time_range": int(self.current_config.get("stats_time_range", 7) or 7),

@@ -76,6 +76,7 @@ except ImportError:
 
 # Accent (blue) + pressed colour for each preset — kept in sync with the HTML.
 _PRESET_ACCENTS = {
+    "petrol":  ("#0B6570", "#084A52"),
     "ocean":   ("#0071D3", "#004990"),
     "orchid":  ("#E95ACC", "#CB51B3"),
     "forest":  ("#619971", "#477154"),
@@ -85,6 +86,7 @@ _PRESET_ACCENTS = {
     "orange":  ("#D97757", "#B85C3F"),
 }
 _THEME_LOGOS = {
+    "petrol":  "logo_dusty.svg",
     "ocean":   "logo.svg",
     "orchid":  "logo_orchid.svg",
     "forest":  "logo_forest.svg",
@@ -140,6 +142,8 @@ _TOGGLE_KEYS = [
     "statistics_widget_enabled", "deck_overview_enabled", "mindmap_enabled",
     "gamification_sidebar_enabled", "music_player_enabled", "pomodoro_enabled",
     "ai_assistant_enabled", "website_viewer_enabled", "notebook_enabled",
+    "panel_show_plan", "panel_show_challenge", "panel_show_due",
+    "stats_show_consistency", "stats_show_retention",
 ]
 
 
@@ -190,7 +194,7 @@ if _QT_AVAILABLE:
                 return
 
             self.setWindowTitle(f"{getattr(constants, 'ADDON_DISPLAY_NAME', 'Smart Study')} - {_('Settings')}")
-            self.resize(900, 640)
+            self.resize(1040, 740)
             self.setMinimumSize(640, 460)
 
             layout = QVBoxLayout(self)
@@ -222,7 +226,7 @@ if _QT_AVAILABLE:
             # otherwise the view flashes white in dark mode while loading.
             try:
                 self._page.setBackgroundColor(
-                    QColor("#2c2c2c") if self._is_night() else QColor("#ffffff"))
+                    QColor("#26282B") if self._is_night() else QColor("#ffffff"))
             except Exception:
                 pass
 
@@ -736,7 +740,7 @@ if _QT_AVAILABLE:
             cfg = self.current_config
             from .deck_overview_options import payload as deck_payload
             from .dashboard_appearance import surface_effects_css
-            active = cfg.get("active_color_theme", "ocean")
+            active = cfg.get("active_color_theme", "petrol")
             accent, accent_press = self._accent_for(active)
             conf = {
                 "language": cfg.get("language", "auto"),
@@ -746,7 +750,7 @@ if _QT_AVAILABLE:
                 "sidebar_visibility_mode": cfg.get("sidebar_visibility_mode", "always_show"),
                 "active_theme": cfg.get("active_theme", "medical_theme.css"),
                 "active_color_theme": active,
-                "custom_bg_light": cfg.get("custom_bg_light", "#f5f5f7"),
+                "custom_bg_light": cfg.get("custom_bg_light", "#F1F1EF"),
                 "custom_bg_dark": cfg.get("custom_bg_dark", "#1f1f21"),
                 "dashboard_surface_controls_expanded": cfg.get("dashboard_surface_controls_expanded"),
                 "dashboard_surface_opacity": cfg.get("dashboard_surface_opacity", 100),
@@ -780,6 +784,13 @@ if _QT_AVAILABLE:
             for k in _TOGGLE_KEYS:
                 default = k not in ("minimal_dashboard_enabled", "gamification_popup_level")
                 conf[k] = bool(cfg.get(k, default))
+            conf["panel_show_fact"] = bool(cfg.get("panel_show_fact", False))
+            conf["home_layout"] = "classic" if cfg.get("home_layout") == "classic" else "panel"
+            for key, fallback in (("panel_plan_items", 4), ("panel_due_days", 7), ("stats_consistency_days", 30)):
+                try:
+                    conf[key] = int(cfg.get(key, fallback) or fallback)
+                except (TypeError, ValueError):
+                    conf[key] = fallback
             banner_fallback = self._banner_fallback_uri()
             try:
                 from . import browser_features

@@ -34,10 +34,10 @@ except Exception:
     SIDEBAR_BG_COLOR_HEX       = "#FFFFFF"
     BUTTON_HOVER_PRESSED_COLOR = "#0071D3"
     BUTTON_ACTIVE_BG_COLOR     = "#0071D3"
-    DEFAULT_TEXT_COLOR         = "#1D1D1F"
+    DEFAULT_TEXT_COLOR         = "#1C1D1F"
     TIMER_LABEL_COLOR          = "#888888"
     TIMER_BUTTON_HOVER_COLOR   = "#D0D0D0"
-    TIMER_BUTTON_PRESSED_COLOR = "#B0B0B0"
+    TIMER_BUTTON_PRESSED_COLOR = "#B4B4B4"
     SEPARATOR_LINE_COLOR       = "#888888"
 
 # --- Sizes & Layout (Launcher) ---
@@ -118,7 +118,7 @@ except Exception:
     QPushButton#AddButton { background-color: #0071D3; color: white; min-width: 25px; max-width: 25px; padding: 3px; font-weight: bold; border: 1px solid #0056A4; border-radius: 4px; }
     QPushButton#AddButton:hover { background-color: #0062C4; } QPushButton#AddButton:pressed { background-color: #004990; }
     QPushButton#AddButton:disabled { background-color: #5A6875; color: #A0A0A0; border: 1px solid #444444; }
-    QPushButton#DeleteButton { min-width: 18px; max-width: 18px; padding: 2px 1px; font-weight: bold; color: #1D1D1F; background-color: #E0E0E0; border: 1px solid #B0B0B0; border-radius: 4px; }
+    QPushButton#DeleteButton { min-width: 18px; max-width: 18px; padding: 2px 1px; font-weight: bold; color: #1C1D1F; background-color: #E0E0E0; border: 1px solid #B4B4B4; border-radius: 4px; }
     QPushButton#DeleteButton:hover { background-color: #F0F0F0; } QPushButton#DeleteButton:pressed { background-color: #D0D0D0; }"""
 WEBSITE_PROFILE_SUBDIR = "website_web_profile"
 CONFIG_KEY_LAST_OPENED_URL = f"addon_{ADDON_NAME_LAUNCHER}_{ADDON_NAME_WEBSITE}_last_opened_url"

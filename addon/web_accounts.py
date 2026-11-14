@@ -236,7 +236,7 @@ class AccountSitesPanel(QWidget):
         self.hint.setWordWrap(True)
         self.hint.setContentsMargins(10, 4, 10, 6)
         from aqt.theme import theme_manager
-        self.hint.setStyleSheet("font-size: 11px; color: %s;" % ("#a1a1a6" if theme_manager.night_mode else "#6e6e73"))
+        self.hint.setStyleSheet("font-size: 11px; color: %s;" % ("#a1a1a6" if theme_manager.night_mode else "#55585C"))
         self.hint.setVisible(False)
         layout.addWidget(self.hint)
 
@@ -251,11 +251,13 @@ class AccountSitesPanel(QWidget):
     def _style_bar(self) -> None:
         from aqt.theme import theme_manager
         line = "#3a3a3c" if theme_manager.night_mode else "#d7d7db"
-        on = "#2f6fd6"
+        from . import design
+        tokens = design.tokens(bool(theme_manager.night_mode))
+        line, on = tokens["line"], tokens["accent"]
         self.setStyleSheet(
             f"#smartstudyAccountBar {{ border-bottom: 1px solid {line}; }}"
-            f"#smartstudyAccountBar QPushButton {{ padding: 3px 9px; border-radius: 6px; border: 1px solid {line}; }}"
-            f"#smartstudyAccountBar QPushButton:checked {{ background: {on}; color: white; border-color: {on}; }}"
+            f"#smartstudyAccountBar QPushButton {{ padding: 4px 11px; border-radius: 13px; border: 1px solid {line}; }}"
+            f"#smartstudyAccountBar QPushButton:checked {{ background: {on}; color: {tokens['on_accent']}; border-color: {on}; }}"
         )
 
     def _ensure_view(self) -> QWebEngineView:

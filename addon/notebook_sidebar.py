@@ -529,7 +529,7 @@ _NAV_STYLE = """
   .snav-fs-btn:hover { background: var(--hover-bg, #efefef); }
   .snav-fs-btn svg { width: 15px; height: 15px; opacity: 0.65; }
   .snav-settings-btn svg { width: 16px; height: 16px; opacity: 0.75; }
-  body.nightMode .snav-btn { color:#7e7e7e; }
+  body.nightMode .snav-btn { color:#8A8A8A; }
   body.nightMode .snav-btn.snav-active,
   body.nightMode .snav-btn:hover { color:#ffffff; }
 
@@ -1868,10 +1868,10 @@ class NotebookPanel(QWidget):
                 if self.current_tool == 'notebook' else ''
             )
             error_page = (
-                '<html><head><style>body{margin:0;background:#fff;color:#252525}'
-                'html.nightMode body{background:#2c2c2c;color:#fff}'
-                'button{font:inherit;padding:8px 12px;border:1px solid #7e7e7e;border-radius:8px;cursor:pointer}'
-                'html.nightMode button{background:#414141;color:#fff}</style></head>'
+                '<html><head><style>body{margin:0;background:#fff;color:#1D1F22}'
+                'html.nightMode body{background:#26282B;color:#fff}'
+                'button{font:inherit;padding:8px 12px;border:1px solid #8A8A8A;border-radius:8px;cursor:pointer}'
+                'html.nightMode button{background:#34373C;color:#fff}</style></head>'
                 '<body><main style="padding:24px;font:14px system-ui">'
                 f'<p>{message}</p><button onclick="pycmd(\'{ADDON_NAME_FOR_BRIDGE}:retry-load\')">{retry}</button>'
                 + recovery_action +

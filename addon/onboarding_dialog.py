@@ -132,7 +132,7 @@ if _QT_AVAILABLE:
                 try:
                     dark = bool(parent and parent.pm and _is_night())
                     self._page.setBackgroundColor(
-                        QColor("#2c2c2c") if dark else QColor("#ffffff"))
+                        QColor("#26282B") if dark else QColor("#ffffff"))
                 except Exception:
                     pass
                 self.view.load(QUrl.fromLocalFile(html_path))
