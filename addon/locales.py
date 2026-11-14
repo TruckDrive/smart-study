@@ -9337,10 +9337,6 @@ TRANSLATIONS.update({
 TRANSLATIONS.update({
     "Assistant": {"de": "Assistent"},
     "New in": {"de": "Neu in"},
-    "Where the tabs of the side panel sit: as a slim rail at the right or left edge of the window, or as a bar on top of the panel.": {"de": "Wo die Reiter der Seitenleiste sitzen: als schmale Leiste am rechten oder linken Fensterrand oder als Zeile oben in der Seitenleiste."},
-    "Right edge": {"de": "Rechter Rand"},
-    "Left edge": {"de": "Linker Rand"},
-    "On top of the panel": {"de": "Oben in der Seitenleiste"},
     "What changed in this version, and things worth knowing.": {"de": "Was sich in dieser Version geändert hat und was du wissen solltest."},
     "Show or hide the side panel": {"de": "Seitenleiste ein- oder ausblenden"},
     "Side panel": {"de": "Seitenleiste"},

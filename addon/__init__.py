@@ -635,10 +635,7 @@ def _apply_saved_settings(new_settings, message=None):
     if not new_settings.get("workspace_mindmap_tab", True) and not new_settings.get("workspace_roadmap_tab", True):
         new_settings["workspace_mindmap_tab"] = True
     previous_language = addon_settings.get("language", "auto")
-    previous_tabs = addon_settings.get("panel_tabs_side", "right")
     addon_settings.update(new_settings); save_addon_settings()
-    if panel_instance is not None and addon_settings.get("panel_tabs_side", "right") != previous_tabs:
-        _rebuild_panel()
 
     # Enabling the compact dashboard may require plan/deadline managers even
     # when their large legacy widgets are switched off.
@@ -1156,17 +1153,6 @@ def _init_panel() -> None:
     except Exception as e:
         print(f"SmartStudy: side panel initialization failed: {e}")
         traceback.print_exc()
-
-
-def _rebuild_panel() -> None:
-    """The tabs moved to another edge: build the panel again in its new place."""
-    global panel_instance
-    try:
-        panel_instance.cleanup()
-    except Exception as e:
-        print(f"SmartStudy: side panel cleanup failed: {e}")
-    panel_instance = None
-    _init_panel()
 
 
 def _init_launcher_dock() -> None:

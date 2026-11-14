@@ -22,10 +22,6 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
     ),
     "settings": (
         "New in",
-        "Where the tabs of the side panel sit: as a slim rail at the right or left edge of the window, or as a bar on top of the panel.",
-        "Right edge",
-        "Left edge",
-        "On top of the panel",
         "What changed in this version, and things worth knowing.",
         "Home",
         "Side panel",

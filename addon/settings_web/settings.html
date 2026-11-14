@@ -671,12 +671,6 @@
                 <option value="panel">Side panel</option><option value="classic">Classic</option>
               </select></div>
             </div>
-            <div class="row" id="tabsSideRow">
-              <div class="rl"><div class="rt">Tabs</div><div class="rd">Where the tabs of the side panel sit: as a slim rail at the right or left edge of the window, or as a bar on top of the panel.</div></div>
-              <div class="rc"><select class="field" id="panel_tabs_side">
-                <option value="right">Right edge</option><option value="left">Left edge</option><option value="top">On top of the panel</option>
-              </select></div>
-            </div>
           </div>
           <div id="panelHome">
             <div class="group-label">Today panel</div>
@@ -1041,7 +1035,6 @@
     var panel=document.getElementById('home_layout').value!=='classic';
     document.getElementById('panelHome').style.display=panel?'':'none';
     document.getElementById('classicHome').style.display=panel?'none':'';
-    document.getElementById('tabsSideRow').style.display=panel?'':'none';
     ['todayGroup','overviewGroup','minimalGroup','dashGroup'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
     if(panel){
       renderToggles('todayGroup', TODAY, _homeCfg);
@@ -1493,7 +1486,6 @@
 
       // toggles
       setSelect('home_layout', cfg.home_layout === 'classic' ? 'classic' : 'panel');
-      setSelect('panel_tabs_side', cfg.panel_tabs_side || 'right');
       setSelect('panel_plan_items', cfg.panel_plan_items || 4);
       setSelect('panel_due_days', cfg.panel_due_days || 7);
       setSelect('stats_consistency_days', cfg.stats_consistency_days || 30);
@@ -1637,7 +1629,6 @@
     });
     document.querySelectorAll('input[type=checkbox][data-key]').forEach(function(cb){ out[cb.dataset.key]=cb.checked; });
     out.home_layout = val('home_layout')==='classic' ? 'classic' : 'panel';
-    out.panel_tabs_side = ['left','top'].indexOf(val('panel_tabs_side'))>=0 ? val('panel_tabs_side') : 'right';
     out.panel_plan_items = Number(val('panel_plan_items')) || 4;
     out.panel_due_days = Number(val('panel_due_days')) || 7;
     out.stats_consistency_days = Number(val('stats_consistency_days')) || 30;

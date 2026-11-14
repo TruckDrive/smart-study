@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """The Smart Study side panel: one column on the right of Anki.
 
-On top sits a small header (Pomodoro, music, settings and the tabs), below it
-either the "Today" page or one of the tools. The tools keep their own docks
-and their own layout menu (sidebar, split, main window, own window); the
-panel only decides which of them is shown and marks the matching tab.
+At the right edge of the window stands a slim rail (logo, tabs, Pomodoro,
+music). Left of it sits either the "Today" page or one of the tools. The
+tools keep their own docks and their own layout menu (sidebar, split, main
+window, own window); the panel only decides which of them is shown and
+marks the matching tab.
 """
 from __future__ import annotations
 
@@ -17,8 +18,8 @@ from typing import Any, Callable, Dict, List, Optional
 from aqt import gui_hooks, mw
 from aqt.operations import QueryOp
 from aqt.qt import (
-    QByteArray, QColor, QDockWidget, QEvent, QFrame, QHBoxLayout, QIcon, QLabel, QMenu,
-    QObject, QPainter, QPixmap, QPushButton, QSize, QSizePolicy, Qt, QTimer, QToolBar, QToolButton,
+    QByteArray, QColor, QDockWidget, QEvent, QFrame, QIcon, QMenu,
+    QObject, QPainter, QPixmap, QPushButton, QSize, Qt, QTimer, QToolBar, QToolButton,
     QVBoxLayout, QWidget,
 )
 from aqt.webview import AnkiWebView
@@ -37,7 +38,6 @@ try:
 except ImportError:  # pragma: no cover
     QSvgRenderer = None  # type: ignore
 
-TITLE_WRAP = "SmartStudyPanelTitle"
 RAIL_BAR = "SmartStudyRail"
 RAIL_WIDTH = 84
 SEPARATOR_MARK = "/* smart study panel */"
@@ -64,7 +64,7 @@ SHOW_KEYS = {
 DEFAULTS = {
     "home_layout": "panel", "panel_open": True, "panel_show_plan": True,
     "panel_show_challenge": True, "panel_show_fact": False, "panel_show_due": True, "panel_due_days": 7,
-    "panel_plan_items": 4, "panel_tabs_side": "right", "panel_rail_open": True,
+    "panel_plan_items": 4, "panel_rail_open": True,
 }
 
 ICONS = {
@@ -194,13 +194,11 @@ class _LogoButton(QToolButton):
 
 
 class Header(QWidget):
-    """Pomodoro, music, settings and the tabs: as a bar on top of the column,
-    or upright as a rail at the edge of the window."""
+    """The rail: logo, tabs, Pomodoro, music and the button that folds the column."""
 
-    def __init__(self, panel: "Panel", vertical: bool = False):
+    def __init__(self, panel: "Panel"):
         super().__init__()
         self.panel = panel
-        self.vertical = vertical
         self.setObjectName("ssHeader")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.tab_buttons: Dict[str, QToolButton] = {}
@@ -209,22 +207,30 @@ class Header(QWidget):
         self.music_button: Optional[QToolButton] = None
         settings = panel.settings
         outer = QVBoxLayout(self)
-        Line = QVBoxLayout if vertical else QHBoxLayout
+        outer.setContentsMargins(6, 10, 6, 10)
+        outer.setSpacing(10)
+
+        self.gear = _LogoButton(panel.ctx["show_settings"])
+        outer.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
 
         self.tabs = QFrame()
         self.tabs.setObjectName("ssTabs")
-        tab_row = Line(self.tabs)
+        tab_row = QVBoxLayout(self.tabs)
         tab_row.setContentsMargins(4, 4, 4, 4)
         tab_row.setSpacing(2)
         self._tab("today", _("Today"), tab_row)
         for tool in panel.tools:
             if settings.get(tool.setting, True):
                 self._tab(tool.key, tool.label, tab_row)
+        outer.addWidget(self.tabs)
+        outer.addStretch(1)
 
         self.pill = QFrame()
         self.pill.setObjectName("ssPill")
-        row = Line(self.pill)
+        row = QVBoxLayout(self.pill)
         row.setSpacing(0)
+        row.setContentsMargins(2, 6, 2, 6)
+        center = Qt.AlignmentFlag.AlignHCenter
         if settings.get("pomodoro_enabled", True):
             self.time_button = QPushButton("25:00")
             self.time_button.setObjectName("ssTime")
@@ -233,43 +239,20 @@ class Header(QWidget):
             self.time_button.setToolTip(_("Pomodoro: reset, skip, settings"))
             self.time_button.clicked.connect(self._pomodoro_menu)
             row.addWidget(self.time_button)
-            self.play_button = self._round("play", _("Start/Pause Timer"), self._start_pause, flat=True)
-            row.addWidget(self.play_button, 0, Qt.AlignmentFlag.AlignHCenter)
+            self.play_button = self._round("play", _("Start/Pause Timer"), self._start_pause)
+            row.addWidget(self.play_button, 0, center)
         if settings.get("music_player_enabled", True):
-            self.music_button = self._round("music", _("Play Music"), self._music, flat=True)
-            row.addWidget(self.music_button, 0, Qt.AlignmentFlag.AlignHCenter)
-
-        if vertical:
-            outer.setContentsMargins(6, 10, 6, 10)
-            outer.setSpacing(10)
-            row.setContentsMargins(2, 6, 2, 6)
-            self.gear = _LogoButton(panel.ctx["show_settings"])
-            outer.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
-            outer.addWidget(self.tabs)
-            outer.addStretch(1)
-            outer.addWidget(self.pill)
-            self.hide_button = self._round("hide", _("Show or hide the side panel"), panel.collapse, flat=True)
-            row.addWidget(self.hide_button, 0, Qt.AlignmentFlag.AlignHCenter)
-            self.setFixedWidth(RAIL_WIDTH)
-        else:
-            outer.setContentsMargins(4, 12, 12, 8)
-            outer.setSpacing(12)
-            row.setContentsMargins(6, 2, 4, 2)
-            top = QHBoxLayout()
-            top.setSpacing(8)
-            self.gear = _LogoButton(panel.ctx["show_settings"])
-            top.addWidget(self.gear)
-            top.addStretch(1)
-            self.hide_button = self._round("hide", _("Hide side panel"), panel.toggle, flat=True)
-            row.addWidget(self.hide_button)
-            top.addWidget(self.pill)
-            outer.addLayout(top)
-            outer.addWidget(self.tabs)
+            self.music_button = self._round("music", _("Play Music"), self._music)
+            row.addWidget(self.music_button, 0, center)
+        self.hide_button = self._round("hide", _("Show or hide the side panel"), panel.collapse)
+        row.addWidget(self.hide_button, 0, center)
+        outer.addWidget(self.pill)
+        self.setFixedWidth(RAIL_WIDTH)
         self.restyle()
 
-    def _round(self, name, tip, slot, flat=False) -> QToolButton:
+    def _round(self, name, tip, slot) -> QToolButton:
         button = QToolButton()
-        button.setObjectName("ssFlat" if flat else "ssRound")
+        button.setObjectName("ssFlat")
         button.setProperty("ssIcon", name)
         button.setToolTip(tip)
         button.setAccessibleName(tip)
@@ -290,12 +273,7 @@ class Header(QWidget):
         button.setIconSize(QSize(22, 22))
         button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button.setCursor(Qt.CursorShape.PointingHandCursor)
-        if self.vertical:
-            button.setFixedSize(RAIL_WIDTH - 22, 54)
-        else:
-            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            button.setFixedHeight(52)
-            button.setMinimumWidth(0)
+        button.setFixedSize(RAIL_WIDTH - 22, 54)
         button.clicked.connect(lambda _checked=False, k=key: self.panel.select(k))
         if key != "today":
             button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -307,16 +285,13 @@ class Header(QWidget):
         c = design.tokens(is_night())
         self.setStyleSheet(f"""
         QWidget#ssHeader {{ background: {c['page']}; }}
-        QFrame#ssPill {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: {14 if self.vertical else 22}px; }}
+        QFrame#ssPill {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 14px; }}
         QFrame#ssTabs {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 14px; }}
         QPushButton#ssTime {{ background: transparent; border: none; color: {c['ink']};
-            font-size: {14 if self.vertical else 16}px; font-weight: 700;
-            padding: {'0' if self.vertical else '0 8px 0 10px'}; min-height: {30 if self.vertical else 40}px; }}
+            font-size: 14px; font-weight: 700; padding: 0; min-height: 30px; }}
         QPushButton#ssTime:hover {{ color: {c['accent']}; }}
         QToolButton#ssFlat {{ background: transparent; border: none; border-radius: 20px; }}
         QToolButton#ssFlat:hover {{ background: {c['raised']}; }}
-        QToolButton#ssRound {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 20px; }}
-        QToolButton#ssRound:hover {{ background: {c['raised']}; }}
         QToolButton#ssTab {{ background: transparent; border: none; border-radius: 10px; color: {c['muted']};
             font-size: 11px; padding: 3px 0 1px; }}
         QToolButton#ssTab:hover {{ background: {c['hover']}; color: {c['ink']}; }}
@@ -352,8 +327,7 @@ class Header(QWidget):
         menu.addAction(_("Skip current phase")).triggered.connect(lambda *_a: pomodoro.skip_action())
         menu.addSeparator()
         menu.addAction(_("Timer Settings")).triggered.connect(lambda *_a: pomodoro.open_pomodoro_config())
-        corner = self.time_button.rect().topLeft() if self.vertical else self.time_button.rect().bottomLeft()
-        menu.exec(self.time_button.mapToGlobal(corner))
+        menu.exec(self.time_button.mapToGlobal(self.time_button.rect().topLeft()))
 
     def _music(self) -> None:
         from . import background_music
@@ -387,9 +361,8 @@ class Header(QWidget):
             seconds = pomodoro.time_remaining or pomodoro.get_current_phase_duration()
             phase = getattr(self, "_phase", "")
             clock = pomodoro.format_time(seconds)
-            self.time_button.setText(clock if self.vertical else f"{clock}  {phase}")
-            if self.vertical:
-                self.time_button.setToolTip(f"{phase}: " + _("Pomodoro: reset, skip, settings"))
+            self.time_button.setText(clock)
+            self.time_button.setToolTip(f"{phase}: " + _("Pomodoro: reset, skip, settings"))
         except Exception:
             pass
 
@@ -428,20 +401,13 @@ class Panel(QObject):
 
         self._open = bool(settings.get("panel_open", True))
         self._force_today = False
-        self.headers: List[Header] = []
-        side = settings.get("panel_tabs_side", "right")
-        self.side = side if side in ("right", "left", "top") else "right"
         self.rail_bar: Optional[QToolBar] = None
 
         self.web = AnkiWebView(mw, title="smart study today")
         self.web.set_bridge_command(self._on_bridge, self)
         self.today_dock = self._dock(TODAY_DOCK, self.web)
-        if self.side == "top":
-            self.header = self._new_header()
-            self.today_dock.setTitleBarWidget(self.header)
-        else:
-            self.header = self._new_header(vertical=True)
-            self._build_rail()
+        self.header = Header(self)
+        self._build_rail()
         self.today_dock.setMinimumWidth(300)
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.today_dock)
         self._style_window()
@@ -487,7 +453,7 @@ class Panel(QObject):
         return dock
 
     def _build_rail(self) -> None:
-        """The tabs as an upright rail at the edge of the window, outside the docks."""
+        """The rail at the right edge of the window, outside the docks."""
         old = mw.findChild(QToolBar, RAIL_BAR)
         if old is not None:
             mw.removeToolBar(old)
@@ -499,59 +465,21 @@ class Panel(QObject):
         bar.toggleViewAction().setVisible(False)
         bar.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
         bar.addWidget(self.header)
-        area = Qt.ToolBarArea.LeftToolBarArea if self.side == "left" else Qt.ToolBarArea.RightToolBarArea
-        mw.addToolBar(area, bar)
+        mw.addToolBar(Qt.ToolBarArea.RightToolBarArea, bar)
         bar.setVisible(bool(self.settings.get("panel_rail_open", True)))
         self.rail_bar = bar
 
-    def _new_header(self, vertical: bool = False) -> Header:
-        header = Header(self, vertical)
-        self.headers.append(header)
-        return header
-
-    def _alive_headers(self) -> List[Header]:
-        alive = []
-        for header in self.headers:
-            try:
-                header.objectName()
-                alive.append(header)
-            except RuntimeError:
-                pass
-        self.headers = alive
-        return alive
-
     def update_timer_ui(self) -> None:
-        for header in self._alive_headers():
-            header.update_timer()
+        try:
+            self.header.update_timer()
+        except RuntimeError:
+            pass
 
     def update_timer_label_only(self) -> None:
-        for header in self._alive_headers():
-            header.update_label()
-
-    def _wrap(self, dock: QDockWidget) -> None:
-        """Put the panel header above the tool's own title bar."""
-        if self.side != "top":
-            return
-        current = dock.titleBarWidget()
-        if current is not None and current.objectName() == TITLE_WRAP:
-            old = current.findChild(Header)
-            header = self._new_header()
-            current.layout().insertWidget(0, header)
-            if old is not None:
-                old.setParent(None)
-                old.deleteLater()
-            return
-        box = QWidget()
-        box.setObjectName(TITLE_WRAP)
-        layout = QVBoxLayout(box)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        layout.addWidget(self._new_header())
-        if current is not None:
-            layout.addWidget(current)
-        dock.setTitleBarWidget(box)
-        if current is not None:
-            current.show()
+        try:
+            self.header.update_label()
+        except RuntimeError:
+            pass
 
     def _style_window(self) -> None:
         c = design.tokens(is_night())
@@ -585,14 +513,13 @@ class Panel(QObject):
         head = f"<style id='ss-tokens'>:root{{{design.css_vars(night)}}}</style>"
         self._loaded = False
         self._last_json = ""
-        self.web.stdHtml(f'<div id="app" class="{"" if self.side == "top" else "rail"}"></div>', css=[base + "today.css"], js=[base + "today.js"],
+        self.web.stdHtml('<div id="app"></div>', css=[base + "today.css"], js=[base + "today.js"],
                          head=head, context=self)
 
     def restyle(self, *_args) -> None:
         if self._closing:
             return
-        for header in self._alive_headers():
-            header.restyle()
+        self.header.restyle()
         self._style_window()
         self._load_page()
 
@@ -614,7 +541,6 @@ class Panel(QObject):
             if dock is None or self._wired.get(tool.key) is dock:
                 continue
             self._wired[tool.key] = dock
-            self._wrap(dock)
             dock.visibilityChanged.connect(lambda _visible, self=self: QTimer.singleShot(0, self.sync))
             dock.topLevelChanged.connect(lambda _floating, self=self: QTimer.singleShot(0, self.sync))
         self.sync()
@@ -662,15 +588,8 @@ class Panel(QObject):
                 self.rail_bar.setVisible(bool(self.settings.get("panel_rail_open", True)) and not hidden)
             self.today_dock.setVisible(self._open and key == "today" and not self._resting())
             shown = key if key != "today" else ("today" if self.today_dock.isVisible() else "")
-            for header in self._alive_headers():
-                for name, button in header.tab_buttons.items():
-                    button.setChecked(name == shown)
-            for tool in self.tools:  # an own window keeps only the tool's own bar
-                dock = self._wired.get(tool.key)
-                bar = dock.titleBarWidget() if dock is not None else None
-                inner = bar.findChild(Header) if bar is not None and bar.objectName() == TITLE_WRAP else None
-                if inner is not None:
-                    inner.setVisible(not dock.isFloating())
+            for name, button in self.header.tab_buttons.items():
+                button.setChecked(name == shown)
             self.ctx["panel_changed"]()
         except RuntimeError:
             pass
@@ -695,7 +614,7 @@ class Panel(QObject):
     def select(self, key: str) -> None:
         self.wire()
         current = self.active()
-        if key == "today" and current == "today" and self.today_dock.isVisible() and self.rail_bar is not None:
+        if key == "today" and current == "today" and self.today_dock.isVisible():
             self._set_open(False)  # a second click on the rail folds the page away
             return
         if key == "today" or key == current:
@@ -743,13 +662,11 @@ class Panel(QObject):
             return False
 
     def is_open(self) -> bool:
-        """What the button in Anki's top bar shows: the rail, or the column without a rail."""
+        """What the button in Anki's top bar shows: whether the rail is there."""
         try:
-            if self.rail_bar is not None:
-                return self.rail_bar.isVisible()
+            return self.rail_bar.isVisible()
         except RuntimeError:
             return False
-        return self.content_open()
 
     def _set_open(self, open_: bool) -> None:
         if not open_:
@@ -773,9 +690,6 @@ class Panel(QObject):
 
     def toggle(self) -> None:
         """The button in Anki's top bar: everything away, or back."""
-        if self.rail_bar is None:
-            self._set_open(not self.content_open())
-            return
         show = not self.rail_bar.isVisible()
         self.settings["panel_rail_open"] = show
         if not show:
@@ -954,16 +868,6 @@ class Panel(QObject):
             mw.setStyleSheet(mw.styleSheet().split(SEPARATOR_MARK)[0])
         except RuntimeError:
             pass
-        for dock in list(self._wired.values()):  # give the tools their own title bar back
-            try:
-                bar = dock.titleBarWidget()
-                if bar is not None and bar.objectName() == TITLE_WRAP:
-                    original = bar.layout().itemAt(1).widget() if bar.layout().count() > 1 else QWidget()
-                    dock.setTitleBarWidget(original)
-                    original.show()
-                    bar.deleteLater()
-            except RuntimeError:
-                pass
         if self.rail_bar is not None:
             try:
                 mw.removeToolBar(self.rail_bar)
