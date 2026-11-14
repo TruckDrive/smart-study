@@ -7,6 +7,19 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.0",
+        "date": "November 14, 2026",
+        "items": [
+            {"tag": "Highlight", "text": "Smart Study has its own look: a calm neutral dark and light theme with round buttons, in Anki's own font. Every function is still there."},
+            {"tag": "New", "text": "Side panel on the right: a slim rail with the logo (opens the settings), the tabs Today, Assistant, Browser, Notebook, Mind map and Trophies, and Pomodoro and music below. It replaces the launcher bar on the left and the widgets above the deck list."},
+            {"tag": "New", "text": "Today: countdown to your next exam, today's study plan items to tick off, the daily challenge and three charts (due, reviews, memory), each with its own period. Hover over the reviews chart to see a day and its number."},
+            {"tag": "New", "text": "Settings: tabs on top, a search over all tabs, and Home with one switch and one period per chart."},
+            {"tag": "Improved", "text": "Assistant, browser, notebook, mind map, trophies, music, timer and the study plan share one palette and round controls."},
+            {"tag": "Improved", "text": "While you review, the Today page stays away; the tools remain one click away."},
+            {"tag": "New", "text": "Prefer the old arrangement? Settings → Home → Layout → Classic brings it back after a restart."},
+        ],
+    },
+    {
         "version": "2.9.8",
         "date": "November 12, 2026",
         "items": [

@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.0.0 – 2026-11-14
+
+Smart Study gets its own look. Every function is still there; where it sits has changed.
+
+- **Side panel on the right**: the launcher bar on the left and the widgets above the deck list are gone. At the right edge of the window stands a slim rail: the logo (opens the settings), the tabs *Today, Assistant, Browser, Notebook, Mind map, Trophies*, and below them Pomodoro, music and a button that folds the column away. The button in Anki's top bar hides the whole panel
+- **Today**: the first tab shows the countdown to your next exam, level and streak, today's items of your study plan to tick off (cards and reviews have a *Study* button), the daily challenge and three charts – *Due* for the next days, *Reviews* per day (hover for the day and its number) and *Memory* (share remembered, share still unseen). Each chart has its own period. The sliders button chooses which parts are shown, the i explains the numbers. The challenge leaves the page once it is claimed and returns the next day
+- **Only on the home screen**: while you review, the Today page stays away; the tools remain one click away on the rail
+- **Tools as before**: they open as a sidebar and keep their layouts (sidebar, split view, main window, own window) – also by right-clicking a tab
+- **Standard theme**: a calm neutral dark and a light look with round buttons, in Anki's own font. New accent colour *Petrol*. The older themes and accent colours stay available; who chose one keeps it
+- **One palette everywhere**: assistant, browser bars, notebook, to-do, PDF viewer, mind map, trophies, music, timer, statistics, onboarding, deck overview and the study plan use the same colours and round controls
+- **Settings**: tabs on top instead of the column on the left, a search over all tabs, and *Home* (formerly *Dashboard*) with *Today panel* and *Overview* – one switch and one period per chart. *News* shows the newest changes as text instead of a banner
+- **Classic layout**: *Settings → Home → Layout → Classic* brings back the launcher bar and the widgets above the deck list (after restarting Anki)
+- **Assistant**: the note about signing in with your own account shows on the API chat only
+- **Fixes**: buttons of the panel no longer take the keyboard focus (Space stays with the card); the period of a chart can be changed inside the panel (the old drop-down did not open in a sidebar)
+
 ## 2.9.8 – 2026-11-12
 
 - **Fix – "Toggle IO Masks" with Image Occlusion Enhanced**: 2.9.7 made the controller action press the *Toggle Masks* button of Anki's own image occlusion cards, but cards of the Image Occlusion Enhanced add-on have a different button (`io-revl-btn`, calling `toggle()`), so the action did nothing there. It now handles both kinds

@@ -130,7 +130,7 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 4. **Sources**: add your book (pace in minutes per page, optional PDF), your lectures (one per line: `Name | 25 | https://…`), lists and Anki decks (search, or pick from the suggestions matching your plan name).
 5. **Topics**: paste the table of contents (`Peritoneum ...... 78`) or create topics from subdecks, then **Suggest links automatically** and check the ★ suggestions.
 6. **Create plan**. From then on, study in Anki as usual; the plan keeps up.
-7. The workspace tools are on the launcher bar on the left; settings are under **Tools → Smart Study → Settings…**.
+7. The workspace tools are on the rail at the right edge of the window; settings are under **Tools → Smart Study → Settings…**.
 
 Plans are stored as JSON under `plan/user_files/plans/` in the add-on folder and also in your Anki collection, so **AnkiWeb sync brings them to your other devices**. If you change a plan on two devices without syncing in between, the newer copy wins.
 
