@@ -18,7 +18,7 @@ from aqt import gui_hooks, mw
 from aqt.operations import QueryOp
 from aqt.qt import (
     QByteArray, QColor, QDockWidget, QEvent, QFrame, QHBoxLayout, QIcon, QLabel, QMenu,
-    QObject, QPainter, QPixmap, QPushButton, QSize, QSizePolicy, Qt, QTimer, QToolButton,
+    QObject, QPainter, QPixmap, QPushButton, QSize, QSizePolicy, Qt, QTimer, QToolBar, QToolButton,
     QVBoxLayout, QWidget,
 )
 from aqt.webview import AnkiWebView
@@ -38,6 +38,8 @@ except ImportError:  # pragma: no cover
     QSvgRenderer = None  # type: ignore
 
 TITLE_WRAP = "SmartStudyPanelTitle"
+RAIL_BAR = "SmartStudyRail"
+RAIL_WIDTH = 84
 SEPARATOR_MARK = "/* smart study panel */"
 TODAY_DOCK = "SmartStudyPanelToday"
 PANEL_WIDTH = 372
@@ -62,7 +64,7 @@ SHOW_KEYS = {
 DEFAULTS = {
     "home_layout": "panel", "panel_open": True, "panel_show_plan": True,
     "panel_show_challenge": True, "panel_show_fact": False, "panel_show_due": True, "panel_due_days": 7,
-    "panel_plan_items": 4,
+    "panel_plan_items": 4, "panel_tabs_side": "right", "panel_rail_open": True,
 }
 
 ICONS = {
@@ -126,32 +128,37 @@ def _tools(toggle_trophies: Callable) -> List[_Tool]:
 
 
 class Header(QWidget):
-    """Pomodoro, music, settings and the tabs."""
+    """Pomodoro, music, settings and the tabs: as a bar on top of the column,
+    or upright as a rail at the edge of the window."""
 
-    def __init__(self, panel: "Panel"):
+    def __init__(self, panel: "Panel", vertical: bool = False):
         super().__init__()
         self.panel = panel
+        self.vertical = vertical
         self.setObjectName("ssHeader")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.tab_buttons: Dict[str, QToolButton] = {}
         self.time_button: Optional[QPushButton] = None
         self.play_button: Optional[QToolButton] = None
         self.music_button: Optional[QToolButton] = None
+        settings = panel.settings
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(4, 12, 12, 8)
-        outer.setSpacing(12)
+        Line = QVBoxLayout if vertical else QHBoxLayout
 
-        top = QHBoxLayout()
-        top.setSpacing(8)
-        self.gear = self._round("gear", _("Smart Study settings"), panel.ctx["show_settings"])
-        top.addWidget(self.gear)
-        top.addStretch(1)
+        self.tabs = QFrame()
+        self.tabs.setObjectName("ssTabs")
+        tab_row = Line(self.tabs)
+        tab_row.setContentsMargins(4, 4, 4, 4)
+        tab_row.setSpacing(2)
+        self._tab("today", _("Today"), tab_row)
+        for tool in panel.tools:
+            if settings.get(tool.setting, True):
+                self._tab(tool.key, tool.label, tab_row)
+
         self.pill = QFrame()
         self.pill.setObjectName("ssPill")
-        row = QHBoxLayout(self.pill)
-        row.setContentsMargins(6, 2, 4, 2)
+        row = Line(self.pill)
         row.setSpacing(0)
-        settings = panel.settings
         if settings.get("pomodoro_enabled", True):
             self.time_button = QPushButton("25:00")
             self.time_button.setObjectName("ssTime")
@@ -160,25 +167,37 @@ class Header(QWidget):
             self.time_button.clicked.connect(self._pomodoro_menu)
             row.addWidget(self.time_button)
             self.play_button = self._round("play", _("Start/Pause Timer"), self._start_pause, flat=True)
-            row.addWidget(self.play_button)
+            row.addWidget(self.play_button, 0, Qt.AlignmentFlag.AlignHCenter)
         if settings.get("music_player_enabled", True):
             self.music_button = self._round("music", _("Play Music"), self._music, flat=True)
-            row.addWidget(self.music_button)
-        self.hide_button = self._round("hide", _("Hide side panel"), panel.toggle, flat=True)
-        row.addWidget(self.hide_button)
-        top.addWidget(self.pill)
-        outer.addLayout(top)
+            row.addWidget(self.music_button, 0, Qt.AlignmentFlag.AlignHCenter)
 
-        self.tabs = QFrame()
-        self.tabs.setObjectName("ssTabs")
-        tab_row = QHBoxLayout(self.tabs)
-        tab_row.setContentsMargins(4, 4, 4, 4)
-        tab_row.setSpacing(2)
-        self._tab("today", _("Today"), tab_row)
-        for tool in panel.tools:
-            if settings.get(tool.setting, True):
-                self._tab(tool.key, tool.label, tab_row)
-        outer.addWidget(self.tabs)
+        if vertical:
+            outer.setContentsMargins(6, 10, 6, 10)
+            outer.setSpacing(10)
+            row.setContentsMargins(2, 6, 2, 6)
+            outer.addWidget(self.tabs)
+            outer.addStretch(1)
+            outer.addWidget(self.pill)
+            self.gear = self._round("gear", _("Smart Study settings"), panel.ctx["show_settings"], flat=True)
+            self.hide_button = self._round("hide", _("Show or hide the side panel"), panel.collapse, flat=True)
+            row.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
+            row.addWidget(self.hide_button, 0, Qt.AlignmentFlag.AlignHCenter)
+            self.setFixedWidth(RAIL_WIDTH)
+        else:
+            outer.setContentsMargins(4, 12, 12, 8)
+            outer.setSpacing(12)
+            row.setContentsMargins(6, 2, 4, 2)
+            top = QHBoxLayout()
+            top.setSpacing(8)
+            self.gear = self._round("gear", _("Smart Study settings"), panel.ctx["show_settings"])
+            top.addWidget(self.gear)
+            top.addStretch(1)
+            self.hide_button = self._round("hide", _("Hide side panel"), panel.toggle, flat=True)
+            row.addWidget(self.hide_button)
+            top.addWidget(self.pill)
+            outer.addLayout(top)
+            outer.addWidget(self.tabs)
         self.restyle()
 
     def _round(self, name, tip, slot, flat=False) -> QToolButton:
@@ -202,9 +221,12 @@ class Header(QWidget):
         button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         button.setIconSize(QSize(22, 22))
         button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        button.setFixedHeight(52)
-        button.setMinimumWidth(0)
+        if self.vertical:
+            button.setFixedSize(RAIL_WIDTH - 22, 54)
+        else:
+            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            button.setFixedHeight(52)
+            button.setMinimumWidth(0)
         button.clicked.connect(lambda _checked=False, k=key: self.panel.select(k))
         if key != "today":
             button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -216,10 +238,11 @@ class Header(QWidget):
         c = design.tokens(is_night())
         self.setStyleSheet(f"""
         QWidget#ssHeader {{ background: {c['page']}; }}
-        QFrame#ssPill {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 22px; }}
+        QFrame#ssPill {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: {14 if self.vertical else 22}px; }}
         QFrame#ssTabs {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 14px; }}
-        QPushButton#ssTime {{ background: transparent; border: none; color: {c['ink']}; font-size: 16px;
-            font-weight: 700; padding: 0 8px 0 10px; min-height: 40px; }}
+        QPushButton#ssTime {{ background: transparent; border: none; color: {c['ink']};
+            font-size: {14 if self.vertical else 16}px; font-weight: 700;
+            padding: {'0' if self.vertical else '0 8px 0 10px'}; min-height: {30 if self.vertical else 40}px; }}
         QPushButton#ssTime:hover {{ color: {c['accent']}; }}
         QToolButton#ssFlat {{ background: transparent; border: none; border-radius: 20px; }}
         QToolButton#ssFlat:hover {{ background: {c['raised']}; }}
@@ -256,7 +279,8 @@ class Header(QWidget):
         menu.addAction(_("Skip current phase"), pomodoro.skip_action)
         menu.addSeparator()
         menu.addAction(_("Timer Settings"), pomodoro.open_pomodoro_config)
-        menu.exec(self.time_button.mapToGlobal(self.time_button.rect().bottomLeft()))
+        corner = self.time_button.rect().topLeft() if self.vertical else self.time_button.rect().bottomLeft()
+        menu.exec(self.time_button.mapToGlobal(corner))
 
     def _music(self) -> None:
         from . import background_music
@@ -288,7 +312,11 @@ class Header(QWidget):
         try:
             pomodoro = self._pomodoro()
             seconds = pomodoro.time_remaining or pomodoro.get_current_phase_duration()
-            self.time_button.setText(f"{pomodoro.format_time(seconds)}  {getattr(self, '_phase', '')}")
+            phase = getattr(self, "_phase", "")
+            clock = pomodoro.format_time(seconds)
+            self.time_button.setText(clock if self.vertical else f"{clock}  {phase}")
+            if self.vertical:
+                self.time_button.setToolTip(f"{phase}: " + _("Pomodoro: reset, skip, settings"))
         except Exception:
             pass
 
@@ -326,13 +354,21 @@ class Panel(QObject):
         self._closing = False
 
         self._open = bool(settings.get("panel_open", True))
+        self._force_today = False
         self.headers: List[Header] = []
+        side = settings.get("panel_tabs_side", "right")
+        self.side = side if side in ("right", "left", "top") else "right"
+        self.rail_bar: Optional[QToolBar] = None
 
         self.web = AnkiWebView(mw, title="smart study today")
         self.web.set_bridge_command(self._on_bridge, self)
-        self.header = self._new_header()
         self.today_dock = self._dock(TODAY_DOCK, self.web)
-        self.today_dock.setTitleBarWidget(self.header)
+        if self.side == "top":
+            self.header = self._new_header()
+            self.today_dock.setTitleBarWidget(self.header)
+        else:
+            self.header = self._new_header(vertical=True)
+            self._build_rail()
         self.today_dock.setMinimumWidth(300)
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.today_dock)
         self._style_window()
@@ -350,7 +386,7 @@ class Panel(QObject):
         self._watcher = _DockWatcher(self)
         self._hooks = [
             (gui_hooks.reviewer_did_answer_card, lambda *_a: self.refresh(4000)),
-            (gui_hooks.state_did_change, lambda *_a: (self.sync(), self.refresh(150))),
+            (gui_hooks.state_did_change, lambda *_a: (setattr(self, "_force_today", False), self.sync(), self.refresh(150))),
             (gui_hooks.sync_did_finish, lambda *_a: self.refresh(300)),
             (gui_hooks.operation_did_execute, lambda *_a: self.refresh(1500)),
             (gui_hooks.theme_did_change, self.restyle),
@@ -377,8 +413,26 @@ class Panel(QObject):
         dock.setWidget(widget)
         return dock
 
-    def _new_header(self) -> Header:
-        header = Header(self)
+    def _build_rail(self) -> None:
+        """The tabs as an upright rail at the edge of the window, outside the docks."""
+        old = mw.findChild(QToolBar, RAIL_BAR)
+        if old is not None:
+            mw.removeToolBar(old)
+            old.deleteLater()
+        bar = QToolBar(mw)
+        bar.setObjectName(RAIL_BAR)
+        bar.setMovable(False)
+        bar.setFloatable(False)
+        bar.toggleViewAction().setVisible(False)
+        bar.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
+        bar.addWidget(self.header)
+        area = Qt.ToolBarArea.LeftToolBarArea if self.side == "left" else Qt.ToolBarArea.RightToolBarArea
+        mw.addToolBar(area, bar)
+        bar.setVisible(bool(self.settings.get("panel_rail_open", True)))
+        self.rail_bar = bar
+
+    def _new_header(self, vertical: bool = False) -> Header:
+        header = Header(self, vertical)
         self.headers.append(header)
         return header
 
@@ -403,6 +457,8 @@ class Panel(QObject):
 
     def _wrap(self, dock: QDockWidget) -> None:
         """Put the panel header above the tool's own title bar."""
+        if self.side != "top":
+            return
         current = dock.titleBarWidget()
         if current is not None and current.objectName() == TITLE_WRAP:
             old = current.findChild(Header)
@@ -429,6 +485,7 @@ class Panel(QObject):
         self.today_dock.setStyleSheet(f"QDockWidget {{ background: {c['page']}; border: none; }}")
         # The line between Anki and the panel takes the panel's colour.
         rule = f"{SEPARATOR_MARK}QMainWindow::separator {{ background: {c['page']}; width: 6px; height: 6px; image: none; }}"
+        rule += f" QToolBar#{RAIL_BAR} {{ background: {c['page']}; border: none; padding: 0; spacing: 0; }}"
         mw.setStyleSheet(mw.styleSheet().split(SEPARATOR_MARK)[0] + rule)
         try:
             self.web.page().setBackgroundColor(QColor(c["page"]))
@@ -449,7 +506,7 @@ class Panel(QObject):
         head = f"<style id='ss-tokens'>:root{{{design.css_vars(night)}}}</style>"
         self._loaded = False
         self._last_json = ""
-        self.web.stdHtml('<div id="app"></div>', css=[base + "today.css"], js=[base + "today.js"],
+        self.web.stdHtml(f'<div id="app" class="{"" if self.side == "top" else "rail"}"></div>', css=[base + "today.css"], js=[base + "today.js"],
                          head=head, context=self)
 
     def restyle(self, *_args) -> None:
@@ -501,17 +558,24 @@ class Panel(QObject):
                 return tool.key
         return "today"
 
+    def _resting(self) -> bool:
+        """While reviewing the Today page stays away; it belongs to the home screen."""
+        return getattr(mw, "state", "") == "review" and not self._force_today
+
     def sync(self) -> None:
         if self._closing:
             return
         try:
             key = self.active()
-            resting = (self.settings.get("sidebar_visibility_mode") == "hide_review"
-                       and getattr(mw, "state", "") == "review")
-            self.today_dock.setVisible(self._open and key == "today" and not resting)
+            reviewing = getattr(mw, "state", "") == "review"
+            if self.rail_bar is not None:
+                hidden = reviewing and self.settings.get("sidebar_visibility_mode") == "hide_review"
+                self.rail_bar.setVisible(bool(self.settings.get("panel_rail_open", True)) and not hidden)
+            self.today_dock.setVisible(self._open and key == "today" and not self._resting())
+            shown = key if key != "today" else ("today" if self.today_dock.isVisible() else "")
             for header in self._alive_headers():
                 for name, button in header.tab_buttons.items():
-                    button.setChecked(name == key)
+                    button.setChecked(name == shown)
             for tool in self.tools:  # an own window keeps only the tool's own bar
                 dock = self._wired.get(tool.key)
                 bar = dock.titleBarWidget() if dock is not None else None
@@ -533,8 +597,12 @@ class Panel(QObject):
     def select(self, key: str) -> None:
         self.wire()
         current = self.active()
+        if key == "today" and current == "today" and self.today_dock.isVisible() and self.rail_bar is not None:
+            self._set_open(False)  # a second click on the rail folds the page away
+            return
         if key == "today" or key == current:
             self._open = True  # leaving a tool always lands on Today
+            self._force_today = key == "today"
             self._close_tools()
             QTimer.singleShot(0, self.sync)
             return
@@ -561,22 +629,56 @@ class Panel(QObject):
         if tool.layout_key in dock_layout._targets:
             dock_layout.show_menu_at_cursor(tool.layout_key)
 
-    def is_open(self) -> bool:
+    def content_open(self) -> bool:
         try:
             return self.today_dock.isVisible() or self.active() != "today"
         except RuntimeError:
             return False
 
-    def toggle(self) -> None:
-        open_ = not self.is_open()
+    def is_open(self) -> bool:
+        """What the button in Anki's top bar shows: the rail, or the column without a rail."""
+        try:
+            if self.rail_bar is not None:
+                return self.rail_bar.isVisible()
+        except RuntimeError:
+            return False
+        return self.content_open()
+
+    def _set_open(self, open_: bool) -> None:
         if not open_:
             self._close_tools()
         self._open = open_
+        self._force_today = False
         self.settings["panel_open"] = open_
         self.ctx["save"]()
         QTimer.singleShot(0, self.sync)
         if open_:
             QTimer.singleShot(0, lambda: self._set_width(PANEL_WIDTH))
+
+    def collapse(self) -> None:
+        """The rail's own button: fold the column away, the rail stays."""
+        if self.content_open():
+            self._set_open(False)
+        else:
+            self._force_today = True
+            self._set_open(True)
+            self._force_today = True
+
+    def toggle(self) -> None:
+        """The button in Anki's top bar: everything away, or back."""
+        if self.rail_bar is None:
+            self._set_open(not self.content_open())
+            return
+        show = not self.rail_bar.isVisible()
+        self.settings["panel_rail_open"] = show
+        if not show:
+            self._close_tools()
+            self._open = False
+        else:
+            self._open = True
+        self.settings["panel_open"] = self._open
+        self.ctx["save"]()
+        QTimer.singleShot(0, self.sync)
 
     # -- Today page ------------------------------------------------------------
     def refresh(self, delay: int = 0) -> None:
@@ -741,6 +843,22 @@ class Panel(QObject):
             mw.setStyleSheet(mw.styleSheet().split(SEPARATOR_MARK)[0])
         except RuntimeError:
             pass
+        for dock in list(self._wired.values()):  # give the tools their own title bar back
+            try:
+                bar = dock.titleBarWidget()
+                if bar is not None and bar.objectName() == TITLE_WRAP:
+                    original = bar.layout().itemAt(1).widget() if bar.layout().count() > 1 else QWidget()
+                    dock.setTitleBarWidget(original)
+                    original.show()
+                    bar.deleteLater()
+            except RuntimeError:
+                pass
+        if self.rail_bar is not None:
+            try:
+                mw.removeToolBar(self.rail_bar)
+                self.rail_bar.deleteLater()
+            except RuntimeError:
+                pass
         for dock in (self.today_dock,):
             try:
                 dock.setVisible(False)
@@ -846,13 +964,13 @@ def _stats_part(col, settings) -> Dict[str, Any]:
             values[int(offset)] += count
     values[0] += col.db.scalar("SELECT COUNT(*) FROM cards WHERE queue = 1") or 0
     start = statistics_widget.anki_today()
-    out["due"] = {"days": due_days, "choices": list(DUE_CHOICES), "values": values, "total": sum(values),
+    out["due"] = {"start": start.isoformat(), "days": due_days, "choices": list(DUE_CHOICES), "values": values, "total": sum(values),
                   "last": (start + timedelta(days=due_days - 1)).strftime("%a" if due_days <= 7 else "%d.%m.")}
 
     review_days = _pick(settings.get("stats_consistency_days"), REVIEW_CHOICES, 30)
     counts = statistics_widget.get_daily_review_counts(since_days=review_days + 2)
     series = [counts.get((start - timedelta(days=review_days - 1 - i)).isoformat(), 0) for i in range(review_days)]
-    out["reviews"] = {"days": review_days, "choices": list(REVIEW_CHOICES), "values": series, "total": sum(series)}
+    out["reviews"] = {"end": start.isoformat(), "days": review_days, "choices": list(REVIEW_CHOICES), "values": series, "total": sum(series)}
 
     memory_days = _pick(settings.get("stats_time_range"), MEMORY_CHOICES, 7)
     since = int((datetime.now() - timedelta(days=memory_days)).timestamp()) * 1000

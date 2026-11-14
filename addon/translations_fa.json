@@ -2371,5 +2371,12 @@
  "Next 7 days": "۷ روز آینده",
  "Next 14 days": "۱۴ روز آینده",
  "Next 30 days": "۳۰ روز آینده",
- "Last 90 Days": "۹۰ روز گذشته"
+ "Last 90 Days": "۹۰ روز گذشته",
+ "New in": "تازه‌های",
+ "Where the tabs of the side panel sit: as a slim rail at the right or left edge of the window, or as a bar on top of the panel.": "جای زبانه‌های پنل کناری: به‌صورت نواری باریک در لبهٔ راست یا چپ پنجره، یا به‌صورت نواری بالای پنل.",
+ "Right edge": "لبهٔ راست",
+ "Left edge": "لبهٔ چپ",
+ "On top of the panel": "بالای پنل",
+ "What changed in this version, and things worth knowing.": "آنچه در این نسخه تغییر کرده و نکته‌هایی که دانستنشان خوب است.",
+ "Show or hide the side panel": "نمایش یا پنهان کردن پنل کناری"
 }

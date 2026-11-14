@@ -118,14 +118,24 @@
     return rows;
   }
 
+  function periodText(which, n) {
+    return n === 365 ? data.t.lastYear : n === 1 ? data.t.lastDay : (which === "due" ? data.t.next : data.t.last).replace("{}", n);
+  }
+  // Own menu instead of a <select>: its native popup does not open inside Anki's side docks.
   function period(which, value, choices, label) {
-    var sel = h("select", { class: "chip", "aria-label": label,
-      onchange: function (e) { send("period", { which: which, days: Number(e.currentTarget.value) }); } });
-    choices.forEach(function (n) {
-      var text = n === 365 ? data.t.lastYear : n === 1 ? data.t.lastDay : (which === "due" ? data.t.next : data.t.last).replace("{}", n);
-      sel.append(h("option", { value: n, selected: n === value }, text));
-    });
-    return sel;
+    var open = menu === "period:" + which;
+    var wrap = h("span", { class: "pw" });
+    wrap.append(h("button", { type: "button", class: "chip", "aria-label": label, "aria-haspopup": "listbox", "aria-expanded": open ? "true" : "false",
+      onclick: function (e) { e.stopPropagation(); menu = open ? null : "period:" + which; draw(); } }, periodText(which, value) + " ▾"));
+    if (open) {
+      var list = h("div", { class: "pm", role: "listbox", onclick: function (e) { e.stopPropagation(); } });
+      choices.forEach(function (n) {
+        list.append(h("button", { type: "button", role: "option", "aria-selected": n === value ? "true" : "false", class: "pmi" + (n === value ? " on" : ""),
+          onclick: function () { menu = null; data[which].days = n; draw(); send("period", { which: which, days: n }); } }, periodText(which, n)));
+      });
+      wrap.append(list);
+    }
+    return wrap;
   }
 
   function due(t) {
@@ -134,7 +144,9 @@
     var max = Math.max.apply(null, d.values.concat([1]));
     var bars = h("div", { class: "bars" + (d.values.length <= 14 ? " wide" : ""), "aria-hidden": "true" });
     d.values.forEach(function (v, i) {
-      bars.append(h("span", { class: "bar" + (i === 0 ? " now" : ""), title: num(v) + " " + t.cards,
+      var day = new Date(d.start + "T12:00:00"); day.setDate(day.getDate() + i);
+      bars.append(h("span", { class: "bar" + (i === 0 ? " now" : ""),
+        title: (i === 0 ? t.todayLower : day.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })) + " · " + num(v) + " " + t.cards,
         style: "height:" + Math.max(2, Math.round(44 * v / max)) + "px" }));
     });
     return h("div", { class: "vs" },
@@ -142,20 +154,42 @@
       bars, h("div", { class: "axis" }, h("span", null, t.todayLower), h("span", null, d.last)));
   }
 
+  function dayLabel(offsetFromEnd) {
+    var d = new Date(data.reviews.end + "T12:00:00");
+    d.setDate(d.getDate() - offsetFromEnd);
+    return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: data.reviews.days > 200 ? "numeric" : undefined });
+  }
   function reviews(t) {
     var r = data.reviews;
     if (!data.show.reviews || !r) return null;
     var w = 240, hgt = 48, n = r.values.length, max = Math.max.apply(null, r.values.concat([1]));
-    var pts = r.values.map(function (v, i) {
-      return (n > 1 ? (w * i / (n - 1)) : w / 2).toFixed(1) + "," + (hgt - 2 - (hgt - 6) * v / max).toFixed(1);
-    });
+    function px(i) { return n > 1 ? (w * i / (n - 1)) : w / 2; }
+    function py(v) { return hgt - 2 - (hgt - 6) * v / max; }
+    var pts = r.values.map(function (v, i) { return px(i).toFixed(1) + "," + py(v).toFixed(1); });
     var chart = h("svg", { class: "spark", role: "img", "aria-label": t.reviews + ": " + num(r.total), viewBox: "0 0 " + w + " " + hgt, preserveAspectRatio: "none" });
     chart.append(h("polygon", { points: "0," + hgt + " " + pts.join(" ") + " " + w + "," + hgt, style: "fill:var(--ss-accent);opacity:.16" }));
     chart.append(h("polyline", { points: pts.join(" "), fill: "none", "stroke-width": 2, "vector-effect": "non-scaling-stroke",
       "stroke-linejoin": "round", style: "stroke:var(--ss-accent)" }));
+    // Hover: the day under the pointer with its number of reviews.
+    var dot = h("span", { class: "sdot" }), rule = h("span", { class: "srule" }), tip = h("div", { class: "stip" });
+    var box = h("div", { class: "sbox" }, chart, rule, dot, tip);
+    function show(e) {
+      var rect = box.getBoundingClientRect();
+      var i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - rect.left) / rect.width * (n - 1))));
+      var x = rect.width * (n > 1 ? i / (n - 1) : .5), y = rect.height * py(r.values[i]) / hgt;
+      dot.style.cssText = "display:block;left:" + x + "px;top:" + y + "px";
+      rule.style.cssText = "display:block;left:" + x + "px";
+      tip.textContent = dayLabel(n - 1 - i) + " · " + num(r.values[i]) + " " + t.cards;
+      tip.style.display = "block";
+      var half = tip.offsetWidth / 2;
+      tip.style.left = Math.max(half, Math.min(rect.width - half, x)) + "px";
+    }
+    function hide() { dot.style.display = rule.style.display = tip.style.display = "none"; }
+    box.addEventListener("mousemove", show);
+    box.addEventListener("mouseleave", hide);
     return h("div", { class: "vs" },
       h("div", { class: "sh" }, h("b", null, t.reviews), period("reviews", r.days, r.choices, t.reviews), h("span", { class: "tot" }, num(r.total))),
-      r.total ? chart : h("div", { class: "m", style: "margin-top:8px" }, t.noData));
+      r.total ? box : h("div", { class: "m", style: "margin-top:8px" }, t.noData));
   }
 
   function ring(value, label, color) {
@@ -185,7 +219,7 @@
         onclick: function (e) { e.stopPropagation(); menu = menu === "info" ? null : "info"; draw(); } }, svg("M12 11v6M12 7v.5", 16, 2.2)));
   }
   function popup(t) {
-    if (!menu) return null;
+    if (menu !== "show" && menu !== "info") return null;
     var box = h("div", { class: "pop", onclick: function (e) { e.stopPropagation(); } });
     if (menu === "info") {
       [t.infoDue, t.infoReviews, t.infoMemory].forEach(function (text) {
@@ -242,6 +276,8 @@
     app.replaceChildren.apply(app, parts);
     document.scrollingElement.scrollTop = keep;
     if (pop) pop.scrollIntoView({ block: "nearest" });
+    var pm = document.querySelector(".pm");
+    if (pm) pm.scrollIntoView({ block: "nearest" });
   }
 
   document.addEventListener("click", function () { if (menu) { menu = null; draw(); } });

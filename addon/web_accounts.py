@@ -283,7 +283,7 @@ class AccountSitesPanel(QWidget):
         self.current = key
         if isinstance(target, QWidget):
             self.stack.setCurrentWidget(target)
-            self.hint.setVisible(False)
+            self.hint.setVisible(bool(self.hint.text()))  # the note belongs to the API chat only
             self.external.setVisible(False)
         else:
             view = self._ensure_view()
@@ -291,7 +291,7 @@ class AccountSitesPanel(QWidget):
                 view.setProperty("site", key)
                 view.setUrl(QUrl(target))
             self.stack.setCurrentWidget(view)
-            self.hint.setVisible(bool(self.hint.text()))
+            self.hint.setVisible(False)
             self.external.setVisible(True)
         if self.remember:
             self.remember(key)

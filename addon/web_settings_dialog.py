@@ -785,6 +785,7 @@ if _QT_AVAILABLE:
                 default = k not in ("minimal_dashboard_enabled", "gamification_popup_level")
                 conf[k] = bool(cfg.get(k, default))
             conf["panel_show_fact"] = bool(cfg.get("panel_show_fact", False))
+            conf["panel_tabs_side"] = cfg.get("panel_tabs_side") if cfg.get("panel_tabs_side") in ("left", "top") else "right"
             conf["home_layout"] = "classic" if cfg.get("home_layout") == "classic" else "panel"
             for key, fallback in (("panel_plan_items", 4), ("panel_due_days", 7), ("stats_consistency_days", 30)):
                 try:

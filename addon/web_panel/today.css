@@ -6,6 +6,7 @@ button, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 #app button { box-shadow: none !important; margin: 0; min-width: 0; text-shadow: none; }
 .cd, .lv, .cb, .link { border-radius: 0; }
+#app.rail { padding: 12px 6px 12px 4px; }
 #app { box-sizing: border-box; min-height: 100%; padding: 0 12px 12px 4px; display: flex; flex-direction: column; gap: 12px; }
 .card { background: var(--ss-card); border: 1px solid var(--ss-line); border-radius: 14px; position: relative; }
 .m { color: var(--ss-muted); font-size: 13px; }
@@ -68,10 +69,22 @@ button { cursor: pointer; }
 .vs:first-child { border-top: 0; }
 .sh { display: flex; align-items: center; gap: 8px; min-height: 30px; }
 .sh b { font-weight: 600; }
-.chip { -webkit-appearance: none; appearance: none; min-height: 28px; padding: 0 10px; background: var(--ss-raised); border: 0;
-  border-radius: 14px; font-size: 12.5px; color: var(--ss-muted); cursor: pointer; max-width: 150px; }
-.chip:hover { color: var(--ss-ink); }
-.chip option { background: var(--ss-card); color: var(--ss-ink); }
+.chip { min-height: 28px; padding: 0 10px; background: var(--ss-raised); border: 0; border-radius: 14px; font-size: 12.5px;
+  color: var(--ss-muted); cursor: pointer; white-space: nowrap; }
+.chip:hover, .chip[aria-expanded="true"] { color: var(--ss-ink); }
+.pw { position: relative; display: inline-flex; }
+.pm { position: absolute; top: 32px; inset-inline-start: 0; z-index: 6; min-width: 150px; padding: 5px; background: var(--ss-card);
+  border: 1px solid var(--ss-line); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; }
+.pmi { min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: none; text-align: start; font-size: 13.5px; white-space: nowrap; }
+.pmi:hover { background: var(--ss-raised); }
+.pmi.on { color: var(--ss-accent); font-weight: 600; }
+.sbox { position: relative; margin-top: 8px; cursor: crosshair; }
+.sbox .spark { margin-top: 0; }
+.sdot, .srule, .stip { display: none; position: absolute; pointer-events: none; }
+.sdot { width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ss-accent); box-shadow: 0 0 0 2px var(--ss-card); }
+.srule { top: 0; bottom: 0; width: 1px; background: var(--ss-line); }
+.stip { bottom: calc(100% + 4px); transform: translateX(-50%); padding: 3px 9px; border-radius: 10px; background: var(--ss-raised); color: var(--ss-ink);
+  font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; z-index: 4; }
 .tot { margin-inline-start: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
 .ib { flex: none; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 15px; background: var(--ss-raised);
   color: var(--ss-muted); display: flex; align-items: center; justify-content: center; }

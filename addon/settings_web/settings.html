@@ -399,6 +399,16 @@
   .btn{border-radius:19px;min-height:38px;padding:0 18px;font-size:14px;}
   .code-input,.shortcut-btn,.bchip,.btextarea{border-radius:12px;}
   .footer{padding:12px max(24px,calc((100% - 820px)/2));}
+  .banner-wrap[hidden]{display:none;}
+  .comm-card,.comm-github,html.dark .comm-github,body.dark .comm-github{background:var(--group-bg)!important;border:1px solid var(--group-border)!important;border-radius:14px!important;padding:12px 18px!important;}
+  .comm-github .comm-btn{background:var(--field-bg)!important;color:var(--text)!important;}
+  .news-item{font-size:14px!important;color:var(--text)!important;margin:0!important;}
+  .news-item b{color:var(--accent-ink);font-weight:600;margin-inline-end:4px;}
+  .news-date{font-size:13px;font-weight:400;color:var(--muted);margin-inline-start:6px;}
+  .news-note{padding:6px 18px 10px;}
+  .news-note p{margin:8px 0;font-size:13.5px;line-height:1.5;color:var(--muted);}
+  .news-note .conflict-addon{color:var(--text)!important;font-weight:600;}
+  .cl-tag{background:var(--field-bg)!important;color:var(--accent-ink)!important;border-radius:10px!important;}
   body.searching .page{display:block;animation:none;padding-bottom:0;}
   body.searching .page.no-hit, body.searching .search-hide{display:none !important;}
   .search-empty{display:none;max-width:820px;margin:0 auto;padding:28px 24px;color:var(--muted);}
@@ -474,10 +484,11 @@
         <!-- NEWS -->
         <section class="page" data-page="news">
           <h1 class="page-title">News</h1>
-          <p class="page-sub">Announcements, tips and updates from Smart Study.</p>
-          <a class="banner-wrap" id="bannerWrap"><img id="homeBanner" class="banner" alt=""></a>
-          <div class="conflict-card">
-            <div class="conflict-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.7 2.4 17.4A2 2 0 0 0 4.1 20h15.8a2 2 0 0 0 1.7-2.6L13.7 3.7a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><b>Known Add-on Conflict</b></div>
+          <p class="page-sub">What changed in this version, and things worth knowing.</p>
+          <a class="banner-wrap" id="bannerWrap" hidden><img id="homeBanner" class="banner" alt=""></a>
+          <div id="newsLatest"></div>
+          <div class="group-label">Known Add-on Conflict</div>
+          <div class="group news-note">
             <p>The following add-on is known to potentially cause UI-related issues when used together with Smart Study:</p>
             <p class="conflict-addon">Progress Bar for Anki - Visualize the Reviewed Cards (Fixed by Shigeඞ)</p>
             <p>This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/smart-study/issues.</p>
@@ -658,6 +669,12 @@
               <div class="rl"><div class="rt">Layout</div><div class="rd">Side panel on the right, or the classic widgets above the deck list. Applies after restarting Anki.</div></div>
               <div class="rc"><select class="field" id="home_layout">
                 <option value="panel">Side panel</option><option value="classic">Classic</option>
+              </select></div>
+            </div>
+            <div class="row" id="tabsSideRow">
+              <div class="rl"><div class="rt">Tabs</div><div class="rd">Where the tabs of the side panel sit: as a slim rail at the right or left edge of the window, or as a bar on top of the panel.</div></div>
+              <div class="rc"><select class="field" id="panel_tabs_side">
+                <option value="right">Right edge</option><option value="left">Left edge</option><option value="top">On top of the panel</option>
               </select></div>
             </div>
           </div>
@@ -1024,6 +1041,7 @@
     var panel=document.getElementById('home_layout').value!=='classic';
     document.getElementById('panelHome').style.display=panel?'':'none';
     document.getElementById('classicHome').style.display=panel?'none':'';
+    document.getElementById('tabsSideRow').style.display=panel?'':'none';
     ['todayGroup','overviewGroup','minimalGroup','dashGroup'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
     if(panel){
       renderToggles('todayGroup', TODAY, _homeCfg);
@@ -1191,6 +1209,18 @@
       return '<div class="group cl-entry"><div class="cl-head"><span class="cl-ver">'+esc(e.version||'')+'</span>'+
         (e.date?'<span class="cl-date">'+esc(e.date)+'</span>':'')+'</div><ul class="cl-items">'+items+'</ul></div>';
     }).join('');
+  }
+
+  /* News: the newest changelog entry as plain text; no banner. */
+  function renderLatest(list){
+    var el = document.getElementById('newsLatest');
+    var e = list && list[0];
+    if(!e){ el.innerHTML=''; return; }
+    var items = (e.items||[]).map(function(i){
+      var item = (i && typeof i === 'object') ? i : {text:i};
+      return '<div class="row"><div class="rl"><div class="rd news-item">'+(item.tag?'<b>'+esc(item.tag)+'</b> ':'')+esc(item.text||'')+'</div></div></div>';
+    }).join('');
+    el.innerHTML = '<div class="group-label">'+esc(tr('New in')+' '+(e.version||''))+(e.date?' <span class="news-date">'+esc(e.date)+'</span>':'')+'</div><div class="group">'+items+'</div>';
   }
 
   function renderSupport(list, note){
@@ -1463,6 +1493,7 @@
 
       // toggles
       setSelect('home_layout', cfg.home_layout === 'classic' ? 'classic' : 'panel');
+      setSelect('panel_tabs_side', cfg.panel_tabs_side || 'right');
       setSelect('panel_plan_items', cfg.panel_plan_items || 4);
       setSelect('panel_due_days', cfg.panel_due_days || 7);
       setSelect('stats_consistency_days', cfg.stats_consistency_days || 30);
@@ -1511,7 +1542,7 @@
       }
       // The banner lives on the News tab; loading it here means it is
       // already in place (no flash) by the time the tab is opened.
-      loadBanner(data.banner || {});
+      renderLatest(data.changelog);
       if(data.initialPage)gotoPage(data.initialPage);
       if(data.initialPage==='dashboard' && data.initialSection==='celebrations'){
         requestAnimationFrame(()=>{
@@ -1606,6 +1637,7 @@
     });
     document.querySelectorAll('input[type=checkbox][data-key]').forEach(function(cb){ out[cb.dataset.key]=cb.checked; });
     out.home_layout = val('home_layout')==='classic' ? 'classic' : 'panel';
+    out.panel_tabs_side = ['left','top'].indexOf(val('panel_tabs_side'))>=0 ? val('panel_tabs_side') : 'right';
     out.panel_plan_items = Number(val('panel_plan_items')) || 4;
     out.panel_due_days = Number(val('panel_due_days')) || 7;
     out.stats_consistency_days = Number(val('stats_consistency_days')) || 30;
