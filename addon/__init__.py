@@ -104,6 +104,7 @@ launcher_dock_widget: Optional[QDockWidget] = None
 # feature cannot be imported, SmartStudy should still fail gracefully instead
 # of raising a second NameError while initialising its globals.
 sidebar_widget_instance: Optional[Any] = None
+panel_instance: Optional[Any] = None
 gamification_manager: Optional[Any] = None
 gamification_sidebar: Optional[Any] = None
 learning_plan_manager: Optional[Any] = None
@@ -118,14 +119,28 @@ _TOP_TOOLBAR_SIDEBAR_ID = "smartstudy-sidebar-toggle"
 _TOP_TOOLBAR_SIDEBAR_ICON_ID = "smartstudy-sidebar-toggle-icon"
 
 # --- Settings Handling ---
+def _panel_defaults() -> Dict[str, Any]:
+    try:
+        from .panel import DEFAULTS
+        return dict(DEFAULTS)
+    except Exception:
+        return {}
+
+
+def _panel_layout() -> bool:
+    """The new home: deck list on the left, Smart Study panel on the right."""
+    return addon_settings.get("home_layout", "panel") == "panel"
+
+
 def get_default_settings() -> Dict[str, Any]:
     from .deck_overview_options import DEFAULTS as deck_defaults
     return {
         "onboarding_completed": False,
         "theme_enabled": True,
         "theme_restart_warning_suppressed": False,
-        "active_theme": "medical_theme.css",
+        "active_theme": "standard.css",
         "fact_theme": "Medical", 
+        **_panel_defaults(),
         "sidebar_visibility_mode": "always_show",
         "launcher_sidebar_open": True,
         "minimal_dashboard_enabled": False,
@@ -271,6 +286,8 @@ def _sync_toolbar_review_class(new_state: str):
 def _launcher_sidebar_is_visible() -> bool:
     """Return the live dock visibility without retaining a deleted Qt object."""
     try:
+        if panel_instance is not None:
+            return panel_instance.is_open()
         return bool(launcher_dock_widget and launcher_dock_widget.isVisible())
     except RuntimeError:
         return False
@@ -318,7 +335,10 @@ def _sync_launcher_toolbar_button(*_args) -> None:
 
 
 def toggle_launcher_sidebar() -> None:
-    """Show or hide SmartStudy's narrow launcher dock."""
+    """Show or hide SmartStudy's side panel (or the older launcher dock)."""
+    if panel_instance is not None:
+        panel_instance.toggle()
+        return
     if not launcher_dock_widget:
         return
     try:
@@ -339,7 +359,8 @@ def _add_launcher_toggle_to_top_toolbar(links, toolbar) -> None:
         if any(_TOP_TOOLBAR_SIDEBAR_ID in str(link) for link in links):
             return
 
-        tooltip_text = _("Show or hide the launcher sidebar.")
+        tooltip_text = (_("Show or hide the Smart Study panel.") if _panel_layout()
+                        else _("Show or hide the launcher sidebar."))
         link = toolbar.create_link(
             _TOP_TOOLBAR_SIDEBAR_CMD,
             "Sidebar",
@@ -644,6 +665,12 @@ def _apply_saved_settings(new_settings, message=None):
         print(f"SmartStudy: workspace refresh failed: {error}")
 
     # Refresh the launcher sidebar (always-visible icon bar on the side).
+    try:
+        from . import design
+        design.set_theme(addon_settings.get("active_theme", design.STANDARD_THEME)
+                         if addon_settings.get("theme_enabled", True) else design.STANDARD_THEME)
+    except Exception:
+        pass
     if sidebar_widget_instance:
         try:
             sidebar_widget_instance.apply_stylesheet()
@@ -752,6 +779,9 @@ def _get_theme_bg_hex(night: bool) -> str:
         css_file = addon_settings.get("active_theme", "medical_theme.css")
         if "/" in css_file or "\\" in css_file:
             return fallback
+        if css_file == "standard.css":
+            from . import design
+            return (design.DARK if night else design.LIGHT)["page"]
         path = os.path.join(addon_path, "theme", "user_files", css_file)
         if not os.path.exists(path):
             return fallback
@@ -1081,10 +1111,57 @@ def _init_data_managers() -> None:
             print(f"SmartStudy: daily gamification maintenance failed: {e}")
 
 
+def _open_deadlines() -> None:
+    dm = getattr(mw, "deadline_manager", None)
+    if dm:
+        DeadlineViewerDialog(dm, parent=mw).exec()
+        if panel_instance is not None:
+            panel_instance.refresh()
+
+
+def _init_panel() -> None:
+    """The side panel replaces the launcher dock and the widgets above the deck list."""
+    global panel_instance, sidebar_widget_instance
+    try:
+        from . import design, panel
+        design.set_theme(addon_settings.get("active_theme", design.STANDARD_THEME)
+                         if addon_settings.get("theme_enabled", True) else design.STANDARD_THEME)
+        study_plan_trigger.set_gamification_sidebar_trigger_function(toggle_gamification_sidebar)
+        study_plan_trigger.set_study_plan_trigger_function(show_configuration_dialog)
+        old = mw.findChild(QDockWidget, "SmartStudyLauncherSidebarDock_v2")
+        if old:
+            old.setVisible(False)
+            old.deleteLater()
+        panel_instance = panel.Panel(addon_settings, {
+            "save": save_addon_settings,
+            "show_settings": lambda: QTimer.singleShot(0, show_settings_dialog),
+            "toggle_trophies": toggle_gamification_sidebar,
+            "open_plan": show_configuration_dialog,
+            "open_deadlines": lambda: QTimer.singleShot(0, _open_deadlines),
+            "stats_changed": statistics_widget.invalidate_statistics_cache,
+            "panel_changed": _sync_launcher_toolbar_button,
+        })
+        sidebar_widget_instance = panel_instance  # the tools report to it when they open
+        if addon_settings.get("pomodoro_enabled", True):
+            init_pomodoro(mw, panel_instance.update_timer_ui,
+                          panel_instance.update_timer_label_only)
+        on_state_change(mw.state, "")
+        try:
+            sidebar_shortcuts.refresh(addon_settings)
+        except Exception as e:
+            print(f"SmartStudy: shortcut setup failed: {e}")
+    except Exception as e:
+        print(f"SmartStudy: side panel initialization failed: {e}")
+        traceback.print_exc()
+
+
 def _init_launcher_dock() -> None:
     """Install the lightweight 55px launcher before the first dashboard paint."""
     global launcher_dock_widget, sidebar_widget_instance
-    if not mw or launcher_dock_widget:
+    if not mw or launcher_dock_widget or panel_instance:
+        return
+    if _panel_layout():
+        _init_panel()
         return
 
     try:
@@ -1317,6 +1394,13 @@ def on_profile_close():
     # Docks are children of Anki's persistent main window, not of a profile.
     # Remove them explicitly so profile switches cannot retain old web pages,
     # signals or data-bound widgets until the next profile finishes loading.
+    global panel_instance
+    if panel_instance is not None:
+        try:
+            panel_instance.cleanup()
+        except Exception as e:
+            print(f"SmartStudy: side panel cleanup failed: {e}")
+        panel_instance = None
     for dock in (gamification_sidebar, launcher_dock_widget):
         if dock:
             try:
@@ -1357,6 +1441,22 @@ def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrow
                                 fact_theme=demo["fact_theme"])
         demo_stats = dashboard_demo.statistics(demo, int(display_settings.get("stats_time_range", 7)),
                                                int(display_settings.get("stats_consistency_days", 30)))
+    if _panel_layout() and not demo:
+        # Everything that used to sit above the deck list now lives in the side
+        # panel; only the celebration still appears over the deck list.
+        _dashboard_rendered_with_models = True
+        try:
+            gm = getattr(mw, 'gamification_manager', None)
+            events = gm.get_celebration_events() if gm else None
+            if events and display_settings.get("gamification_popups_enabled", True):
+                from . import celebration_live
+                content.stats = celebration_live.render_celebration_modal(
+                    celebration_live.select_events(events, addon_settings)) + getattr(content, 'stats', '')
+        except Exception as e:
+            print(f"SmartStudy: celebration popup error: {e}")
+        if panel_instance is not None:
+            panel_instance.refresh(200)
+        return
     minimal_enabled = bool(display_settings.get("minimal_dashboard_enabled", False))
     # A sidebar (e.g. the browser in split view) leaves the main area narrow:
     # use the compact dashboard and keep the deck list in view.
@@ -1788,7 +1888,7 @@ if modules_loaded and mw and gui_hooks:
         gui_hooks.top_toolbar_did_init_links.append(
             _add_launcher_toggle_to_top_toolbar
         )
-    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|integrations/[^/]+/web/.+)$") # theme css, notebook, media and study plan files
+    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css)|integrations/[^/]+/web/.+)$") # theme css, notebook, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
     try:
         from . import smooth_ui

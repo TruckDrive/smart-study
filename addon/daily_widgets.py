@@ -627,6 +627,23 @@ def generate_learning_plan_widget(plan_data: List[Dict]) -> str:
     widget_html = f'''<div class="daily-widget plan-widget{plan_state_class}" style="{widget_style}">{header_html}{rows_html}</div>'''
     return widget_html
 
+def todays_fact(fact_theme: str = "Medical") -> str:
+    """Only the text of today's fact (the side panel shows it without a picture)."""
+    if fact_theme == "Random":
+        facts = MEDICAL_FACTS + LAW_FACTS + GENERAL_FACTS + COUNTRY_FACTS
+    else:
+        facts = {"Law": LAW_FACTS, "General": GENERAL_FACTS, "Countries": COUNTRY_FACTS}.get(fact_theme, MEDICAL_FACTS)
+    if not facts:
+        return ""
+    if fact_theme == "Random":
+        seed = str(date.today().toordinal() + _debug_day_offset).encode("ascii")
+        index = int(hashlib.sha256(seed).hexdigest(), 16) % len(facts)
+    else:
+        index = (date.today().timetuple().tm_yday + _debug_day_offset - 1) % len(facts)
+    text = facts[index].get("text", "")
+    return _(text) if text else ""
+
+
 def generate_fact_widget(fact_theme: str = "Medical", display_index=None) -> str:
     """Generiert das HTML für das Fakten-Widget basierend auf dem gewählten Thema."""
     global _debug_day_offset
