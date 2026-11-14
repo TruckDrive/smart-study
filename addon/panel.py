@@ -127,6 +127,72 @@ def _tools(toggle_trophies: Callable) -> List[_Tool]:
     ]
 
 
+def logo_icon(size: int) -> QIcon:
+    """The Smart Study logo in the colour of the chosen accent."""
+    result = QIcon()
+    if QSvgRenderer is None:
+        return result
+    try:
+        import os
+        from . import theme
+        names = {"orchid": "logo_orchid.svg", "forest": "logo_forest.svg", "deluge": "logo_deluge.svg",
+                 "horizon": "logo_horizon.svg", "dusty": "logo_dusty.svg", "orange": "logo_orange.svg"}
+        folder = getattr(constants, "icons_folder", "")
+        name = theme.get_active_theme()
+        path = os.path.join(folder, names.get(name, "logo.svg"))
+        if not os.path.exists(path):
+            path = os.path.join(folder, "logo.svg")
+        if name in ("petrol", "custom"):
+            from .logo_utils import recoloured_brand_svg_bytes
+            data = QByteArray(recoloured_brand_svg_bytes(path, theme.palette(False).get("blue", "#0B6570")))
+        else:
+            with open(path, "rb") as handle:
+                data = QByteArray(handle.read())
+        ratio = mw.devicePixelRatioF() if mw else 1.0
+        pixmap = QPixmap(int(size * ratio), int(size * ratio))
+        pixmap.fill(QColor(0, 0, 0, 0))
+        painter = QPainter(pixmap)
+        QSvgRenderer(data).render(painter)
+        painter.end()
+        pixmap.setDevicePixelRatio(ratio)
+        result.addPixmap(pixmap)
+    except Exception as error:
+        print(f"SmartStudy: logo could not be drawn: {error}")
+    return result
+
+
+class _LogoButton(QToolButton):
+    """The logo opens the settings; while the pointer is on it, it shows a gear."""
+
+    def __init__(self, open_settings: Callable):
+        super().__init__()
+        self.setObjectName("ssLogo")
+        self.setToolTip(_("Open Add-on Settings"))
+        self.setAccessibleName(_("Open Add-on Settings"))
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setFixedSize(48, 48)
+        self.setIconSize(QSize(40, 40))
+        self.clicked.connect(lambda _checked=False: open_settings())
+        self._logo = QIcon()
+        self._gear = QIcon()
+
+    def set_icons(self, logo: QIcon, gear: QIcon) -> None:
+        self._logo, self._gear = logo, gear
+        self.setIcon(self._gear if self.underMouse() else self._logo)
+        self.setIconSize(QSize(26, 26) if self.underMouse() else QSize(40, 40))
+
+    def enterEvent(self, event):
+        self.setIcon(self._gear)
+        self.setIconSize(QSize(26, 26))
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.setIcon(self._logo)
+        self.setIconSize(QSize(40, 40))
+        super().leaveEvent(event)
+
+
 class Header(QWidget):
     """Pomodoro, music, settings and the tabs: as a bar on top of the column,
     or upright as a rail at the edge of the window."""
@@ -163,6 +229,7 @@ class Header(QWidget):
             self.time_button = QPushButton("25:00")
             self.time_button.setObjectName("ssTime")
             self.time_button.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.time_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.time_button.setToolTip(_("Pomodoro: reset, skip, settings"))
             self.time_button.clicked.connect(self._pomodoro_menu)
             row.addWidget(self.time_button)
@@ -176,12 +243,12 @@ class Header(QWidget):
             outer.setContentsMargins(6, 10, 6, 10)
             outer.setSpacing(10)
             row.setContentsMargins(2, 6, 2, 6)
+            self.gear = _LogoButton(panel.ctx["show_settings"])
+            outer.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
             outer.addWidget(self.tabs)
             outer.addStretch(1)
             outer.addWidget(self.pill)
-            self.gear = self._round("gear", _("Smart Study settings"), panel.ctx["show_settings"], flat=True)
             self.hide_button = self._round("hide", _("Show or hide the side panel"), panel.collapse, flat=True)
-            row.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
             row.addWidget(self.hide_button, 0, Qt.AlignmentFlag.AlignHCenter)
             self.setFixedWidth(RAIL_WIDTH)
         else:
@@ -190,7 +257,7 @@ class Header(QWidget):
             row.setContentsMargins(6, 2, 4, 2)
             top = QHBoxLayout()
             top.setSpacing(8)
-            self.gear = self._round("gear", _("Smart Study settings"), panel.ctx["show_settings"])
+            self.gear = _LogoButton(panel.ctx["show_settings"])
             top.addWidget(self.gear)
             top.addStretch(1)
             self.hide_button = self._round("hide", _("Hide side panel"), panel.toggle, flat=True)
@@ -209,6 +276,7 @@ class Header(QWidget):
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setFixedSize(40, 40)
         button.setIconSize(QSize(18, 18))
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)  # Space and Enter stay with the card
         button.clicked.connect(lambda _checked=False: slot())
         return button
 
@@ -220,6 +288,7 @@ class Header(QWidget):
         button.setCheckable(True)
         button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         button.setIconSize(QSize(22, 22))
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         if self.vertical:
             button.setFixedSize(RAIL_WIDTH - 22, 54)
@@ -252,8 +321,11 @@ class Header(QWidget):
             font-size: 11px; padding: 3px 0 1px; }}
         QToolButton#ssTab:hover {{ background: {c['hover']}; color: {c['ink']}; }}
         QToolButton#ssTab:checked {{ background: {c['raised']}; color: {c['accent']}; }}
+        QToolButton#ssLogo {{ background: transparent; border: none; border-radius: 12px; }}
+        QToolButton#ssLogo:hover {{ background: {c['raised']}; }}
         QToolButton:focus {{ outline: none; }}
         """)
+        self.gear.set_icons(logo_icon(40), icon("gear", c["accent"], 26))
         for button in self.findChildren(QToolButton):
             name = button.property("ssIcon")
             if name:
@@ -274,11 +346,12 @@ class Header(QWidget):
         menu = QMenu(self)
         running = pomodoro.current_state in (constants.STATE_WORK, constants.STATE_SHORT_BREAK,
                                              constants.STATE_LONG_BREAK)
-        menu.addAction(_("Pause") if running else _("Start"), pomodoro.start_pause_action)
-        menu.addAction(_("Reset Timer"), pomodoro.reset_action)
-        menu.addAction(_("Skip current phase"), pomodoro.skip_action)
+        # Lambdas: Qt would hand the action's "checked" flag to the functions.
+        menu.addAction(_("Pause") if running else _("Start")).triggered.connect(lambda *_a: pomodoro.start_pause_action())
+        menu.addAction(_("Reset Timer")).triggered.connect(lambda *_a: pomodoro.reset_action())
+        menu.addAction(_("Skip current phase")).triggered.connect(lambda *_a: pomodoro.skip_action())
         menu.addSeparator()
-        menu.addAction(_("Timer Settings"), pomodoro.open_pomodoro_config)
+        menu.addAction(_("Timer Settings")).triggered.connect(lambda *_a: pomodoro.open_pomodoro_config())
         corner = self.time_button.rect().topLeft() if self.vertical else self.time_button.rect().bottomLeft()
         menu.exec(self.time_button.mapToGlobal(corner))
 
@@ -378,7 +451,7 @@ class Panel(QObject):
         except Exception:
             pass
         self._load_page()
-        self.today_dock.visibilityChanged.connect(lambda visible: visible and self.refresh())
+        self.today_dock.visibilityChanged.connect(self._today_shown)
 
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
@@ -492,6 +565,12 @@ class Panel(QObject):
         except Exception:
             pass
 
+    def _today_shown(self, visible: bool) -> None:
+        if visible and not self._closing:
+            self.refresh()
+            # A tool in split view leaves the column wide; Today takes its own width again.
+            QTimer.singleShot(0, lambda: self._set_width(PANEL_WIDTH))
+
     def _set_width(self, width: int) -> None:
         try:
             if self.today_dock.isVisible():
@@ -552,9 +631,19 @@ class Panel(QObject):
             self._wired.pop(tool.key, None)
             return False
 
+    def _fills_anki(self, tool: _Tool) -> bool:
+        """The tool is shown as "Main window": it replaces Anki's middle part."""
+        if not tool.layout_key:
+            return False
+        try:
+            from . import dock_layout
+            return tool.layout_key in dock_layout._targets and dock_layout.mode(tool.layout_key) == "main"
+        except Exception:
+            return False
+
     def active(self) -> str:
         for tool in self.tools:
-            if self._in_column(tool):
+            if self._in_column(tool) or self._fills_anki(tool):
                 return tool.key
         return "today"
 
@@ -588,7 +677,16 @@ class Panel(QObject):
 
     def _close_tools(self, keep: Optional[str] = None) -> None:
         for tool in self.tools:
-            if tool.key != keep and self._in_column(tool):
+            if tool.key != keep and self._fills_anki(tool):
+                try:
+                    from . import dock_layout
+                    dock_layout._targets[tool.layout_key].exit_main()
+                    self.wire()
+                    if self._in_column(tool):  # leaving the main window puts it back into the column
+                        tool.toggle()
+                except Exception as error:
+                    print(f"SmartStudy: could not leave the main window of {tool.key}: {error}")
+            elif tool.key != keep and self._in_column(tool):
                 try:
                     tool.toggle()
                 except Exception as error:
@@ -626,8 +724,17 @@ class Panel(QObject):
         if tool is None or not tool.layout_key:
             return
         from . import dock_layout
-        if tool.layout_key in dock_layout._targets:
-            dock_layout.show_menu_at_cursor(tool.layout_key)
+        if tool.layout_key == "website":
+            from . import browser_layout
+            browser_layout._register()
+        if tool.layout_key not in dock_layout._targets:
+            # The tool is built on first use; open it once, then offer its layouts.
+            if self.active() != key:
+                self.select(key)
+            QTimer.singleShot(400, lambda: tool.layout_key in dock_layout._targets
+                              and dock_layout.show_menu_at_cursor(tool.layout_key))
+            return
+        dock_layout.show_menu_at_cursor(tool.layout_key)
 
     def content_open(self) -> bool:
         try:
@@ -768,7 +875,11 @@ class Panel(QObject):
             return None
         try:
             data = json.loads(message[len(BRIDGE):])
-            return self._command(data.get("cmd"), data.get("args") or {})
+            result = self._command(data.get("cmd"), data.get("args") or {})
+            if data.get("cmd") in ("toggle", "period", "show", "claim"):
+                # Anki's own keys (Space, numbers, shortcuts) keep working after a click here.
+                QTimer.singleShot(0, lambda: mw.web.setFocus() if mw.web.isVisible() else None)
+            return result
         except Exception as error:
             traceback.print_exc()
             from aqt.utils import tooltip

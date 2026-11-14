@@ -25,7 +25,7 @@
   *{box-sizing:border-box;-webkit-user-select:none;user-select:none;}
   html,body{height:100%;margin:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--text);font-size:13px;
     -webkit-font-smoothing:antialiased;overflow:hidden;
   }
@@ -200,6 +200,8 @@
     flex-shrink:0;min-height:18px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .schint{font-size:10.5px;color:var(--muted);opacity:.7;text-align:center;padding-top:2px;}
+/* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }
 </style>
 <style id="smartstudy-keyboard-focus">
 body button:focus-visible, body input:focus-visible, body select:focus-visible,

@@ -93,3 +93,6 @@ body.learning-mode .workspace-anki-link,body.hint-edit-mode .workspace-anki-link
 :root.dark #workspace-nav .tool.active{background:#34373C;color:#fff;}
 /* RTL */
 [dir=rtl] #map-select-btn,[dir=rtl] #mindmap-select-btn { background-position:left 8px center; }
+
+/* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }

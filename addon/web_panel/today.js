@@ -101,7 +101,7 @@
   function extras(t) {
     var rows = [];
     var c = data.show.challenge && data.challenge;
-    if (c) {
+    if (c && !c.claimed) {  // done for today: gone until tomorrow's challenge
       var reached = c.cur >= c.target;
       rows.push(h("div", { class: "row" },
         h("div", { class: "row-head" }, h("b", null, t.challenge),

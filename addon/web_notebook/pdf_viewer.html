@@ -8,6 +8,8 @@
      NOT from prefers-color-scheme — that follows the OS, not Anki. */
   html.nightMode { color-scheme: dark; }
   html:has(body.nightMode) { color-scheme: dark; }
+/* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }
 </style>
 
   <meta charset="UTF-8">
@@ -22,7 +24,7 @@
       --text-gray:    #9b9a97;
       --hover-bg:     #efefef;
       --border:       rgba(0,0,0,0.08);
-      --font:         -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font:         "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       --accent:       var(--smartstudy-primary, #0B6570);
       --danger:       #e03e3e;
       --input-bg:     #f7f7f5;
@@ -2380,7 +2382,7 @@ if (window.__SMARTSTUDY_PDF_PRELOAD__ !== undefined) {
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
+                + 'font:13px/1.45 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'

@@ -9,6 +9,8 @@
   html.nightMode { color-scheme: dark; }
   html:has(body.nightMode) { color-scheme: dark; }
 
+/* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }
 </style>
 
     <meta charset="UTF-8">
@@ -23,7 +25,7 @@
             --hover-bg: #efefef;
             --border: rgba(0,0,0,0.08);
             --selection: #cce9ff;
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            --font: "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
             --code-bg: #f7f6f3;
             --callout-bg: #f1f1ef;
             --callout-text: #37352f;
@@ -683,7 +685,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
         .header-bar > .nb-header-control { margin-inline-start:4px;flex-shrink:0;background:transparent;color:var(--text-gray); }
         .header-bar > .nb-header-control:hover { background:var(--hover-bg);color:var(--text); }
         #notebook-outline { position:fixed;z-index:6400;width:220px;max-width:calc(100vw - 16px);max-height:50vh;overflow:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.1); }
-        #notebook-outline button { display:block;width:100%;border:0;background:transparent;color:var(--text-gray);text-align:start;padding:7px 8px;font:13px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;cursor:pointer;border-radius:4px; }
+        #notebook-outline button { display:block;width:100%;border:0;background:transparent;color:var(--text-gray);text-align:start;padding:7px 8px;font:13px/1.4 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;border-radius:4px; }
         #notebook-outline button:hover, #notebook-outline .nb-outline-current { background:var(--hover-bg);color:var(--text); }
         #notebook-tools-menu { min-width:180px;max-width:calc(100vw - 16px); }
         #notebook-dialog { width:760px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);box-sizing:border-box;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:18px;overflow:auto; }
@@ -3588,7 +3590,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
+                + 'font:13px/1.45 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'

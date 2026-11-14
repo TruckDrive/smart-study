@@ -26,7 +26,7 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--text);font-size:13px;-webkit-font-smoothing:antialiased;
     display:flex;flex-direction:column;overflow:hidden;
   }
@@ -141,6 +141,8 @@
   .analytics-state{padding:26px 18px;text-align:center;font-size:13px;line-height:1.6;color:var(--muted);}
   @media(max-width:400px){.header{padding:16px 14px 14px}.content{padding:0 14px 14px}.row{padding:10px;gap:7px}.row .rl{font-size:13px}.unit{width:20px}.stepper input{width:36px}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;}}
+/* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }
 </style>
 <script>
   /* Apply dark mode BEFORE the first paint (avoids a white flash) —
@@ -473,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function(){
             b = document.createElement('div');
             b.id = 'sp-error-banner';
             b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:2147483000;display:none;'
-                + 'font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start;'
+                + 'font:13px/1.45 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:start;'
                 + 'padding:12px 18px;box-shadow:0 -6px 24px rgba(0,0,0,0.25);border-top:2px solid #dc3545;'
                 + (dark ? 'background:#26282B;color:#e0e0e0;' : 'background:#ffffff;color:#333333;');
             var btnCss = 'margin-inline-end:8px;padding:4px 12px;font:inherit;font-size:12px;cursor:pointer;border-radius:7px;'

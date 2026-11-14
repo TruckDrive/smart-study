@@ -161,7 +161,7 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
             margin: 0; padding: 0; background-color: var(--background-color); color: var(--text-color);
             display: flex; flex-direction: column; height: 100vh; overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
@@ -633,7 +633,9 @@
 #context-menu .node-menu-action:hover,#context-menu .node-menu-remove:hover,#context-menu .node-menu-toggle:hover{background:var(--workspace-hover,var(--button-hover,#eee))}
 #context-menu .node-menu-toggle[aria-pressed=true]:hover{background:var(--primary-color)}
 
-    </style>
+    /* Smart Study's own look: round controls, like the rest of the add-on. */
+button, select, input[type=text], input[type=search], input[type=number], input[type=url], input[type=password], input:not([type]), textarea { border-radius: 14px !important; }
+</style>
 <style id="smartstudy-keyboard-focus">
 body button:focus-visible, body input:focus-visible, body select:focus-visible,
 body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-visible {
