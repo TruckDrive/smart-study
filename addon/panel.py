@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """The Smart Study side panel: one column on the right of Anki.
 
-At the right edge of the window stands a slim rail (logo, tabs, Pomodoro,
-music). Left of it sits either the "Today" page or one of the tools. The
+At the left edge of the window stands a slim rail (logo, tabs, Pomodoro,
+music). On the right sits either the "Today" page or one of the tools. The
 tools keep their own docks and their own layout menu (sidebar, split, main
 window, own window); the panel only decides which of them is shown and
 marks the matching tab.
@@ -453,7 +453,7 @@ class Panel(QObject):
         return dock
 
     def _build_rail(self) -> None:
-        """The rail at the right edge of the window, outside the docks."""
+        """The rail at the left edge of the window, outside the docks."""
         old = mw.findChild(QToolBar, RAIL_BAR)
         if old is not None:
             mw.removeToolBar(old)
@@ -465,7 +465,7 @@ class Panel(QObject):
         bar.toggleViewAction().setVisible(False)
         bar.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
         bar.addWidget(self.header)
-        mw.addToolBar(Qt.ToolBarArea.RightToolBarArea, bar)
+        mw.addToolBar(Qt.ToolBarArea.LeftToolBarArea, bar)
         bar.setVisible(bool(self.settings.get("panel_rail_open", True)))
         self.rail_bar = bar
 

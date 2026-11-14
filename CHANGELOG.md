@@ -4,7 +4,7 @@
 
 Smart Study gets its own look. Every function is still there; where it sits has changed.
 
-- **Side panel on the right**: the launcher bar on the left and the widgets above the deck list are gone. At the right edge of the window stands a slim rail: the logo (opens the settings), the tabs *Today, Assistant, Browser, Notebook, Mind map, Trophies*, and below them Pomodoro, music and a button that folds the column away. The button in Anki's top bar hides the whole panel
+- **Rail on the left, panel on the right**: the old launcher bar and the widgets above the deck list are gone. At the left edge of the window stands a slim rail: the logo (opens the settings), the tabs *Today, Assistant, Browser, Notebook, Mind map, Trophies*, and below them Pomodoro, music and a button that folds the column away. The button in Anki's top bar hides the whole panel
 - **Today**: the first tab shows the countdown to your next exam, level and streak, today's items of your study plan to tick off (cards and reviews have a *Study* button), the daily challenge and three charts – *Due* for the next days, *Reviews* per day (hover for the day and its number) and *Memory* (share remembered, share still unseen). Each chart has its own period. The sliders button chooses which parts are shown, the i explains the numbers. The challenge leaves the page once it is claimed and returns the next day
 - **Only on the home screen**: while you review, the Today page stays away; the tools remain one click away on the rail
 - **Tools as before**: they open as a sidebar and keep their layouts (sidebar, split view, main window, own window) – also by right-clicking a tab

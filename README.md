@@ -2,6 +2,10 @@
 
 **One Anki extension for your whole study workflow: study plans up to your exam, plus a full workspace with notebook, PDF viewer, mind maps, focus timer, music, AI assistant and motivation, all inside Anki.**
 
+![Smart Study: your decks, and on the right today's plan and your numbers](screenshots/home-3.0.png)
+
+*Anki stays Anki: the deck list is where it always was. A slim rail on the left opens the tools; on the right, **Today** shows the countdown to your exam, today's plan items to tick off, and what is due.*
+
 ## Install
 
 Smart Study needs Anki Desktop 25.09.4 or newer (developed and tested on 26.09).
@@ -24,7 +28,7 @@ Changelog and release notes: [CHANGELOG.md](CHANGELOG.md) · [Releases](https://
 
 You tell Smart Study what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
 
-![Plan view](screenshots/plan-2.9.png)
+![Plan view](screenshots/plan-3.0.png)
 
 *An Anki add-on for Anki Desktop. No account. Nothing is sent anywhere unless you use an online feature yourself (see [Privacy](#privacy)).*
 
@@ -58,7 +62,8 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 ### Workspace
 
-- **Side panel** on the right: a slim rail with tabs for every tool (each with an optional keyboard shortcut), Pomodoro and music
+- **Rail on the left, panel on the right**: a slim rail with the logo (opens the settings), a tab for every tool (each with an optional keyboard shortcut), Pomodoro and music. The tools open in a panel on the right and can also be shown as a split view, in the main window or in their own window
+- **Today**, the first tab: countdown to the next exam, today's plan items to tick off without opening the plan, the daily challenge, and three charts with their own period each – cards due on the next days, reviews per day (hover for a day's number) and how much you remembered. It shows on the home screen only and stays away while you review
 - **Notebook** with nested pages, task lists and a built-in **PDF viewer** (PDF.js bundled, nothing loaded from a CDN), plus a PDF card creator for basic, reversed and cloze cards
 - **Mind maps** and FreeMap diagrams with images, icons and links to Anki cards
 - **Pomodoro and session timers** with study-time analytics by deck
@@ -66,8 +71,8 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
 - **Browser** with tabs, an address field that suggests visited pages, favourites with icons, PDF viewer (PDFs open right in the tab), ad blocker, saved passwords, and layouts: sidebar, split view, main window or its own window
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
-- **Today**: countdown to the next exam, today's plan items to tick off, daily challenge, and charts for due cards, reviews and memory; daily facts and a custom deck overview
-- Light and dark mode, color themes, custom backgrounds, eleven interface languages
+- A **custom deck overview** with retention and hard cards, optional daily facts
+- **Its own look**: a calm neutral dark and light theme in Anki's own font, accent colours, the older colour themes and custom backgrounds, eleven interface languages. *Settings → Home → Layout → Classic* brings back the earlier arrangement with widgets above the deck list
 
 ### Built-in add-ons
 
@@ -92,13 +97,27 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 
 ## Screenshots
 
-| Overview: streak, heatmap, plans | Dark mode |
+| Light mode | While reviewing: the assistant next to the card |
 |---|---|
-| ![Overview](screenshots/home-2.9.png) | ![Plan in dark mode](screenshots/plan-dark-2.9.png) |
+| ![Home in light mode](screenshots/home-light-3.0.png) | ![AI assistant](screenshots/workspace-ai-assistant-3.0.png) |
+
+| Browser: tabs, address field, favourites | Mind maps |
+|---|---|
+| ![Browser](screenshots/workspace-website-3.0.png) | ![Mind map](screenshots/workspace-mindmap-3.0.png) |
+
+| Trophies: level, streak, challenge, badges | Settings: tabs on top, search, one switch per part |
+|---|---|
+| ![Trophies](screenshots/trophies-3.0.png) | ![Settings](screenshots/settings-3.0.png) |
+
+**Study plan**
+
+| Overview: streak, heatmap, plans | A plan in dark mode |
+|---|---|
+| ![Overview](screenshots/plan-home-3.0.png) | ![Plan in dark mode](screenshots/plan-dark-3.0.png) |
 
 | Basics, milestones and single days | Sources |
 |---|---|
-| ![Basics](screenshots/edit-basics-2.9.png) | ![Sources](screenshots/edit-sources-2.9.png) |
+| ![Basics](screenshots/plan-edit-3.0.png) | ![Sources](screenshots/edit-sources-2.9.png) |
 
 | Topics with linked pages, lectures and subdecks | Tools: weak spots, mock exam |
 |---|---|
@@ -106,21 +125,7 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 
 **Retrospective**: what worked, and your real pace for the next plan
 
-![Retrospective](screenshots/review-2.9.png)
-
-**Workspace**: notebook with PDF viewer, mind maps, AI assistant and browser, all next to your Anki cards
-
-| Notebook with PDF viewer | Mind maps |
-|---|---|
-| ![Notebook](screenshots/workspace-notebook.png) | ![Mind map](screenshots/workspace-mindmap.png) |
-
-| AI assistant | Browser: tabs, address field, favourites |
-|---|---|
-| ![AI assistant](screenshots/workspace-ai-assistant.png) | ![Website](screenshots/workspace-website-2.9.png) |
-
-**Study plan window**: today's items, progress, and Archive / Delete in reach
-
-![Study plan window](screenshots/workspace-study-plan-2.9.png)
+![Retrospective](screenshots/plan-review-3.0.png)
 
 ## Usage
 
@@ -130,7 +135,7 @@ Switch them on or off under *Tools → Smart Study → Settings → Add-ons* or 
 4. **Sources**: add your book (pace in minutes per page, optional PDF), your lectures (one per line: `Name | 25 | https://…`), lists and Anki decks (search, or pick from the suggestions matching your plan name).
 5. **Topics**: paste the table of contents (`Peritoneum ...... 78`) or create topics from subdecks, then **Suggest links automatically** and check the ★ suggestions.
 6. **Create plan**. From then on, study in Anki as usual; the plan keeps up.
-7. The workspace tools are on the rail at the right edge of the window; settings are under **Tools → Smart Study → Settings…**.
+7. The workspace tools are on the rail at the left edge of the window; settings are under **Tools → Smart Study → Settings…**.
 
 Plans are stored as JSON under `plan/user_files/plans/` in the add-on folder and also in your Anki collection, so **AnkiWeb sync brings them to your other devices**. If you change a plan on two devices without syncing in between, the newer copy wins.
 
@@ -147,7 +152,8 @@ python -I tests/test_store.py <empty dir>     # plan sync between two devices
 ./build.sh                                     # → dist/smart_study.ankiaddon
 ```
 
-- `addon/__init__.py`: entry point, menu, launcher, dashboard and hooks
+- `addon/__init__.py`: entry point, menu and hooks
+- `addon/panel.py`, `addon/web_panel/`: the rail and the Today page; `addon/design.py`: the colour tokens shared by Qt and the web pages
 - `addon/plan/`: the study planner (`planner.py` scheduler in plain Python, `ankidata.py` collection queries, `store.py` storage and sync, `web/` interface)
 - `addon/*.py`, `addon/web_*`, `addon/settings_web/`: the workspace tools
 
