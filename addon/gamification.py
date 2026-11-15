@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 from html import escape
@@ -38,7 +44,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
@@ -338,7 +344,7 @@ class GamificationManager:
                 try:
                     mw.col.conf[CONFIG_KEY] = self.data
                 except Exception:
-                    pass
+                    _ignored()
                 print(f"{ADDON_NAME}: Restored gamification data from JSON backup after col.conf loss.")
             else:
                 self.data = defaults
@@ -716,7 +722,7 @@ class GamificationManager:
             if cutoff:
                 return (int(cutoff) - 86400) * 1000
         except Exception:
-            pass
+            _ignored()
         # Fallback: derive the configured rollover boundary locally.
         start = (datetime.combine(_anki_today(), datetime.min.time())
                  + timedelta(hours=self._get_rollover_hour()))
@@ -971,7 +977,7 @@ class GamificationManager:
             else:
                 mw.moveToState("deckBrowser")
         except Exception:
-            pass
+            _ignored()
 
     # --- Debug Methoden ---
     def debug_add_xp(self, amount: int):

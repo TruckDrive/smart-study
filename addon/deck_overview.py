@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import os
@@ -25,7 +31,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
@@ -521,7 +527,7 @@ def _session_summary_inner():
         try:
             night = bool(_is_night())
         except Exception:
-            pass
+            _ignored()
         c = _palette(night)
         bg = c.get("surface", "#26282B" if night else "#ffffff")
         text = c.get("text", "#F1F1EF" if night else "#1C1D1F")
@@ -537,7 +543,7 @@ def _session_summary_inner():
                 lbl_remaining = _("{} XP to next level").format(f"{remaining:,}")
                 remaining_html = f'<span>{lbl_remaining}</span>'
         except Exception:
-            pass
+            _ignored()
 
         lbl_title = _("Session Summary")
         lbl_cards = _("{} cards").format(count)

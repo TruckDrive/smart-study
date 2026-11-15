@@ -1,4 +1,10 @@
 from __future__ import annotations
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 from . import workspace_preferences
 
@@ -756,7 +762,7 @@ def _apply_night_mode(html: str) -> str:
             accent_style = ('<style id="smartstudy-primary-color">:root {'
                             '--smartstudy-primary: ' + accent + ';}</style>')
     except Exception:
-        pass
+        _ignored()
 
     flag_tag = ('<script id="smartstudy-night">window.__SMARTSTUDY_NIGHT__='
                 + ("true" if night else "false") + ';</script>' + accent_style)
@@ -1619,7 +1625,7 @@ class NotebookPanel(QWidget):
         try:
             self.web.eval(f"if(window.{callback}) window.{callback}();")
         except Exception:
-            pass
+            _ignored()
 
     def _flush_current_state(self, on_complete: Callable[[bool], None]) -> None:
         """Ask the page for its current snapshot and persist it before teardown.
@@ -1744,7 +1750,7 @@ class NotebookPanel(QWidget):
         try:
             self.web.eval(js)
         except Exception:
-            pass
+            _ignored()
 
     def _set_nav_toggle(self, active: bool, windowed: bool) -> None:
         """Swap the fullscreen / window button icon inside the nav bar.
@@ -1767,7 +1773,7 @@ class NotebookPanel(QWidget):
         try:
             self.web.eval(js)
         except Exception:
-            pass
+            _ignored()
 
     def enter_fullscreen(self) -> None:
         if not self.web or self.is_in_fullscreen or self.is_embedded:
@@ -2328,7 +2334,7 @@ class NotebookPanel(QWidget):
                 f"window[{callback_json}]({json.dumps(success)}, {message_json});"
             )
         except Exception:
-            pass
+            _ignored()
 
     @staticmethod
     def _decode_pdf_action_payload(body: str) -> dict:
@@ -2966,7 +2972,7 @@ def cleanup_notebook_sidebar():
         try:
             mw.removeDockWidget(dock_ref)
         except Exception:
-            pass
+            _ignored()
         dock_ref.deleteLater()
 
     if isinstance(panel, NotebookPanel):

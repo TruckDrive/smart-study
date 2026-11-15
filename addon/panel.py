@@ -9,6 +9,12 @@ marks the matching tab.
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import json
 import time
 import traceback
@@ -416,7 +422,7 @@ class Header(QWidget):
             self.time_button.setText(clock)
             self.time_button.setToolTip(f"{phase}: " + _("Pomodoro: reset, skip, settings"))
         except Exception:
-            pass
+            _ignored()
 
     # launcher_widget API that the Pomodoro expects
     update_timer_ui = update_timer
@@ -469,7 +475,7 @@ class Panel(QObject):
             from . import web_sleep
             web_sleep.watch(self.web)
         except Exception:
-            pass
+            _ignored()
         self._load_page()
         self.today_dock.visibilityChanged.connect(self._today_shown)
 
@@ -554,7 +560,7 @@ class Panel(QObject):
         try:
             self.web.page().setBackgroundColor(QColor(c["page"]))
         except Exception:
-            pass
+            _ignored()
 
     def _today_shown(self, visible: bool) -> None:
         if visible and not self._closing:
@@ -875,7 +881,7 @@ class Panel(QObject):
             if not mw.col.card_count():
                 data.pop("challenge", None)  # a new, empty collection: nothing to review yet (switch stays as it is)
         except Exception:
-            pass
+            _ignored()
         if data.get("countdown") is None:
             data["countdown"] = self._deadline()
         if data["show"]["fact"]:
@@ -898,7 +904,7 @@ class Panel(QObject):
             if info and "days_remaining" in info:
                 return {"days": info["days_remaining"], "title": info["title"], "source": "deadline"}
         except Exception:
-            pass
+            _ignored()
         return None
 
     def _on_bridge(self, message: str) -> Any:
@@ -1006,7 +1012,7 @@ class Panel(QObject):
         try:
             self.web.cleanup()
         except Exception:
-            pass
+            _ignored()
 
 
 def texts() -> Dict[str, str]:

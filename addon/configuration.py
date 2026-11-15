@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import os
@@ -40,7 +46,7 @@ try:
     if _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 # --- Translation ---
 try:

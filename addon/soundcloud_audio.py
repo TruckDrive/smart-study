@@ -4,6 +4,12 @@ The official SoundCloud widget still authorizes streams and owns its UI. Audio
 uses a separate instance of Anki's bundled mpv, never Anki's review audio queue.
 No stream-resolution API, external browser, codec installation or data migration.
 """
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from dataclasses import dataclass
 import json
 import math
@@ -115,7 +121,7 @@ class SoundCloudNativeAudio(QObject):
                 try:
                     stream.process.close()
                 except Exception:
-                    pass
+                    _ignored()
             elements.clear()
         page.destroyed.connect(close_processes)
 
@@ -135,7 +141,7 @@ class SoundCloudNativeAudio(QObject):
             try:
                 stream.process.close()
             except Exception:
-                pass
+                _ignored()
 
     def reset(self):
         self.timer.stop()

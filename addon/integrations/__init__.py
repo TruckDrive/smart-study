@@ -26,6 +26,12 @@ add-ons register their hooks while Anki starts.
 """
 from __future__ import annotations
 
+try:
+    from ..quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import importlib
 import json
 import os
@@ -203,7 +209,7 @@ def installed_folders() -> Dict[str, bool]:
                 out[str(aid)] = bool(meta.enabled)
                 _folder_of_id[str(aid)] = meta.dir_name
     except Exception:
-        pass
+        _ignored()
     return out
 
 

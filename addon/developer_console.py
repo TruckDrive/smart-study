@@ -1,4 +1,10 @@
 """Developer tools: local diagnostics and isolated visual previews."""
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import json
 from datetime import date, timedelta
 from pathlib import Path
@@ -207,7 +213,7 @@ def open_console(parent=None):
         from .sidebar import _is_night
         dark.setChecked(_is_night())
     except Exception:
-        pass
+        _ignored()
     reduced = QCheckBox(_('Reduced motion'))
     form.addRow(_('Preview'), kind)
     form.addRow(_('Previous rank'), old)

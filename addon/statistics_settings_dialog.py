@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 """HTML configuration dialog for the dashboard statistics widget."""
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import os
@@ -66,11 +72,11 @@ class StatisticsSettingsDialog(QDialog):
             from aqt import mw
             night = bool(mw and _is_night())
         except Exception:
-            pass
+            _ignored()
         try:
             self._page.setBackgroundColor(QColor("#26282B" if night else "#ffffff"))
         except Exception:
-            pass
+            _ignored()
 
         # Read the page ourselves instead of relying on constants.addon_path.
         # During some Anki startup/profile sequences that shared path can still
@@ -138,7 +144,7 @@ class StatisticsSettingsDialog(QDialog):
             from aqt import mw
             night = bool(mw and _is_night())
         except Exception:
-            pass
+            _ignored()
         colors = palette(night)
         payload = {
             "isDark": night,

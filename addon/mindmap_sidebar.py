@@ -1,4 +1,10 @@
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import math
@@ -486,7 +492,7 @@ class MindmapPanel(QWidget):
                     boot_pressed = boot_palette.get("blue_pressed") or boot_accent
                 except Exception:
                     # The post-load theme injection below remains as a fallback.
-                    pass
+                    _ignored()
                 script = QWebEngineScript()
                 script.setName("smartstudy-mindmap-i18n")
                 script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
@@ -510,7 +516,7 @@ class MindmapPanel(QWidget):
                 s.setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
                 if hasattr(QWebEngineSettings.WebAttribute, 'AllowFileAccessFromFileUrls'):
                     s.setAttribute(QWebEngineSettings.WebAttribute.AllowFileAccessFromFileUrls, True)
-            except Exception: pass
+            except Exception: _ignored()
 
         # Match the page background to the theme BEFORE anything paints —
         # otherwise the view flashes white in dark mode while loading.
@@ -520,7 +526,7 @@ class MindmapPanel(QWidget):
             self.web_view.page().setBackgroundColor(
                 QColor("#26282B") if dark else QColor("#f8f9fa"))
         except Exception:
-            pass
+            _ignored()
 
         web_ref = self.web_view
         self.web_view.loadFinished.connect(
@@ -876,7 +882,7 @@ class MindmapPanel(QWidget):
             )
             self.web_view.page().runJavaScript(js)
         except Exception:
-            pass
+            _ignored()
 
     def _inject_theme_accent(self):
         """Apply the add-on's colour theme to the page.
@@ -912,7 +918,7 @@ class MindmapPanel(QWidget):
                     "window.__smartstudyMarkMindmapThemeReady();"
                 )
             except Exception:
-                pass
+                _ignored()
 
     def enter_fullscreen(self):
         if not self.web_view: return
@@ -995,7 +1001,7 @@ class MindmapPanel(QWidget):
                 f"if(window.{fn}) {fn}({flag}, {t_json});"
             )
         except Exception:
-            pass
+            _ignored()
 
     def on_visibility_changed(self, visible):
         """RAM-Management Logik"""
@@ -1093,7 +1099,7 @@ def cleanup_mindmap_sidebar():
         try:
             mw.removeDockWidget(dock_ref)
         except Exception:
-            pass
+            _ignored()
         dock_ref.deleteLater()
         if mindmap_dock is dock_ref:
             mindmap_dock = None

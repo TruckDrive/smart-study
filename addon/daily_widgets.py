@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 import re
@@ -22,7 +28,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY

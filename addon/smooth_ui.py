@@ -11,6 +11,12 @@
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import math
 import sys
 import time
@@ -150,7 +156,7 @@ class _Kinetic(QObject):
             if target is None or sip.isdeleted(target):
                 return
         except Exception:
-            pass
+            _ignored()
         k = self.PX_PER_ANGLE  # dx, dy are page pixels; the page reads them from angleDelta
         event = QWheelEvent(self.pos, self.gpos, QPoint(dx, dy), QPoint(round(dx / k), round(dy / k)),
                             Qt.MouseButton.NoButton, self.mods, phase, self.inverted)

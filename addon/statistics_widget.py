@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 from datetime import datetime, timedelta
 import time
@@ -11,7 +17,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
@@ -82,7 +88,7 @@ try:
     _gui_hooks.state_did_reset.append(invalidate_statistics_cache)
     _gui_hooks.collection_did_load.append(invalidate_statistics_cache)
 except Exception:
-    pass
+    _ignored()
 
 # ── Review activity helpers ───────────────────────────────────────────────────
 def _get_rollover_hour() -> int:

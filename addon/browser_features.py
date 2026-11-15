@@ -10,6 +10,12 @@ Settings live in the profile's SmartStudy_Data/website_state.json under
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import hashlib
 import html
 import json
@@ -450,7 +456,7 @@ def open_pip(view) -> None:
     try:
         view.page().setVisible(True)  # keep it playing although the browser may be hidden
     except Exception:
-        pass
+        _ignored()
 
 
 def close_pip(show_browser: bool = False) -> None:
@@ -530,7 +536,7 @@ def _enter_fullscreen(view) -> None:
     try:
         view.page().setVisible(True)
     except Exception:
-        pass
+        _ignored()
 
 
 def leave_fullscreen() -> None:
@@ -541,13 +547,13 @@ def leave_fullscreen() -> None:
     try:
         QApplication.instance().removeEventFilter(window)
     except Exception:
-        pass
+        _ignored()
     view = window.view
     if _alive(view):
         try:  # tell the page too, in case Esc ended it here and not in the page
             view.triggerPageAction(type(view.page()).WebAction.ExitFullScreen)
         except Exception:
-            pass
+            _ignored()
         _ws().attach_view(view, show=True)
         view.setFocus()
     window.hide()
@@ -595,7 +601,7 @@ def open_plan_pdf(path: str, page: int) -> bool:
         if not getattr(package, "addon_settings", {}).get("website_viewer_enabled", True):
             return False
     except Exception:
-        pass
+        _ignored()
     if load_settings()["plan_external"]:
         return False
     if _ws().open_local_pdf(path, page) is None:
@@ -641,7 +647,7 @@ def open_plan_video(url: str, plan_id: str, item_id: str) -> bool:
         if not getattr(package, "addon_settings", {}).get("website_viewer_enabled", True):
             return False
     except Exception:
-        pass
+        _ignored()
     if load_settings()["plan_external"]:
         return False
     ws = _ws()
@@ -847,7 +853,7 @@ def occlusion_from_image(view) -> None:
             return
         waited["done"] = True
         try: clipboard.dataChanged.disconnect(copied)
-        except Exception: pass
+        except Exception: _ignored()
         from anki.utils import tmpdir
         path = os.path.join(tmpdir(), "smartstudy-occlusion-%d.png" % int(time.time() * 1000))
         image.save(path, "PNG")
@@ -857,7 +863,7 @@ def occlusion_from_image(view) -> None:
         if not waited["done"]:
             waited["done"] = True
             try: clipboard.dataChanged.disconnect(copied)
-            except Exception: pass
+            except Exception: _ignored()
             tooltip(_("Could not copy the image."))
 
     clipboard.dataChanged.connect(copied)

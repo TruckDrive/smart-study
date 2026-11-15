@@ -12,6 +12,12 @@ code that shows or hides a tool keeps working without knowing about it.
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from typing import Callable, Dict, Optional
 
 from aqt import mw
@@ -76,7 +82,7 @@ def mode(key: str) -> str:
         if target.is_main and target.is_main():
             return "main"
     except Exception:
-        pass
+        _ignored()
     if is_window(key):
         return "window"
     dock = _dock(key)
@@ -187,7 +193,7 @@ def _save_geometry(target) -> None:
         from aqt.utils import saveGeom
         saveGeom(_dock(target.key), _geom_key(target))
     except Exception:
-        pass
+        _ignored()
 
 
 def _enter_window(target, dock) -> None:
@@ -205,7 +211,7 @@ def _enter_window(target, dock) -> None:
     except TypeError:
         dock.resize(1100, 800)
     except Exception:
-        pass
+        _ignored()
     dock.show()
 
 

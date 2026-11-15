@@ -11,6 +11,12 @@ Bridge (Python -> JS):  initMusic(payload) / musicState(s) / userTracks(list)
                         / scState(s) / applyColors(c)
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import os
@@ -287,7 +293,7 @@ def _get_music_web_profile() -> Optional['QWebEngineProfile']:
             try:
                 prof.setPersistentCookiesPolicy(QWebEngineProfile.AllowPersistentCookies)
             except Exception:
-                pass
+                _ignored()
         # Let us start playback programmatically (station picker auto-play) without
         # requiring a click *inside* the embedded page.
         try:
@@ -295,7 +301,7 @@ def _get_music_web_profile() -> Optional['QWebEngineProfile']:
             st.setAttribute(
                 QWebEngineSettings.WebAttribute.PlaybackRequiresUserGesture, False)
         except Exception:
-            pass
+            _ignored()
         _music_web_profile = prof
     except Exception:
         traceback.print_exc()
@@ -395,7 +401,7 @@ def _get_user_music_folder() -> Optional[str]:
             os.makedirs(folder, exist_ok=True)
             return folder
     except Exception:
-        pass
+        _ignored()
     return None
 
 def _load_user_tracks() -> list:
@@ -591,7 +597,7 @@ class MiniMusicPlayer(QDialog):
         try:
             if mw and _is_night(): return True
         except Exception:
-            pass
+            _ignored()
         return False
 
     # --- Audio backend -------------------------------------------------------
@@ -610,7 +616,7 @@ class MiniMusicPlayer(QDialog):
                 self.player.positionChanged.connect(lambda _p: self._push_position())
                 self.player.durationChanged.connect(lambda _d: self._push_position(force=True))
             except Exception:
-                pass
+                _ignored()
         except Exception:
             traceback.print_exc()
             self._backend_error = True
@@ -622,14 +628,14 @@ class MiniMusicPlayer(QDialog):
             if self.audio_output:
                 self.audio_output.setVolume(frac)
         except Exception:
-            pass
+            _ignored()
 
     def _get_raw_vol(self) -> float:
         try:
             if self.audio_output:
                 return float(self.audio_output.volume())
         except Exception:
-            pass
+            _ignored()
         return 0.0
 
     def _stop_fade(self):
@@ -638,7 +644,7 @@ class MiniMusicPlayer(QDialog):
                 self._fade_timer.stop()
                 self._fade_timer.deleteLater()
             except Exception:
-                pass
+                _ignored()
             self._fade_timer = None
 
     def _fade_to(self, target: float, duration_ms: int, done=None):
@@ -798,14 +804,14 @@ class MiniMusicPlayer(QDialog):
             if self.ui_view and self.ui_view.page():
                 self.ui_view.page().runJavaScript(code)
         except Exception:
-            pass
+            _ignored()
 
     def _sc_js(self, code: str):
         try:
             if self.sc_view and self.sc_view.page():
                 self.sc_view.page().runJavaScript(code)
         except Exception:
-            pass
+            _ignored()
 
     def _on_sc_load_finished(self, ok: bool) -> None:
         if not ok:
@@ -1019,7 +1025,7 @@ class MiniMusicPlayer(QDialog):
         try:
             self.player.stop()
         except Exception:
-            pass
+            _ignored()
         QTimer.singleShot(120, self._swap_phase_clear)
 
     def _swap_phase_clear(self):
@@ -1027,7 +1033,7 @@ class MiniMusicPlayer(QDialog):
         try:
             self.player.setSource(QUrl(""))
         except Exception:
-            pass
+            _ignored()
         QTimer.singleShot(180, self._swap_phase_load)
 
     def _swap_phase_load(self):
@@ -1069,7 +1075,7 @@ class MiniMusicPlayer(QDialog):
             try:
                 QTimer.singleShot(60, lambda: self.player and self.player.setPosition(pos))
             except Exception:
-                pass
+                _ignored()
         self._fade_to(self._user_vol / 100.0, FADE_MS)
 
     def play_with_fade(self):
@@ -1089,7 +1095,7 @@ class MiniMusicPlayer(QDialog):
             try:
                 self.player.pause()
             except Exception:
-                pass
+                _ignored()
             self.save_state()
 
         self._fade_to(0.0, FADE_MS, done=do_pause)
@@ -1105,7 +1111,7 @@ class MiniMusicPlayer(QDialog):
         try:
             self.player.setPosition(max(0, int(ms)))
         except Exception:
-            pass
+            _ignored()
         self._push_position(force=True)
         self._save_soon()
 
@@ -1126,7 +1132,7 @@ class MiniMusicPlayer(QDialog):
             if self.player:
                 return int(self.player.position())
         except Exception:
-            pass
+            _ignored()
         return 0
 
     def _save_soon(self):
@@ -1138,7 +1144,7 @@ class MiniMusicPlayer(QDialog):
                 self._save_timer.timeout.connect(self.save_state)
             self._save_timer.start(800)
         except Exception:
-            pass
+            _ignored()
 
     def save_state(self):
         _save_state({
@@ -1216,13 +1222,13 @@ class MiniMusicPlayer(QDialog):
                 if isinstance(st, dict):
                     self._apply_sc_status(st)
             except Exception:
-                pass
+                _ignored()
         try:
             page = self.sc_view.page()
             if page:
                 page.runJavaScript("JSON.stringify(window._scStatus || null)", got)
         except Exception:
-            pass
+            _ignored()
 
     def _apply_sc_status(self, st: dict):
         """Single source of truth for SC state (fed by bridge events + polling)."""
@@ -1379,7 +1385,7 @@ class MiniMusicPlayer(QDialog):
                         self._sc_artwork_path = dest
                         _notify_artwork()
                 except Exception:
-                    pass
+                    _ignored()
 
             # Marshal back to the main thread.
             try:
@@ -1388,7 +1394,7 @@ class MiniMusicPlayer(QDialog):
                 try:
                     QTimer.singleShot(0, apply)
                 except Exception:
-                    pass
+                    _ignored()
 
         threading.Thread(target=worker, daemon=True).start()
 
@@ -1447,7 +1453,7 @@ class MiniMusicPlayer(QDialog):
                 if os.path.isfile(fp):
                     os.remove(fp)
             except Exception:
-                pass
+                _ignored()
         self._push_user_tracks()
         # If it was the active track, fall back to the first built-in sound.
         if self._track_id == tid:
@@ -1537,7 +1543,7 @@ def _sc_artwork_cache_path() -> Optional[str]:
             os.makedirs(folder, exist_ok=True)
             return os.path.join(folder, "sc_cover.jpg")
     except Exception:
-        pass
+        _ignored()
     return None
 
 
@@ -1624,7 +1630,7 @@ def refresh_music_player_theme() -> None:
         try:
             _music_window.refresh_theme()
         except Exception:
-            pass
+            _ignored()
 
 
 def cleanup_music_player():
@@ -1633,40 +1639,40 @@ def cleanup_music_player():
         if _artwork_cb:
             _artwork_cb(None)
     except Exception:
-        pass
+        _ignored()
     _artwork_cb = None
     if _music_window:
         try:
             _music_window.save_state()
         except Exception:
-            pass
+            _ignored()
         try:
             if _music_window._sc_poll is not None:
                 _music_window._sc_poll.stop()
         except Exception:
-            pass
+            _ignored()
         if _music_window.player:
             try:
                 _music_window.player.stop()
             except Exception:
-                pass
+                _ignored()
         try:
             _music_window._sc_js("scPause();")
             native_audio = getattr(_music_window._sc_page, "_native_sc_audio", None)
             if native_audio is not None:
                 native_audio.reset()
         except Exception:
-            pass
+            _ignored()
         for attr in ("sc_view", "ui_view"):
             v = getattr(_music_window, attr, None)
             if v is not None:
                 try:
                     v.deleteLater()
                 except Exception:
-                    pass
+                    _ignored()
         _music_window.close()
         _music_window = None
     if _music_web_profile is not None:
         try: _music_web_profile.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
         _music_web_profile = None

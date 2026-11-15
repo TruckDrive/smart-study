@@ -21,6 +21,12 @@ closes the dialog with accept(), making the result available via
 get_result().
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 import json
@@ -134,7 +140,7 @@ if _QT_AVAILABLE:
                     self._page.setBackgroundColor(
                         QColor("#26282B") if dark else QColor("#ffffff"))
                 except Exception:
-                    pass
+                    _ignored()
                 self.view.load(QUrl.fromLocalFile(html_path))
             else:
                 print(f"SmartStudy Onboarding: HTML file not found at {html_path!r}")

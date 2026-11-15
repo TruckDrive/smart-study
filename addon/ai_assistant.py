@@ -9,6 +9,12 @@ Bridge: JS → Python via console.log("PYCALL:action:json")
         Python → JS via page.runJavaScript(...)
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import html
@@ -86,7 +92,7 @@ def _detect_night_mode() -> bool:
         if mw and hasattr(mw, 'pm') and mw.pm:
             return bool(_is_night())
     except Exception:
-        pass
+        _ignored()
     return False
 
 
@@ -99,7 +105,7 @@ def _get_theme_accent(is_dark: bool) -> str:
         if color and color.startswith("#"):
             return color
     except Exception:
-        pass
+        _ignored()
     return "#3b82f6" if not is_dark else "#6366f1"
 
 # ── Module constants ──────────────────────────────────────────────────────────
@@ -528,7 +534,7 @@ def _stream_openai_compat(
                         if rc:
                             on_reasoning(rc)
             except Exception:
-                pass
+                _ignored()
 
 
 def _stream_gemini(
@@ -576,7 +582,7 @@ def _stream_gemini(
                         if text:
                             on_chunk(text)
             except Exception:
-                pass
+                _ignored()
 
 
 def _stream_anthropic(
@@ -619,7 +625,7 @@ def _stream_anthropic(
                 elif ev.get("type") == "message_stop":
                     break
             except Exception:
-                pass
+                _ignored()
 
 
 def _stream_ollama(
@@ -650,7 +656,7 @@ def _stream_ollama(
                 if ev.get("done"):
                     break
             except Exception:
-                pass
+                _ignored()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1100,7 +1106,7 @@ def _action_copy_response(data: Dict[str, Any]) -> None:
         mw.app.clipboard().setText(text)
         success = True
     except Exception:
-        pass
+        _ignored()
     _run_js(f"responseCopied({json.dumps(button_id)}, {json.dumps(success)});")
 
 
@@ -1364,7 +1370,7 @@ if _qt_ok and QDialog is not object:
                 try:
                     response.close()
                 except Exception:
-                    pass
+                    _ignored()
 
         def _build_ui(self) -> None:
             root = QVBoxLayout(self)
@@ -1566,7 +1572,7 @@ if _qt_ok and QDialog is not object:
                         try:
                             resp.close()
                         except Exception:
-                            pass
+                            _ignored()
                     with self._pull_response_lock:
                         if self._pull_response is resp:
                             self._pull_response = None
@@ -1688,7 +1694,7 @@ def _setup_sidebar() -> bool:
             page.setBackgroundColor(
                 QColor("#26282B") if _detect_night_mode() else QColor("#ffffff"))
         except Exception:
-            pass
+            _ignored()
 
         # Load HTML
         html_path = _get_html_path()
@@ -1792,7 +1798,7 @@ def refresh_ai_assistant_theme() -> None:
         if page:
             page.setBackgroundColor(QColor("#26282B" if is_dark else "#ffffff"))
     except Exception:
-        pass
+        _ignored()
 
     dark_js = "true" if is_dark else "false"
     _run_js(
@@ -1870,25 +1876,25 @@ def cleanup_ai_assistant_sidebar() -> None:
         try:
             gui_hooks.state_did_change.remove(_on_state_change)
         except Exception:
-            pass
+            _ignored()
         if _dock and hasattr(_dock, "visibilityChanged"):
             try:
                 _dock.visibilityChanged.disconnect(_on_visibility_changed)
             except Exception:
-                pass
+                _ignored()
         _hooks_connected = False
 
     global _sites_panel
     if _sites_panel:
         try: _sites_panel.cleanup()
-        except Exception: pass
+        except Exception: _ignored()
         _sites_panel = None
 
     if _webview:
         try: _webview.setUrl(QUrl("about:blank"))
-        except Exception: pass
+        except Exception: _ignored()
         try: _webview.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
 
     if _dock:
         try:
@@ -1900,10 +1906,10 @@ def cleanup_ai_assistant_sidebar() -> None:
 
     if _profile:
         try: _profile.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
     if _dispatcher:
         try: _dispatcher.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
 
     _dock = _webview = _profile = _dispatcher = None
     _conversation.clear()

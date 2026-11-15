@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 from typing import Any, Optional, Dict
@@ -45,7 +51,7 @@ try:
     if _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 # --- Theme ---
 try:
@@ -267,7 +273,7 @@ class SettingsDialog(QDialog):
                     layout.addWidget(image_label)
                     self._info_image_label = image_label
         except Exception:
-            pass
+            _ignored()
 
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 4, 0, 0)
@@ -841,7 +847,7 @@ class SettingsDialog(QDialog):
         try:
             cb.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         except Exception:
-            pass
+            _ignored()
         self.checkboxes[key] = cb
         layout.addWidget(cb)
         if desc:
@@ -934,7 +940,7 @@ class SettingsDialog(QDialog):
                 geom = screen.availableGeometry()
                 return max(320, geom.width() - 40), max(300, geom.height() - 80)
         except Exception:
-            pass
+            _ignored()
         return 800, 600
 
     def _apply_initial_size(self):
@@ -959,7 +965,7 @@ class SettingsDialog(QDialog):
             )
             self._info_image_label.setPixmap(scaled)
         except Exception:
-            pass
+            _ignored()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -977,7 +983,7 @@ class SettingsDialog(QDialog):
                 found_themes = [f for f in os.listdir(theme_path) if f.endswith(".css")]
                 found_themes.sort()
         except Exception:
-            pass
+            _ignored()
 
         self.visual_theme_combo.addItem(_("None"), "none.css")
         self.visual_theme_combo.setItemData(0, QColor("#d94c4c"), Qt.ItemDataRole.ForegroundRole)

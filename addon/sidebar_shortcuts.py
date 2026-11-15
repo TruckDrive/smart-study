@@ -6,6 +6,12 @@ survives a move between macOS, Windows and Linux.  Qt converts that portable
 form to the platform's native symbols for display and key matching.
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import re
 from functools import partial
 from typing import Any, Dict, Optional
@@ -170,7 +176,7 @@ def _trigger(feature_key: str) -> None:
         try:
             tooltip(_("Could not open this sidebar tool."))
         except Exception:
-            pass
+            _ignored()
 
 
 def _ambiguous(feature_key: str, portable: str) -> None:
@@ -183,7 +189,7 @@ def _ambiguous(feature_key: str, portable: str) -> None:
             )
         )
     except Exception:
-        pass
+        _ignored()
 
 
 def cleanup() -> None:

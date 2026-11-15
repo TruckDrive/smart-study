@@ -23,6 +23,12 @@ can use either):
         new = dlg.get_new_settings()
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 import json
@@ -184,7 +190,7 @@ if _QT_AVAILABLE:
                 custom_background.discard_pending()
                 self.rejected.connect(custom_background.discard_pending)
             except Exception:
-                pass
+                _ignored()
 
             html = _html_path()
             self._available = os.path.exists(html)
@@ -233,7 +239,7 @@ if _QT_AVAILABLE:
                 self._page.setBackgroundColor(
                     QColor("#26282B") if self._is_night() else QColor("#ffffff"))
             except Exception:
-                pass
+                _ignored()
 
             from . import rtl; rtl.prepare_view(self._view)
             self._view.setUrl(QUrl.fromLocalFile(html))
@@ -409,7 +415,7 @@ if _QT_AVAILABLE:
                         self._page.runJavaScript(
                             "window.addonInstallDone && addonInstallDone(%s, %s);" % (json.dumps(code), json.dumps(bool(ok))))
                     except Exception:
-                        pass  # the settings window was closed meanwhile
+                        _ignored()  # the settings window was closed meanwhile
 
                 addon_sync.install([code], package.addon_settings, package.save_addon_settings, parent=self, on_done=done)
             except Exception as e:
@@ -418,7 +424,7 @@ if _QT_AVAILABLE:
                     self._page.runJavaScript(
                         "window.addonInstallDone && addonInstallDone(%s, false);" % json.dumps(str(code)))
                 except Exception:
-                    pass
+                    _ignored()
 
         def _open_integrations(self):
             """Opens the full window (options, credits) and shows its result here."""

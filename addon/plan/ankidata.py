@@ -1,6 +1,12 @@
 # Everything that reads data from the Anki collection or creates decks.
 # Functions take the collection as an argument (in Anki: mw.col) so they
 # also work with a test collection.
+try:
+    from ..quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import html
 import random
 import re
@@ -153,7 +159,7 @@ def weak(col, plan):
                 try:
                     cids.update(col.find_cards(q))
                 except Exception:
-                    pass
+                    _ignored()
         if not cids:
             continue
         s = ids2str(cids)
@@ -233,7 +239,7 @@ def sim_result(col, plan, sim):
                 try:
                     ids.update(col.find_cards(q))
                 except Exception:
-                    pass
+                    _ignored()
         hit = [c for c in answers if c in ids]
         if hit:
             per.append({"name": t["name"], "n": len(hit), "ok": sum(1 for c in hit if answers[c])})

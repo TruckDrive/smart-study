@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os, sys, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
@@ -52,7 +58,7 @@ if mw and _anki_point_version < _minimum_point_version:
     try:
         QTimer.singleShot(0, lambda msg=_version_error: showWarning(msg))
     except Exception:
-        pass
+        _ignored()
     raise RuntimeError(_version_error)
 
 # --- Sound ---
@@ -443,7 +449,7 @@ def on_state_change(new_state: str, old_state: str):
             import time as _time
             mw._sp_session_start_ms = int(_time.time() * 1000)
         except Exception:
-            pass
+            _ignored()
 
     # Leaving the review: if Anki lands on the congrats page ("Congratulations!
     # You have finished this deck for now."), add the session summary to it.
@@ -456,7 +462,7 @@ def on_state_change(new_state: str, old_state: str):
         try:
             statistics_widget.invalidate_statistics_cache()
         except Exception:
-            pass
+            _ignored()
         try:
             if gamification_manager:
                 gamification_manager.credit_study_xp(getattr(mw, "_sp_session_start_ms", None))
@@ -471,7 +477,7 @@ def on_state_change(new_state: str, old_state: str):
             mw.progress.single_shot(450, deck_overview.inject_session_summary_into_congrats)
             mw.progress.single_shot(1400, deck_overview.inject_session_summary_into_congrats)
         except Exception:
-            pass
+            _ignored()
     if not launcher_dock_widget:
         return
     
@@ -577,21 +583,21 @@ def _refresh_ui_after_onboarding():
         try:
             sidebar_widget_instance.apply_stylesheet()
         except Exception:
-            pass
+            _ignored()
 
     # Gamification sidebar
     if gamification_sidebar:
         try:
             gamification_sidebar.refresh_style()
         except Exception:
-            pass
+            _ignored()
 
     # Website sidebar button colours
     try:
         from .website_sidebar import refresh_website_theme
         refresh_website_theme()
     except Exception:
-        pass
+        _ignored()
 
     # Refresh the already-open AI Assistant without reloading the chat. This
     # keeps its accent token in sync with the selected SmartStudy colour theme.
@@ -599,19 +605,19 @@ def _refresh_ui_after_onboarding():
         from .ai_assistant import refresh_ai_assistant_theme
         refresh_ai_assistant_theme()
     except Exception:
-        pass
+        _ignored()
 
     # Deck browser — re-renders all widgets (fact, gamification, deadline…)
     if mw and mw.state == "deckBrowser":
         try:
             mw.deckBrowser.refresh()
         except Exception:
-            pass
+            _ignored()
     elif mw:
         try:
             mw.reset()
         except Exception:
-            pass
+            _ignored()
 
 
 def run_onboarding_if_needed():
@@ -691,7 +697,7 @@ def _apply_saved_settings(new_settings, message=None):
             set_custom_theme_colors(addon_settings.get("custom_theme_colors", {}))
         set_active_theme(_theme_name)
     except Exception:
-        pass
+        _ignored()
 
     try:
         from .plan import restyle as restyle_study_plan
@@ -710,21 +716,21 @@ def _apply_saved_settings(new_settings, message=None):
         try:
             sidebar_widget_instance.apply_stylesheet()
         except Exception:
-            pass
+            _ignored()
 
     # Refresh the gamification sidebar in-place (always-visible Qt widget).
     if gamification_sidebar:
         try:
             gamification_sidebar.refresh_style()
         except Exception:
-            pass
+            _ignored()
 
     # Refresh website sidebar button colours.
     try:
         from .website_sidebar import refresh_website_theme
         refresh_website_theme()
     except Exception:
-        pass
+        _ignored()
 
     # Keep the open AI Assistant in sync with the newly selected colour theme
     # without reloading it or clearing the conversation.
@@ -732,14 +738,14 @@ def _apply_saved_settings(new_settings, message=None):
         from .ai_assistant import refresh_ai_assistant_theme
         refresh_ai_assistant_theme()
     except Exception:
-        pass
+        _ignored()
 
     # Refresh music player dialog colour (if open).
     try:
         from .background_music import refresh_music_player_theme
         refresh_music_player_theme()
     except Exception:
-        pass
+        _ignored()
 
     deck_overview.update_settings(addon_settings)
 
@@ -827,7 +833,7 @@ def _get_theme_bg_hex(night: bool) -> str:
         if m:
             return m.group(1)
     except Exception:
-        pass
+        _ignored()
     return fallback
 
 
@@ -848,7 +854,7 @@ def _sync_webview_bg_colors():
         try:
             night = bool(_is_night())
         except Exception:
-            pass
+            _ignored()
         theme_qc = QColor(_get_theme_bg_hex(night))
         custom_active = bool(
             addon_settings.get("custom_background_enabled", False)
@@ -871,7 +877,7 @@ def _sync_webview_bg_colors():
                         page_color=QColor("#2B2E32" if night else "#ffffff")
                     wv.page().setBackgroundColor(page_color)
             except Exception:
-                pass
+                _ignored()
         try:
             cw = mw.centralWidget()
             if cw is not None:
@@ -883,7 +889,7 @@ def _sync_webview_bg_colors():
                 cw.setPalette(pal)
                 cw.setAutoFillBackground(True)
         except Exception:
-            pass
+            _ignored()
     except Exception as e:
         print(f"SmartStudy: webview bg sync failed: {e}")
 
@@ -1010,7 +1016,7 @@ def on_theme_changed():
     try:
         custom_background.setup(addon_settings)
     except Exception:
-        pass
+        _ignored()
     # Anki rebuilds its WebEngine documents after this hook. Refresh once the
     # switch has settled so the transparent root is present in the newly
     # created light/dark documents as well.
@@ -1033,12 +1039,12 @@ def on_theme_changed():
     try:
         mw.progress.single_shot(120, refresh_custom_background_after_theme)
     except Exception:
-        pass
+        _ignored()
     try:
         from .ai_assistant import refresh_ai_assistant_theme
         refresh_ai_assistant_theme()
     except Exception:
-        pass
+        _ignored()
     def show_theme_restart_warning() -> None:
         if addon_settings.get("theme_restart_warning_suppressed", False):
             return
@@ -1094,7 +1100,7 @@ def on_sync_finished(*_args) -> None:
     try:
         statistics_widget.invalidate_statistics_cache()
     except Exception:
-        pass
+        _ignored()
     try:
         if gamification_manager:
             gamification_manager.invalidate_dashboard_cache(full=True)
@@ -1253,13 +1259,13 @@ def on_profile_open():
             set_custom_theme_colors(addon_settings.get("custom_theme_colors", {}))
         set_active_theme(theme_name)
     except Exception:
-        pass
+        _ignored()
     _dashboard_rendered_with_models = False
     _daily_maintenance_done = False
     try:
         statistics_widget.invalidate_statistics_cache()
     except Exception:
-        pass
+        _ignored()
     if mw:
         mw.progress.single_shot(
             200,
@@ -1340,7 +1346,7 @@ def on_profile_close():
         from . import diagnostics
         diagnostics.stop('profile_closed')
     except Exception:
-        pass
+        _ignored()
     global launcher_dock_widget, sidebar_widget_instance, gamification_manager, gamification_sidebar, learning_plan_manager, deadline_manager
     global _dashboard_rendered_with_models, _daily_maintenance_done
     global _top_toolbar_redraw_generation, _profile_generation, _smartstudy_tools_menu
@@ -1353,7 +1359,7 @@ def on_profile_close():
     try:
         sidebar_shortcuts.cleanup()
     except Exception:
-        pass
+        _ignored()
     
     cleanup_pomodoro(); cleanup_website_sidebar()
     cleanup_music_player(); cleanup_ai_assistant_sidebar()
@@ -1362,17 +1368,17 @@ def on_profile_close():
         from . import web_sleep
         web_sleep.stop()
     except Exception:
-        pass
+        _ignored()
     try:
         from . import music_accounts, web_accounts
         music_accounts.cleanup_music_accounts()
         web_accounts.forget_profiles()  # after the views using them are gone
     except Exception:
-        pass
+        _ignored()
     try:
         custom_background.cleanup()
     except Exception:
-        pass
+        _ignored()
 
     # Docks are children of Anki's persistent main window, not of a profile.
     # Remove them explicitly so profile switches cannot retain old web pages,
@@ -1400,10 +1406,10 @@ def on_profile_close():
     try:
         statistics_widget.invalidate_statistics_cache()
     except Exception:
-        pass
+        _ignored()
     if _smartstudy_tools_menu is not None:
         try: mw.form.menuTools.removeAction(_smartstudy_tools_menu.menuAction())
-        except Exception: pass
+        except Exception: _ignored()
         _smartstudy_tools_menu = None
     
     for attr in ["gamification_manager", "deadline_manager", "learning_plan_manager", "daily_widgets", "gamification_sidebar"]:
@@ -1437,7 +1443,7 @@ def _plan_timer_cancel(subject: str):
     t = _plan_timers.pop(subject, None)
     if t is not None:
         try: t.stop(); t.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
 
 def _plan_timer_fire(subject: str):
     _plan_timers.pop(subject, None)
@@ -1702,7 +1708,7 @@ def _add_menus():
         try:
             mw.form.menuTools.removeAction(_smartstudy_tools_menu.menuAction())
         except Exception:
-            pass
+            _ignored()
         _smartstudy_tools_menu = None
     # "SmartStudy" is the brand/product name and is intentionally not translated.
     m = mw.form.menuTools.addMenu("Smart Study")

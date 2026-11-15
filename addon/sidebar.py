@@ -13,6 +13,12 @@ Public API (used by __init__.py):
     .refresh_style()                      – re-apply theme after settings change
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import json
 import os
@@ -230,7 +236,7 @@ class GamificationSidebar(QDockWidget):
             s.setAttribute(
                 QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
         except Exception:
-            pass
+            _ignored()
 
         self._view.loadFinished.connect(self._on_load_finished)
         from . import rtl; rtl.prepare_view(self._view)
@@ -255,7 +261,7 @@ class GamificationSidebar(QDockWidget):
             try:
                 self._page.runJavaScript("window.replayBadge && replayBadge();")
             except Exception:
-                pass
+                _ignored()
 
     # ── internals ─────────────────────────────────────────────────────────────
     def _apply_view_background(self) -> None:
@@ -266,7 +272,7 @@ class GamificationSidebar(QDockWidget):
             self._page.setBackgroundColor(
                 QColor(c.get("bg", "#1c1c1e" if _is_night() else "#F1F1EF")))
         except Exception:
-            pass
+            _ignored()
 
     def _on_load_finished(self, ok: bool) -> None:
         if ok:
@@ -327,7 +333,7 @@ class GamificationSidebar(QDockWidget):
             if isinstance(settings, dict):
                 return settings, save
         except Exception:
-            pass
+            _ignored()
         return None, None
 
     def _popups_enabled(self) -> bool:

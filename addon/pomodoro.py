@@ -1,6 +1,12 @@
 
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 import time
@@ -70,7 +76,7 @@ try:
     if _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 # --- Stylesheets ---
 
@@ -735,7 +741,7 @@ def _pomo_web_payload() -> dict:
     try:
         accent = _palette(is_night_mode).get("blue_accent", accent)
     except Exception:
-        pass
+        _ignored()
 
     return {
         "isDark": is_night_mode,
@@ -834,7 +840,7 @@ if _web_ok:
                 self._page.setBackgroundColor(
                     QColor("#26282B") if dark else QColor("#F1F1EF"))
             except Exception:
-                pass
+                _ignored()
             self._page.message.connect(self._on_message)
             lay.addWidget(self._view)
             from . import rtl; rtl.prepare_view(self._view)

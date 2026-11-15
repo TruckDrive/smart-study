@@ -8,6 +8,12 @@ backgrounds. An extra image copy is provided only for explicitly enabled glass.
 
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import base64
 import json
@@ -484,7 +490,7 @@ def _set_page_transparency(active: bool) -> None:
                 view.page().setBackgroundColor(color)
                 view.eval(js)
         except Exception:
-            pass
+            _ignored()
 
 
 def sync_state(state: str) -> None:
@@ -511,7 +517,7 @@ def sync_state(state: str) -> None:
         QTimer.singleShot(0, resync_document)
         QTimer.singleShot(100, resync_document)
     except Exception:
-        pass
+        _ignored()
 
 
 def inject_style(web_content, active: bool) -> None:
@@ -669,7 +675,7 @@ def on_internal_page_styled(web) -> None:
                 _layer.hide()
             _set_page_transparency(False)
     except Exception:
-        pass
+        _ignored()
 
 
 def cleanup() -> None:

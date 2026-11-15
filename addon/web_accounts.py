@@ -9,6 +9,12 @@ the page talks to the website directly, as in a normal browser.
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import os
 import re
 from typing import Callable, List, Optional, Tuple, Union
@@ -367,7 +373,7 @@ class AccountSitesPanel(QWidget):
             from . import browser_chrome
             browser_chrome.set_icon(self.external, "external", 14)
         except Exception:
-            pass
+            _ignored()
 
     def _ensure_view(self) -> QWebEngineView:
         if self.view is None:

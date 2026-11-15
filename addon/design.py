@@ -4,6 +4,12 @@
 Every new surface (the side panel, the Today page, the standard theme) reads
 its colours from here, so a change in one place reaches all of them.
 """
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from typing import Dict
 
 STANDARD_THEME = "standard.css"
@@ -46,7 +52,7 @@ def tokens(night: bool) -> Dict[str, str]:
             t["accent"] = p["blue_accent"] if night else p["blue"]
             t["on_accent"] = on_accent(t["accent"])
     except Exception:
-        pass
+        _ignored()
     return t
 
 

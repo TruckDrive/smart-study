@@ -5,6 +5,12 @@ pass page text, URLs, user input, exception messages or filesystem paths.
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import json
 import math
 import os
@@ -156,18 +162,18 @@ class Sampler:
                 pids.update(p.pid for p in children)
                 scope = 'main_and_children'
             except Exception:
-                pass
+                _ignored()
             for pid in sorted(pids)[:65]:
                 try:
                     rss[pid] = self.psutil.Process(pid).memory_info().rss
                 except Exception:
-                    pass
+                    _ignored()
             try:
                 memory = self.psutil.virtual_memory()
                 available, total = memory.available, memory.total
                 memory_source = 'psutil_available'
             except Exception:
-                pass
+                _ignored()
         else:
             try:
                 if platform.system() == 'Darwin':
@@ -181,7 +187,7 @@ class Sampler:
             try:
                 available, total, memory_source = _system_memory()
             except Exception:
-                pass
+                _ignored()
         return {'main_rss': rss.get(os.getpid()), 'observed_rss_sum': sum(rss.values()) if rss else None,
                 'renderer_rss_sum': sum(rss[p] for p in set(renderer_pids) if p in rss) if any(p in rss for p in renderer_pids) else None,
                 'processes_measured': len(rss), 'main_cpu_percent': main_cpu,
@@ -234,7 +240,7 @@ class Recorder:
         except queue.Full:
             self.dropped += 1
         except Exception:
-            pass
+            _ignored()
 
     def heartbeat(self):
         now = time.monotonic()
@@ -343,7 +349,7 @@ class Recorder:
         finally:
             if handle:
                 try: handle.close()
-                except Exception: pass
+                except Exception: _ignored()
 
 
 def saved_sessions(root):
@@ -380,7 +386,7 @@ def record(event, **fields):
     try:
         if _recorder is not None: _recorder.record(event, **fields)
     except Exception:
-        pass
+        _ignored()
 
 
 def stop(reason='user'):
@@ -388,7 +394,7 @@ def stop(reason='user'):
         if _timer is not None: _timer.stop()
         if _recorder is not None: _recorder.stop(reason)
     except Exception:
-        pass
+        _ignored()
 
 
 def start():
@@ -406,11 +412,11 @@ def start():
             from PyQt6.QtWebEngineCore import qWebEngineChromiumVersion
             metadata['chromium'] = qWebEngineChromiumVersion()
         except Exception:
-            pass
+            _ignored()
         try:
             metadata['addon'] = json.loads((Path(__file__).parent / 'manifest.json').read_text())['human_version']
         except Exception:
-            pass
+            _ignored()
         _recorder = Recorder(root_path(), metadata)
         if _timer is None:
             _timer = QTimer(mw)
@@ -436,7 +442,7 @@ def _heartbeat():
         elif _timer is not None:
             _timer.stop()
     except Exception:
-        pass
+        _ignored()
 
 
 def attach_webview(view):
@@ -447,7 +453,7 @@ def attach_webview(view):
             try:
                 if _recorder is not None: _recorder.renderer(key, int(pid))
                 record('browser.renderer_pid', pid=int(pid))
-            except Exception: pass
+            except Exception: _ignored()
         page = view.page()
         pid_changed(page.renderProcessPid())
         record('browser.state', visible=bool(view.isVisible()), count=page.history().count(), index=page.history().currentItemIndex())
@@ -463,14 +469,14 @@ def attach_webview(view):
             try:
                 record('browser.renderer_terminated', status=int(status.value), exit_code=int(code))
                 pid_changed(0)
-            except Exception: pass
+            except Exception: _ignored()
         view.renderProcessTerminated.connect(terminated)
         def navigation(request):
             try:
                 record('browser.navigation', value=int(request.navigationType().value))
-            except Exception: pass
+            except Exception: _ignored()
         view.page().navigationRequested.connect(navigation)
         view.page().visibleChanged.connect(lambda visible: record('browser.visible', visible=bool(visible)))
         record('browser.attached')
     except Exception:
-        pass
+        _ignored()

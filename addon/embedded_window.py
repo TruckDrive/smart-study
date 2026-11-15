@@ -12,6 +12,12 @@ Only one embedded view can be active at a time (across all tools).
 
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 from typing import Callable, List, Optional
 
@@ -104,7 +110,7 @@ def _build_header(title: str, on_close: Callable[[], None]) -> QWidget:
     try:
         close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
     except Exception:
-        pass
+        _ignored()
     close_btn.clicked.connect(lambda: on_close())
     h.addWidget(close_btn)
 
@@ -167,7 +173,7 @@ def embed(inner_widget: QWidget, on_close: Callable[[], None],
         container.setSizePolicy(QSizePolicy.Policy.Expanding,
                                 QSizePolicy.Policy.Expanding)
     except Exception:
-        pass
+        _ignored()
     v = QVBoxLayout(container)
     v.setContentsMargins(1, 0, 0, 0)
     v.setSpacing(0)
@@ -180,12 +186,12 @@ def embed(inner_widget: QWidget, on_close: Callable[[], None],
         inner_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
                                    QSizePolicy.Policy.Expanding)
     except Exception:
-        pass
+        _ignored()
     v.addWidget(inner_widget, 1)
     try:
         inner_widget.show()
     except Exception:
-        pass
+        _ignored()
 
     # Hide Anki's normal central widgets, including the top toolbar
     # (Decks / Add / Browse …) which isn't needed in this focused view.
@@ -207,7 +213,7 @@ def embed(inner_widget: QWidget, on_close: Callable[[], None],
                 w.setVisible(False)
                 hidden.append(w)
         except Exception:
-            pass
+            _ignored()
         # Some widgets (notably Anki's top toolbar) keep reserving their
         # vertical slot even when hidden, leaving an empty grey band. Clamp
         # both min and max height to 0 so the layout truly reclaims the space.
@@ -216,7 +222,7 @@ def embed(inner_widget: QWidget, on_close: Callable[[], None],
             w.setMinimumHeight(0)
             w.setMaximumHeight(0)
         except Exception:
-            pass
+            _ignored()
 
     # Take over the whole central area.
     try:
@@ -246,12 +252,12 @@ def restore() -> None:
         try:
             layout.removeWidget(container)
         except Exception:
-            pass
+            _ignored()
     try:
         container.setParent(None)
         container.deleteLater()
     except Exception:
-        pass
+        _ignored()
 
     # Undo the height clamp first, then re-show, so widgets regain their slot.
     toolbar_was_collapsed = False
@@ -267,14 +273,14 @@ def restore() -> None:
                 w.setMinimumHeight(old_min)
                 w.setMaximumHeight(old_max if old_max else _QWIDGETSIZE_MAX)
         except Exception:
-            pass
+            _ignored()
     for w in _hidden_widgets:
         try:
             # See the matching comment in embed(): setVisible() bypasses
             # Anki's asynchronous toolbar show()/height animation override.
             w.setVisible(True)
         except Exception:
-            pass
+            _ignored()
 
     _container = None
     _on_close = None

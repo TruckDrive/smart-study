@@ -40,6 +40,12 @@ Adding / editing translations
   tags …) identical across all languages so ``.format()`` keeps working.
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from typing import Dict
 import json
 from pathlib import Path
@@ -80,14 +86,14 @@ def _detect_anki_lang() -> str:
         from anki.lang import current_lang  # type: ignore
         raw = current_lang or ""
     except Exception:
-        pass
+        _ignored()
     # Fallback API name used on some older Anki versions.
     if not raw:
         try:
             from anki.lang import currentLang  # type: ignore
             raw = currentLang or ""
         except Exception:
-            pass
+            _ignored()
     # Last resort: read directly from the profile manager.
     if not raw:
         try:
@@ -95,7 +101,7 @@ def _detect_anki_lang() -> str:
             if mw is not None and getattr(mw, "pm", None) is not None:
                 raw = mw.pm.meta.get("defaultLang", "") or ""
         except Exception:
-            pass
+            _ignored()
 
     raw = (raw or "").lower()
     if raw.startswith("de"):

@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import os
 
 # --- Addon Package Name ---
@@ -147,7 +153,7 @@ def is_night() -> bool:
         from aqt.theme import theme_manager
         return bool(theme_manager.night_mode)
     except Exception:
-        pass
+        _ignored()
     try:
         from aqt import mw
         return bool(mw and mw.pm and mw.pm.night_mode())

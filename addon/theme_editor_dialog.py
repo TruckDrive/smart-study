@@ -10,6 +10,12 @@ Exported:
     ThemeEditorDialog – QDialog subclass
 """
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 from typing import Dict, Optional
 
@@ -42,7 +48,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 # ── Four user-facing colour keys ──────────────────────────────────────────────
 # (blue_accent and blue_border are auto-derived in theme.palette())

@@ -11,6 +11,12 @@ used here).
 """
 from __future__ import annotations
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import os
 import pickle
 import time
@@ -182,7 +188,7 @@ def _build(folder: str) -> Optional[FilterEngine]:
             if isinstance(engine, FilterEngine):
                 return engine
     except Exception:
-        pass  # missing, stale or from another add-on version: rebuild
+        _ignored()  # missing, stale or from another add-on version: rebuild
     texts = []
     for path in paths:
         with open(path, encoding="utf-8", errors="replace") as f:

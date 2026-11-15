@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 from .constants import is_night as _is_night
 import os
 import base64
@@ -39,7 +45,7 @@ try:
     if mw and _is_night():
         is_night_mode = True
 except Exception:
-    pass
+    _ignored()
 
 try:
     from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
@@ -206,7 +212,7 @@ class DeadlineManager:
                 if datetime.strptime(d["end_date"], self.DATE_FORMAT).date() >= today:
                     upcoming.append(d)
             except Exception:
-                pass
+                _ignored()
         if upcoming:
             return upcoming[0]  # sorted by end_date, so first = nearest
         return deadlines[-1]   # all past → show most recent

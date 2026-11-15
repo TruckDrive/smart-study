@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+try:
+    from .quiet import ignored as _ignored
+except ImportError:  # the module is loaded on its own (tests)
+    def _ignored(*_args):
+        pass
+
 import json
 import html
 import traceback
@@ -156,7 +162,7 @@ def _make_window_icon(size: int = 16, active: bool = False):
         try:
             pm.setDevicePixelRatio(float(scale))
         except Exception:
-            pass
+            _ignored()
         return QIcon(pm)
     except Exception as e:
         print(f"WS Warn: could not build window icon: {e}")
@@ -174,7 +180,7 @@ def _apply_window_icon(btn, active: bool = False) -> None:
         browser_chrome.set_icon(btn, "layout-close" if active else "layout")
         return
     except Exception:
-        pass
+        _ignored()
     icon = _make_window_icon(16, active=active)
     if icon is not None:
         try:
@@ -183,11 +189,11 @@ def _apply_window_icon(btn, active: bool = False) -> None:
             btn.setIconSize(QSize(16, 16))
             return
         except Exception:
-            pass
+            _ignored()
     try:
         btn.setText("⧉")  # ⧉ fallback glyph
     except Exception:
-        pass
+        _ignored()
 
 # --- Module Globals ---
 sidebar_dock: Optional[QDockWidget] = None
@@ -570,7 +576,7 @@ def add_current_page() -> None:
     try:
         browser_history.save_icon(url, getattr(view, "_ss_icon", None))
     except Exception:
-        pass
+        _ignored()
     tooltip(_("Site '{}' added.").format(name))
     rebuild_custom_buttons_ui()
 
@@ -893,7 +899,7 @@ def create_button_pair(name: str, url: str, index: int) -> Optional[QWidget]:
             site_button.setIcon(chip_icon)
             site_button.setIconSize(QSize(14, 14))
     except Exception:
-        pass
+        _ignored()
     site_button._ss_site = (name, url)
     site_button.setStyleSheet(_get_raised_text_button_style())
     site_button.setToolTip(url)
@@ -1415,7 +1421,7 @@ class _TabPage(_PageBase):
         try:
             super().javaScriptConsoleMessage(level, message, line, source)
         except Exception:
-            pass
+            _ignored()
 
 
 def _make_tab_view():
@@ -1583,7 +1589,7 @@ def close_tab(index: int) -> None:
     _show_close_buttons()
     _schedule_save_tabs()
     try: view.setUrl(QUrl("about:blank"))
-    except Exception: pass
+    except Exception: _ignored()
     view.deleteLater()
 
 
@@ -1974,7 +1980,7 @@ def open_website_window():
         try:
             window_button.setToolTip(_("Browser layout"))
         except Exception:
-            pass
+            _ignored()
         # Flip the icon to the "close window" state (frame with a dash).
         _apply_window_icon(window_button, active=True)
 
@@ -1987,7 +1993,7 @@ def close_website_window():
         try:
             sidebar_dock.setWidget(content)  # reparents out of the embed container
         except Exception:
-            pass
+            _ignored()
     embedded_window.restore()
     website_embedded_content = None
     website_window = None
@@ -1995,7 +2001,7 @@ def close_website_window():
         try:
             window_button.setToolTip(_("Browser layout"))
         except Exception:
-            pass
+            _ignored()
         # Restore the normal "open in main window" icon.
         _apply_window_icon(window_button, active=False)
     if sidebar_dock is not None:
@@ -2003,7 +2009,7 @@ def close_website_window():
             sidebar_dock.show()
             sidebar_dock.raise_()
         except Exception:
-            pass
+            _ignored()
 
 
 # --- Toggle Function ---
@@ -2077,24 +2083,24 @@ def refresh_website_theme() -> None:
                 browser_chrome.refresh_icon(button)
     if home_button_widget is not None:
         try: home_button_widget.setStyleSheet(_get_raised_text_button_style())
-        except Exception: pass
+        except Exception: _ignored()
     if more_button is not None and not sip.isdeleted(more_button):
         more_button.setStyleSheet(_get_raised_icon_button_style())
     if add_button_widget is not None:
         try:
             add_button_widget.setStyleSheet(_get_raised_icon_button_style())
             browser_chrome.refresh_icon(add_button_widget)
-        except Exception: pass
+        except Exception: _ignored()
     for _btn in (back_button, forward_button, refresh_button, window_button):
         if _btn is not None:
             try:
                 _btn.setStyleSheet(icon_style)
                 browser_chrome.refresh_icon(_btn)
-            except Exception: pass
+            except Exception: _ignored()
     if window_button is not None:
         # Keep the "close window" variant while the embedded view is active.
         try: _apply_window_icon(window_button, active=(website_window is not None))
-        except Exception: pass
+        except Exception: _ignored()
     try:
         if mw is not None:
             bar = mw.findChild(QWidget, "smartstudyWebToolbar")
@@ -2102,10 +2108,10 @@ def refresh_website_theme() -> None:
                 bar.setStyleSheet(browser_chrome.toolbar())
         if load_bar is not None and not sip.isdeleted(load_bar):
             load_bar.update()
-    except Exception: pass
+    except Exception: _ignored()
     # Rebuild custom site buttons so their styles refresh too.
     try: rebuild_custom_buttons_ui()
-    except Exception: pass
+    except Exception: _ignored()
 
 # --- Cleanup Function ---
 def cleanup_website_sidebar():
@@ -2120,7 +2126,7 @@ def cleanup_website_sidebar():
     global more_button
     more_button = None
     try: browser_history.save()
-    except Exception: pass
+    except Exception: _ignored()
 
     diagnostics.record('browser.cleanup')
     try: browser_layout.cleanup()
@@ -2138,7 +2144,7 @@ def cleanup_website_sidebar():
         try: close_website_window()
         except Exception:
             try: embedded_window.restore()
-            except Exception: pass
+            except Exception: _ignored()
         website_window = None
 
     # Anki's main window survives profile switches. Destroy the Qt objects so
@@ -2147,22 +2153,22 @@ def cleanup_website_sidebar():
         if view is None:
             continue
         try: view.setUrl(QUrl("about:blank"))
-        except Exception: pass
+        except Exception: _ignored()
         try: view.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
     tab_bar = None; tab_stack = None; search_help = None; pip_placeholder = None; browser_container = None
     global address_bar
     address_bar = None
     if sidebar_dock is not None:
         try: mw.removeDockWidget(sidebar_dock)
-        except Exception: pass
+        except Exception: _ignored()
         try: sidebar_dock.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
     if website_profile is not None:
         try: website_profile.setUrlRequestInterceptor(None)
-        except Exception: pass
+        except Exception: _ignored()
         try: website_profile.deleteLater()
-        except Exception: pass
+        except Exception: _ignored()
     global ad_blocker
     ad_blocker = None
 
