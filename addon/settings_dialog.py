@@ -772,7 +772,7 @@ class SettingsDialog(QDialog):
             ("pomodoro_enabled", _("Timer"),
              _("A focus timer with work and break intervals.")),
             ("ai_assistant_enabled", _("AI Assistant"),
-             _("Chat assistant that can explain your cards.")),
+             _("ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.")),
             ("website_viewer_enabled", _("Website Viewer"),
              _("Open websites in a panel without leaving Anki.")),
             ("notebook_enabled", _("Notebook"),

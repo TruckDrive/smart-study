@@ -8064,11 +8064,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "fr": "Un minuteur de concentration avec intervalles de travail et de pause.", "vi": "Bộ đếm giờ tập trung với các khoảng làm việc và nghỉ.",
         "zh": "带工作和休息间隔的专注计时器。", "hi": "कार्य और विराम अंतराल वाला फोकस टाइमर।",
     },
-    "Chat assistant that can explain your cards.": {
-        "de": "Chat-Assistent, der deine Karten erklären kann.", "es": "Asistente de chat que puede explicar tus tarjetas.",
-        "ko": "카드를 설명해 주는 채팅 어시스턴트.", "pt": "Assistente de chat que pode explicar seus cartões.",
-        "fr": "Assistant de chat capable d'expliquer vos cartes.", "vi": "Trợ lý trò chuyện có thể giải thích thẻ của bạn.",
-        "zh": "可以讲解您卡片的聊天助手。", "hi": "चैट असिस्टेंट जो आपके कार्ड समझा सकता है।",
+    "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": {
+        "de": "ChatGPT, Claude, Gemini oder NotebookLM neben deinen Karten, mit deinem eigenen Konto.",
+        "es": "ChatGPT, Claude, Gemini o NotebookLM junto a tus tarjetas, con tu propia cuenta.",
+        "ko": "카드 옆에서 ChatGPT, Claude, Gemini 또는 NotebookLM을 내 계정으로 사용합니다.",
+        "pt": "ChatGPT, Claude, Gemini ou NotebookLM ao lado dos seus cartões, com a sua própria conta.",
+        "fr": "ChatGPT, Claude, Gemini ou NotebookLM à côté de tes cartes, avec ton propre compte.",
+        "vi": "ChatGPT, Claude, Gemini hoặc NotebookLM cạnh thẻ của bạn, bằng tài khoản của bạn.",
+        "zh": "在卡片旁使用 ChatGPT、Claude、Gemini 或 NotebookLM，使用你自己的账号。",
+        "hi": "आपके कार्ड के पास ChatGPT, Claude, Gemini या NotebookLM, आपके अपने खाते से।",
     },
     "Open websites in a panel without leaving Anki.": {
         "de": "Webseiten in einem Panel öffnen, ohne Anki zu verlassen.", "es": "Abre sitios web en un panel sin salir de Anki.",
@@ -8488,6 +8492,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 }
 
 # Gamification sidebar settings.
+# Assistant: chatbot picker and Google sign-in window
+TRANSLATIONS.update({
+    "Sign in with Google": {"de": "Mit Google anmelden", "es": "Iniciar sesión con Google", "ko": "Google로 로그인", "pt": "Entrar com o Google", "fr": "Se connecter avec Google", "vi": "Đăng nhập bằng Google", "zh": "使用 Google 登录", "hi": "Google से साइन इन करें"},
+    "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": {"de": "Melde dich hier einmal an – Gemini, NotebookLM und YouTube Music nutzen dann dieses Google-Konto.", "es": "Inicia sesión aquí una vez: Gemini, NotebookLM y YouTube Music usarán esta cuenta de Google.", "ko": "여기서 한 번 로그인하면 Gemini, NotebookLM, YouTube Music이 이 Google 계정을 사용합니다.", "pt": "Entre aqui uma vez – o Gemini, o NotebookLM e o YouTube Music passam a usar esta conta Google.", "fr": "Connecte-toi ici une fois – Gemini, NotebookLM et YouTube Music utiliseront ensuite ce compte Google.", "vi": "Đăng nhập một lần tại đây – Gemini, NotebookLM và YouTube Music sẽ dùng tài khoản Google này.", "zh": "在这里登录一次——之后 Gemini、NotebookLM 和 YouTube Music 都会使用这个 Google 账号。", "hi": "यहाँ एक बार साइन इन करें – फिर Gemini, NotebookLM और YouTube Music इसी Google खाते का उपयोग करेंगे।"},
+    "Choose the chatbot": {"de": "Chatbot wählen", "es": "Elegir el chatbot", "ko": "챗봇 선택", "pt": "Escolher o chatbot", "fr": "Choisir le chatbot", "vi": "Chọn chatbot", "zh": "选择聊天机器人", "hi": "चैटबॉट चुनें"},
+})
+
 TRANSLATIONS.update({
     "Streak sensitivity": {
         "de": "Streak-Empfindlichkeit"

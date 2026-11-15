@@ -14,7 +14,7 @@ import re
 from typing import Callable, List, Optional, Tuple, Union
 
 from aqt import mw
-from aqt.qt import (QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+from aqt.qt import (QHBoxLayout, QLabel, QPushButton, QSizePolicy, QTimer,
                     QStackedWidget, QUrl, QVBoxLayout, QWidget, Qt, QDesktopServices)
 from aqt.utils import tooltip
 
@@ -194,6 +194,89 @@ class _Page(QWebEnginePage):
     def createWindow(self, _type):  # sign-in pop-ups (Google, Apple, …)
         return self
 
+    def acceptNavigationRequest(self, url, nav_type, is_main_frame):
+        # Google refuses a sign-in in this profile ("browser may not be secure"),
+        # but accepts it in the Smart Study browser's profile, whose Google
+        # cookies are then copied over (share_login_from). So a click on
+        # "Sign in" opens the Google sign-in in a small window with that profile.
+        if (is_main_frame and url.host() == "accounts.google.com"
+                and nav_type == QWebEnginePage.NavigationType.NavigationTypeLinkClicked):
+            view = self.parent()
+            QTimer.singleShot(0, lambda: google_sign_in(url, view))
+            return False
+        return super().acceptNavigationRequest(url, nav_type, is_main_frame)
+
+
+_signin_dialog = None
+
+
+def _website_profile():
+    """The Smart Study browser's profile (created with its dock, kept hidden)."""
+    from . import website_sidebar as ws
+    if ws.website_profile is None:
+        dock = ws.create_website_dock()
+        if dock is not None and not dock.isVisible():
+            dock.setVisible(False)
+    return ws.website_profile
+
+
+def google_sign_in(url: "QUrl", reload_view=None) -> None:
+    """Google sign-in in a small window that uses the Smart Study browser's
+    profile; afterwards the page that asked for it is loaded again."""
+    global _signin_dialog
+    from aqt.qt import QDialog
+    if _signin_dialog is not None:
+        _signin_dialog.raise_()
+        return
+    profile = _website_profile()
+    if profile is None:
+        QDesktopServices.openUrl(url)
+        return
+    dialog = QDialog(mw)
+    dialog.setWindowTitle(tr("Sign in with Google"))
+    dialog.resize(480, 640)
+    layout = QVBoxLayout(dialog)
+    layout.setContentsMargins(0, 0, 0, 0)
+    note = QLabel(tr("Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account."))
+    note.setWordWrap(True)
+    note.setContentsMargins(12, 8, 12, 8)
+    layout.addWidget(note)
+    view = QWebEngineView(dialog)
+    view.setPage(QWebEnginePage(profile, view))
+    layout.addWidget(view, 1)
+    from urllib.parse import parse_qs, urlsplit
+    goal = parse_qs(urlsplit(url.toString()).query).get("continue", [""])[0]
+    targets = {urlsplit(goal).hostname or "", "gemini.google.com", "notebooklm.google.com",
+               "music.youtube.com", "myaccount.google.com"} - {""}
+
+    def changed(new_url):
+        if new_url.host() in targets:
+            # Google sent us back to the site: signed in.
+            dialog.accept()
+
+    view.urlChanged.connect(changed)
+    view.setUrl(url)
+
+    def finished(_result):
+        global _signin_dialog
+        _signin_dialog = None
+        view.setUrl(QUrl("about:blank"))
+        if reload_view is not None:
+            # give the copied cookies a moment, then load the site again
+            QTimer.singleShot(800, lambda: _reload(reload_view))
+        dialog.deleteLater()
+
+    dialog.finished.connect(finished)
+    _signin_dialog = dialog
+    dialog.show()
+
+
+def _reload(view) -> None:
+    try:
+        view.reload()
+    except RuntimeError:
+        pass
+
 
 class AccountSitesPanel(QWidget):
     """A row of tab buttons above a stack.  A tab shows either an own widget or
@@ -201,7 +284,7 @@ class AccountSitesPanel(QWidget):
 
     def __init__(self, tabs: List[Tuple[str, str, Union[str, QWidget]]], *,
                  hint: str = "", remember: Optional[Callable[[str], None]] = None,
-                 parent: Optional[QWidget] = None):
+                 picker: bool = False, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.tabs = tabs              # (key, label, url or widget)
         self.remember = remember
@@ -218,13 +301,31 @@ class AccountSitesPanel(QWidget):
         row = QHBoxLayout(bar)
         row.setContentsMargins(8, 6, 8, 6)
         row.setSpacing(4)
-        for key, label, _target in tabs:
-            button = QPushButton(label)
-            button.setCheckable(True)
-            button.setCursor(Qt.CursorShape.PointingHandCursor)
-            button.clicked.connect(lambda _=False, k=key: self.show_site(k))
-            row.addWidget(button)
-            self.buttons[key] = button
+        self.picker = None
+        if picker:
+            # One site at a time; a small menu shows which one and switches.
+            from aqt.qt import QMenu, QToolButton
+            self.picker = QToolButton()
+            self.picker.setObjectName("smartstudySitePicker")
+            self.picker.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+            self.picker.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.picker.setToolTip(tr("Choose the chatbot"))
+            menu = QMenu(self.picker)
+            for key, label, _target in tabs:
+                action = menu.addAction(label)
+                action.setCheckable(True)
+                action.triggered.connect(lambda _=False, k=key: self.show_site(k))
+                self.buttons[key] = action
+            self.picker.setMenu(menu)
+            row.addWidget(self.picker)
+        else:
+            for key, label, _target in tabs:
+                button = QPushButton(label)
+                button.setCheckable(True)
+                button.setCursor(Qt.CursorShape.PointingHandCursor)
+                button.clicked.connect(lambda _=False, k=key: self.show_site(k))
+                row.addWidget(button)
+                self.buttons[key] = button
         row.addStretch(1)
         self.external = QPushButton("↗")
         self.external.setToolTip(tr("Open in browser"))
@@ -258,6 +359,8 @@ class AccountSitesPanel(QWidget):
             f"#smartstudyAccountBar {{ border-bottom: 1px solid {line}; }}"
             f"#smartstudyAccountBar QPushButton {{ padding: 4px 11px; border-radius: 13px; border: 1px solid {line}; }}"
             f"#smartstudyAccountBar QPushButton:checked {{ background: {on}; color: {tokens['on_accent']}; border-color: {on}; }}"
+            f"#smartstudySitePicker {{ padding: 4px 12px; border-radius: 13px; border: 1px solid {line}; font-weight: 600; }}"
+            "#smartstudySitePicker::menu-indicator { image: none; width: 0; }"
         )
 
     def _ensure_view(self) -> QWebEngineView:
@@ -280,6 +383,8 @@ class AccountSitesPanel(QWidget):
             key, _label, target = self.tabs[0]
         for k, button in self.buttons.items():
             button.setChecked(k == key)
+        if self.picker is not None:
+            self.picker.setText(next(l for k, l, _t in self.tabs if k == key) + "  ▾")
         self.current = key
         if isinstance(target, QWidget):
             self.stack.setCurrentWidget(target)

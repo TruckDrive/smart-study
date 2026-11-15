@@ -1702,9 +1702,9 @@ def _setup_sidebar() -> bool:
 
         # page_ready signal from JS will trigger _inject_init()
         # (no fixed-delay injection needed)
-        from . import rtl; rtl.prepare_view(_webview)
-        _webview.setUrl(QUrl.fromLocalFile(html_path))
-        print(f"AI Assistant: loading {html_path}")
+        # The own API chat is no longer offered (only the sites with your own
+        # account), so its page is not loaded; the view stays as a hidden stub.
+        _webview.hide()
 
         # Dock
         _dock = QDockWidget(_("AI Assistant"), mw)
@@ -1720,15 +1720,17 @@ def _setup_sidebar() -> bool:
         _dock.setTitleBarWidget(QWidget())
         _dock.setMinimumWidth(340)
         _webview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        # Tabs: the API chat, or ChatGPT/Claude/Gemini/NotebookLM with your own account.
+        # Tabs: ChatGPT/Claude/Gemini/NotebookLM with your own account.
         global _sites_panel
         from .web_accounts import AccountSitesPanel
         _sites_panel = AccountSitesPanel(
-            [("api", _web_tr("API chat"), _webview)] + AI_SITES,
+            list(AI_SITES), picker=True,
             hint=_web_tr("Sign in with your own account – no API key needed. Use your e-mail address: Google does not allow “Sign in with Google” inside apps like Anki. Gemini and NotebookLM use your Google sign-in from the Smart Study browser: sign in to Google there once."),
             remember=lambda key: _cfg_set(CK_WEB_SITE, key),
         )
-        _sites_panel.show_site(_cfg_get(CK_WEB_SITE, "api") or "api")
+        _sites_panel.show_site(_cfg_get(CK_WEB_SITE, "chatgpt") or "chatgpt")  # an old "api" falls back to the first site
+        _webview.setParent(_sites_panel)
+        _webview.hide()
         _dock.setWidget(_sites_panel)
         _dock.setVisible(False)
         from .sidebar_widths import attach

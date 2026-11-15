@@ -177,7 +177,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "Progress, rewards and motivation panel.", "Music Player",
         "Background music while you study.", "Timer",
         "A focus timer with work and break intervals.", "AI Assistant",
-        "Chat assistant that can explain your cards.", "Website Viewer",
+        "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.", "Website Viewer",
         "Open websites in a panel without leaving Anki.", "Notebook",
         "Notes, to-dos and PDFs alongside your cards.", "Set keyboard shortcut",
         "Add Shortcut", "No changelog yet", "Supporters will be listed here soon",

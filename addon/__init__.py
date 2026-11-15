@@ -498,6 +498,16 @@ def on_state_change(new_state: str, old_state: str):
         pass
 
 # --- Startup & Logic ---
+# Setup wizard "What do you want Smart Study for?" → settings it switches on or off.
+ONBOARDING_NEEDS = {
+    "plan": ("deadline_bar_enabled", "panel_show_plan"),
+    "focus": ("pomodoro_enabled", "music_player_enabled"),
+    "notes": ("notebook_enabled", "mindmap_enabled"),
+    "ai": ("ai_assistant_enabled", "website_viewer_enabled"),
+    "motivation": ("gamification_widgets_enabled", "panel_show_challenge", "gamification_sidebar_enabled"),
+}
+
+
 def _apply_onboarding_result(result: dict):
     """
     Apply language, colour theme, and fact-category from the onboarding
@@ -539,9 +549,18 @@ def _apply_onboarding_result(result: dict):
         print(f"SmartStudy Onboarding: could not apply theme '{theme_name}': {e}")
 
     # ── Fact category (driven by user role) ───────────────────────────────────
-    role_key = result.get("roleKey", "other")
-    fact_theme = onboarding_dialog.ROLE_TO_FACT_THEME.get(role_key, "General")
-    addon_settings["fact_theme"] = fact_theme
+    role_key = result.get("roleKey")  # only older wizard pages asked for a role
+    if role_key in onboarding_dialog.ROLE_TO_FACT_THEME:
+        addon_settings["fact_theme"] = onboarding_dialog.ROLE_TO_FACT_THEME[role_key]
+    fact_theme = addon_settings.get("fact_theme")
+
+    # ── What the new user wants: only that is switched on from the start ────
+    needs = result.get("needs")
+    if isinstance(needs, list):
+        chosen = {n for n in needs if isinstance(n, str)}
+        for need, keys in ONBOARDING_NEEDS.items():
+            for key in keys:
+                addon_settings[key] = need in chosen
 
     # Keep the selected discovery source locally as part of the onboarding
     # result, matching the consent screen shown before completion.
@@ -552,7 +571,7 @@ def _apply_onboarding_result(result: dict):
 
     save_addon_settings()
     print(f"SmartStudy Onboarding: applied — lang={lang}, theme={theme_name}, "
-          f"fact_theme={fact_theme}, role={role_key}")
+          f"fact_theme={fact_theme}, needs={result.get('needs')}")
 
 
 def _refresh_ui_after_onboarding():

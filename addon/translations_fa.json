@@ -313,7 +313,6 @@
  "Changed": "تغییر کرد",
  "Changelog": "تغییرات نسخه‌ها",
  "Chat Font Size": "اندازهٔ قلم گفت‌وگو",
- "Chat assistant that can explain your cards.": "دستیار گفت‌وگو که کارت‌هایتان را توضیح می‌دهد.",
  "Chat subscriptions and API access are separate products with separate billing. Google Gemini and some OpenRouter models offer free tiers; Ollama runs locally for free. API credit is managed in the selected provider's dashboard.": "اشتراک گفت‌وگو و دسترسی API محصولات جدا با صورت‌حساب جدا هستند. Google Gemini و برخی مدل‌های OpenRouter سطح رایگان دارند؛ Ollama به‌صورت محلی رایگان اجرا می‌شود. اعتبار API در داشبورد سرویس‌دهنده مدیریت می‌شود.",
  "Check again": "بررسی دوباره",
  "Check the endpoint and make sure the server is running.": "نشانی سرور را بررسی کنید و مطمئن شوید سرور در حال اجراست.",
@@ -2375,5 +2374,9 @@
  "Language, the period of the Memory chart and when the left bar is shown.": "زبان، بازهٔ نمودار حافظه و زمان نمایش نوار چپ.",
  "Period of the Memory chart (also under Home).": "بازهٔ نمودار حافظه (در خانه هم هست).",
  "Show the left bar with the tabs always, or hide it while you review.": "نوار چپ با زبانه‌ها را همیشه نشان بده یا هنگام مرور پنهان کن.",
- "Open page": "باز کردن صفحه"
+ "Open page": "باز کردن صفحه",
+ "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": "ChatGPT، Claude، Gemini یا NotebookLM کنار کارت‌هایتان، با حساب خودتان.",
+ "Sign in with Google": "ورود با Google",
+ "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": "یک بار اینجا وارد شوید – سپس Gemini، NotebookLM و YouTube Music از همین حساب Google استفاده می‌کنند.",
+ "Choose the chatbot": "انتخاب چت‌بات"
 }

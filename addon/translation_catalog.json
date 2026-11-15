@@ -4910,9 +4910,6 @@
   "Chat Font Size": {
     "pl": "Rozmiar tekstu czatu"
   },
-  "Chat assistant that can explain your cards.": {
-    "pl": "Asystent czatu, który wyjaśni Twoje karty."
-  },
   "Chat subscriptions and API access are separate products with separate billing. Google Gemini and some OpenRouter models offer free tiers; Ollama runs locally for free. API credit is managed in the selected provider's dashboard.": {
     "pl": "Subskrypcje czatu i dostęp API to osobne produkty z osobnym rozliczeniem. Google Gemini i niektóre modele OpenRouter mają darmowe limity; Ollama działa lokalnie za darmo. Środkami API zarządzasz w panelu wybranego dostawcy."
   },
@@ -9196,5 +9193,17 @@
   },
   "Open page": {
     "pl": "Otwórz stronę"
+  },
+  "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": {
+    "pl": "ChatGPT, Claude, Gemini lub NotebookLM obok twoich kart, na twoim własnym koncie."
+  },
+  "Sign in with Google": {
+    "pl": "Zaloguj się przez Google"
+  },
+  "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": {
+    "pl": "Zaloguj się tu raz – Gemini, NotebookLM i YouTube Music będą potem używać tego konta Google."
+  },
+  "Choose the chatbot": {
+    "pl": "Wybierz chatbota"
   }
 }
