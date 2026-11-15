@@ -455,9 +455,10 @@ class Panel(QObject):
 
     def _build_rail(self) -> None:
         """The rail at the left edge of the window, outside the docks."""
-        old = mw.findChild(QToolBar, RAIL_BAR)
-        if old is not None:
+        # All of them: a rail removed a moment ago may still wait for deleteLater.
+        for old in mw.findChildren(QToolBar, RAIL_BAR):
             mw.removeToolBar(old)
+            old.setParent(None)
             old.deleteLater()
         bar = QToolBar(mw)
         bar.setObjectName(RAIL_BAR)
@@ -765,17 +766,12 @@ class Panel(QObject):
     def _finish(self, data: Dict[str, Any]) -> None:
         settings = self.settings
         data["show"] = {name: bool(settings.get(key, True)) for name, key in SHOW_KEYS.items()}
-        try:
-            if data["show"]["challenge"] and not mw.col.card_count():
-                data["show"]["challenge"] = False  # a new, empty collection: nothing to review yet
-        except Exception:
-            pass
         manager = getattr(mw, "gamification_manager", None)
         if manager:
             try:
                 data["level"] = manager.get_level()
                 data["streak"] = manager.get_streak()
-                data["rank"] = _(manager.get_rank_name())
+                data["rank"] = " ".join(_(manager.get_rank_name()).replace("<br>", " ").split())
                 data["xp"] = manager.get_progress_percentage()
                 current, target = manager.get_challenge_progress()
                 data["challenge"] = {
@@ -784,6 +780,11 @@ class Panel(QObject):
                 }
             except Exception as error:
                 print(f"SmartStudy: level display failed: {error}")
+        try:
+            if not mw.col.card_count():
+                data.pop("challenge", None)  # a new, empty collection: nothing to review yet (switch stays as it is)
+        except Exception:
+            pass
         if data.get("countdown") is None:
             data["countdown"] = self._deadline()
         if data["show"]["fact"]:

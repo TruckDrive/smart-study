@@ -105,6 +105,9 @@ plan["topics"] = [{"id": "t1", "name": "Hals", "pages": {}, "anki": {"s3": 'deck
                   {"id": "t2", "name": "Arm", "anki": {"s3": 'deck:"Andere"'}}]
 short = share.export_plan(plan, short=True)
 assert short["v"] == 2
+plan["onceOnly"] = True
+assert share.export_plan(plan, short=True)["plan"]["onceOnly"] is True
+assert share.import_plan(share.export_plan(plan, short=True), base)["onceOnly"] is True
 assert short["plan"]["days"] == [{"d": "2026-11-06", "items": [
     {"id": "i3", "kind": "custom", "custom": True, "text": "Link", "url": "javascript:alert(1)"}]}], "only own items"
 assert short["plan"]["topics"][0]["anki"] == {"s3": 1} and "pages" not in short["plan"]["topics"][0]

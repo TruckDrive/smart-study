@@ -951,7 +951,10 @@ function calendar(p) {
         onchange: e => { const v = +e.target.value; const def = p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay; if (v === def) delete p.dayMinutes[d]; else p.dayMinutes[d] = v; render(); } }), h("span", { class: "muted" }, L("min", "min", "دقیقه"))),
       h("input", { type: "text", placeholder: L("Notiz", "Note", "یادداشت"), value: (p.dayNotes || {})[d] || "", onchange: e => { p.dayNotes = p.dayNotes || {}; if (e.target.value) p.dayNotes[d] = e.target.value; else delete p.dayNotes[d]; } })));
   }
-  return h("details", { key: "cal", open: store.get("calOpen") === false ? null : true, ontoggle: e => store.set("calOpen", e.target.open) }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
+  // Closed for a new plan (a wall of day cards scares people off); open once it is used or was opened.
+  const used = Object.keys(p.dayMinutes || {}).length || Object.keys(p.dayNotes || {}).length;
+  const open = store.get("calOpen") === true || (store.get("calOpen") !== false && used);
+  return h("details", { key: "cal", open: open ? true : null, ontoggle: e => store.set("calOpen", e.target.open) }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
 }
 
 function addSource(type) {
