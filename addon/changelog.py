@@ -17,8 +17,6 @@ CHANGELOG = [
             {"tag": "Fix", "text": "Study plan: the ⋯ menu also opens after you ticked an item or the page refreshed."},
             {"tag": "Fix", "text": "Pomodoro works right after switching it on in the settings, without restarting Anki."},
             {"tag": "Fix", "text": "Hiding Level and streak on the Today page updates the level on the rail at once."},
-            {"tag": "Fix", "text": "Settings: the Deck Overview, Side panel, Browser and Changelog tabs, the colour swatches and the logo were empty; they are back."},
-            {"tag": "Improved", "text": "The classic layout (widgets above the deck list, Minimalist Dashboard) is gone; the side panel is the only home. The settings of the old widgets are removed."},
         ],
     },
     {

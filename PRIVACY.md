@@ -14,13 +14,13 @@ add-on with several optional online tools.
 
 ## Optional online features
 
-- **AI Assistant:** sends the prompt and conversation needed for the request to
-  the provider selected by the user. If card context is enabled, visible card
-  text is included. Providers have their own privacy policies. Ollama and
-  llama.cpp can be used locally.
+- **AI Assistant:** opens the website of the chatbot the user chose (ChatGPT,
+  Claude, Gemini or NotebookLM) with the user's own account. What is typed
+  there goes to that provider, which has its own privacy policy. Smart Study
+  has no chat of its own any more (since 3.0.1).
 - **Website sidebar:** loads websites selected by the user. “Search in Sidebar”
   sends the selected search phrase to the search engine chosen under ⚙ in the
-  browser (DuckDuckGo by default) after the user chooses the action.
+  browser (Google by default) after the user chooses the action.
 - **Browser ad blocker:** when the browser is opened, it downloads uBlock
   Origin's default filter lists (uBlock filters, EasyList, EasyPrivacy) from
   ublockorigin.github.io at most once a week and keeps them in

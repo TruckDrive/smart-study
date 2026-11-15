@@ -1,14 +1,23 @@
 # Changelog
 
-## Unreleased (3.0.2)
+## Unreleased
 
-- **Accent colour everywhere**: the Today page, the study plan, the deck list, the Study Now button and the tool bars follow the colour chosen under *Settings → Appearance* (they stayed petrol before); also the browser's loading line, the chips on the trophies page, the link button in the notebook and the highlight tag in the news. Text on coloured buttons is dark or white, whichever reads better
-- **Icons**: the FreeMap tutorial entry, the assistant's *Open in browser* button and the *study* / *open* links of the study plan are drawn instead of using characters some systems cannot show
-- **Study plan**: the ⋯ menu also opens after you ticked an item or the page refreshed
-- **Pomodoro** works right after switching it on in the settings; hiding *Level and streak* updates the rail at once
 - **Settings**: the Deck Overview, Side panel, Browser and Changelog tabs, the colour swatches and the logo stayed empty because the settings page could not load its own script file; fixed
 - **Classic layout removed**: *Settings → Home → Layout* and the classic widgets above the deck list (Minimalist Dashboard, Advanced Statistics widget, Facts/Tasks widget, wide deck list switch) are gone. The side panel is the only home. The daily fact now has just its switch in *Home* and a topic choice
-- Screenshots in the README and on AnkiWeb show the current look; the old ones (classic layout, API chat, 2.1 What's new) are removed
+- Screenshots in the README and on AnkiWeb show the current look; the old ones (classic layout, API chat, 2.1 What's new, Persian mock-up) are removed
+
+## 3.0.2 – 2026-11-15
+
+- **Accent colour everywhere**: the standard theme set the petrol accent on `<body>`, which overrode the colour chosen under *Settings → Appearance*. The Today page, the deck list, the *Study Now* button and the tool bars now follow it, and the study plan window does too (it had petrol written into its stylesheet) – also at once when the colour is changed while it is open
+- **Also in your colour**: the browser's loading line (was a fixed blue), the soft chips on the trophies page, the link button of the notebook and the *Highlight* tag in the news
+- **Readable text on the accent**: text on coloured buttons is dark or white, whichever has more contrast with the accent – before it was always white in light mode, which was hard to read on Orchid, Orange, Forest, Dusty, Horizon and on light colours of your own
+- **Icons**: the *FreeMap tutorial* menu entry had none; the assistant's *Open in browser* button and the *study* / *open* links of the study plan are drawn icons instead of characters that need a symbol or emoji font
+- **Fix – study plan ⋯ menu**: after ticking an item, or any other refresh of the page, the menu did not open any more until the plan was reopened
+- **Fix – Pomodoro**: switched on in the settings, the timer on the rail did nothing until Anki was restarted
+- **Fix – level on the rail**: hiding *Level and streak* on the Today page reaches the rail at once instead of at some later redraw
+- **Credits**: `THIRD_PARTY_NOTICES.md` now also lists Synapse, D3, Cal-HeatMap, the Lucide icons, the filter lists and SponsorBlock; the AnkiWeb description names all of them. A leftover log file is no longer shipped
+- **Docs**: README and PRIVACY describe the assistant and the search engine as they are since 3.0.1
+
 
 ## 3.0.1 – 2026-11-15
 
