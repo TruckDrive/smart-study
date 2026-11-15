@@ -99,4 +99,33 @@ else:
 
 assert share.file_name('Kopf/Hals: "Testat"') == "KopfHals Testat.smartstudy.json"
 assert share.file_name("") == "Plan.smartstudy.json"
+# Short chat code (v2): no generated days, topic searches as deck index, empties dropped.
+plan["sources"][2]["decks"] = ["AnKing::Anatomie", 'AnKing::"Kopf"']
+plan["topics"] = [{"id": "t1", "name": "Hals", "pages": {}, "anki": {"s3": 'deck:"AnKing::\\"Kopf\\""'}},
+                  {"id": "t2", "name": "Arm", "anki": {"s3": 'deck:"Andere"'}}]
+short = share.export_plan(plan, short=True)
+assert short["v"] == 2
+assert short["plan"]["days"] == [{"d": "2026-11-06", "items": [
+    {"id": "i3", "kind": "custom", "custom": True, "text": "Link", "url": "javascript:alert(1)"}]}], "only own items"
+assert short["plan"]["topics"][0]["anki"] == {"s3": 1} and "pages" not in short["plan"]["topics"][0]
+assert short["plan"]["topics"][1]["anki"] == {"s3": 'deck:"Andere"'}, "own searches stay"
+code2 = share.encode(short)
+assert len(code2) < len(share.encode(share.export_plan(plan)))
+got = share.decode("Plan:\n" + code2 + " danke! ~ bis bald")
+assert got == short, "text after the end mark is not part of the code"
+mine = share.import_plan(got, base)
+assert [t["anki"] for t in mine["topics"]] == [{"s3": 'deck:"AnKing::\\"Kopf\\""'}, {"s3": 'deck:"Andere"'}]
+assert [it["id"] for d in mine["days"] for it in d["items"]] == ["i3"] and "url" not in mine["days"][0]["items"][0]
+bad = json.loads(json.dumps(short))
+bad["plan"]["topics"][0]["anki"] = {"s3": 7, "s9": 0, "s2": True}
+assert share.import_plan(bad, base)["topics"][0]["anki"] == {}, "broken deck index is dropped"
+# 3.0.0 only knows v1: it says "please update" instead of importing an empty plan.
+share.VERSION = 1
+try:
+    share.decode(code2)
+except share.ShareError as e:
+    assert str(e) == "newer version"
+else:
+    raise AssertionError("old version must refuse v2")
+share.VERSION = 2
 print("share ok")

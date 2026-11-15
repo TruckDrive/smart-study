@@ -511,6 +511,43 @@ html.dark .tos-modal-header { border-color: #34373C; }
 html.dark .tos-close { background: #34373C; color: #B4B4B4; }
 html.dark .tos-close:hover { background: #505050; color: #fff; }
 html.dark .tos-row a { color: #93c5fd; }
+
+/* ── Smart Study look (3.x): petrol accent, neutral surfaces, round buttons ── */
+:root { --acc: #0B6570; --acc-hover: #084A52; --acc-soft: #E3F0F1; --acc-line: #56BAC6; }
+html.dark { --acc: #1F7A87; --acc-hover: #155660; --acc-soft: #22383B; --acc-line: #56BAC6; }
+.left-panel { background: var(--acc); }
+.left-img { filter: hue-rotate(-28deg) saturate(.55) brightness(.82); }
+.progress-fill, .btn-cta { background: var(--acc); }
+.btn-cta { border-radius: 999px; }
+.btn-cta:hover:not(:disabled) { background: var(--acc-hover); }
+.loading-fill { background: var(--acc); }
+.opt { border-radius: 999px; }
+.opt:hover, html.dark .opt:hover { border-color: var(--acc-line); background: var(--acc-soft); }
+.opt.selected, html.dark .opt.selected { border-color: var(--acc-line); background: var(--acc-soft); color: inherit; }
+.tos-row a, html.dark .tos-row a { color: var(--acc-line); }
+.tos-row input[type="checkbox"] { accent-color: var(--acc); }
+.tip-img { filter: hue-rotate(-28deg) saturate(.7); }
+.theme-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 560px; }
+.theme-card.selected, html.dark .theme-card.selected { border-color: var(--sw, var(--acc)); }
+.theme-card:focus-visible { outline-color: var(--acc-line); }
+.accent-card { aspect-ratio: auto; padding: 12px 12px 10px; gap: 8px; align-items: stretch; }
+.sw-preview { display: grid; grid-template-columns: 10px 1fr; grid-template-rows: auto auto auto; gap: 5px 7px;
+  background: #F3F4F6; border-radius: 10px; padding: 9px; height: 70px; }
+html.dark .sw-preview { background: #2E3135; }
+.sw-bar { grid-row: 1 / 4; background: var(--sw); border-radius: 5px; opacity: .9; }
+.sw-line { height: 7px; border-radius: 4px; background: rgba(127,127,127,.35); }
+.sw-line.short { width: 60%; }
+.sw-pill { height: 12px; width: 55%; border-radius: 99px; background: var(--sw); }
+.sw-name { font-size: 13px; font-weight: 600; text-align: center; color: #374151; }
+html.dark .sw-name { color: #E5E7EB; }
+.theme-card.selected .sw-name { color: var(--sw); }
+html.dark .theme-card.selected .sw-name { filter: brightness(1.35); }
+.screen#screen-6 .right-panel { padding-top: 24px; padding-bottom: 80px; }
+.support-content h2 { margin-bottom: 14px; }
+.support-text-box { padding: 16px 22px; margin-bottom: 16px; }
+.support-p { font-size: 14px; line-height: 1.55; }
+.support-img { height: 64px; margin-bottom: 4px; object-fit: contain; }
+.loading-wrap { margin-top: 8px; }
 </style>
 <script>
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -551,8 +588,8 @@ html.dark .tos-row a { color: #93c5fd; }
     </div>
     <div class="right-panel">
       <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width:16%"></div></div>
-        <div class="progress-label">1 / 6</div>
+        <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+        <div class="progress-label">1 / 5</div>
       </div>
       <h2 class="screen-title" data-i18n="chooseLanguage">Choose Your Language</h2>
       <div class="option-grid cols-3" >
@@ -584,8 +621,8 @@ html.dark .tos-row a { color: #93c5fd; }
     </div>
     <div class="right-panel">
       <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width:33%"></div></div>
-        <div class="progress-label">2 / 6</div>
+        <div class="progress-track"><div class="progress-fill" style="width:40%"></div></div>
+        <div class="progress-label">2 / 5</div>
       </div>
       <h2 class="screen-title" data-i18n="whoAreYou">Who Are You?</h2>
       <div class="option-grid cols-2" >
@@ -598,7 +635,7 @@ html.dark .tos-row a { color: #93c5fd; }
       </div>
     </div>
     <div class="bottom-row">
-      <button class="btn-cta" id="btn-next-2" disabled onclick="goTo(3)" data-i18n="continue">Continue</button>
+      <button class="btn-cta" id="btn-next-2" disabled onclick="goTo(4)" data-i18n="continue">Continue</button>
     </div>
   </div>
 
@@ -637,36 +674,17 @@ html.dark .tos-row a { color: #93c5fd; }
   <div class="screen full-width" id="screen-4">
     <div class="right-panel">
       <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width:66%"></div></div>
-        <div class="progress-label">4 / 6</div>
+        <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+        <div class="progress-label">3 / 5</div>
       </div>
       <h2 class="screen-title" data-i18n="whichTheme">Which Theme Do You Choose?</h2>
       <p class="screen-subtitle" data-i18n="changeThemeLater">You can change it later in the settings.</p>
       
       <!-- HIER KOMMEN DEINE 6 THEME BILDER REIN -->
-      <div class="theme-grid">
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="0" onclick="selectTheme(this)">
-          <img src="img_theme_1.png" class="theme-img" alt="">
-        </button>
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="1" onclick="selectTheme(this)">
-          <img src="img_theme_2.png" class="theme-img" alt="">
-        </button>
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="2" onclick="selectTheme(this)">
-          <img src="img_theme_3.png" class="theme-img" alt="">
-        </button>
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="3" onclick="selectTheme(this)">
-          <img src="img_theme_4.png" class="theme-img" alt="">
-        </button>
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="4" onclick="selectTheme(this)">
-          <img src="img_theme_5.png" class="theme-img" alt="">
-        </button>
-        <button type="button" class="theme-card" data-group="theme" data-theme-index="5" onclick="selectTheme(this)">
-          <img src="img_theme_6.png" class="theme-img" alt="">
-        </button>
-      </div>
+      <div class="theme-grid" id="theme-grid"></div>
     </div>
     <div class="bottom-row">
-      <button class="btn-cta" id="btn-next-4" disabled onclick="goTo(5)" data-i18n="continue">Continue</button>
+      <button class="btn-cta" id="btn-next-4" onclick="goTo(5)" data-i18n="continue">Continue</button>
     </div>
   </div>
 
@@ -676,8 +694,8 @@ html.dark .tos-row a { color: #93c5fd; }
   <div class="screen full-width" id="screen-5">
     <div class="right-panel" style="align-items:center;">
       <div class="progress-wrap" style="width:100%;">
-        <div class="progress-track"><div class="progress-fill" style="width:83%"></div></div>
-        <div class="progress-label">5 / 6</div>
+        <div class="progress-track"><div class="progress-fill" style="width:80%"></div></div>
+        <div class="progress-label">4 / 5</div>
       </div>
       <div class="tip-body">
         <h2 class="screen-title" style="text-align:center;" data-i18n="settingsTipTitle">Find Your Settings</h2>
@@ -1054,7 +1072,7 @@ function goTo(n) {
   currentScreen = n;
   document.getElementById('screen-' + currentScreen).classList.add('active');
 }
-function goBack() { if (currentScreen > 0) goTo(currentScreen - 1); }
+function goBack() { if (currentScreen > 0) goTo(currentScreen === 4 ? 2 : currentScreen - 1); }  // screen 3 (survey) is skipped
 
 /* ─────────────────────────────────
    Selections (mit Button-Freischaltung!)
@@ -1074,6 +1092,23 @@ function selectOpt(btn) {
   if (group === 'role') document.getElementById('btn-next-2').disabled = false; 
   if (group === 'source') document.getElementById('btn-next-3').disabled = false; 
 }
+
+// The accents of the add-on (same list as Settings → Appearance); Petrol is the default look.
+const ACCENTS = [['petrol','Petrol','#1F7A87'],['ocean','Ocean','#0071D3'],['forest','Forest','#619971'],
+                 ['dusty','Dusty','#5A9491'],['horizon','Horizon','#6183A9'],['deluge','Deluge','#7961A9'],
+                 ['orchid','Orchid','#E95ACC'],['orange','Orange','#D97757']];
+(function buildAccents() {
+  const grid = document.getElementById('theme-grid');
+  ACCENTS.forEach(([key, name, color], i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'theme-card accent-card' + (i === 0 ? ' selected' : '');
+    b.dataset.group = 'theme'; b.dataset.themeName = key; b.style.setProperty('--sw', color);
+    b.innerHTML = '<span class="sw-preview"><span class="sw-bar"></span><span class="sw-line"></span><span class="sw-line short"></span><span class="sw-pill"></span></span><span class="sw-name"></span>';
+    b.querySelector('.sw-name').textContent = name;
+    b.onclick = () => selectTheme(b);
+    grid.appendChild(b);
+  });
+})();
 
 function selectTheme(card) {
   document.querySelectorAll('[data-group="theme"]').forEach(c => c.classList.remove('selected'));
@@ -1107,7 +1142,8 @@ function startLoading() {
 
   function runStep() {
     if (step >= waypoints.length) return;
-    const [target, dur] = waypoints[step];
+    let [target, dur] = waypoints[step];
+    dur = Math.round(dur * 0.15);  // nothing is really loading – keep it short
     const jitter = (Math.random() - 0.5) * dur * 0.15;
     fill.style.transition = `width ${Math.max(200, dur + jitter).toFixed(0)}ms ease-in-out`;
     fill.style.width = target + '%';
@@ -1149,6 +1185,7 @@ function finish() {
   const sourceKey = sourceBtn ? (sourceBtn.dataset.value || 'other') : 'other';
 
   const payload = {
+    themeName:   selectedThemeCard ? selectedThemeCard.dataset.themeName : 'petrol',
     lang:        selectedLang,   // e.g. "de", "en", "ko"
     themeNumber: themeNumber,    // 1–6  →  Python maps to theme name
     roleKey:     roleKey,        // "medical" | "law" | "language" | "highschool" | "programmer" | "other"

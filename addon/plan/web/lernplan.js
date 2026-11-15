@@ -682,9 +682,9 @@ async function shareDialog() {
   const opt = (label, hint, fn, cls) => h("div", { style: "display:flex;gap:10px;align-items:center;margin:8px 0" },
     h("button", { class: cls, style: "min-width:170px", onclick: fn }, label), h("span", { class: "muted small" }, hint));
   await modal(L("Plan teilen", "Share plan", "اشتراک‌گذاری برنامه"), h("div", null,
-    h("p", { class: "small", style: "margin:0 0 6px" }, L("Deine Freunde bekommen den Plan mit allen Tagen, Themen und Video-Links – aber nicht deinen Fortschritt und keine Dateipfade von deinem Computer.",
-      "Your friends get the plan with all days, topics and video links – but not your progress and no file paths from your computer.",
-      "دوستانتان برنامه را با همهٔ روزها، موضوع‌ها و لینک‌های ویدیو دریافت می‌کنند – اما نه پیشرفت شما و نه مسیر فایل‌های رایانهٔ شما را.")),
+    h("p", { class: "small", style: "margin:0 0 6px" }, L("Deine Freunde bekommen den Plan mit Themen, Terminen und Video-Links. Die einzelnen Tage rechnet ihr Anki selbst aus – passend zu ihren Karten. Nicht dabei: dein Fortschritt und Dateipfade von deinem Computer.",
+      "Your friends get the plan with its topics, dates and video links. Their Anki works out the days itself – to fit their cards. Not included: your progress and file paths from your computer.",
+      "دوستانتان برنامه را با موضوع‌ها، تاریخ‌ها و لینک‌های ویدیو دریافت می‌کنند. Anki آن‌ها روزها را خودش، متناسب با کارت‌هایشان، محاسبه می‌کند. شامل نمی‌شود: پیشرفت شما و مسیر فایل‌های رایانهٔ شما.")),
     opt(L("Code kopieren", "Copy code", "کپی کد"), L("Für WhatsApp & Co. – einfügen und senden.", "For WhatsApp & co. – paste and send.", "برای واتس‌اپ و غیره – جای‌گذاری و ارسال."), copyCode, "primary"),
     opt(L("Als Datei speichern", "Save as file", "ذخیره به‌صورت فایل"), L("Zum Mailen oder für einen Cloud-Ordner.", "For email or a cloud folder.", "برای ایمیل یا پوشهٔ ابری."), saveFile),
     opt(L("Als Text kopieren", "Copy as text", "کپی به‌صورت متن"), L("Lesbare Übersicht für alle ohne Smart Study.", "Readable overview for anyone without Smart Study.", "خلاصهٔ خوانا برای کسانی که Smart Study ندارند."), copyText)),
@@ -700,7 +700,8 @@ async function importDialog() {
   const r = await run(call(how === "file" ? "importFile" : "importCode", { text: box.value }));
   if (!r) return;
   const hints = [];
-  if (r.missingDecks.length) hints.push(L("Diese Decks fehlen bei dir: ", "You don't have these decks: ", "این دسته‌ها را ندارید: ") + r.missingDecks.join(", "));
+  if (r.missingDecks.length) hints.push(L("Diese Decks fehlen bei dir: ", "You don't have these decks: ", "این دسته‌ها را ندارید: ") + r.missingDecks.join(", ")
+    + L(" – sobald du sie hast, auf „Neu planen“ klicken.", " – once you have them, press “Replan”.", " – وقتی آن‌ها را داشتید، «برنامه‌ریزی دوباره» را بزنید."));
   if (r.pdfs) hints.push(L("PDF-Datei unter Bearbeiten → Quellen wählen.", "Choose the PDF file under Edit → Sources.", "فایل PDF را از ویرایش ← منابع انتخاب کنید."));
   toast(L(`„${r.title}“ übernommen.`, `“${r.title}” imported.`, `«${r.title}» وارد شد.`) + (hints.length ? " " + hints.join(" ") : ""), hints.length ? 7000 : 3000);
   go("plan", r.id);

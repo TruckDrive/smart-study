@@ -408,6 +408,7 @@ class Panel(QObject):
         self.today_dock = self._dock(TODAY_DOCK, self.web)
         self.header = Header(self)
         self._build_rail()
+        self._rail_sig = self._rail_signature()
         self.today_dock.setMinimumWidth(300)
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.today_dock)
         self._style_window()
@@ -516,10 +517,31 @@ class Panel(QObject):
         self.web.stdHtml('<div id="app"></div>', css=[base + "today.css"], js=[base + "today.js"],
                          head=head, context=self)
 
+    def _rail_signature(self) -> tuple:
+        """What the rail's buttons depend on: language and the switched-on tools."""
+        st = self.settings
+        try:
+            from .locales import _current_lang
+            lang = _current_lang()
+        except Exception:
+            lang = ""
+        return (lang, tuple(t.key for t in self.tools if st.get(t.setting, True)),
+                bool(st.get("pomodoro_enabled", True)), bool(st.get("music_player_enabled", True)))
+
     def restyle(self, *_args) -> None:
         if self._closing:
             return
-        self.header.restyle()
+        if self._rail_signature() != self._rail_sig:
+            # Language changed (e.g. right after the setup wizard) or a tool was
+            # switched on/off in the settings: build the rail again, no restart needed.
+            self.tools = _tools(self.ctx["toggle_trophies"])
+            self.header = Header(self)
+            self._build_rail()
+            self._rail_sig = self._rail_signature()
+            self.update_timer_ui()
+            self.sync()
+        else:
+            self.header.restyle()
         self._style_window()
         self._load_page()
 
@@ -743,6 +765,11 @@ class Panel(QObject):
     def _finish(self, data: Dict[str, Any]) -> None:
         settings = self.settings
         data["show"] = {name: bool(settings.get(key, True)) for name, key in SHOW_KEYS.items()}
+        try:
+            if data["show"]["challenge"] and not mw.col.card_count():
+                data["show"]["challenge"] = False  # a new, empty collection: nothing to review yet
+        except Exception:
+            pass
         manager = getattr(mw, "gamification_manager", None)
         if manager:
             try:

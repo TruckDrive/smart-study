@@ -523,11 +523,14 @@ def _apply_onboarding_result(result: dict):
     rtl.offer_anki_language("")
 
     # ── Colour theme ──────────────────────────────────────────────────────────
-    try:
-        theme_num = int(result.get("themeNumber", 1))
-    except (ValueError, TypeError):
-        theme_num = 1
-    theme_name = onboarding_dialog.THEME_INDEX_TO_NAME.get(theme_num, "ocean")
+    from .theme import COLOR_THEMES
+    theme_name = result.get("themeName")
+    if theme_name not in COLOR_THEMES:  # older wizard pages sent a picture number
+        try:
+            theme_num = int(result.get("themeNumber", 0))
+        except (ValueError, TypeError):
+            theme_num = 0
+        theme_name = onboarding_dialog.THEME_INDEX_TO_NAME.get(theme_num, "petrol")
     addon_settings["active_color_theme"] = theme_name
     try:
         from .theme import set_active_theme
@@ -601,7 +604,12 @@ def _refresh_ui_after_onboarding():
 
 
 def run_onboarding_if_needed():
+    first_start = False
     if not addon_settings.get("onboarding_completed", False) and hasattr(onboarding_dialog, 'OnboardingWizard'):
+        first_start = True
+        # A new user just met the add-on in the wizard: no "What's new" window
+        # and no add-on sync question right after it (that one waits for the next start).
+        addon_settings["last_seen_version"] = constants.ADDON_VERSION
         wizard = onboarding_dialog.OnboardingWizard(addon_path, mw)
         if wizard.exec():
             # Apply the user's language / theme / role selections directly.
@@ -619,9 +627,9 @@ def run_onboarding_if_needed():
         whats_new.show_if_updated(addon_settings, save_addon_settings, constants.ADDON_VERSION)
     except Exception:
         traceback.print_exc()
-    if addon_settings.get("onboarding_completed", False):
+    if addon_settings.get("onboarding_completed", False) and not first_start:
         try:
-            # Asked once per device, on the first start and after this update.
+            # Asked once per device, from the second start on and after this update.
             if addon_settings.get(addon_sync.ASKED):
                 addon_sync.check(addon_settings, save_addon_settings)
             else:
