@@ -362,6 +362,12 @@ class AccountSitesPanel(QWidget):
             f"#smartstudySitePicker {{ padding: 4px 12px; border-radius: 13px; border: 1px solid {line}; font-weight: 600; }}"
             "#smartstudySitePicker::menu-indicator { image: none; width: 0; }"
         )
+        try:
+            # A drawn icon instead of the arrow character, which some fonts lack.
+            from . import browser_chrome
+            browser_chrome.set_icon(self.external, "external", 14)
+        except Exception:
+            pass
 
     def _ensure_view(self) -> QWebEngineView:
         if self.view is None:

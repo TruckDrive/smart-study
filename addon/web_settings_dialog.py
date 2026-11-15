@@ -215,6 +215,12 @@ if _QT_AVAILABLE:
                     QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls,
                     True,
                 )
+                # settings.html loads deck_overview.js next to it; without this the
+                # script is blocked and initSettings stops half-way (empty tabs).
+                self._view.settings().setAttribute(
+                    QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls,
+                    True,
+                )
                 self._view.settings().setAttribute(
                     QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard,
                     True,

@@ -600,6 +600,14 @@ class Panel(QObject):
             self.header = Header(self)
             self._build_rail()
             self._rail_sig = self._rail_signature()
+            if self.settings.get("pomodoro_enabled", True):
+                # Switched on in the settings just now: without its timer the
+                # buttons would do nothing until the next start.
+                try:
+                    from .pomodoro import init_pomodoro
+                    init_pomodoro(mw, self.update_timer_ui, self.update_timer_label_only)
+                except Exception as error:
+                    print(f"SmartStudy: pomodoro could not be started: {error}")
             self.update_timer_ui()
             self.sync()
         else:
@@ -930,6 +938,8 @@ class Panel(QObject):
             self.ctx["save"]()
             self._last_json = ""
             self.refresh()
+            if key == "gamification_widgets_enabled":
+                QTimer.singleShot(0, self.restyle)  # the level on the rail follows at once
         elif cmd == "claim":
             manager = getattr(mw, "gamification_manager", None)
             if manager:

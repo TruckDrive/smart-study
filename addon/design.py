@@ -22,6 +22,20 @@ LIGHT: Dict[str, str] = {
     "new": "#1D5FD0", "learn": "#B8342A", "due": "#1C7437",
 }
 
+def on_accent(color: str) -> str:
+    """Dark or white text, whichever reads better on the accent colour."""
+    try:
+        h = color.lstrip("#")
+        if len(h) == 3:
+            h = "".join(c * 2 for c in h)
+        def lin(v):
+            return v / 12.92 if v <= .03928 else ((v + .055) / 1.055) ** 2.4
+        r, g, b = (lin(int(h[i:i + 2], 16) / 255) for i in (0, 2, 4))
+        return "#14100E" if .2126 * r + .7152 * g + .0722 * b > .19 else "#FFFFFF"
+    except Exception:
+        return "#FFFFFF"
+
+
 def tokens(night: bool) -> Dict[str, str]:
     """The colour tokens for dark or light, with the accent colour the user chose."""
     t = dict(DARK if night else LIGHT)
@@ -30,7 +44,7 @@ def tokens(night: bool) -> Dict[str, str]:
         if theme.get_active_theme() != "petrol":
             p = theme.palette(night)
             t["accent"] = p["blue_accent"] if night else p["blue"]
-            t["on_accent"] = "#14100E" if night else "#FFFFFF"
+            t["on_accent"] = on_accent(t["accent"])
     except Exception:
         pass
     return t

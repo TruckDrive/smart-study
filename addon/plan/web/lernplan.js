@@ -339,7 +339,11 @@ const ICON = {
   restore: "M4 12a8 8 0 1 0 2.4-5.7M4 4.5V9h4.5",
   trash: "M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.5 10.5v6M13.5 10.5v6",
   history: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.5H8M12 8v4.5l3 2",
+  play: "M8 5.5v13l10.5-6.5z",
+  book: "M3 5h6a3 3 0 0 1 3 3v11.5a2.5 2.5 0 0 0-2.5-2.5H3zM21 5h-6a3 3 0 0 0-3 3v11.5a2.5 2.5 0 0 1 2.5-2.5H21z",
 };
+// Small drawn icon in front of a link's text (an emoji needs a font that not every system has).
+const mini = name => svg("svg", { class: "ic", viewBox: "0 0 24 24", width: 13, height: 13, "aria-hidden": "true", style: "vertical-align:-1.5px;margin-inline-end:3px" }, svg("path", { d: ICON[name] }));
 const icon = name => svg("svg", { class: "ic", viewBox: "0 0 24 24", width: 18, height: 18, "aria-hidden": "true" }, svg("path", { d: ICON[name] }));
 async function archivePlan(id, on, then) {
   await run(call("archive", { id, on }));
@@ -455,7 +459,8 @@ function itemDone(it) {
 
 // "⋯" button with the rarely used actions, so the plan's head keeps three buttons.
 function moreMenu(entries) {
-  const wrap = h("div", { class: "more" });
+  // replace, not morph: a kept old button would get the click handler of a wrapper that never reaches the page
+  const wrap = h("div", { class: "more", "data-morph": "replace" });
   const close = () => { wrap.querySelector(".more-list")?.remove(); document.removeEventListener("mousedown", outside, true); document.removeEventListener("keydown", esc, true); };
   const outside = e => { if (!wrap.contains(e.target)) close(); };
   const esc = e => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
@@ -647,12 +652,12 @@ function itemEl(it, day) {
   if (it.min && !auto && !it.moved) t.append(h("span", { class: "chip info" }, hm(it.min)));
   if (it.for) t.append(h("span", { class: "chip info" }, L("für ", "for ", "برای ") + it.for));
   const act = (label, fn) => t.append(h("a", { class: "small", style: "margin-inline-start:6px;white-space:nowrap", onclick: e => { e.preventDefault(); e.stopPropagation(); fn(); } }, label));
-  if ((it.kind === "cards" || it.kind === "reviews") && !it.moved) act(L("▶ lernen", "▶ study", "▶ مطالعه"), async () => {
+  if ((it.kind === "cards" || it.kind === "reviews") && !it.moved) act([mini("play"), L("lernen", "study", "مطالعه")], async () => {
     const r = await run(call("studyItem", { id: plan.id, item: it.id }));
     if (r && r.ok === false) toast(L("Keine passenden Karten (mehr) gefunden.", "No matching cards (left).", "کارت مناسبی (دیگر) پیدا نشد."));
   });
   const psrc = it.kind === "pages" && plan.sources.find(s => s.id === it.source);
-  if (psrc && (psrc.file || psrc.fileName)) act(L("📖 öffnen", "📖 open", "📖 باز کردن"), async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r && r.cancelled) return; if (r && r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
+  if (psrc && (psrc.file || psrc.fileName)) act([mini("book"), L("öffnen", "open", "باز کردن")], async () => { const r = await run(call("openPages", { id: plan.id, item: it.id })); if (r && r.cancelled) return; if (r && r.noPage) toast(L(`Kein Okular gefunden – bitte selbst zu Seite ${r.page} blättern.`, `Okular not found – please go to page ${r.page} yourself.`, `Okular پیدا نشد – لطفاً خودتان به صفحهٔ ${r.page} بروید.`)); });
   if (it.url) t.append(h("a", { class: "small", style: "margin-inline-start:6px", title: it.url, onclick: e => { e.preventDefault(); run(call("openLink", { url: it.url, id: plan.id, item: it.id })); } }, L("öffnen ↗", "open ↗", "باز کردن ↖")));
   if (it.custom && !done && day.d >= S.data.stats.today && day.d < plan.exam) act(L("→ morgen", "→ tomorrow", "← فردا"), async () => {
     await run(call("moveItem", { id: plan.id, item: it.id, day: addDays(day.d, 1) })); refresh();
