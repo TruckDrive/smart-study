@@ -72,7 +72,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Browser** with tabs, an address field that suggests visited pages, favourites with icons, PDF viewer (PDFs open right in the tab), ad blocker, saved passwords, and layouts: sidebar, split view, main window or its own window
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - A **custom deck overview** with retention and hard cards, optional daily facts
-- **Its own look**: a calm neutral dark and light theme in Anki's own font, accent colours, the older colour themes and custom backgrounds, eleven interface languages. *Settings → Home → Layout → Classic* brings back the earlier arrangement with widgets above the deck list
+- **Its own look**: a calm neutral dark and light theme in Anki's own font, accent colours, the older colour themes and custom backgrounds, eleven interface languages.
 
 ### Built-in add-ons
 
@@ -92,9 +92,9 @@ Smart Study does not ship other people's add-ons any more, except the controller
 
 Up to 3.0.2 modified copies of both were built in. After the update Smart Study offers once to install the originals.
 
-| AI assistant with your own ChatGPT/Claude/Gemini account | Controller that cannot be told apart |
-|---|---|
-| ![AI websites](screenshots/ai-accounts.png) | ![Which controller?](screenshots/controller-ask.png) |
+A controller that cannot be recognised reliably (many pads call themselves "Xbox 360 Controller") makes Smart Study ask once which one it is:
+
+![Which controller?](screenshots/controller-ask.png)
 
 **Good to know**
 - Google does not allow signing in inside apps such as Anki (“This browser or app may not be secure”). A click on *Sign in* therefore opens Google's sign-in in a small separate window; Gemini, NotebookLM and YouTube Music then use that sign-in. ChatGPT and Claude: sign in with your e-mail address.

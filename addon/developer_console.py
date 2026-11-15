@@ -170,8 +170,6 @@ def open_console(parent=None):
     outer.addWidget(tabs)
     from .diagnostics_ui import build_panel
     tabs.addTab(build_panel(dialog), _('Diagnose'))
-    from .dashboard_demo import build_panel as build_dashboard_demo_panel
-    tabs.addTab(build_dashboard_demo_panel(dialog), 'Dashboard Demo')
     preview_panel = QWidget(dialog)
     tabs.addTab(preview_panel, _('Previews'))
     layout = QVBoxLayout(preview_panel)

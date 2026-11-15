@@ -103,7 +103,7 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         'Dashboard Surfaces', 'Edit Dashboard Surfaces',
         'Widget Shadow', 'Shadow intensity for widgets and the deck list. Set to 0 to turn off.',
         'Surface Opacity',
-        'Applies to widgets and the deck list, including the minimalist dashboard. Text and controls stay fully visible.',
+        'Applies to the side panel and the deck list. Text and controls stay fully visible.',
 
         "Widget Content", "Facts", "Tasks",
         "Show facts or open tasks on the home screen. Click the task widget to open your list.",

@@ -6,6 +6,8 @@
 - **Focus mode while reviewing**: *Settings → General → Sidebar Visibility* has a third choice. While you review, only the card and Anki's answer bar are shown; the left rail and Anki's top bar step aside and return when you leave the review. Shortcuts, the timer, music and every tool keep working (a tool opened by shortcut still appears)
 - **Review Heatmap and Life Drain are suggested, not built in**: the two modified copies are gone from the package. *Settings → Add-ons* lists them under *Suggested add-ons* with an *Install* button that downloads the original add-on from AnkiWeb. Who used the built-in heatmap (or Life Drain) is asked once after the update whether to install the original. The controller support and *Copy selections with pictures as an image* stay built in
 - **Smaller package**: without the two copies and their libraries (D3, Cal-HeatMap)
+- **Classic layout removed**: *Settings → Home → Layout* and the classic widgets above the deck list (Minimalist Dashboard, Advanced Statistics widget, Facts/Tasks widget, wide deck list switch) are gone. The side panel is the only home. The daily fact now has just its switch in *Home* and a topic choice
+- Screenshots in the README and on AnkiWeb show the current look; the old ones (classic layout, API chat, 2.1 What's new, Persian mock-up) are removed
 
 
 ## 3.0.2 – 2026-11-15

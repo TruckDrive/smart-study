@@ -136,10 +136,9 @@ _TOGGLE_KEYS = [
     "workspace_mindmap_tab", "workspace_roadmap_tab",
     "gamification_popups_enabled", "gamification_popup_rank",
     "gamification_popup_level", "gamification_popup_challenge",
-    "minimal_dashboard_enabled", "dashboard_wide_deck_list",
     "gamification_widgets_enabled", "study_plan_widget_enabled",
-    "daily_fact_widget_enabled", "deadline_bar_enabled",
-    "statistics_widget_enabled", "deck_overview_enabled", "mindmap_enabled",
+    "deadline_bar_enabled",
+    "deck_overview_enabled", "mindmap_enabled",
     "gamification_sidebar_enabled", "music_player_enabled", "pomodoro_enabled",
     "ai_assistant_enabled", "website_viewer_enabled", "notebook_enabled",
     "panel_show_plan", "panel_show_challenge", "panel_show_due",
@@ -215,13 +214,14 @@ if _QT_AVAILABLE:
                     QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls,
                     True,
                 )
-                self._view.settings().setAttribute(
-                    QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard,
-                    True,
-                )
-                # The page loads deck_overview.js/.css from its own folder.
+                # settings.html loads deck_overview.js next to it; without this the
+                # script is blocked and initSettings stops half-way (empty tabs).
                 self._view.settings().setAttribute(
                     QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls,
+                    True,
+                )
+                self._view.settings().setAttribute(
+                    QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard,
                     True,
                 )
             except Exception as e:
@@ -833,10 +833,9 @@ if _QT_AVAILABLE:
             for key, fallback in _COUNTER_COLOR_DEFAULTS.items():
                 conf[key] = _safe_counter_color(cfg.get(key), fallback)
             for k in _TOGGLE_KEYS:
-                default = k not in ("minimal_dashboard_enabled", "gamification_popup_level")
+                default = k != "gamification_popup_level"
                 conf[k] = bool(cfg.get(k, default))
             conf["panel_show_fact"] = bool(cfg.get("panel_show_fact", False))
-            conf["home_layout"] = "classic" if cfg.get("home_layout") == "classic" else "panel"
             for key, fallback in (("panel_plan_items", 4), ("panel_due_days", 7), ("stats_consistency_days", 30)):
                 try:
                     conf[key] = int(cfg.get(key, fallback) or fallback)
