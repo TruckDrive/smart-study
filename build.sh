@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Builds dist/smart_study.ankiaddon from addon/ (without personal plans, caches and meta.json).
 # Before every release: bump ADDON_VERSION in addon/constants.py and human_version in addon/manifest.json.
+# Then run the unit tests (tests/test_*.py) and the GUI smoke test (tests/gui/run.sh).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$ROOT/dist"

@@ -17,7 +17,6 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-from . import constants
 from .theme import palette
 from .locales import _
 

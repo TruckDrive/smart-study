@@ -22,7 +22,6 @@ from typing import Callable, List, Optional, Tuple, Union
 from aqt import mw
 from aqt.qt import (QHBoxLayout, QLabel, QPushButton, QSizePolicy, QTimer,
                     QStackedWidget, QUrl, QVBoxLayout, QWidget, Qt, QDesktopServices)
-from aqt.utils import tooltip
 
 try:
     from PyQt6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile,

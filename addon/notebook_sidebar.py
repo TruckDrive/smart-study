@@ -25,9 +25,9 @@ from aqt import mw
 from aqt.operations import CollectionOp
 from aqt.qt import (
     QApplication,
-    QDockWidget, Qt, QVBoxLayout, QHBoxLayout,
-    QWidget, QFileDialog, QUrl, QKeySequence, QShortcut,
-    QPushButton, QLabel, QTimer,
+    QDockWidget, Qt, QVBoxLayout,
+    QWidget, QFileDialog, QKeySequence, QShortcut,
+    QTimer,
 )
 from aqt.webview import AnkiWebView, AnkiWebViewKind
 from aqt.utils import tooltip, showInfo, askUser
@@ -429,7 +429,6 @@ TOOL_FILES = {
 # PDF.js offline bundling
 # ──────────────────────────────────────────────
 
-PDFJS_VERSION = "3.11.174"
 _PDFJS_FILES  = ["pdf.min.js", "pdf.worker.min.js"]
 
 
@@ -833,10 +832,6 @@ def _ensure_db_at(path: str, timeout: float = 5.0) -> None:
         con.close()
 
 
-def ensure_db() -> None:
-    _ensure_db_at(db_path())
-
-
 # ── Snapshot persistence ───────────────────────
 
 def _snapshot_recovery_path(table: str, database_path: Optional[str] = None) -> str:
@@ -1094,10 +1089,6 @@ def load_latest_note(database_path: Optional[str] = None) -> str:
     return _load_latest_snapshot("notes", "[]", database_path)
 
 
-def save_note(body: str) -> bool:
-    return _save_snapshot("notes", body)
-
-
 # ── Todos ─────────────────────────────────────
 
 def _todo_cleanup_enabled():
@@ -1137,10 +1128,6 @@ def load_latest_todos(database_path: Optional[str] = None) -> str:
     return _normalize_todo_body(_load_latest_snapshot("todos", "[]", database_path))
 
 
-def save_todos(body: str) -> bool:
-    return _save_snapshot("todos", body)
-
-
 # ── PDFs ──────────────────────────────────────
 
 def load_pdf_list(database_path: Optional[str] = None) -> str:
@@ -1164,10 +1151,6 @@ def load_pdf_list_enriched(database_path: Optional[str] = None) -> str:
         return json.dumps(data)
     except Exception:
         return raw
-
-
-def save_pdf_list(body: str) -> bool:
-    return _save_snapshot("pdfs", body)
 
 
 def _pdf_deck_names() -> list[str]:

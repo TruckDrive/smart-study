@@ -16,7 +16,6 @@ except ImportError:  # the module is loaded on its own (tests)
         pass
 
 import json
-import time
 import traceback
 from datetime import date, datetime, timedelta
 from typing import Any, Callable, Dict, List, Optional

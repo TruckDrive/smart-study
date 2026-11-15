@@ -16,7 +16,7 @@ is only compared with the few filters that share a token with its URL.
 from __future__ import annotations
 
 import re
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Set
 
 _TOKEN = re.compile(r"[a-z0-9%]{2,}")
 _HOSTS_LINE = re.compile(r"^(?:0\.0\.0\.0|127\.0\.0\.1)\s+([^\s#]+)")

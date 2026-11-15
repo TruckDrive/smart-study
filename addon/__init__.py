@@ -9,7 +9,7 @@ except ImportError:  # the module is loaded on its own (tests)
         pass
 
 from .constants import is_night as _is_night
-import os, sys, json, re, traceback, shutil
+import os, json, re, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
 from . import settings_sync, addon_sync, rtl, anki_persian
@@ -79,11 +79,11 @@ try:
     from .mindmap_sidebar import cleanup_mindmap_sidebar    
     from .notebook_sidebar import (
         cleanup_notebook_sidebar, setup_notebook_sidebar,
-        toggle_notebook_dock, open_pdf_review_link,
+        open_pdf_review_link,
     )
     from . import deck_overview, sidebar_shortcuts
     from . import statistics_widget, daily_widgets, settings_dialog, custom_background
-    from .gamification import GamificationManager, CMD_RESET_DATA, CMD_CLAIM_CHALLENGE, CMD_LP_START_PREFIX, CMD_LP_PAUSE_PREFIX
+    from .gamification import GamificationManager, CMD_RESET_DATA, CMD_CLAIM_CHALLENGE
     from .sidebar import GamificationSidebar
     from .deadline_bar import DeadlineManager
     from .configuration import DeadlineViewerDialog, DeadlineConfigDialog
@@ -95,7 +95,6 @@ except Exception as e:
 # --- Config Paths ---
 addon_path = os.path.dirname(__file__)
 
-study_plan_config_json_path = os.path.join(addon_path, "study_plan_config.json")
 addon_settings_path = os.path.join(addon_path, "addon_settings.json") 
 
 if hasattr(constants, 'addon_path'):
@@ -599,14 +598,6 @@ def _refresh_ui_after_onboarding():
     except Exception:
         _ignored()
 
-    # Refresh the already-open AI Assistant without reloading the chat. This
-    # keeps its accent token in sync with the selected SmartStudy colour theme.
-    try:
-        from .ai_assistant import refresh_ai_assistant_theme
-        refresh_ai_assistant_theme()
-    except Exception:
-        _ignored()
-
     # Deck browser — re-renders all widgets (fact, gamification, deadline…)
     if mw and mw.state == "deckBrowser":
         try:
@@ -729,14 +720,6 @@ def _apply_saved_settings(new_settings, message=None):
     try:
         from .website_sidebar import refresh_website_theme
         refresh_website_theme()
-    except Exception:
-        _ignored()
-
-    # Keep the open AI Assistant in sync with the newly selected colour theme
-    # without reloading it or clearing the conversation.
-    try:
-        from .ai_assistant import refresh_ai_assistant_theme
-        refresh_ai_assistant_theme()
     except Exception:
         _ignored()
 
@@ -1040,11 +1023,6 @@ def on_theme_changed():
         mw.progress.single_shot(120, refresh_custom_background_after_theme)
     except Exception:
         _ignored()
-    try:
-        from .ai_assistant import refresh_ai_assistant_theme
-        refresh_ai_assistant_theme()
-    except Exception:
-        _ignored()
     def show_theme_restart_warning() -> None:
         if addon_settings.get("theme_restart_warning_suppressed", False):
             return
@@ -1171,7 +1149,6 @@ def _init_panel() -> None:
     try:
         from . import panel
         study_plan_trigger.set_gamification_sidebar_trigger_function(toggle_gamification_sidebar)
-        study_plan_trigger.set_study_plan_trigger_function(show_configuration_dialog)
         old = mw.findChild(QDockWidget, "SmartStudyLauncherSidebarDock_v2")
         if old:
             old.setVisible(False)
@@ -1207,7 +1184,7 @@ def _init_launcher_dock() -> None:
 
 
 def on_profile_open():
-    global study_plan_config_json_path, addon_settings_path
+    global addon_settings_path
     global _dashboard_rendered_with_models, _daily_maintenance_done, _profile_generation
 
     _profile_generation += 1
@@ -1237,10 +1214,15 @@ def on_profile_open():
             except Exception as e: print(f"SmartStudy Migration Error (Plan): {e}")
 
         addon_settings_path = new_settings_path
-        study_plan_config_json_path = new_plan_path
 
     except Exception as e:
         print(f"SmartStudy: Error determining profile path: {e}")
+
+    try:
+        from .ai_assistant import remove_old_api_keys
+        remove_old_api_keys()
+    except Exception:
+        _ignored()
 
     load_addon_settings()
     _pull_synced_settings()
@@ -1288,7 +1270,7 @@ def on_profile_open():
 
 def _init_ui_delayed(expected_profile_generation=None):
     global launcher_dock_widget, sidebar_widget_instance, gamification_manager, learning_plan_manager, deadline_manager
-    global study_plan_config_json_path, _daily_maintenance_done
+    global _daily_maintenance_done
     
     if (not mw or not modules_loaded or not getattr(mw, "col", None)
             or (expected_profile_generation is not None
@@ -1316,7 +1298,6 @@ def _init_ui_delayed(expected_profile_generation=None):
 
     if study_plan_trigger:
         study_plan_trigger.set_gamification_sidebar_trigger_function(toggle_gamification_sidebar)
-        study_plan_trigger.set_study_plan_trigger_function(show_configuration_dialog)
 
     # Focus Music: resume playback from the last session (if the user opted in
     # and music was still playing when Anki was closed).
@@ -1617,7 +1598,7 @@ def inject_theme_assets(web_content: WebContent, context: Optional[Any]):
                     f":root.night-mode,body.nightMode{{--ss-accent:{dark['accent']};--ss-on-accent:{dark['on_accent']}}}"
                     "</style>")
             if isinstance(context, DeckBrowser):
-                from .dashboard_appearance import dashboard_surface_css, deck_list_width_css
+                from .dashboard_appearance import dashboard_surface_css
                 web_content.head += dashboard_surface_css(
                     addon_settings.get("dashboard_surface_opacity", 100),
                     addon_settings.get("dashboard_glass_enabled", False),

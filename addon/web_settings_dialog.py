@@ -69,7 +69,7 @@ _QT_AVAILABLE = False
 try:
     from aqt.qt import (
         QDialog, QDialogButtonBox, QKeySequence, QKeySequenceEdit, QLabel,
-        QPushButton, QVBoxLayout, QDesktopServices, QUrl, Qt, pyqtSignal,
+        QVBoxLayout, QDesktopServices, QUrl, pyqtSignal,
         QBuffer, QIODevice, QSize, QTimer,
     )
     from PyQt6.QtWebEngineWidgets import QWebEngineView

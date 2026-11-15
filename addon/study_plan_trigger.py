@@ -18,14 +18,8 @@ except ImportError:
         return text
 
 # --- Global function references (set during addon init) ---
-_trigger_study_plan_func: Optional[Callable] = None
 _trigger_gamification_sidebar_func: Optional[Callable] = None
 
-
-def set_study_plan_trigger_function(func: Callable):
-    """Wird von __init__.py aufgerufen, um die eigentliche Funktion zu übergeben."""
-    global _trigger_study_plan_func
-    _trigger_study_plan_func = func
 
 def set_gamification_sidebar_trigger_function(func: Callable):
     """Wird von __init__.py aufgerufen, um die Funktion zum Umschalten der Sidebar zu übergeben."""
@@ -34,23 +28,6 @@ def set_gamification_sidebar_trigger_function(func: Callable):
 
 
 # --- Trigger-Funktionen, die vom Launcher-Button aufgerufen werden ---
-
-def trigger_study_plan_action():
-    """Löst die Konfiguration des Lernplans aus."""
-    print("\n--- Triggering Study Plan Deadline ---")
-    if _trigger_study_plan_func and callable(_trigger_study_plan_func):
-        try:
-            _trigger_study_plan_func()
-        except Exception as e:
-            msg = _("Error triggering Study Plan Deadline action: {}").format(e)
-            print(f"ERROR: {msg}")
-            traceback.print_exc()
-            tooltip(msg)
-    else:
-        msg = _("Cannot trigger Study Plan Deadline: Function not initialized by main addon.")
-        print(f"ERROR: {msg}")
-        tooltip(msg)
-
 
 def trigger_gamification_sidebar_action():
     """Löst das Anzeigen/Verstecken der Gamification-Sidebar aus."""

@@ -1,6 +1,4 @@
 """Canonical workspace strings, using the same language as the rest of SmartStudy."""
-import json
-from pathlib import Path
 from .locales import _, TRANSLATIONS, WORKSPACE_TRANSLATIONS
 
 CATALOG = WORKSPACE_TRANSLATIONS

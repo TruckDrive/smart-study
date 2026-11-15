@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.4 – 2026-11-15
+
+A clean-up release. Nothing visible changes.
+
+- **Dead code removed** (about 5,500 lines, 27 files): the hidden API chat of the assistant with its providers, streaming and the Ollama wizard (`ai_assistant.py` shrank from 1,927 to 269 lines), `chat_ui.html`, `chat_math.js` and the KaTeX library only the chat used; the HTML generators and the statistics widget of the removed classic layout; 38 unused constants, `help_dialog.py`, unused functions and 72 unused imports
+- **Old API keys are deleted**: keys saved by versions before 3.0.1 (`SmartStudy_Data/ai_secrets.json` and the old entries in the collection configuration) are removed at the first start. There was no way left to delete them in the app
+- **Ignored errors leave a trace**: 219 places said `except Exception: pass`. They now call `quiet.ignored()`, which behaves the same but prints the error once per place, with file and line
+- **GUI smoke test**: `tests/gui/run.sh` starts Anki without a window in a throwaway profile and checks the rail, the settings page, the study plan page and the focus mode (18 checks). Against 3.0.2 it fails exactly where the settings window was broken
+
+
 ## 3.0.3 – 2026-11-15
 
 - **Fix – settings window**: the settings page loads a helper script from its own folder, and Qt WebEngine refused that on some systems. The page then stopped half-way while it opened: no logo, the accent colour could not be changed, the *Browser* tab showed only its headings, the changelog was empty and *Save Settings* did nothing. The page may now load its own files, Python hands the script over if it is still missing, and one failing part no longer stops the rest. Page errors are printed instead of being swallowed

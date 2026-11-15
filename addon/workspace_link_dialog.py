@@ -2,7 +2,7 @@
 from .workspace_strings import _
 from . import workspace_links as links
 from aqt.qt import (QDialog,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QLineEdit,QComboBox,
-                    QListWidget,QListWidgetItem,QPlainTextEdit,QSplitter,QWidget,QDialogButtonBox,QTimer,Qt)
+                    QListWidget,QListWidgetItem,QPlainTextEdit,QSplitter,QWidget,QDialogButtonBox,QTimer)
 
 class LinkDialog(QDialog):
     def __init__(self,parent,existing,seed=''):

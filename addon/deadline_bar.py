@@ -17,8 +17,6 @@ from typing import Dict, List, Optional, TYPE_CHECKING
 
 # --- Anki/Qt Imports ---
 from aqt import mw
-from aqt.qt import QWidget, QDate, Qt
-from aqt.utils import tooltip, showInfo
 
 # Importing __init__ from here creates a circular dependency during add-on
 # startup. Resolve the immutable package path/name directly instead.

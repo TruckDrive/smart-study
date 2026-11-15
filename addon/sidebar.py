@@ -25,7 +25,6 @@ import os
 import traceback
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
-from aqt import mw
 from aqt.qt import Qt, QDockWidget, QLabel, QUrl, QWidget
 from aqt.utils import tooltip
 

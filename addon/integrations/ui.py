@@ -8,7 +8,7 @@ theme.dialog_palette, so colour themes and dark mode apply.
 """
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from aqt import mw
 from aqt.qt import (QAbstractButton, QButtonGroup, QColor, QDialog, QFrame,

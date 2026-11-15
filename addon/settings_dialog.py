@@ -8,7 +8,7 @@ except ImportError:  # the module is loaded on its own (tests)
 
 from .constants import is_night as _is_night
 import os
-from typing import Any, Optional, Dict
+from typing import Optional, Dict
 
 # --- Local Imports ---
 try:
@@ -130,12 +130,6 @@ def _build_settings_style(night: bool) -> str:
 
 # Styles computed per-instance at dialog creation time (not cached here).
 
-
-# --- Responsive breakpoints (available width of the dialog's content area) ---
-# Below COMPACT_BREAKPOINT: single-column layout, smaller margins, smaller image
-# Below TINY_BREAKPOINT:    additionally hide/shrink non-essential text
-COMPACT_BREAKPOINT = 720
-TINY_BREAKPOINT = 480
 
 
 class SettingsDialog(QDialog):

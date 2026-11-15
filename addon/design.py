@@ -12,8 +12,6 @@ except ImportError:  # the module is loaded on its own (tests)
 
 from typing import Dict
 
-STANDARD_THEME = "standard.css"
-
 DARK: Dict[str, str] = {
     "page": "#26282B", "card": "#1D1F22", "line": "#3A3D42", "raised": "#34373C",
     "hover": "#2B2E32", "accent": "#56BAC6", "on_accent": "#06181B",

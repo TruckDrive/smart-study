@@ -9,16 +9,15 @@ except ImportError:  # the module is loaded on its own (tests)
 
 from .constants import is_night as _is_night
 import os
-import time
 import traceback
 import datetime
 from typing import Optional, Callable
 
 # --- PyQt Imports ---
 try:
-    from aqt.qt import (QDialog, QGridLayout, QLabel, QSpinBox, QLineEdit,
-                        QCheckBox, QDialogButtonBox, QVBoxLayout, QFrame,
-                        QHBoxLayout, QPushButton, QWidget, QScrollArea, QPixmap,
+    from aqt.qt import (QDialog, QGridLayout, QLabel, QSpinBox,
+                        QCheckBox, QVBoxLayout, QFrame,
+                        QHBoxLayout, QPushButton, QWidget, QScrollArea,
                         QPainter, QColor, QFont, QTimer, pyqtSignal, Qt,
                         QTabWidget, QTreeWidget, QTreeWidgetItem)
 except ImportError:
@@ -29,7 +28,7 @@ except ImportError:
 
 # --- Anki Imports ---
 from aqt import mw
-from aqt.utils import showWarning, showInfo, tooltip, qconnect, askUser
+from aqt.utils import showInfo, tooltip, qconnect, askUser
 
 # --- Local Imports ---
 from . import constants

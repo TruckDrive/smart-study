@@ -10,7 +10,7 @@ except ImportError:  # the module is loaded on its own (tests)
 import html
 import random
 import re
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from anki.utils import ids2str
 

@@ -60,7 +60,6 @@ CMD_RESET_DATA = f"gamification_reset_data_{ADDON_FOLDER_NAME}"
 CMD_CLAIM_CHALLENGE = f"gamification_claim_challenge_{ADDON_FOLDER_NAME}"
 CMD_LP_START_PREFIX = f"lp_start"
 CMD_LP_PAUSE_PREFIX = f"lp_pause"
-IMAGES_SUBFOLDER = "images"
 
 # --- Gamification Balancing ---
 XP_PER_MINUTE_STUDIED = 10

@@ -2,7 +2,6 @@
 import os
 from aqt import mw
 from aqt.qt import *
-from aqt.utils import showInfo
 
 try:
     from .locales import _

@@ -37,8 +37,7 @@ InfiniteLoop = -1
 
 try:
     from aqt.qt import (QWidget, QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
-                        QLabel, QLineEdit, QFileDialog, QPixmap, QPainter,
-                        QPainterPath, QUrl, Qt, QTimer, QRectF, QColor)
+                        QLabel, QLineEdit, QFileDialog, QUrl, Qt, QTimer, QColor)
     from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
     _has_multimedia = True
     InfiniteLoop = QMediaPlayer.Loops.Infinite
@@ -359,26 +358,6 @@ else:
 
 
 # --- Helper Functions ---
-
-def _rounded_pixmap(pix: 'QPixmap', radius: int = 16) -> 'QPixmap':
-    """Return a copy of *pix* with rounded corners (Apple-style artwork)."""
-    try:
-        if pix.isNull():
-            return pix
-        rounded = QPixmap(pix.size())
-        rounded.fill(Qt.GlobalColor.transparent)
-        painter = QPainter(rounded)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-        path = QPainterPath()
-        path.addRoundedRect(QRectF(0, 0, pix.width(), pix.height()), radius, radius)
-        painter.setClipPath(path)
-        painter.drawPixmap(0, 0, pix)
-        painter.end()
-        return rounded
-    except Exception:
-        return pix
-
 
 def _get_music_file_path(filename: str) -> Optional[str]:
     if not constants.icons_folder: return None
@@ -718,11 +697,6 @@ class MiniMusicPlayer(QDialog):
                 return t
         return None
 
-    def get_image_for_file(self, tid) -> Optional[str]:
-        """Cover path for the sidebar artwork callback."""
-        t = self._find_track(tid)
-        return t.get("cover_path") if t else None
-
     # --- UI ------------------------------------------------------------------
 
     def init_ui(self):
@@ -1055,7 +1029,6 @@ class MiniMusicPlayer(QDialog):
         if self._swap_autoplay:
             self._start_faded_playback()
         self._push_music_state()
-        _notify_artwork()
         self.save_state()
 
     def _start_faded_playback(self):
@@ -1123,7 +1096,6 @@ class MiniMusicPlayer(QDialog):
 
     def _on_state_changed(self, state):
         self._push_music_state()
-        _notify_artwork()
 
     # --- State persistence ---------------------------------------------------
 
@@ -1244,7 +1216,6 @@ class MiniMusicPlayer(QDialog):
             if playing != self._sc_playing:
                 self._sc_playing = playing
                 self._push_sc_state(playing=playing)
-                _notify_artwork()
                 self._sc_sync_activity()
 
         title = (st.get("title") or "").strip()
@@ -1261,7 +1232,6 @@ class MiniMusicPlayer(QDialog):
             elif not art and self._sc_artwork_url:
                 self._sc_artwork_url = ""
                 self._sc_artwork_path = None
-                _notify_artwork()
 
     def _set_sc_url(
         self,
@@ -1383,7 +1353,6 @@ class MiniMusicPlayer(QDialog):
                     # Only apply if this is still the current track's cover.
                     if url == self._sc_artwork_url:
                         self._sc_artwork_path = dest
-                        _notify_artwork()
                 except Exception:
                     _ignored()
 
@@ -1523,18 +1492,6 @@ class MiniMusicPlayer(QDialog):
         event.ignore()
         self.hide()
 
-# --- Sidebar artwork notification -------------------------------------------
-# The launcher sidebar can register a callback to show the current track's
-# cover on its music button while something is playing.
-_artwork_cb: Optional[callable] = None
-
-
-def set_artwork_callback(cb) -> None:
-    """Register cb(path_or_None); called whenever playback/track changes."""
-    global _artwork_cb
-    _artwork_cb = cb
-
-
 def _sc_artwork_cache_path() -> Optional[str]:
     """Local cache file for the current SoundCloud cover (profile folder)."""
     try:
@@ -1545,26 +1502,6 @@ def _sc_artwork_cache_path() -> Optional[str]:
     except Exception:
         _ignored()
     return None
-
-
-def _notify_artwork() -> None:
-    if _artwork_cb is None:
-        return
-    try:
-        path = None
-        w = _music_window
-        if w is not None:
-            if w._mode == "local" and w.player is not None and w.is_playing():
-                path = w.get_image_for_file(w._track_id)
-            elif w._mode == "soundcloud" and w._sc_playing:
-                p = getattr(w, "_sc_artwork_path", None)
-                if p and os.path.isfile(p):
-                    path = p
-        _artwork_cb(path)
-    except RuntimeError:
-        pass  # button/widget already deleted (profile close)
-    except Exception:
-        traceback.print_exc()
 
 
 # --- Global Control ---
@@ -1634,13 +1571,7 @@ def refresh_music_player_theme() -> None:
 
 
 def cleanup_music_player():
-    global _music_window, _artwork_cb, _music_web_profile
-    try:
-        if _artwork_cb:
-            _artwork_cb(None)
-    except Exception:
-        _ignored()
-    _artwork_cb = None
+    global _music_window, _music_web_profile
     if _music_window:
         try:
             _music_window.save_state()

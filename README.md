@@ -154,6 +154,7 @@ Smart Study sends nothing on its own: no analytics, no remote banner, no update 
 python -I tests/test_planner.py               # scheduler, no Anki needed
 python -I tests/test_ankidata.py <empty dir>  # Anki queries on a throwaway collection
 python -I tests/test_store.py <empty dir>     # plan sync between two devices
+tests/gui/run.sh                               # GUI smoke test: Anki without a window, throwaway profile
 ./build.sh                                     # → dist/smart_study.ankiaddon
 ```
 

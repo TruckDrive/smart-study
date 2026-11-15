@@ -2,7 +2,6 @@
 from __future__ import annotations
 import threading
 import zipfile
-from pathlib import Path
 
 from . import diagnostics as diag
 from .locales import _ as tr

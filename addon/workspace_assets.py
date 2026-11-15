@@ -1,7 +1,6 @@
 """Bounded, content-addressed images in the Anki profile, outside add-on updates."""
 import base64
 import hashlib
-import json
 import os
 import re
 import tempfile

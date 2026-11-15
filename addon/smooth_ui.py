@@ -432,67 +432,16 @@ _TOOLBAR_CSS = """<style id="ss-toolbar-narrow">
 @media (max-width: 600px) { .hitem { font-size: 92% !important; } }
 </style>"""
 
-_rendered_compact: Optional[bool] = None
-
-
-def deck_area_narrow() -> bool:
-    web = getattr(mw, "web", None)
-    return bool(web is not None and web.width() < NARROW_WIDTH)
-
-
-def note_rendered(compact: bool) -> None:
-    global _rendered_compact
-    _rendered_compact = compact
-
 
 def _on_content(web_content, context) -> None:
     try:
         from aqt.deckbrowser import DeckBrowser
-        from aqt.overview import Overview
     except Exception:
         return
     if isinstance(context, DeckBrowser):
         web_content.head += COMPACT_CSS  # takes effect only while narrow
     if type(context).__name__ in ("Toolbar", "TopToolbar"):
         web_content.head += _TOOLBAR_CSS
-
-
-class _MainAreaWatcher(QObject):
-    """Re-render the deck list when the main area becomes narrow or wide."""
-
-    def __init__(self):
-        super().__init__()
-        self.timer = QTimer(self)
-        self.timer.setSingleShot(True)
-        self.timer.setInterval(280)
-        self.timer.timeout.connect(self._check)
-
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.Resize:
-            self.timer.start()
-        return False
-
-    def _check(self) -> None:
-        if _rendered_compact is None or getattr(mw, "state", "") != "deckBrowser":
-            return
-        if deck_area_narrow() != _rendered_compact:
-            try:
-                mw.deckBrowser.refresh()
-            except Exception as e:
-                print(f"Smart Study: deck list not refreshed: {e}")
-
-
-_watcher: Optional[_MainAreaWatcher] = None
-
-
-def _setup_main_web() -> None:
-    global _watcher
-    web = getattr(mw, "web", None)
-    if web is None:
-        return
-    if _watcher is None:
-        _watcher = _MainAreaWatcher()
-        web.installEventFilter(_watcher)
 
 
 def setup() -> None:
@@ -505,6 +454,3 @@ def setup() -> None:
         _dock_slide = _DockSlide()
         app.installEventFilter(_dock_slide)
     gui_hooks.webview_will_set_content.append(_on_content)
-    gui_hooks.main_window_did_init.append(_setup_main_web)
-    if getattr(mw, "web", None) is not None:
-        _setup_main_web()

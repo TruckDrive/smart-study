@@ -7,28 +7,16 @@ except ImportError:  # the module is loaded on its own (tests)
         pass
 
 from .constants import is_night as _is_night
-import json
-import os
-import traceback
 import copy
 import uuid
-from typing import Dict, Optional, List, TYPE_CHECKING
-from datetime import date, datetime
 
-from aqt import mw
 from aqt.qt import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QAbstractItemView, QHeaderView, QPushButton, QLineEdit, QTimeEdit, QTime,
-    QLabel, QDialogButtonBox, QMessageBox, QWidget, Qt, QTimer, QShortcut, QKeySequence,
-    QCalendarWidget, QDate, QCheckBox, QDateEdit, QFrame,
-    QFormLayout,
-    QSizePolicy,
-    QFont, QColor, QPainter, QPen, QBrush, QRectF, QIcon, QToolButton,
-    QTextEdit, QTextCharFormat,
-    QApplication,
-    QDesktopServices, QUrl
+    QAbstractItemView, QHeaderView, QPushButton, QLineEdit,
+    QLabel, QWidget, Qt,
+    QDate, QCheckBox, QDateEdit, QFrame
 )
-from aqt.utils import showInfo, tooltip
+from aqt.utils import showInfo
 
 # --- Addon Imports ---
 try:
@@ -378,7 +366,7 @@ class DeadlineViewerDialog(QDialog):
         c = _palette(is_night_mode)
 
         if deadline_manager:
-            from datetime import date as _date, datetime as _dt, timedelta as _td
+            from datetime import date as _date, datetime as _dt
             DATE_FMT = "%Y-%m-%d"
             deadlines = deadline_manager.get_all_deadlines()
             pinned_id = deadline_manager.data.get("pinned_id")

@@ -292,13 +292,3 @@ def restore() -> None:
             QTimer.singleShot(0, repair_top_toolbar)
         except Exception:
             repair_top_toolbar()
-
-
-def force_close() -> None:
-    """Invoke the active close callback (used during cleanup)."""
-    cb = _on_close
-    if cb is not None:
-        try:
-            cb()
-        except Exception:
-            restore()

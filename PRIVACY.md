@@ -62,10 +62,11 @@ AnkiWeb, exactly as *Tools → Add-ons → Get Add-ons* does.
 ## Local and synced storage
 
 - General settings, study plans, browser history/custom shortcuts, browser
-  cookies, AI keys, notebook data, mind maps, and imported music files are
+  cookies, notebook data, mind maps, and imported music files are
   profile-local under the Anki profile directory.
-- AI keys are stored in `SmartStudy_Data/ai_secrets.json` with user-only file
-  permissions where the operating system supports them.
+- Smart Study stores no AI keys any more. Keys saved by versions before 3.0.1
+  (`SmartStudy_Data/ai_secrets.json` and the old entries in the collection
+  configuration) are deleted at the first start of 3.0.4.
 - Gamification, deadlines, music preferences, and non-secret AI preferences use
   Anki collection configuration and may be included in Anki sync and backups.
 - Smart Study's general settings and the on/off switches of the built-in
@@ -77,8 +78,8 @@ AnkiWeb, exactly as *Tools → Add-ons → Get Add-ons* does.
 - If you switch on add-on sync, the AnkiWeb codes and names of your installed
   add-ons are kept in the collection configuration (`smartstudy_addons`).
   Missing add-ons are downloaded from AnkiWeb only after you confirm.
-- A migration removes API keys and website history from the older
-  collection-synced locations when the corresponding feature is first opened.
+- A migration removes website history from the older collection-synced
+  location when the browser is first opened.
 
 Uninstalling or updating an add-on may replace its installation directory.
 Smart Study therefore keeps user data in the profile directory rather than the
@@ -86,9 +87,9 @@ add-on directory. Removing Smart Study does not automatically delete that data.
 
 ## Sensitive content
 
-Do not paste secrets into AI prompts or website search. Card context is off
-until explicitly enabled. API-provider requests are made directly from the
-desktop client; Smart Study does not proxy them through any server.
+Do not paste secrets into AI prompts or website search. What you type into a
+chatbot's website goes directly to that provider; Smart Study does not proxy
+it through any server.
 
 
 ## Optional local diagnostics

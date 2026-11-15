@@ -10,11 +10,9 @@ import json
 import html
 import traceback
 from functools import partial
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, List, Dict
 import os
 import urllib.parse
-
-BROWSER_HOME_URL = "https://www.google.com/"  # default; see _home_url()
 
 # --- Local Imports ---
 from . import constants, diagnostics
@@ -91,10 +89,6 @@ def _toolbar_palette() -> dict:
     return browser_chrome.palette()
 
 
-def _get_blue_button_style() -> str:
-    return browser_chrome.chip()
-
-
 def _get_icon_button_style() -> str:
     """Square icon button of the bars (back, forward, reload, new tab …)."""
     return browser_chrome.icon_button()
@@ -107,14 +101,6 @@ def _get_raised_text_button_style() -> str:
 
 def _get_raised_icon_button_style() -> str:
     return browser_chrome.small_icon_button()
-
-
-def _get_delete_button_style() -> str:
-    return browser_chrome.small_icon_button()
-
-
-# Backwards-compatible alias (still referenced in a few places).
-WHITE_BUTTON_STYLE = _get_delete_button_style()
 
 
 # Same "open in main window" glyph used by the Mindmap / Notebook nav bars:
@@ -327,11 +313,6 @@ def save_last_opened_url(url: str):
     state = _load_website_state()
     state["last_url"] = url
     _save_website_state(state)
-
-def load_last_opened_url() -> Optional[str]:
-    value = _load_website_state().get("last_url")
-    return value if isinstance(value, str) and len(value) <= 8192 else None
-
 
 # --- UI Actions ---
 def _search_engine() -> str:
@@ -1916,14 +1897,6 @@ def on_webview_url_changed(url: QUrl):
 
 # --- Embedded View (inside the Anki main window) ---
 from . import embedded_window
-
-
-def toggle_website_window():
-    """Toggle the embedded main-window view on/off (the ⧉ button)."""
-    if website_window is not None and embedded_window.is_active():
-        close_website_window()
-    else:
-        open_website_window()
 
 
 def open_website_window():

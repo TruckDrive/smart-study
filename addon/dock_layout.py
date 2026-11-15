@@ -69,11 +69,6 @@ def is_window(key: str) -> bool:
         return False
 
 
-def dock_is_own_window(dock) -> bool:
-    """For code that closes other tools: leave own windows alone."""
-    return any(is_window(key) and _dock(key) is dock for key in _targets)
-
-
 def mode(key: str) -> str:
     target = _targets.get(key)
     if target is None:

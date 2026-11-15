@@ -28,7 +28,7 @@ from typing import Callable, Dict, List, Optional
 
 from aqt import mw
 from aqt.qt import (QApplication, QFrame, QObject, QHBoxLayout, QInputDialog, QKeySequence,
-                    QLabel, QMenu, QPushButton, QShortcut, QSizeGrip, QTimer,
+                    QLabel, QPushButton, QShortcut, QSizeGrip, QTimer,
                     QUrl, QVBoxLayout, QWidget, Qt)
 from aqt.utils import tooltip
 

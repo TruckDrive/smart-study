@@ -7,6 +7,15 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.4",
+        "date": "November 15, 2026",
+        "items": [
+            {"tag": "Improved", "text": "A tidier add-on: about 5,500 lines of code that nothing used any more are gone (the old API chat with its formula library, leftovers of the classic layout). Nothing you can see changes; the package is smaller."},
+            {"tag": "Improved", "text": "Old API keys of the removed AI chat are deleted from your profile at the first start. Smart Study stores no keys any more."},
+            {"tag": "Improved", "text": "Errors that were skipped silently are now noted once, so problems like the broken settings window of 3.0.2 show up instead of hiding."},
+        ],
+    },
+    {
         "version": "3.0.3",
         "date": "November 15, 2026",
         "items": [

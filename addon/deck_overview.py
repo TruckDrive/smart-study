@@ -8,7 +8,6 @@ except ImportError:  # the module is loaded on its own (tests)
 
 from .constants import is_night as _is_night
 import json
-import os
 import re
 from collections import Counter
 from . import deck_overview_options as overview_options
