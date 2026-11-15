@@ -6042,9 +6042,6 @@
   "Language": {
     "pl": "Język"
   },
-  "Language, daily facts, the statistics range and when the sidebar is shown.": {
-    "pl": "Język, ciekawostki, zakres statystyk i widoczność panelu."
-  },
   "Language:": {
     "pl": "Język:"
   },
@@ -6728,9 +6725,6 @@
   "Performance and stability improvements across the add-on.": {
     "pl": "Poprawki wydajności i stabilności całego dodatku."
   },
-  "Period covered by the statistics widget.": {
-    "pl": "Okres statystyk widżetu."
-  },
   "Pick from the list or type a custom model name.": {
     "pl": "Wybierz z listy lub wpisz własną nazwę modelu."
   },
@@ -7235,9 +7229,6 @@
   },
   "Show or hide the launcher sidebar.": {
     "pl": "Pokaż lub ukryj panel narzędzi."
-  },
-  "Show the launcher always, or hide it while you review.": {
-    "pl": "Pokazuj panel zawsze lub ukrywaj podczas powtórek."
   },
   "Show while studying": {
     "pl": "Pokaż podczas nauki"
@@ -9193,5 +9184,17 @@
     "vi": "Màu nền chế độ tối",
     "hi": "गहरे मोड का पृष्ठभूमि रंग",
     "pl": "Kolor tła w trybie ciemnym"
+  },
+  "Language, the period of the Memory chart and when the left bar is shown.": {
+    "pl": "Język, okres wykresu pamięci i kiedy widać lewy pasek."
+  },
+  "Period of the Memory chart (also under Home).": {
+    "pl": "Okres wykresu pamięci (także na Stronie głównej)."
+  },
+  "Show the left bar with the tabs always, or hide it while you review.": {
+    "pl": "Pokazuj lewy pasek z kartami zawsze lub ukrywaj go podczas powtórek."
+  },
+  "Open page": {
+    "pl": "Otwórz stronę"
   }
 }

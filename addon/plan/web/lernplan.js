@@ -338,6 +338,7 @@ const ICON = {
   archive: "M4 7.5h16v3H4zM5.5 10.5V19h13v-8.5M10 14h4",
   restore: "M4 12a8 8 0 1 0 2.4-5.7M4 4.5V9h4.5",
   trash: "M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.5 10.5v6M13.5 10.5v6",
+  history: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.5H8M12 8v4.5l3 2",
 };
 const icon = name => svg("svg", { class: "ic", viewBox: "0 0 24 24", width: 18, height: 18, "aria-hidden": "true" }, svg("path", { d: ICON[name] }));
 async function archivePlan(id, on, then) {
@@ -452,6 +453,27 @@ function itemDone(it) {
   return !!(d.plan.done[it.id] || (d.ev[it.id] && d.ev[it.id].done));
 }
 
+// "⋯" button with the rarely used actions, so the plan's head keeps three buttons.
+function moreMenu(entries) {
+  const wrap = h("div", { class: "more" });
+  const close = () => { wrap.querySelector(".more-list")?.remove(); document.removeEventListener("mousedown", outside, true); document.removeEventListener("keydown", esc, true); };
+  const outside = e => { if (!wrap.contains(e.target)) close(); };
+  const esc = e => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+  const btn = h("button", { class: "more-btn", title: L("Weitere Aktionen", "More actions", "کارهای بیشتر"), "aria-haspopup": "menu",
+    onclick: () => {
+      if (wrap.querySelector(".more-list")) return close();
+      const list = h("div", { class: "more-list", role: "menu" });
+      for (const [ic, label, fn, cls] of entries)
+        list.append(h("button", { class: "with-icon" + (cls ? " " + cls : ""), role: "menuitem", onclick: () => { close(); fn(); } }, ic, label));
+      wrap.append(list);
+      document.addEventListener("mousedown", outside, true);
+      document.addEventListener("keydown", esc, true);
+      list.querySelector("button")?.focus();
+    } }, "⋯");
+  wrap.append(btn);
+  return wrap;
+}
+
 function renderPlan(root) {
   const { plan, stats, progress, phase, overdue } = S.data;
   const today = stats.today, left = daysBetween(today, plan.exam);
@@ -462,10 +484,12 @@ function renderPlan(root) {
     h("div", { class: "bar-actions" },
       h("button", { onclick: () => go("edit") }, L("Bearbeiten", "Edit", "ویرایش")),
       h("button", { onclick: () => replan() }, L("Neu planen", "Replan", "برنامه‌ریزی دوباره")),
-      h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")),
       h("button", { onclick: () => shareDialog() }, L("Teilen", "Share", "اشتراک‌گذاری")),
-      h("button", { class: "with-icon", onclick: () => archivePlan(plan.id, plan.status !== "archived", () => go("home")) }, icon(plan.status === "archived" ? "restore" : "archive"), plan.status === "archived" ? L("Aktivieren", "Make active", "فعال کردن") : L("Archivieren", "Archive", "بایگانی")),
-      h("button", { class: "with-icon danger", onclick: () => deletePlan(plan.id, plan.title, () => go("home")) }, icon("trash"), L("Löschen", "Delete", "حذف")))));
+      moreMenu([
+        [icon("history"), L("Rückblick", "Retrospective", "جمع‌بندی"), () => go("review")],
+        [icon(plan.status === "archived" ? "restore" : "archive"), plan.status === "archived" ? L("Aktivieren", "Make active", "فعال کردن") : L("Archivieren", "Archive", "بایگانی"), () => archivePlan(plan.id, plan.status !== "archived", () => go("home"))],
+        [icon("trash"), L("Löschen", "Delete", "حذف"), () => deletePlan(plan.id, plan.title, () => go("home")), "danger"],
+      ]))));
 
   (plan.notes || []).forEach((n, i) => root.append(h("div", { class: "card warn", key: "note" + i }, n)));
 
