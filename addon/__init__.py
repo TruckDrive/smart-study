@@ -66,7 +66,6 @@ modules_loaded = False
 try:
     from . import onboarding_dialog
     from . import mode
-    from .launcher_widget import SidebarWidget
     from .pomodoro import init_pomodoro, cleanup_pomodoro
     from .website_sidebar import cleanup_website_sidebar
     from .background_music import cleanup_music_player
@@ -77,7 +76,7 @@ try:
         toggle_notebook_dock, open_pdf_review_link,
     )
     from . import deck_overview, sidebar_shortcuts
-    from . import statistics_widget, daily_widgets, minimal_dashboard, settings_dialog, custom_background
+    from . import statistics_widget, daily_widgets, settings_dialog, custom_background
     from .gamification import GamificationManager, CMD_RESET_DATA, CMD_CLAIM_CHALLENGE, CMD_LP_START_PREFIX, CMD_LP_PAUSE_PREFIX
     from .sidebar import GamificationSidebar
     from .deadline_bar import DeadlineManager
@@ -127,11 +126,6 @@ def _panel_defaults() -> Dict[str, Any]:
         return {}
 
 
-def _panel_layout() -> bool:
-    """The new home: deck list on the left, Smart Study panel on the right."""
-    return addon_settings.get("home_layout", "panel") == "panel"
-
-
 def get_default_settings() -> Dict[str, Any]:
     from .deck_overview_options import DEFAULTS as deck_defaults
     return {
@@ -143,7 +137,6 @@ def get_default_settings() -> Dict[str, Any]:
         **_panel_defaults(),
         "sidebar_visibility_mode": "always_show",
         "launcher_sidebar_open": True,
-        "minimal_dashboard_enabled": False,
         "gamification_widgets_enabled": True,
         "study_plan_widget_enabled": False, "daily_fact_widget_enabled": True,
         "deadline_bar_enabled": True, "statistics_widget_enabled": True,
@@ -367,8 +360,7 @@ def _add_launcher_toggle_to_top_toolbar(links, toolbar) -> None:
         if any(_TOP_TOOLBAR_SIDEBAR_ID in str(link) for link in links):
             return
 
-        tooltip_text = (_("Show or hide the Smart Study panel.") if _panel_layout()
-                        else _("Show or hide the launcher sidebar."))
+        tooltip_text = _("Show or hide the Smart Study panel.")
         link = toolbar.create_link(
             _TOP_TOOLBAR_SIDEBAR_CMD,
             "Sidebar",
@@ -958,8 +950,7 @@ def _ensure_gamification_sidebar():
     if gamification_sidebar:
         return gamification_sidebar
     if (not mw or not gamification_manager
-            or not (addon_settings.get("gamification_sidebar_enabled", True)
-                    or addon_settings.get("minimal_dashboard_enabled", False))):
+            or not addon_settings.get("gamification_sidebar_enabled", True)):
         return None
     try:
         sidebar = GamificationSidebar(manager=gamification_manager, parent=mw)
@@ -1134,9 +1125,7 @@ def _init_data_managers() -> None:
             print(f"SmartStudy: gamification manager initialization failed: {e}")
             traceback.print_exc()
 
-    minimal_dashboard_enabled = addon_settings.get("minimal_dashboard_enabled", False)
-
-    if (minimal_dashboard_enabled or addon_settings.get("deadline_bar_enabled", True)) and not deadline_manager:
+    if addon_settings.get("deadline_bar_enabled", True) and not deadline_manager:
         try:
             deadline_manager = DeadlineManager()
             mw.deadline_manager = deadline_manager
@@ -1197,63 +1186,10 @@ def _init_panel() -> None:
 
 
 def _init_launcher_dock() -> None:
-    """Install the lightweight 55px launcher before the first dashboard paint."""
-    global launcher_dock_widget, sidebar_widget_instance
-    if not mw or launcher_dock_widget or panel_instance:
+    """Install the Smart Study panel before the first dashboard paint."""
+    if not mw or panel_instance:
         return
-    if _panel_layout():
-        _init_panel()
-        return
-
-    try:
-        # The launcher buttons may be clicked immediately after they appear.
-        study_plan_trigger.set_gamification_sidebar_trigger_function(
-            toggle_gamification_sidebar)
-        study_plan_trigger.set_study_plan_trigger_function(
-            show_configuration_dialog)
-
-        launcher_dock_name = "SmartStudyLauncherSidebarDock_v2"
-        existing = mw.findChild(QDockWidget, launcher_dock_name)
-        if existing:
-            existing.setVisible(False)
-            existing.deleteLater()
-
-        dock = QDockWidget("", mw)
-        dock.setObjectName(launcher_dock_name)
-        content = SidebarWidget(
-            parent=dock,
-            settings_dialog_trigger=show_settings_dialog,
-            settings=addon_settings,
-        )
-        dock.setWidget(content)
-        dock.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
-        dock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea)
-        dock.setTitleBarWidget(QWidget())
-        dock.setFixedWidth(constants.SIDEBAR_WIDTH)
-        mw.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)
-        dock.setVisible(bool(addon_settings.get("launcher_sidebar_open", True)))
-
-        launcher_dock_widget = dock
-        sidebar_widget_instance = content
-        if addon_settings.get("pomodoro_enabled", True):
-            init_pomodoro(
-                mw,
-                content.update_timer_ui,
-                content.update_timer_label_only,
-            )
-        try:
-            dock.visibilityChanged.connect(_sync_launcher_toolbar_button)
-        except (AttributeError, RuntimeError):
-            pass
-
-        on_state_change(mw.state, "")
-        try:
-            sidebar_shortcuts.refresh(addon_settings)
-        except Exception as e:
-            print(f"SmartStudy: shortcut setup failed: {e}")
-    except Exception as e:
-        print(f"SmartStudy: launcher initialization failed: {e}")
-        traceback.print_exc()
+    _init_panel()
 
 
 def on_profile_open():
@@ -1391,8 +1327,6 @@ def _init_ui_delayed(expected_profile_generation=None):
     
 
 def on_profile_close():
-    from . import dashboard_demo
-    dashboard_demo.stop()
     # Diagnostics owns a background writer, never wait for disk IO on the GUI.
     try:
         from . import diagnostics
@@ -1470,131 +1404,21 @@ def on_profile_close():
 # --- Webview & Rendering Hooks ---
 def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrowserContent):
     global _dashboard_rendered_with_models
-    from . import dashboard_demo
-    demo = dashboard_demo.current(getattr(mw, "col", None))
     display_settings = dict(addon_settings)
-    demo_stats = None
-    if demo:
-        display_settings.update(statistics_widget_enabled=True, gamification_widgets_enabled=True,
-                                daily_fact_widget_enabled=True, daily_widget_content="facts",
-                                stats_show_consistency=True, stats_show_efficiency=True,
-                                stats_show_retention=True, stats_show_new_cards=True,
-                                fact_theme=demo["fact_theme"])
-        demo_stats = dashboard_demo.statistics(demo, int(display_settings.get("stats_time_range", 7)),
-                                               int(display_settings.get("stats_consistency_days", 30)))
-    if _panel_layout() and not demo:
-        # Everything that used to sit above the deck list now lives in the side
-        # panel; only the celebration still appears over the deck list.
-        _dashboard_rendered_with_models = True
-        try:
-            gm = getattr(mw, 'gamification_manager', None)
-            events = gm.get_celebration_events() if gm else None
-            if events and display_settings.get("gamification_popups_enabled", True):
-                from . import celebration_live
-                content.stats = celebration_live.render_celebration_modal(
-                    celebration_live.select_events(events, addon_settings)) + getattr(content, 'stats', '')
-        except Exception as e:
-            print(f"SmartStudy: celebration popup error: {e}")
-        if panel_instance is not None:
-            panel_instance.refresh(200)
-        return
-    minimal_enabled = bool(display_settings.get("minimal_dashboard_enabled", False))
-    # A sidebar (e.g. the browser in split view) leaves the main area narrow:
-    # use the compact dashboard and keep the deck list in view.
-    compact_area = False
-    try:
-        from . import smooth_ui
-        compact_area = smooth_ui.deck_area_narrow()
-        smooth_ui.note_rendered(compact_area)
-    except Exception:
-        smooth_ui = None
-    if compact_area:
-        minimal_enabled = True
-    if (not minimal_enabled
-            and not display_settings.get("statistics_widget_enabled", True)
-            and not display_settings.get("gamification_widgets_enabled", True)
-            and not display_settings.get("study_plan_widget_enabled", True)
-            and not display_settings.get("daily_fact_widget_enabled", True)
-            and not display_settings.get("deadline_bar_enabled", True)):
-        _dashboard_rendered_with_models = True
-        return
-    
-    stats_html = gamification_html = daily_html = deadline_html = compact_html = compact_stats_html = ""
-    gm = dashboard_demo.DisplayGamification(demo) if demo else getattr(mw, 'gamification_manager', None)
-    lpm = getattr(mw, 'learning_plan_manager', None)
-    dm = getattr(mw, 'deadline_manager', None)
-    if minimal_enabled:
-        _dashboard_rendered_with_models = bool(gm and lpm and dm)
-        try:
-            fact_theme = display_settings.get("fact_theme", "Medical")
-            tasks_selected = display_settings.get("daily_widget_content", "facts") == "tasks"
-            fact_html = "" if tasks_selected else daily_widgets.generate_fact_widget(fact_theme, demo["fact_index"] if demo else None)
-            compact_html, compact_stats_html = minimal_dashboard.render_minimal_dashboard_sections(
-                gm, lpm, dm, int(display_settings.get("stats_time_range", 7)),
-                fact_theme, fact_html, tasks_selected, bool(display_settings.get("daily_fact_widget_enabled", True)),
-                statistics_override=demo_stats,
-            )
-        except Exception as e:
-            print(f"SmartStudy: minimal dashboard render error: {e}")
-    else:
-        _dashboard_rendered_with_models = bool(
-            (not display_settings.get("gamification_widgets_enabled", True) or gm)
-            and (not display_settings.get("study_plan_widget_enabled", True) or lpm)
-            and (not display_settings.get("deadline_bar_enabled", True) or dm)
-        )
-
-        if display_settings.get("statistics_widget_enabled", True):
-            try:
-                stats_html = statistics_widget.render_statistics_widget_html(
-                    stats_days=int(display_settings.get("stats_time_range", 7)),
-                    chart_days=int(display_settings.get("stats_consistency_days", 30)),
-                    display_data=demo_stats,
-                    visibility={
-                        "consistency": display_settings.get("stats_show_consistency", True),
-                        "efficiency": display_settings.get("stats_show_efficiency", True),
-                        "retention": display_settings.get("stats_show_retention", True),
-                        "new_cards": display_settings.get("stats_show_new_cards", True),
-                    },
-                )
-            except Exception as e: print(f"SmartStudy: stats widget render error: {e}")
-        if display_settings.get("gamification_widgets_enabled", True) and gm:
-            try: gamification_html = gm.render_widgets_html()
-            except Exception as e: print(f"SmartStudy: gamification widget render error: {e}")
-        plan_enabled = display_settings.get("study_plan_widget_enabled", True)
-        fact_enabled = display_settings.get("daily_fact_widget_enabled", True)
-        if fact_enabled or (plan_enabled and lpm):
-            try:
-                plan_data = lpm.get_plan_for_display() if plan_enabled and lpm else []
-                daily_html = daily_widgets.generate_daily_widgets_html(
-                    plan_data, display_settings.get("fact_theme", "Medical"),
-                    show_study_plan=bool(plan_enabled and lpm),
-                    show_daily_fact=bool(fact_enabled),
-                    widget_content=display_settings.get("daily_widget_content", "facts"),
-                    display_fact_index=demo["fact_index"] if demo else None,
-                )
-            except Exception as e: print(f"SmartStudy: daily widget render error: {e}")
-        if display_settings.get("deadline_bar_enabled", True) and dm:
-            try: deadline_html = dm.render_deadline_bar_html()
-            except Exception as e: print(f"SmartStudy: deadline bar render error: {e}")
-    
-    # Celebration popup (rank-up / level-up / challenge) — deck browser only,
-    # so it can never interrupt a review session. Events are consumed from the
-    # manager even while popups are disabled, so re-enabling them later
-    # doesn't replay old events.
-    celebrate_html = ""
+    # Everything that used to sit above the deck list lives in the side panel;
+    # only the celebration still appears over the deck list.
+    _dashboard_rendered_with_models = True
     try:
         gm = getattr(mw, 'gamification_manager', None)
-        if gm and not demo:
-            events = gm.get_celebration_events()
-            if events and display_settings.get("gamification_popups_enabled", True):
-                from . import celebration_live
-                celebrate_html = celebration_live.render_celebration_modal(
-                    celebration_live.select_events(events, addon_settings))
+        events = gm.get_celebration_events() if gm else None
+        if events and display_settings.get("gamification_popups_enabled", True):
+            from . import celebration_live
+            content.stats = celebration_live.render_celebration_modal(
+                celebration_live.select_events(events, addon_settings)) + getattr(content, 'stats', '')
     except Exception as e:
         print(f"SmartStudy: celebration popup error: {e}")
-
-    content.stats = compact_stats_html + stats_html + celebrate_html + getattr(content, 'stats', '')
-    content.tree = compact_html + gamification_html + daily_html + deadline_html + getattr(content, 'tree', '')
+    if panel_instance is not None:
+        panel_instance.refresh(200)
 
 # --- Study-plan countdown timers ------------------------------------------------
 # Fire a "time's up" notification when a subject's timer runs out — even while the
@@ -1787,16 +1611,10 @@ def inject_theme_assets(web_content: WebContent, context: Optional[Any]):
                     addon_settings.get("dashboard_widget_shadow", 0),
                     enabled=addon_settings.get("dashboard_surface_controls_expanded") is not False,
                 )
-                web_content.head += deck_list_width_css(addon_settings.get("dashboard_wide_deck_list", True))
-                dashboard_class = (
-                    ",'smartstudy-minimal-dashboard'"
-                    if addon_settings.get("minimal_dashboard_enabled", False)
-                    else ""
-                )
                 # Prepend so the width-mode class is present before the deck
                 # table is parsed and no 860px -> native-width jump is painted.
                 web_content.body = (
-                    f"<script>document.body.classList.add('deckbrowser'{dashboard_class});</script>"
+                    f"<script>document.body.classList.add('deckbrowser');</script>"
                     + web_content.body
                 )
                 if addon_settings.get("deck_counter_colors_enabled", False):

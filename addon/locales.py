@@ -265,7 +265,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 
     'Dashboard Surfaces': {"de": 'Dashboard-Flächen'},
     'Surface Opacity': {"de": 'Deckkraft der Flächen'},
-    'Applies to widgets and the deck list, including the minimalist dashboard. Text and controls stay fully visible.': {"de": 'Gilt für Widgets und die Deckliste, auch im minimalistischen Dashboard. Texte und Bedienelemente bleiben vollständig sichtbar.'},
+    'Applies to the side panel and the deck list. Text and controls stay fully visible.': {"de": 'Gilt für das Seitenpanel und die Deckliste. Texte und Bedienelemente bleiben vollständig sichtbar.'},
 
     'Task settings': {"de": 'Aufgabeneinstellungen'},
     'Remove completed one-time tasks on the next day': {"de": 'Erledigte einmalige Aufgaben am nächsten Tag löschen'},

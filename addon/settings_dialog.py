@@ -635,35 +635,14 @@ class SettingsDialog(QDialog):
             _("Widgets shown on the Anki home screen (the deck list)."),
         )
 
-        self.add_checkbox(
-            "minimal_dashboard_enabled", _("Minimalist Dashboard"), layout,
-            _("Shows level, streak, challenge, study plan, deadline and key statistics in one compact panel."),
-        )
-        layout.addSpacing(8)
-
         features = [
-            ("dashboard_wide_deck_list", _("Wide Deck List"), _("Match the deck list width to the widgets. Turn off for a compact deck list.")),
-            ("gamification_widgets_enabled", _("Gamification Widgets"),
-             _("Your level, XP and daily streak.")),
-            ("daily_fact_widget_enabled", _("Daily Fact Widget"),
-             _("A new fact on your Anki home screen each day.")),
-            ("deadline_bar_enabled", _("Deadline Bar"),
-             _("A countdown bar towards your exam or deadline.")),
-            ("statistics_widget_enabled", _("Advanced Statistics"),
-             _("An extra panel with detailed review statistics.")),
+            ("gamification_widgets_enabled", _("Level and streak"),
+             _("Small, next to the countdown.")),
+            ("deadline_bar_enabled", _("Countdown to the next exam"),
+             _("Days left, taken from your study plan.")),
         ]
         for key, text, desc in features:
             self.add_checkbox(key, text, layout, desc)
-
-        minimal_cb = self.checkboxes["minimal_dashboard_enabled"]
-        widget_keys = [key for key, _text, _desc in features]
-
-        def sync_minimal_widgets(enabled):
-            for key in widget_keys:
-                self.checkboxes[key].setEnabled(not bool(enabled))
-
-        minimal_cb.toggled.connect(sync_minimal_widgets)
-        sync_minimal_widgets(minimal_cb.isChecked())
 
         layout.addSpacing(22)
         self._add_section_header(layout, _("Gamification"), "")

@@ -62,7 +62,7 @@ SHOW_KEYS = {
 }
 
 DEFAULTS = {
-    "home_layout": "panel", "panel_open": True, "panel_show_plan": True,
+    "panel_open": True, "panel_show_plan": True,
     "panel_show_challenge": True, "panel_show_fact": False, "panel_show_due": True, "panel_due_days": 7,
     "panel_plan_items": 4, "panel_rail_open": True,
 }

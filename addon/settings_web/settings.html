@@ -568,7 +568,7 @@
             </div>
             <div id="dashboardSurfaceControls" hidden>
             <div class="row">
-              <div class="rl"><div class="rt">Surface Opacity</div><div class="rd">Applies to widgets and the deck list, including the minimalist dashboard. Text and controls stay fully visible.</div></div>
+              <div class="rl"><div class="rt">Surface Opacity</div><div class="rd">Applies to the side panel and the deck list. Text and controls stay fully visible.</div></div>
               <div class="rc range-control"><input type="range" id="dashboard_surface_opacity" min="0" max="100" step="5" aria-label="Surface Opacity"><span class="range-value" id="dashboardSurfaceOpacityValue">100%</span></div>
             </div>
             <div class="row" style="display:block;">
@@ -670,14 +670,6 @@
         <section class="page" data-page="dashboard">
           <h1 class="page-title">Home</h1>
           <p class="page-sub">What Smart Study shows next to your decks. The deck list itself always stays.</p>
-          <div class="group">
-            <div class="row">
-              <div class="rl"><div class="rt">Layout</div><div class="rd">Side panel on the right, or the classic widgets above the deck list. Applies after restarting Anki.</div></div>
-              <div class="rc"><select class="field" id="home_layout">
-                <option value="panel">Side panel</option><option value="classic">Classic</option>
-              </select></div>
-            </div>
-          </div>
           <div id="panelHome">
             <div class="group-label">Today panel</div>
             <p class="group-note">The first tab of the side panel.</p>
@@ -686,28 +678,11 @@
             <p class="group-note">The three charts under the plan. Each one has its own period.</p>
             <div class="group" id="overviewGroup"></div>
           </div>
-          <div id="classicHome">
-            <div class="group-label">Classic widgets</div>
-            <div class="group" id="minimalGroup"></div>
-            <div style="height:12px"></div>
-            <div class="group" id="dashGroup"></div>
-            <p class="dashboard-lock-note" id="dashboardLockNote">Individual dashboard widgets are unavailable while Minimalist Dashboard is enabled.</p>
-          </div>
           <select id="panel_plan_items" hidden><option value="3">3 items</option><option value="4">4 items</option><option value="5">5 items</option><option value="6">6 items</option><option value="8">8 items</option></select>
           <select id="panel_due_days" hidden><option value="7">Next 7 days</option><option value="14">Next 14 days</option><option value="30">Next 30 days</option></select>
           <select id="stats_consistency_days" hidden><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="365">Last year</option></select>
-          <div class="group-label">Facts or Tasks Widget</div>
+          <div class="group-label">Daily fact</div>
           <div class="group" id="contentWidgetGroup">
-            <div class="row">
-              <div class="rl"><div class="rt">Facts or Tasks Widget</div><div class="rd">Show the selected content on your Anki home screen.</div></div>
-              <div class="rc"><label class="switch"><input type="checkbox" data-key="daily_fact_widget_enabled"><span class="slider"></span></label></div>
-            </div>
-            <div class="row" id="widget-content-row">
-              <div class="rl"><div class="rt">Widget Content</div><div class="rd">Show facts or open tasks on the home screen. Click the task widget to open your list.</div></div>
-              <div class="rc"><select class="field" id="daily_widget_content">
-                <option value="facts">Facts</option><option value="tasks">Tasks</option>
-              </select></div>
-            </div>
             <div class="row" id="fact-topic-row">
               <div class="rl"><div class="rt">Daily Fact Topic</div><div class="rd">Subject the daily fact on the home screen is drawn from.</div></div>
               <div class="rc"><select class="field" id="fact_theme">
@@ -715,8 +690,6 @@
               </select></div>
             </div>
           </div>
-
-          <p class="rd" id="daily-widget-restart-note" style="font-size:11px;line-height:1.5;margin:8px 4px 20px">If the change does not appear, restart Anki.</p>
 
           <div class="group-label" id="gamificationSettingsLabel">Gamification</div>
           <div class="group" id="celebrationGroup"></div>
@@ -842,15 +815,6 @@
     ['horizon','Horizon','#6183A9','#4B6683'],
     ['dusty','Dusty','#5A9491','#4E8280'],
     ['orange','Orange','#D97757','#B85C3F'],
-  ];
-  var DASH = [
-    ['dashboard_wide_deck_list','Wide Deck List','Match the deck list width to the widgets. Turn off for a compact deck list.'],
-    ['gamification_widgets_enabled','Gamification Widgets','Your level, XP and daily streak.'],
-    ['deadline_bar_enabled','Deadline Bar','A countdown bar towards your exam or deadline.'],
-    ['statistics_widget_enabled','Advanced Statistics','An extra panel with detailed review statistics.'],
-  ];
-  var MINIMAL_DASH = [
-    ['minimal_dashboard_enabled','Minimalist Dashboard','Shows level, streak, challenge, study plan, deadline and key statistics in one compact panel.'],
   ];
   var DECK = [
     ['deck_overview_enabled','Custom Deck Dashboard','Replaces the standard overview with retention, hard cards and more.'],
@@ -1008,7 +972,7 @@
     }
   }
 
-  /* Home page: the side-panel groups or the classic widgets, never both, so
+  /* Home page: the side-panel groups, so
      every setting has exactly one switch on the page. */
   var _homeCfg = {};
   var TODAY = [
@@ -1038,24 +1002,14 @@
     row.querySelector('.rc').insertBefore(btn,row.querySelector('.rc').firstChild);
   }
   function renderHome(){
-    var panel=document.getElementById('home_layout').value!=='classic';
-    document.getElementById('panelHome').style.display=panel?'':'none';
-    document.getElementById('classicHome').style.display=panel?'none':'';
-    ['todayGroup','overviewGroup','minimalGroup','dashGroup'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
-    if(panel){
-      renderToggles('todayGroup', TODAY, _homeCfg);
-      renderToggles('overviewGroup', OVERVIEW, _homeCfg);
-      TODAY.concat(OVERVIEW).forEach(function(d){
-        if(!d[3]) return;
-        var cb=document.querySelector('input[data-key="'+d[0]+'"]');
-        if(cb) homeSelect(cb.closest('.row'), d[3]);
-      });
-    }else{
-      renderToggles('minimalGroup', MINIMAL_DASH, _homeCfg);
-      renderToggles('dashGroup', DASH, _homeCfg);
-      var minimal=document.querySelector('input[data-key="minimal_dashboard_enabled"]');
-      if(minimal) minimal.addEventListener('change', syncMinimalDashboardControls);
-    }
+    ['todayGroup','overviewGroup'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
+    renderToggles('todayGroup', TODAY, _homeCfg);
+    renderToggles('overviewGroup', OVERVIEW, _homeCfg);
+    TODAY.concat(OVERVIEW).forEach(function(d){
+      if(!d[3]) return;
+      var cb=document.querySelector('input[data-key="'+d[0]+'"]');
+      if(cb) homeSelect(cb.closest('.row'), d[3]);
+    });
   }
 
   /* Search: shows the matching rows of every tab on one page. */
@@ -1089,20 +1043,6 @@
     input.addEventListener('keydown', function(e){ if(e.key==='Escape'){ input.value=''; run(); } });
     document.getElementById('nav').addEventListener('click', function(){ if(input.value){ input.value=''; run(); } });
   })();
-
-  function syncMinimalDashboardControls(){
-    var minimal = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
-    var locked = !!(minimal && minimal.checked);
-    DASH.forEach(function(def){
-      var cb = document.querySelector('input[data-key="'+def[0]+'"]');
-      if(!cb) return;
-      cb.disabled = locked;
-      var row = cb.closest('.row');
-      if(row) row.classList.toggle('mode-locked', locked);
-    });
-    var note = document.getElementById('dashboardLockNote');
-    if(note) note.classList.toggle('visible', locked);
-  }
 
   // Built-in add-ons: their switches are saved as "integration:<key>".
   window.setIntegrations = function(info){
@@ -1447,13 +1387,6 @@
       enhanceSelects();
       setSelect('language', cfg.language || 'auto');
       setSelect('fact_theme', cfg.fact_theme || 'Medical');
-      setSelect('daily_widget_content', cfg.daily_widget_content === 'tasks' ? 'tasks' : 'facts');
-      const contentSelect=document.getElementById('daily_widget_content');
-      const contentEnabled=document.querySelector('input[data-key="daily_fact_widget_enabled"]');
-      contentEnabled.checked=cfg.daily_fact_widget_enabled!==false;
-      const updateTopic=()=>{document.getElementById('widget-content-row').style.display=contentEnabled.checked?'':'none';document.getElementById('fact-topic-row').style.display=contentEnabled.checked&&contentSelect.value!=='tasks'?'':'none';};
-      contentEnabled.onchange=updateTopic;
-      contentSelect.onchange=updateTopic;updateTopic();
       setSelect('stats_time_range', cfg.stats_time_range != null ? cfg.stats_time_range : 7);
       setSelect('sidebar_visibility', cfg.sidebar_visibility_mode || 'always_show');
       var configuredBackground=cfg.active_theme||'medical_theme.css';
@@ -1491,13 +1424,11 @@
       syncDeckCounterControls();
 
       // toggles
-      setSelect('home_layout', cfg.home_layout === 'classic' ? 'classic' : 'panel');
       setSelect('panel_plan_items', cfg.panel_plan_items || 4);
       setSelect('panel_due_days', cfg.panel_due_days || 7);
       setSelect('stats_consistency_days', cfg.stats_consistency_days || 30);
       _homeCfg = Object.assign({}, cfg);
       renderHome();
-      document.getElementById('home_layout').addEventListener('change', function(){ rememberHome(); renderHome(); syncMinimalDashboardControls(); });
       renderToggles('celebrationGroup', [
         ['gamification_popups_enabled','Celebration popups','Show celebrations on the dashboard.'],
         ['gamification_popup_rank','New Rank!',''],
@@ -1518,9 +1449,6 @@
       renderBrowser(data.browser);
       setIntegrations(data.integrations);
       setAddonSync(data.addonSync);
-      var minimalToggle = document.querySelector('input[data-key="minimal_dashboard_enabled"]');
-      if(minimalToggle) minimalToggle.addEventListener('change', syncMinimalDashboardControls);
-      syncMinimalDashboardControls();
 
       // swatches + logo
       buildSwatches();
@@ -1603,7 +1531,6 @@
       dashboard_glass_strength: Number(val('dashboard_glass_strength')),
       dashboard_widget_shadow: Number(val('dashboard_widget_shadow')),
       fact_theme: val('fact_theme'),
-      daily_widget_content: val('daily_widget_content'),
       stats_time_range: Number(val('stats_time_range')) || 7,
       sidebar_visibility_mode: val('sidebar_visibility'),
       active_theme: val('background_style'),
@@ -1630,11 +1557,10 @@
     };
     rememberHome();
     ['deadline_bar_enabled','gamification_widgets_enabled','panel_show_plan','panel_show_challenge','panel_show_fact','panel_show_due',
-     'stats_show_consistency','stats_show_retention','minimal_dashboard_enabled','dashboard_wide_deck_list','statistics_widget_enabled'].forEach(function(k){
+     'stats_show_consistency','stats_show_retention'].forEach(function(k){
       if(k in _homeCfg) out[k]=!!_homeCfg[k];
     });
     document.querySelectorAll('input[type=checkbox][data-key]').forEach(function(cb){ out[cb.dataset.key]=cb.checked; });
-    out.home_layout = val('home_layout')==='classic' ? 'classic' : 'panel';
     out.panel_plan_items = Number(val('panel_plan_items')) || 4;
     out.panel_due_days = Number(val('panel_due_days')) || 7;
     out.stats_consistency_days = Number(val('stats_consistency_days')) || 30;

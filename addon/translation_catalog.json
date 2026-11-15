@@ -1726,16 +1726,16 @@
     "de": "Eine geringere Stärke reduziert den Darstellungsaufwand. Stelle die Deckkraft unter 100 %, damit der Effekt sichtbar wird. Ohne technische Unterstützung bleibt die normale Transparenz erhalten.",
     "pl": "Mniejsza siła zmniejsza obciążenie renderowania. Ustaw krycie poniżej 100%, aby zobaczyć efekt. Bez obsługi efektu pozostaje zwykła przezroczystość."
   },
-  "Applies to widgets and the deck list, including the minimalist dashboard. Text and controls stay fully visible.": {
-    "es": "Se aplica a widgets y lista de mazos, incluido el panel minimalista. El texto y los controles siguen totalmente visibles.",
-    "ko": "위젯과 덱 목록 및 미니멀 대시보드에 적용됩니다. 텍스트와 컨트롤은 완전히 표시됩니다.",
-    "pt": "Aplica-se aos widgets e à lista de baralhos, incluindo o painel minimalista. Texto e controles permanecem totalmente visíveis.",
-    "fr": "S’applique aux widgets et à la liste des paquets, y compris le tableau de bord minimaliste. Texte et commandes restent entièrement visibles.",
-    "vi": "Áp dụng cho tiện ích và danh sách bộ thẻ, kể cả bảng điều khiển tối giản. Văn bản và nút điều khiển vẫn rõ hoàn toàn.",
-    "zh": "适用于小组件和牌组列表，包括极简仪表盘。文字和控件保持完全可见。",
-    "hi": "विजेट और डेक सूची पर लागू, न्यूनतम डैशबोर्ड सहित। पाठ और नियंत्रण पूरी तरह दिखाई देते हैं।",
-    "de": "Gilt für Widgets und die Deckliste, auch im minimalistischen Dashboard. Texte und Bedienelemente bleiben vollständig sichtbar.",
-    "pl": "Dotyczy widżetów i listy talii, także w widoku minimalistycznym. Tekst i przyciski pozostają w pełni widoczne."
+  "Applies to the side panel and the deck list. Text and controls stay fully visible.": {
+    "es": "Se aplica al panel lateral y a la lista de mazos. El texto y los controles siguen totalmente visibles.",
+    "ko": "사이드 패널과 덱 목록에 적용됩니다. 텍스트와 컨트롤은 완전히 표시됩니다.",
+    "pt": "Aplica-se ao painel lateral e à lista de baralhos. Texto e controles permanecem totalmente visíveis.",
+    "fr": "S’applique au panneau latéral et à la liste des paquets. Texte et commandes restent entièrement visibles.",
+    "vi": "Áp dụng cho bảng bên và danh sách bộ thẻ. Văn bản và nút điều khiển vẫn rõ hoàn toàn.",
+    "zh": "适用于侧边面板和牌组列表。文字和控件保持完全可见。",
+    "hi": "साइड पैनल और डेक सूची पर लागू। पाठ और नियंत्रण पूरी तरह दिखाई देते हैं।",
+    "de": "Gilt für das Seitenpanel und die Deckliste. Texte und Bedienelemente bleiben vollständig sichtbar.",
+    "pl": "Dotyczy panelu bocznego i listy talii. Tekst i przyciski pozostają w pełni widoczne."
   },
   "All decks are enabled in Settings.": {
     "es": "Todos los mazos están activados en Ajustes.",

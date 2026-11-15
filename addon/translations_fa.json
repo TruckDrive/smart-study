@@ -189,7 +189,7 @@
  "Appearance": "ظاهر",
  "Applied once and cached for smooth performance.": "یک بار اعمال و برای روان بودن ذخیره می‌شود.",
  "Applies to all conversations. Formulas are displayed automatically.": "برای همهٔ گفت‌وگوها اعمال می‌شود. فرمول‌ها خودکار نمایش داده می‌شوند.",
- "Applies to widgets and the deck list, including the minimalist dashboard. Text and controls stay fully visible.": "روی ویجت‌ها و فهرست دسته‌ها، از جمله داشبورد مینیمال، اعمال می‌شود. متن و کنترل‌ها کاملاً دیده می‌مانند.",
+ "Applies to the side panel and the deck list. Text and controls stay fully visible.": "روی پنل کناری و فهرست دسته‌ها اعمال می‌شود. متن و کنترل‌ها کاملاً دیده می‌مانند.",
  "Apply": "اعمال",
  "Apply demo and view dashboard": "اعمال نمونه و دیدن داشبورد",
  "Apply style": "اعمال سبک",
