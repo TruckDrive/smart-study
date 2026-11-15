@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.0.1 – 2026-11-15
+
+- **Level always in sight**: a big level number with an XP bar sits at the top of the left rail, under the logo – also when the side panel is folded. A click opens the trophies
+- **Shorter plan codes**: *Share → Copy code* leaves out the generated days, empty fields and deck searches that repeat a source's deck (about five times shorter: 12 308 → 2 644 characters for a large plan). On import the receiver's Anki plans the days for their own cards. Plan files and old codes import as before; Smart Study 3.0.0 asks to update for a new code
+- **Setup wizard**: in the own look (petrol, accent picker with the real accents, Petrol preselected – before, the first picture set *Ocean*). *Who are you?* and *Where did you find us?* are replaced by *What do you want Smart Study for?* (study plan, focus, notes and mind maps, AI and browser, motivation): only what you pick is switched on, the rest waits in the settings. No *What's new* window and no add-on sync question right after it (the sync question comes with the next start)
+- **Assistant**: the own API chat is gone. One chatbot at a time (ChatGPT, Claude, Gemini, NotebookLM) with a small menu to switch; the choice is remembered
+- **Google sign-in for Gemini, NotebookLM and YouTube Music**: Google refuses a sign-in inside these sidebars. A click on *Sign in* now opens Google's sign-in in a small window with the Smart Study browser's profile, where Google accepts it; the sign-in is passed on and the site reloads signed in
+- **Study plan**: the plan's head keeps *Edit, Replan, Share*; *Retrospective, Archive, Delete* moved into a ⋯ menu. A new plan starts with the *Single days* grid folded. A plan without topics says *2 new cards* instead of *2 new cards · remaining cards*. Shared plans now carry *cards only until each milestone*
+- **Own background image**: *studied today* and the heatmap line sit on a soft pill in the opposite brightness of the text colour, so they stay readable on bright and dark pictures
+- **Browser**: Google is the default search engine (DuckDuckGo stays the fallback when Google asks for a captcha). In the settings the keyboard shortcuts are folded
+- **Settings**: texts without *launcher* and *daily facts*; the GitHub button says *Open page* (German showed *Offen*)
+- **Fixes**: the rail follows a language change or a switched-off tool at once (was in the old language until a restart, and two quick changes left a second rail); the study plan window follows the add-on's language, not only Anki's; the daily challenge waits until the collection has cards; the level tooltip no longer shows a raw `<br>`
+
 ## 3.0.0 – 2026-11-14
 
 Smart Study gets its own look. Every function is still there; where it sits has changed.

@@ -19,8 +19,8 @@ from aqt import gui_hooks, mw
 from aqt.operations import QueryOp
 from aqt.qt import (
     QByteArray, QColor, QDockWidget, QEvent, QFrame, QIcon, QMenu,
-    QObject, QPainter, QPixmap, QPushButton, QSize, Qt, QTimer, QToolBar, QToolButton,
-    QVBoxLayout, QWidget,
+    QObject, QPainter, QPixmap, QProgressBar, QPushButton, QSize, Qt, QTimer, QToolBar, QToolButton,
+    QLabel, QVBoxLayout, QWidget,
 )
 from aqt.webview import AnkiWebView
 
@@ -213,6 +213,35 @@ class Header(QWidget):
         self.gear = _LogoButton(panel.ctx["show_settings"])
         outer.addWidget(self.gear, 0, Qt.AlignmentFlag.AlignHCenter)
 
+        # Level, always in sight (also with the side panel folded): number + XP bar.
+        self.level: Optional[QToolButton] = None
+        self.level_bar: Optional[QProgressBar] = None
+        if settings.get("gamification_widgets_enabled", True):
+            box = QFrame()
+            box.setObjectName("ssLevelBox")
+            col = QVBoxLayout(box)
+            col.setContentsMargins(6, 6, 6, 7)
+            col.setSpacing(2)
+            self.level_caption = QLabel(_("Level"))
+            self.level_caption.setObjectName("ssLevelCaption")
+            self.level_caption.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+            col.addWidget(self.level_caption)
+            self.level = QToolButton()
+            self.level.setObjectName("ssLevel")
+            self.level.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.level.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.level.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
+            if settings.get("gamification_sidebar_enabled", True):
+                self.level.clicked.connect(lambda _c=False: panel.select("trophies"))
+            col.addWidget(self.level, 0, Qt.AlignmentFlag.AlignHCenter)
+            self.level_bar = QProgressBar()
+            self.level_bar.setObjectName("ssLevelBar")
+            self.level_bar.setTextVisible(False)
+            self.level_bar.setRange(0, 100)
+            self.level_bar.setFixedHeight(5)
+            col.addWidget(self.level_bar)
+            outer.addWidget(box)
+
         self.tabs = QFrame()
         self.tabs.setObjectName("ssTabs")
         tab_row = QVBoxLayout(self.tabs)
@@ -299,6 +328,12 @@ class Header(QWidget):
         QToolButton#ssLogo {{ background: transparent; border: none; border-radius: 12px; }}
         QToolButton#ssLogo:hover {{ background: {c['raised']}; }}
         QToolButton:focus {{ outline: none; }}
+        QFrame#ssLevelBox {{ background: {c['card']}; border: 1px solid {c['line']}; border-radius: 14px; }}
+        QLabel#ssLevelCaption {{ color: {c['muted']}; font-size: 10px; background: transparent; }}
+        QToolButton#ssLevel {{ background: transparent; border: none; color: {c['ink']}; font-size: 22px; font-weight: 800; padding: 0; }}
+        QToolButton#ssLevel:hover {{ color: {c['accent']}; }}
+        QProgressBar#ssLevelBar {{ background: {c['line']}; border: none; border-radius: 2px; }}
+        QProgressBar#ssLevelBar::chunk {{ background: {c['accent']}; border-radius: 2px; }}
         """)
         self.gear.set_icons(logo_icon(40), icon("gear", c["accent"], 26))
         for button in self.findChildren(QToolButton):
@@ -307,6 +342,23 @@ class Header(QWidget):
                 size = 22 if button.objectName() == "ssTab" else 18
                 button.setIcon(icon(name, c["muted"], size, c["accent"]))
         self.update_timer()
+        self.update_level()
+
+    def update_level(self) -> None:
+        if self.level is None:
+            return
+        manager = getattr(mw, "gamification_manager", None)
+        if manager is None:
+            self.level.setText("–")
+            return
+        try:
+            level, pct = manager.get_level(), manager.get_progress_percentage()
+            rank = " ".join(_(manager.get_rank_name()).replace("<br>", " ").split())
+        except Exception:
+            return
+        self.level.setText(str(level))
+        self.level.setToolTip(f"{rank} · {pct}% XP")
+        self.level_bar.setValue(int(pct))
 
     # -- Pomodoro and music --------------------------------------------------
     def _pomodoro(self):
@@ -425,8 +477,8 @@ class Panel(QObject):
         self._timer.timeout.connect(self._collect)
         self._watcher = _DockWatcher(self)
         self._hooks = [
-            (gui_hooks.reviewer_did_answer_card, lambda *_a: self.refresh(4000)),
-            (gui_hooks.state_did_change, lambda *_a: (setattr(self, "_force_today", False), self.sync(), self.refresh(150))),
+            (gui_hooks.reviewer_did_answer_card, lambda *_a: (self.refresh(4000), QTimer.singleShot(300, self._level))),
+            (gui_hooks.state_did_change, lambda *_a: (setattr(self, "_force_today", False), self.sync(), self.refresh(150), self._level())),
             (gui_hooks.sync_did_finish, lambda *_a: self.refresh(300)),
             (gui_hooks.operation_did_execute, lambda *_a: self.refresh(1500)),
             (gui_hooks.theme_did_change, self.restyle),
@@ -470,6 +522,14 @@ class Panel(QObject):
         mw.addToolBar(Qt.ToolBarArea.LeftToolBarArea, bar)
         bar.setVisible(bool(self.settings.get("panel_rail_open", True)))
         self.rail_bar = bar
+
+    def _level(self) -> None:
+        if self._closing:
+            return
+        try:
+            self.header.update_level()
+        except RuntimeError:
+            pass
 
     def update_timer_ui(self) -> None:
         try:
@@ -527,7 +587,8 @@ class Panel(QObject):
         except Exception:
             lang = ""
         return (lang, tuple(t.key for t in self.tools if st.get(t.setting, True)),
-                bool(st.get("pomodoro_enabled", True)), bool(st.get("music_player_enabled", True)))
+                bool(st.get("pomodoro_enabled", True)), bool(st.get("music_player_enabled", True)),
+                bool(st.get("gamification_widgets_enabled", True)))
 
     def restyle(self, *_args) -> None:
         if self._closing:
@@ -764,6 +825,7 @@ class Panel(QObject):
             failed).run_in_background()
 
     def _finish(self, data: Dict[str, Any]) -> None:
+        self._level()
         settings = self.settings
         data["show"] = {name: bool(settings.get(key, True)) for name, key in SHOW_KEYS.items()}
         manager = getattr(mw, "gamification_manager", None)

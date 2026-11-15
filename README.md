@@ -68,7 +68,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 - **Mind maps** and FreeMap diagrams with images, icons and links to Anki cards
 - **Pomodoro and session timers** with study-time analytics by deck
 - **Music player** for local audio, optional SoundCloud, plus a Streaming sidebar with YouTube Music (Spotify opens in its app)
-- **AI assistant** (optional): ChatGPT, Claude or Gemini with your own account, or an API key for OpenAI, Gemini, Anthropic, OpenRouter, DeepSeek, or local Ollama / llama.cpp. Requests go directly to the provider you choose, keys stay in your Anki profile
+- **AI assistant** (optional): ChatGPT, Claude, Gemini or NotebookLM with your own account, one at a time (a small menu switches). The page talks to the site directly, as in a normal browser
 - **Browser** with tabs, an address field that suggests visited pages, favourites with icons, PDF viewer (PDFs open right in the tab), ad blocker, saved passwords, and layouts: sidebar, split view, main window or its own window
 - **Motivation**: XP, ranks, streaks, daily challenges, celebrations
 - A **custom deck overview** with retention and hard cards, optional daily facts
