@@ -7,6 +7,19 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.1",
+        "date": "November 15, 2026",
+        "items": [
+            {"tag": "New", "text": "Your level is always in sight: a big number with an XP bar at the top of the left rail, also with the side panel folded. A click opens the trophies."},
+            {"tag": "New", "text": "Share a study plan as a much shorter code (about five times shorter) – it fits into a WhatsApp message. The receiver's Anki works out the days for their own cards."},
+            {"tag": "Improved", "text": "Assistant: one chatbot at a time (ChatGPT, Claude, Gemini or NotebookLM) with a small menu to switch. Signing in with Google for Gemini and NotebookLM now works: a click on Sign in opens a small window where Google accepts it."},
+            {"tag": "Improved", "text": "The study plan's head keeps Edit, Replan and Share; Retrospective, Archive and Delete are in the ⋯ menu."},
+            {"tag": "Improved", "text": "With your own background image, 'studied today' and the heatmap line stay readable on any picture."},
+            {"tag": "Improved", "text": "The browser searches with Google by default; the keyboard shortcuts in its settings are folded away."},
+            {"tag": "Fix", "text": "The left rail follows a language change at once; the study plan window follows the add-on's language."},
+        ],
+    },
+    {
         "version": "3.0.0",
         "date": "November 14, 2026",
         "items": [

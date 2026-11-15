@@ -332,7 +332,7 @@ class SettingsDialog(QDialog):
 
         self._add_section_header(
             layout, _("General"),
-            _("Language, daily facts, the statistics range and when the sidebar is shown."),
+            _("Language, the period of the Memory chart and when the left bar is shown."),
         )
 
         grid = QGridLayout()
@@ -411,7 +411,7 @@ class SettingsDialog(QDialog):
         idx = self.stats_range_combo.findData(int(raw_val))
         self.stats_range_combo.setCurrentIndex(idx if idx != -1 else 1)
         _row(_("Statistics Time Range"),
-             _("Period covered by the statistics widget."),
+             _("Period of the Memory chart (also under Home)."),
              self.stats_range_combo)
 
         # --- Sidebar visibility ---------------------------------------
@@ -422,7 +422,7 @@ class SettingsDialog(QDialog):
         idx = self.sidebar_vis_combo.findData(vis_val)
         self.sidebar_vis_combo.setCurrentIndex(idx if idx != -1 else 0)
         _row(_("Sidebar Visibility"),
-             _("Show the launcher always, or hide it while you review."),
+             _("Show the left bar with the tabs always, or hide it while you review."),
              self.sidebar_vis_combo)
 
         layout.addLayout(grid)
@@ -772,7 +772,7 @@ class SettingsDialog(QDialog):
             ("pomodoro_enabled", _("Timer"),
              _("A focus timer with work and break intervals.")),
             ("ai_assistant_enabled", _("AI Assistant"),
-             _("Chat assistant that can explain your cards.")),
+             _("ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.")),
             ("website_viewer_enabled", _("Website Viewer"),
              _("Open websites in a panel without leaving Anki.")),
             ("notebook_enabled", _("Notebook"),

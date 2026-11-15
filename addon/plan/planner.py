@@ -387,8 +387,11 @@ def build(plan, counts, today, ev=None, forecast=None, taken=None, budget=None):
 
         def card_text(k, topic_id):
             t = topics.get(topic_id)
-            return tr(f"{k} neue Karten", f"{k} new cards", f"{k} کارت جدید") + (
-                f" · {t['name']}" if t else tr(" · übrige Karten", " · remaining cards", " · کارت‌های باقی‌مانده"))
+            base = tr(f"{k} neue Karten", f"{k} new cards", f"{k} کارت جدید")
+            if t:
+                return base + f" · {t['name']}"
+            # "remaining" only means something next to topics; a plan without topics just has cards
+            return base + tr(" · übrige Karten", " · remaining cards", " · کارت‌های باقی‌مانده") if topics else base
 
         def retarget(query):
             """Card items of one search count up in day order: each is done once that many cards were seen."""

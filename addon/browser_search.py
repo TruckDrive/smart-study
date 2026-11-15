@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlencode
 
-DEFAULT_ENGINE = "duckduckgo"
+DEFAULT_ENGINE = "google"
 
 # key: (name, home page, search URL without the query, query parameter)
 ENGINES = {

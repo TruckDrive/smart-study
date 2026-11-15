@@ -628,11 +628,30 @@ html:has(body.nightMode.smartstudy-custom-background.top-toolbar) #header:has(a#
     else:
         studied_color = "#1C1D1F"
         studied_shadow = "0 1px 2px rgba(255,255,255,0.32)"
+    # On a busy or bright picture a shadow is not enough: the text sits on a
+    # soft pill in the opposite brightness, so it stays readable on any image.
+    r, g, b = (int(studied_color[i:i + 2], 16) for i in (1, 3, 5))
+    light_text = 0.299 * r + 0.587 * g + 0.114 * b > 140
+    pill = "rgba(18,19,21,0.55)" if light_text else "rgba(255,255,255,0.72)"
     web_content.head += (
         '<style id="smartstudy-custom-background-text-style">'
-        'body.smartstudy-custom-background.deckbrowser #studiedToday{'
+        'body.smartstudy-custom-background.deckbrowser #studiedToday,'
+        'body.smartstudy-custom-background.deckbrowser #studiedToday span{'
         f'color:{studied_color} !important;text-shadow:{studied_shadow} !important;'
-        '}</style>'
+        '}'
+        'body.smartstudy-custom-background.deckbrowser #studiedToday > span{'
+        f'background:{pill};padding:5px 14px;border-radius:999px;line-height:1.9;'
+        '-webkit-box-decoration-break:clone;box-decoration-break:clone;'
+        'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);'
+        '}'
+        # Review heatmap below it: same colour, on a soft card of the same kind.
+        'body.smartstudy-custom-background.deckbrowser .rh-container{'
+        f'color:{studied_color} !important;text-shadow:{studied_shadow};'
+        f'background:{pill};border-radius:16px;padding:6px 14px;width:fit-content;max-width:100%;'
+        'margin-inline:auto;box-sizing:border-box;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);'
+        '}'
+        'body.smartstudy-custom-background.deckbrowser .rh-container a{color:inherit !important;}'
+        '</style>'
     )
     if active:
         web_content.body = (

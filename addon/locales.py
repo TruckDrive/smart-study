@@ -7255,6 +7255,16 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "内嵌查看",
         "hi": "इनलाइन देखें",
     },
+    "Open page": {
+        "de": "Seite öffnen",
+        "es": "Abrir página",
+        "ko": "페이지 열기",
+        "pt": "Abrir página",
+        "fr": "Ouvrir la page",
+        "vi": "Mở trang",
+        "zh": "打开页面",
+        "hi": "पेज खोलें",
+    },
     "Open externally": {
         "de": "Extern öffnen",
         "es": "Abrir externamente",
@@ -7880,15 +7890,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "de": "Zeitraum der Statistiken", "es": "Rango de tiempo de estadísticas", "ko": "통계 기간", "pt": "Período das estatísticas",
         "fr": "Période des statistiques", "vi": "Khoảng thời gian thống kê", "zh": "统计时间范围", "hi": "आंकड़ों की समय-सीमा",
     },
-    "Language, daily facts, the statistics range and when the sidebar is shown.": {
-        "de": "Sprache, tägliche Fakten, der Statistik-Zeitraum und wann die Seitenleiste angezeigt wird.",
-        "es": "Idioma, datos diarios, el rango de estadísticas y cuándo se muestra la barra lateral.",
-        "ko": "언어, 오늘의 상식, 통계 기간, 사이드바 표시 시점.",
-        "pt": "Idioma, fatos diários, o período das estatísticas e quando a barra lateral é exibida.",
-        "fr": "Langue, faits quotidiens, période des statistiques et affichage de la barre latérale.",
-        "vi": "Ngôn ngữ, sự thật hằng ngày, khoảng thống kê và khi nào hiển thị thanh bên.",
-        "zh": "语言、每日知识、统计范围以及何时显示侧边栏。",
-        "hi": "भाषा, दैनिक तथ्य, आंकड़ों की सीमा और साइडबार कब दिखे।",
+    "Language, the period of the Memory chart and when the left bar is shown.": {
+        "de": "Sprache, Zeitraum des Gedächtnis-Diagramms und wann die linke Leiste angezeigt wird.",
+        "es": "Idioma, el período del gráfico de memoria y cuándo se muestra la barra izquierda.",
+        "ko": "언어, 기억 차트의 기간, 왼쪽 막대를 표시할 시점.",
+        "pt": "Idioma, o período do gráfico de memória e quando a barra esquerda é exibida.",
+        "fr": "Langue, période du graphique de mémoire et affichage de la barre de gauche.",
+        "vi": "Ngôn ngữ, khoảng thời gian của biểu đồ ghi nhớ và khi nào hiển thị thanh bên trái.",
+        "zh": "语言、记忆图表的时间范围以及何时显示左侧栏。",
+        "hi": "भाषा, मेमोरी चार्ट की अवधि और बायाँ बार कब दिखे।",
     },
     "Interface language. \"Auto\" follows your Anki language.": {
         "de": "Sprache der Oberfläche. \"Auto\" folgt deiner Anki-Sprache.",
@@ -7910,21 +7920,25 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "主屏幕每日知识的来源主题。",
         "hi": "जिस विषय से होम स्क्रीन का दैनिक तथ्य लिया जाता है।",
     },
-    "Period covered by the statistics widget.": {
-        "de": "Zeitraum, den das Statistik-Widget abdeckt.", "es": "Período que cubre el widget de estadísticas.",
-        "ko": "통계 위젯이 다루는 기간.", "pt": "Período coberto pelo widget de estatísticas.",
-        "fr": "Période couverte par le widget de statistiques.", "vi": "Khoảng thời gian widget thống kê bao phủ.",
-        "zh": "统计小部件涵盖的时间段。", "hi": "आंकड़े विजेट द्वारा कवर की गई अवधि।",
+    "Period of the Memory chart (also under Home).": {
+        "de": "Zeitraum des Gedächtnis-Diagramms (auch unter Start).",
+        "es": "Período del gráfico de memoria (también en Inicio).",
+        "ko": "기억 차트의 기간 (홈에도 있음).",
+        "pt": "Período do gráfico de memória (também em Início).",
+        "fr": "Période du graphique de mémoire (aussi sous Accueil).",
+        "vi": "Khoảng thời gian của biểu đồ ghi nhớ (cũng có ở Trang chủ).",
+        "zh": "记忆图表的时间范围（主页中也可设置）。",
+        "hi": "मेमोरी चार्ट की अवधि (होम में भी)।",
     },
-    "Show the launcher always, or hide it while you review.": {
-        "de": "Launcher immer anzeigen oder beim Wiederholen ausblenden.",
-        "es": "Mostrar el lanzador siempre u ocultarlo mientras repasas.",
-        "ko": "런처를 항상 표시하거나 복습 중에는 숨깁니다.",
-        "pt": "Mostrar o iniciador sempre ou ocultá-lo durante a revisão.",
-        "fr": "Toujours afficher le lanceur, ou le masquer pendant la révision.",
-        "vi": "Luôn hiển thị thanh khởi chạy, hoặc ẩn khi bạn ôn tập.",
-        "zh": "始终显示启动器，或在复习时隐藏。",
-        "hi": "लॉन्चर हमेशा दिखाएँ, या दोहराते समय छिपाएँ।",
+    "Show the left bar with the tabs always, or hide it while you review.": {
+        "de": "Linke Leiste mit den Reitern immer anzeigen oder beim Wiederholen ausblenden.",
+        "es": "Mostrar siempre la barra izquierda con las pestañas u ocultarla mientras repasas.",
+        "ko": "탭이 있는 왼쪽 막대를 항상 표시하거나 복습 중에는 숨깁니다.",
+        "pt": "Mostrar sempre a barra esquerda com as abas ou ocultá-la durante a revisão.",
+        "fr": "Toujours afficher la barre de gauche avec les onglets, ou la masquer pendant la révision.",
+        "vi": "Luôn hiển thị thanh bên trái có các thẻ, hoặc ẩn khi bạn ôn tập.",
+        "zh": "始终显示带标签的左侧栏，或在复习时隐藏。",
+        "hi": "टैब वाला बायाँ बार हमेशा दिखाएं, या समीक्षा के दौरान छिपाएं।",
     },
     "Choose the accent colour used across Smart Study and the background style.": {
         "de": "Wähle die Akzentfarbe für Smart Study und den Hintergrund-Stil.",
@@ -8050,11 +8064,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "fr": "Un minuteur de concentration avec intervalles de travail et de pause.", "vi": "Bộ đếm giờ tập trung với các khoảng làm việc và nghỉ.",
         "zh": "带工作和休息间隔的专注计时器。", "hi": "कार्य और विराम अंतराल वाला फोकस टाइमर।",
     },
-    "Chat assistant that can explain your cards.": {
-        "de": "Chat-Assistent, der deine Karten erklären kann.", "es": "Asistente de chat que puede explicar tus tarjetas.",
-        "ko": "카드를 설명해 주는 채팅 어시스턴트.", "pt": "Assistente de chat que pode explicar seus cartões.",
-        "fr": "Assistant de chat capable d'expliquer vos cartes.", "vi": "Trợ lý trò chuyện có thể giải thích thẻ của bạn.",
-        "zh": "可以讲解您卡片的聊天助手。", "hi": "चैट असिस्टेंट जो आपके कार्ड समझा सकता है।",
+    "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": {
+        "de": "ChatGPT, Claude, Gemini oder NotebookLM neben deinen Karten, mit deinem eigenen Konto.",
+        "es": "ChatGPT, Claude, Gemini o NotebookLM junto a tus tarjetas, con tu propia cuenta.",
+        "ko": "카드 옆에서 ChatGPT, Claude, Gemini 또는 NotebookLM을 내 계정으로 사용합니다.",
+        "pt": "ChatGPT, Claude, Gemini ou NotebookLM ao lado dos seus cartões, com a sua própria conta.",
+        "fr": "ChatGPT, Claude, Gemini ou NotebookLM à côté de tes cartes, avec ton propre compte.",
+        "vi": "ChatGPT, Claude, Gemini hoặc NotebookLM cạnh thẻ của bạn, bằng tài khoản của bạn.",
+        "zh": "在卡片旁使用 ChatGPT、Claude、Gemini 或 NotebookLM，使用你自己的账号。",
+        "hi": "आपके कार्ड के पास ChatGPT, Claude, Gemini या NotebookLM, आपके अपने खाते से।",
     },
     "Open websites in a panel without leaving Anki.": {
         "de": "Webseiten in einem Panel öffnen, ohne Anki zu verlassen.", "es": "Abre sitios web en un panel sin salir de Anki.",
@@ -8474,6 +8492,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 }
 
 # Gamification sidebar settings.
+# Assistant: chatbot picker and Google sign-in window
+TRANSLATIONS.update({
+    "Sign in with Google": {"de": "Mit Google anmelden", "es": "Iniciar sesión con Google", "ko": "Google로 로그인", "pt": "Entrar com o Google", "fr": "Se connecter avec Google", "vi": "Đăng nhập bằng Google", "zh": "使用 Google 登录", "hi": "Google से साइन इन करें"},
+    "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": {"de": "Melde dich hier einmal an – Gemini, NotebookLM und YouTube Music nutzen dann dieses Google-Konto.", "es": "Inicia sesión aquí una vez: Gemini, NotebookLM y YouTube Music usarán esta cuenta de Google.", "ko": "여기서 한 번 로그인하면 Gemini, NotebookLM, YouTube Music이 이 Google 계정을 사용합니다.", "pt": "Entre aqui uma vez – o Gemini, o NotebookLM e o YouTube Music passam a usar esta conta Google.", "fr": "Connecte-toi ici une fois – Gemini, NotebookLM et YouTube Music utiliseront ensuite ce compte Google.", "vi": "Đăng nhập một lần tại đây – Gemini, NotebookLM và YouTube Music sẽ dùng tài khoản Google này.", "zh": "在这里登录一次——之后 Gemini、NotebookLM 和 YouTube Music 都会使用这个 Google 账号。", "hi": "यहाँ एक बार साइन इन करें – फिर Gemini, NotebookLM और YouTube Music इसी Google खाते का उपयोग करेंगे।"},
+    "Choose the chatbot": {"de": "Chatbot wählen", "es": "Elegir el chatbot", "ko": "챗봇 선택", "pt": "Escolher o chatbot", "fr": "Choisir le chatbot", "vi": "Chọn chatbot", "zh": "选择聊天机器人", "hi": "चैटबॉट चुनें"},
+})
+
 TRANSLATIONS.update({
     "Streak sensitivity": {
         "de": "Streak-Empfindlichkeit"

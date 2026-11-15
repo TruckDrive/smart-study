@@ -409,6 +409,12 @@
   .news-note p{margin:8px 0;font-size:13.5px;line-height:1.5;color:var(--muted);}
   .news-note .conflict-addon{color:var(--text)!important;font-weight:600;}
   .cl-tag{background:var(--field-bg)!important;color:var(--accent-ink)!important;border-radius:10px!important;}
+  /* Folded group (keyboard shortcuts): closed until clicked; the search still finds its rows */
+  .group-label.fold{cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;}
+  .group-label.fold::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);opacity:.7;transition:transform .15s;}
+  .group-label.fold.open::after{transform:rotate(45deg);}
+  .group-label.fold:not(.open) + .group, .group-label.fold:not(.open) + .group + .rd{display:none;}
+  body.searching .group-label.fold + .group, body.searching .group-label.fold + .group + .rd{display:block;}
   body.searching .page{display:block;animation:none;padding-bottom:0;}
   body.searching .page.no-hit, body.searching .search-hide{display:none !important;}
   .search-empty{display:none;max-width:820px;margin:0 auto;padding:28px 24px;color:var(--muted);}
@@ -498,7 +504,7 @@
         <!-- GENERAL -->
         <section class="page active" data-page="general">
           <h1 class="page-title">General</h1>
-          <p class="page-sub">Language, daily facts, the statistics range and when the sidebar is shown.</p>
+          <p class="page-sub">Language, the period of the Memory chart and when the left bar is shown.</p>
           <div class="group">
             <div class="row">
               <div class="rl"><div class="rt">Language</div><div class="rd">Interface language. “Auto” follows your Anki language.</div></div>
@@ -509,13 +515,13 @@
               </select></div>
             </div>
             <div class="row">
-              <div class="rl"><div class="rt">Statistics Time Range</div><div class="rd">Period covered by the statistics widget.</div></div>
+              <div class="rl"><div class="rt">Statistics Time Range</div><div class="rd">Period of the Memory chart (also under Home).</div></div>
               <div class="rc"><select class="field" id="stats_time_range">
                 <option value="1">Last 24 Hours</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option><option value="90">Last 90 Days</option><option value="365">Last year</option>
               </select></div>
             </div>
             <div class="row">
-              <div class="rl"><div class="rt">Sidebar Visibility</div><div class="rd">Show the launcher always, or hide it while you review.</div></div>
+              <div class="rl"><div class="rt">Sidebar Visibility</div><div class="rd">Show the left bar with the tabs always, or hide it while you review.</div></div>
               <div class="rc"><select class="field" id="sidebar_visibility">
                 <option value="always_show">Always Show</option><option value="hide_review">Hide while Reviewing</option>
               </select></div>
@@ -525,7 +531,7 @@
           <div class="community-strip">
             <div class="comm-card comm-github">
               <div class="rl"><div class="rt">GitHub</div><div class="rd">Source code, issues and contributions.</div></div>
-              <button class="btn comm-btn" onclick="openUrl('https://github.com/TruckDrive/smart-study')">Open</button>
+              <button class="btn comm-btn" onclick="openUrl('https://github.com/TruckDrive/smart-study')">Open page</button>
             </div>
           </div>
 
@@ -740,7 +746,7 @@
           <div class="group" id="browserVideoGroup"></div>
           <div class="group-label">Tabs</div>
           <div class="group" id="browserTabGroup"></div>
-          <div class="group-label">Keyboard shortcuts</div>
+          <div class="group-label fold" role="button" tabindex="0" aria-expanded="false" onclick="this.classList.toggle('open');this.setAttribute('aria-expanded',this.classList.contains('open'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Keyboard shortcuts</div>
           <div class="group" id="browserKeysGroup"></div>
           <p class="rd" style="margin:8px 4px 0;" id="browserKeysHint">Video shortcuts work everywhere in Anki, also while you review. Click a shortcut and press the new keys; Backspace removes it, Esc cancels.</p>
           <div class="group-label">Controller</div>
@@ -854,7 +860,7 @@
     ['gamification_sidebar_enabled','Gamification Sidebar','Progress, rewards and motivation panel.'],
     ['music_player_enabled','Music Player','Background music while you study.'],
     ['pomodoro_enabled','Timer','A focus timer with work and break intervals.'],
-    ['ai_assistant_enabled','AI Assistant','Chat assistant that can explain your cards.'],
+    ['ai_assistant_enabled','AI Assistant','ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.'],
     ['website_viewer_enabled','Website Viewer','Open websites in a panel without leaving Anki.'],
     ['notebook_enabled','Notebook','Notes, to-dos and PDFs alongside your cards.'],
   ];

@@ -338,6 +338,7 @@ const ICON = {
   archive: "M4 7.5h16v3H4zM5.5 10.5V19h13v-8.5M10 14h4",
   restore: "M4 12a8 8 0 1 0 2.4-5.7M4 4.5V9h4.5",
   trash: "M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.5 10.5v6M13.5 10.5v6",
+  history: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.5H8M12 8v4.5l3 2",
 };
 const icon = name => svg("svg", { class: "ic", viewBox: "0 0 24 24", width: 18, height: 18, "aria-hidden": "true" }, svg("path", { d: ICON[name] }));
 async function archivePlan(id, on, then) {
@@ -452,6 +453,27 @@ function itemDone(it) {
   return !!(d.plan.done[it.id] || (d.ev[it.id] && d.ev[it.id].done));
 }
 
+// "⋯" button with the rarely used actions, so the plan's head keeps three buttons.
+function moreMenu(entries) {
+  const wrap = h("div", { class: "more" });
+  const close = () => { wrap.querySelector(".more-list")?.remove(); document.removeEventListener("mousedown", outside, true); document.removeEventListener("keydown", esc, true); };
+  const outside = e => { if (!wrap.contains(e.target)) close(); };
+  const esc = e => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+  const btn = h("button", { class: "more-btn", title: L("Weitere Aktionen", "More actions", "کارهای بیشتر"), "aria-haspopup": "menu",
+    onclick: () => {
+      if (wrap.querySelector(".more-list")) return close();
+      const list = h("div", { class: "more-list", role: "menu" });
+      for (const [ic, label, fn, cls] of entries)
+        list.append(h("button", { class: "with-icon" + (cls ? " " + cls : ""), role: "menuitem", onclick: () => { close(); fn(); } }, ic, label));
+      wrap.append(list);
+      document.addEventListener("mousedown", outside, true);
+      document.addEventListener("keydown", esc, true);
+      list.querySelector("button")?.focus();
+    } }, "⋯");
+  wrap.append(btn);
+  return wrap;
+}
+
 function renderPlan(root) {
   const { plan, stats, progress, phase, overdue } = S.data;
   const today = stats.today, left = daysBetween(today, plan.exam);
@@ -462,10 +484,12 @@ function renderPlan(root) {
     h("div", { class: "bar-actions" },
       h("button", { onclick: () => go("edit") }, L("Bearbeiten", "Edit", "ویرایش")),
       h("button", { onclick: () => replan() }, L("Neu planen", "Replan", "برنامه‌ریزی دوباره")),
-      h("button", { onclick: () => go("review") }, L("Rückblick", "Retrospective", "جمع‌بندی")),
       h("button", { onclick: () => shareDialog() }, L("Teilen", "Share", "اشتراک‌گذاری")),
-      h("button", { class: "with-icon", onclick: () => archivePlan(plan.id, plan.status !== "archived", () => go("home")) }, icon(plan.status === "archived" ? "restore" : "archive"), plan.status === "archived" ? L("Aktivieren", "Make active", "فعال کردن") : L("Archivieren", "Archive", "بایگانی")),
-      h("button", { class: "with-icon danger", onclick: () => deletePlan(plan.id, plan.title, () => go("home")) }, icon("trash"), L("Löschen", "Delete", "حذف")))));
+      moreMenu([
+        [icon("history"), L("Rückblick", "Retrospective", "جمع‌بندی"), () => go("review")],
+        [icon(plan.status === "archived" ? "restore" : "archive"), plan.status === "archived" ? L("Aktivieren", "Make active", "فعال کردن") : L("Archivieren", "Archive", "بایگانی"), () => archivePlan(plan.id, plan.status !== "archived", () => go("home"))],
+        [icon("trash"), L("Löschen", "Delete", "حذف"), () => deletePlan(plan.id, plan.title, () => go("home")), "danger"],
+      ]))));
 
   (plan.notes || []).forEach((n, i) => root.append(h("div", { class: "card warn", key: "note" + i }, n)));
 
@@ -682,9 +706,9 @@ async function shareDialog() {
   const opt = (label, hint, fn, cls) => h("div", { style: "display:flex;gap:10px;align-items:center;margin:8px 0" },
     h("button", { class: cls, style: "min-width:170px", onclick: fn }, label), h("span", { class: "muted small" }, hint));
   await modal(L("Plan teilen", "Share plan", "اشتراک‌گذاری برنامه"), h("div", null,
-    h("p", { class: "small", style: "margin:0 0 6px" }, L("Deine Freunde bekommen den Plan mit allen Tagen, Themen und Video-Links – aber nicht deinen Fortschritt und keine Dateipfade von deinem Computer.",
-      "Your friends get the plan with all days, topics and video links – but not your progress and no file paths from your computer.",
-      "دوستانتان برنامه را با همهٔ روزها، موضوع‌ها و لینک‌های ویدیو دریافت می‌کنند – اما نه پیشرفت شما و نه مسیر فایل‌های رایانهٔ شما را.")),
+    h("p", { class: "small", style: "margin:0 0 6px" }, L("Deine Freunde bekommen den Plan mit Themen, Terminen und Video-Links. Die einzelnen Tage rechnet ihr Anki selbst aus – passend zu ihren Karten. Nicht dabei: dein Fortschritt und Dateipfade von deinem Computer.",
+      "Your friends get the plan with its topics, dates and video links. Their Anki works out the days itself – to fit their cards. Not included: your progress and file paths from your computer.",
+      "دوستانتان برنامه را با موضوع‌ها، تاریخ‌ها و لینک‌های ویدیو دریافت می‌کنند. Anki آن‌ها روزها را خودش، متناسب با کارت‌هایشان، محاسبه می‌کند. شامل نمی‌شود: پیشرفت شما و مسیر فایل‌های رایانهٔ شما.")),
     opt(L("Code kopieren", "Copy code", "کپی کد"), L("Für WhatsApp & Co. – einfügen und senden.", "For WhatsApp & co. – paste and send.", "برای واتس‌اپ و غیره – جای‌گذاری و ارسال."), copyCode, "primary"),
     opt(L("Als Datei speichern", "Save as file", "ذخیره به‌صورت فایل"), L("Zum Mailen oder für einen Cloud-Ordner.", "For email or a cloud folder.", "برای ایمیل یا پوشهٔ ابری."), saveFile),
     opt(L("Als Text kopieren", "Copy as text", "کپی به‌صورت متن"), L("Lesbare Übersicht für alle ohne Smart Study.", "Readable overview for anyone without Smart Study.", "خلاصهٔ خوانا برای کسانی که Smart Study ندارند."), copyText)),
@@ -700,7 +724,8 @@ async function importDialog() {
   const r = await run(call(how === "file" ? "importFile" : "importCode", { text: box.value }));
   if (!r) return;
   const hints = [];
-  if (r.missingDecks.length) hints.push(L("Diese Decks fehlen bei dir: ", "You don't have these decks: ", "این دسته‌ها را ندارید: ") + r.missingDecks.join(", "));
+  if (r.missingDecks.length) hints.push(L("Diese Decks fehlen bei dir: ", "You don't have these decks: ", "این دسته‌ها را ندارید: ") + r.missingDecks.join(", ")
+    + L(" – sobald du sie hast, auf „Neu planen“ klicken.", " – once you have them, press “Replan”.", " – وقتی آن‌ها را داشتید، «برنامه‌ریزی دوباره» را بزنید."));
   if (r.pdfs) hints.push(L("PDF-Datei unter Bearbeiten → Quellen wählen.", "Choose the PDF file under Edit → Sources.", "فایل PDF را از ویرایش ← منابع انتخاب کنید."));
   toast(L(`„${r.title}“ übernommen.`, `“${r.title}” imported.`, `«${r.title}» وارد شد.`) + (hints.length ? " " + hints.join(" ") : ""), hints.length ? 7000 : 3000);
   go("plan", r.id);
@@ -950,7 +975,10 @@ function calendar(p) {
         onchange: e => { const v = +e.target.value; const def = p.offWeekdays.includes(wd) ? 0 : p.minutesPerDay; if (v === def) delete p.dayMinutes[d]; else p.dayMinutes[d] = v; render(); } }), h("span", { class: "muted" }, L("min", "min", "دقیقه"))),
       h("input", { type: "text", placeholder: L("Notiz", "Note", "یادداشت"), value: (p.dayNotes || {})[d] || "", onchange: e => { p.dayNotes = p.dayNotes || {}; if (e.target.value) p.dayNotes[d] = e.target.value; else delete p.dayNotes[d]; } })));
   }
-  return h("details", { key: "cal", open: store.get("calOpen") === false ? null : true, ontoggle: e => store.set("calOpen", e.target.open) }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
+  // Closed for a new plan (a wall of day cards scares people off); open once it is used or was opened.
+  const used = Object.keys(p.dayMinutes || {}).length || Object.keys(p.dayNotes || {}).length;
+  const open = store.get("calOpen") === true || (store.get("calOpen") !== false && used);
+  return h("details", { key: "cal", open: open ? true : null, ontoggle: e => store.set("calOpen", e.target.open) }, h("summary", null, L("Einzelne Tage (Minuten · Notiz wie „Präpsaal 13–17 Uhr“)", "Single days (minutes · note like “Lab 1–5 pm”)", "روزها به‌صورت جداگانه (دقیقه · یادداشت مانند «جلسهٔ عملی 13–17»)")), cal);
 }
 
 function addSource(type) {

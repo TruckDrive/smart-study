@@ -26,6 +26,7 @@ button { cursor: pointer; }
 .lv { margin-inline-start: auto; text-align: end; padding: 0; border: 0; background: none; flex: none; }
 .lv b { display: block; font-weight: 600; }
 .lv:hover b { color: var(--ss-accent); }
+.lv:only-child { margin-inline-start: 0; text-align: start; }  /* no countdown next to it */
 
 /* Plan */
 .plan { padding: 8px 8px 6px; }

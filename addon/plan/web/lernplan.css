@@ -242,3 +242,11 @@ tr:hover td { background: var(--soft); }
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+
+/* "⋯" menu in the plan's head */
+.more { position: relative; }
+.more-btn { min-width: 38px; font-weight: 700; letter-spacing: 1px; }
+.more-list { position: absolute; inset-inline-end: 0; top: calc(100% + 6px); z-index: 20; min-width: 190px; display: flex; flex-direction: column;
+  gap: 2px; padding: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+.more-list button { justify-content: flex-start; border: 0; background: none; border-radius: 10px; text-align: start; width: 100%; }
+.more-list button:hover, .more-list button:focus-visible { background: var(--soft); }

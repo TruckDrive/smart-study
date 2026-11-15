@@ -8,7 +8,7 @@ from typing import Optional, List, Dict, Tuple
 import os
 import urllib.parse
 
-BROWSER_HOME_URL = "https://duckduckgo.com/"  # default; see _home_url()
+BROWSER_HOME_URL = "https://www.google.com/"  # default; see _home_url()
 
 # --- Local Imports ---
 from . import constants, diagnostics

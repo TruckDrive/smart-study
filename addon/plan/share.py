@@ -8,14 +8,14 @@ import re
 import zlib
 
 KIND = "smart-study-plan"
-VERSION = 1
+VERSION = 2  # 2 = short chat code: no generated days (the receiver's Anki plans them again)
 PREFIX = "SSP1:"
 MAX_BYTES = 4 * 1024 * 1024  # plenty for a plan of a whole semester
 
 # What a friend gets; everything else (done, autoDone, sim, simHistory,
 # review, maintenance, notes, savedAt, status, id) stays private.
 SHARED_KEYS = ("title", "subtitle", "exam", "examTime", "start", "minutesPerDay", "offWeekdays",
-               "dayMinutes", "dayNotes", "order", "milestones", "sources", "topics", "days")
+               "dayMinutes", "dayNotes", "order", "milestones", "sources", "topics", "days", "onceOnly")
 PRIVATE_SOURCE_KEYS = ("file",)  # a PDF path only exists on the sender's computer
 SOURCE_TYPES = ("pages", "videos", "tasks", "anki")
 _ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
@@ -28,14 +28,46 @@ class ShareError(ValueError):
     pass
 
 
-def export_plan(plan):
-    """The shareable part of a plan, wrapped with a marker and version."""
+def export_plan(plan, short=False):
+    """The shareable part of a plan, wrapped with a marker and version.
+    short=True (for the chat code) leaves out what the receiver's Anki can work out
+    again: the generated day items (only own items stay), empty fields, and topic
+    searches that just repeat a deck of the source (stored as its index)."""
     out = {k: json.loads(json.dumps(plan[k])) for k in SHARED_KEYS if k in plan}
     for s in out.get("sources") or []:
         if isinstance(s, dict):
             for k in PRIVATE_SOURCE_KEYS:
                 s.pop(k, None)
-    return {"kind": KIND, "v": VERSION, "plan": out}
+    if not short:
+        return {"kind": KIND, "v": 1, "plan": out}
+    days = []
+    for d in out.get("days") or []:
+        own = [it for it in d.get("items") or [] if isinstance(it, dict) and it.get("custom")]
+        if own:
+            days.append({"d": d.get("d"), "items": [{k: v for k, v in it.items() if k != "moved"} for it in own]})
+    out["days"] = days
+    decks = {s.get("id"): s.get("decks") for s in out.get("sources") or [] if isinstance(s, dict)}
+    for t in out.get("topics") or []:
+        anki = t.get("anki") if isinstance(t, dict) else None
+        for sid, q in (anki or {}).items():
+            names = decks.get(sid)
+            if isinstance(names, list) and isinstance(q, str):
+                ix = next((i for i, n in enumerate(names) if isinstance(n, str) and _deck_query(n) == q), None)
+                if ix is not None:
+                    anki[sid] = ix
+    return {"kind": KIND, "v": VERSION, "plan": _drop_empty(out)}
+
+
+def _deck_query(name):  # = planner.deck_query
+    return 'deck:"%s"' % name.replace('"', '\\"')
+
+
+def _drop_empty(x):
+    if isinstance(x, dict):
+        return {k: _drop_empty(v) for k, v in x.items() if v not in ({}, [], "", None)}
+    if isinstance(x, list):
+        return [_drop_empty(v) for v in x]
+    return x
 
 
 def encode(payload):
@@ -109,6 +141,20 @@ def _clean(x, depth=0):
 def import_plan(data, base):
     """Fills *base* (a new empty plan of this user) with the shared plan."""
     shared = _clean(data["plan"])
+    decks = {s.get("id"): s.get("decks") for s in shared.get("sources") or [] if isinstance(s, dict)}
+    for t in shared.get("topics") or []:
+        anki = t.get("anki") if isinstance(t, dict) else None
+        if not isinstance(anki, dict):
+            continue
+        for sid, q in list(anki.items()):
+            if isinstance(q, int) and not isinstance(q, bool):  # short code: index into the source's decks
+                names = decks.get(sid)
+                if isinstance(names, list) and 0 <= q < len(names) and isinstance(names[q], str):
+                    anki[sid] = _deck_query(names[q])
+                else:
+                    anki.pop(sid)
+            elif not isinstance(q, str):
+                anki.pop(sid)
     plan = dict(base)
     for k in SHARED_KEYS:
         if k not in shared:
@@ -162,6 +208,8 @@ def import_plan(data, base):
     plan["dayMinutes"] = {d: int(v) for d, v in (plan.get("dayMinutes") or {}).items()
                           if _DATE.match(d) and isinstance(v, (int, float)) and not isinstance(v, bool) and 0 <= v <= 24 * 60}
     plan["dayNotes"] = {d: v for d, v in (plan.get("dayNotes") or {}).items() if _DATE.match(d) and isinstance(v, str)}
+    if "onceOnly" in plan:
+        plan["onceOnly"] = plan["onceOnly"] is True
     plan["done"], plan["autoDone"], plan["notes"] = {}, {}, []
     plan["status"] = "active"
     return plan

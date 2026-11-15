@@ -9,7 +9,6 @@ import subprocess
 import time
 import traceback
 
-from anki.lang import current_lang
 from aqt import dialogs, gui_hooks, mw
 from aqt.qt import QApplication, QDesktopServices, QDialog, QFileDialog, QMessageBox, QTimer, QUrl, QVBoxLayout, Qt
 from aqt.utils import openLink, restoreGeom, saveGeom
@@ -27,10 +26,8 @@ FOLDER = MODULE.split(".")[0]
 
 def _sync_lang():
     """Follows the add-on's language setting, which is only loaded at profile open."""
-    if _current_lang() == "fa":
-        planner.LANG = "fa"
-    else:
-        planner.LANG = "de" if (current_lang or "").startswith("de") else "en"
+    lang = _current_lang()  # "auto" already resolved to Anki's language
+    planner.LANG = lang if lang in ("de", "fa") else "en"
 
 
 _sync_lang()
@@ -166,10 +163,11 @@ def home(stats=None, act=None):
             "profile": store.profile(), "version": VERSION, "name": NAME}
 
 
-def generate_all(pid):
+def generate_all(pid, others=True):
     """Replans all running plans because they share the study time: the nearest
     exam first, every further plan gets what is still free on that day.
-    Returns the notes of the requested plan."""
+    others=False plans only *pid* and leaves the other plans as they are (their
+    days still count as taken time). Returns the notes of the requested plan."""
     t = today()
     budget = store.profile().get("budget")
     if not store.load(pid).get("exam"):
@@ -180,6 +178,11 @@ def generate_all(pid):
     plans.sort(key=lambda p: (p["exam"], p["id"]))
     taken, notes = {}, []
     for plan in plans:
+        if not others and plan["id"] != pid:
+            if plan["exam"] < store.load(pid)["exam"]:
+                for d, m in planner.day_load(plan, t).items():
+                    taken[d] = taken.get(d, 0) + m
+            continue
         try:
             st = ankidata.stats(mw.col, plan)
             n = planner.build(plan, st["counts"], t, planner.evaluate(plan, st),
@@ -494,7 +497,7 @@ def handle(cmd, a):
         store.save(store.normalize(plan))  # a newer savedAt than the deletion: every device takes it back
         return True
     if cmd == "shareCode":
-        return {"code": share.encode(share.export_plan(store.load(a["id"])))}
+        return {"code": share.encode(share.export_plan(store.load(a["id"]), short=True))}
     if cmd == "copyText":
         QApplication.clipboard().setText(str(a.get("text", ""))[:500000])
         return True
@@ -536,7 +539,15 @@ def handle(cmd, a):
                              "این یک برنامهٔ معتبر Smart Study نیست (شاید کد کامل کپی نشده است؟).")))
         if not plan.get("start"):
             plan["start"] = t
+        store.normalize(plan)
         store.save(plan)
+        if plan.get("exam") and not any(not it.get("custom") for d in plan["days"] if d["d"] >= t for it in d["items"]):
+            # A short chat code has no days: plan them right away with this Anki's cards.
+            try:
+                generate_all(plan["id"], others=False)
+            except Exception:
+                traceback.print_exc()  # the plan is saved; "Replan" on its page tries again
+            plan = store.load(plan["id"])
         missing = [d for s in planner.anki_sources(plan) for d in planner.src_decks(s) if d not in set(ankidata.deck_names(col))]
         return {"id": plan["id"], "title": plan["title"], "pdfs": sum(1 for s in plan["sources"] if s["type"] == "pages"),
                 "missingDecks": missing[:10]}

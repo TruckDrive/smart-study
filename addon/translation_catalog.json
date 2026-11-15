@@ -4910,9 +4910,6 @@
   "Chat Font Size": {
     "pl": "Rozmiar tekstu czatu"
   },
-  "Chat assistant that can explain your cards.": {
-    "pl": "Asystent czatu, który wyjaśni Twoje karty."
-  },
   "Chat subscriptions and API access are separate products with separate billing. Google Gemini and some OpenRouter models offer free tiers; Ollama runs locally for free. API credit is managed in the selected provider's dashboard.": {
     "pl": "Subskrypcje czatu i dostęp API to osobne produkty z osobnym rozliczeniem. Google Gemini i niektóre modele OpenRouter mają darmowe limity; Ollama działa lokalnie za darmo. Środkami API zarządzasz w panelu wybranego dostawcy."
   },
@@ -6042,9 +6039,6 @@
   "Language": {
     "pl": "Język"
   },
-  "Language, daily facts, the statistics range and when the sidebar is shown.": {
-    "pl": "Język, ciekawostki, zakres statystyk i widoczność panelu."
-  },
   "Language:": {
     "pl": "Język:"
   },
@@ -6728,9 +6722,6 @@
   "Performance and stability improvements across the add-on.": {
     "pl": "Poprawki wydajności i stabilności całego dodatku."
   },
-  "Period covered by the statistics widget.": {
-    "pl": "Okres statystyk widżetu."
-  },
   "Pick from the list or type a custom model name.": {
     "pl": "Wybierz z listy lub wpisz własną nazwę modelu."
   },
@@ -7235,9 +7226,6 @@
   },
   "Show or hide the launcher sidebar.": {
     "pl": "Pokaż lub ukryj panel narzędzi."
-  },
-  "Show the launcher always, or hide it while you review.": {
-    "pl": "Pokazuj panel zawsze lub ukrywaj podczas powtórek."
   },
   "Show while studying": {
     "pl": "Pokaż podczas nauki"
@@ -9193,5 +9181,29 @@
     "vi": "Màu nền chế độ tối",
     "hi": "गहरे मोड का पृष्ठभूमि रंग",
     "pl": "Kolor tła w trybie ciemnym"
+  },
+  "Language, the period of the Memory chart and when the left bar is shown.": {
+    "pl": "Język, okres wykresu pamięci i kiedy widać lewy pasek."
+  },
+  "Period of the Memory chart (also under Home).": {
+    "pl": "Okres wykresu pamięci (także na Stronie głównej)."
+  },
+  "Show the left bar with the tabs always, or hide it while you review.": {
+    "pl": "Pokazuj lewy pasek z kartami zawsze lub ukrywaj go podczas powtórek."
+  },
+  "Open page": {
+    "pl": "Otwórz stronę"
+  },
+  "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": {
+    "pl": "ChatGPT, Claude, Gemini lub NotebookLM obok twoich kart, na twoim własnym koncie."
+  },
+  "Sign in with Google": {
+    "pl": "Zaloguj się przez Google"
+  },
+  "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": {
+    "pl": "Zaloguj się tu raz – Gemini, NotebookLM i YouTube Music będą potem używać tego konta Google."
+  },
+  "Choose the chatbot": {
+    "pl": "Wybierz chatbota"
   }
 }
