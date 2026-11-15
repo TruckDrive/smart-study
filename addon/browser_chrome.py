@@ -19,8 +19,6 @@ except Exception:  # QtSvg missing: buttons fall back to their text glyphs
 
 from .constants import is_night
 
-ACCENT = "#4a90e2"
-
 # Line icons on a 24 px grid, drawn with round 2 px strokes.
 _PATHS = {
     "back": '<path d="M15 5l-7 7 7 7"/>',
@@ -212,7 +210,7 @@ class LoadBar(QWidget):
         painter = QPainter(self)
         painter.fillRect(self.rect(), QColor(palette()["bar"]))
         if self._value:
-            painter.fillRect(0, 0, int(self.width() * self._value / 100), self.height(), QColor(ACCENT))
+            painter.fillRect(0, 0, int(self.width() * self._value / 100), self.height(), QColor(palette()["accent"]))
         painter.end()
 
 

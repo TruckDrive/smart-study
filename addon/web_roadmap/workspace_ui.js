@@ -13,6 +13,7 @@
         duplicate: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/>',
         export: '<path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/>',
         import: '<path d="M12 15V3m-4 4 4-4 4 4M5 17v4h14v-4"/>',
+        tutorial: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
         delete: '<path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/>'
     };
     const icon = key => `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[key]}</svg>`;

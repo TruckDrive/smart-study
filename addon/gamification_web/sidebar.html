@@ -9,14 +9,14 @@
   :root{
     color-scheme:light;
     --accent:#0B6570; --accent-bright:#1A8A98;
-    --accent-soft:rgba(0,113,211,0.10);
+    --accent-soft:color-mix(in srgb,var(--accent) 10%,transparent);
     --bg:#F1F1EF; --card:#ffffff; --border:rgba(0,0,0,0.08);
     --text:#1C1D1F; --muted:#55585C; --track:#e9e9ec;
     --green:#248A3D;
   }
   html.dark, body.dark{
     color-scheme:dark;
-    --accent-soft:rgba(10,132,255,0.16);
+    --accent-soft:color-mix(in srgb,var(--accent-bright) 16%,transparent);
     --bg:#26282B; --card:#1D1F22; --border:rgba(255,255,255,0.08);
     --text:#ffffff; --muted:#B4B4B4; --track:#34373C;
     --green:#4CC763;

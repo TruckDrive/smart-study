@@ -694,6 +694,12 @@ def _apply_saved_settings(new_settings, message=None):
         pass
 
     try:
+        from .plan import restyle as restyle_study_plan
+        restyle_study_plan()
+    except Exception as error:
+        print(f"SmartStudy: study plan restyle failed: {error}")
+
+    try:
         from .mindmap_sidebar import refresh_workspace_settings
         refresh_workspace_settings()
     except Exception as error:
@@ -1762,6 +1768,16 @@ def inject_theme_assets(web_content: WebContent, context: Optional[Any]):
 
         if os.path.exists(local_path):
             web_content.css.append(f"/_addons/{addon_pkg}/theme/user_files/{css_file}?v={int(os.path.getmtime(local_path))}")
+            if css_file == "standard.css":
+                # standard.css sets the petrol accent on <body>; the accent chosen in
+                # the settings has to be set there too, or every page stays petrol.
+                from . import design
+                light, dark = design.tokens(False), design.tokens(True)
+                web_content.head += (
+                    "<style id='ss-accent-tokens'>"
+                    f":root,body{{--ss-accent:{light['accent']};--ss-on-accent:{light['on_accent']}}}"
+                    f":root.night-mode,body.nightMode{{--ss-accent:{dark['accent']};--ss-on-accent:{dark['on_accent']}}}"
+                    "</style>")
             if isinstance(context, DeckBrowser):
                 from .dashboard_appearance import dashboard_surface_css, deck_list_width_css
                 web_content.head += dashboard_surface_css(

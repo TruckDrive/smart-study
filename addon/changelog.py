@@ -7,6 +7,19 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.2",
+        "date": "November 15, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Your accent colour everywhere: the Today page, the study plan, the deck list, the Study Now button and the tool bars follow the colour chosen under Settings → Appearance. Before, they stayed petrol."},
+            {"tag": "Fix", "text": "Also in your colour now: the browser's loading line, the chips on the trophies page, the link button in the notebook and the highlight tag in the news."},
+            {"tag": "Improved", "text": "Text on coloured buttons is dark or white, whichever reads better on your accent colour – also with a colour of your own."},
+            {"tag": "Fix", "text": "Missing icons: the FreeMap tutorial entry has one, and the assistant's Open in browser button and the study and open links of the study plan are drawn instead of using characters that some systems cannot show."},
+            {"tag": "Fix", "text": "Study plan: the ⋯ menu also opens after you ticked an item or the page refreshed."},
+            {"tag": "Fix", "text": "Pomodoro works right after switching it on in the settings, without restarting Anki."},
+            {"tag": "Fix", "text": "Hiding Level and streak on the Today page updates the level on the rail at once."},
+        ],
+    },
+    {
         "version": "3.0.1",
         "date": "November 15, 2026",
         "items": [

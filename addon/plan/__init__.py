@@ -561,6 +561,32 @@ def handle(cmd, a):
     raise ValueError(f"unknown command {cmd}")
 
 
+def _accent_css():
+    """The accent colour chosen in the settings, for light and dark; without it
+    the page keeps the petrol from lernplan.css."""
+    try:
+        from .. import design
+        rules = []
+        for selector, night in ((":root", False), ("html.night-mode", True)):
+            t = design.tokens(night)
+            rules.append(f"{selector}{{--accent:{t['accent']};--on-accent:{t['on_accent']};"
+                         f"--accent-bg:color-mix(in srgb,{t['accent']} 14%,var(--panel));}}")
+        return "".join(rules)
+    except Exception:
+        traceback.print_exc()
+        return ""
+
+
+def restyle():
+    """The accent colour changed in the settings: an open plan window follows at once."""
+    try:
+        if _win is not None and _win.isVisible():
+            _win.web.eval("(function(){var s=document.getElementById('ss-accent');"
+                          f"if(s)s.textContent={json.dumps(_accent_css())};}})()")
+    except RuntimeError:  # the window is already gone
+        pass
+
+
 class StudyPlanWindow(QDialog):
     # Defaults on the class: Qt already sends events while __init__ is still running.
     current = None  # plan the page shows; None = overview
@@ -582,7 +608,7 @@ class StudyPlanWindow(QDialog):
         skeleton = ('<div class="skel" style="height:54px;width:55%"></div><div class="skel" style="height:64px"></div>'
                     '<div class="skel" style="height:110px"></div><div class="skel" style="height:86px"></div>')
         self.web.stdHtml(f'<div id="app" data-lang="{planner.LANG}">{skeleton}</div>', css=[base + "lernplan.css"],
-                         js=[base + "lernplan.js"], context=self)
+                         js=[base + "lernplan.js"], head=f'<style id="ss-accent">{_accent_css()}</style>', context=self)
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(self._refresh)

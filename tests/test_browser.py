@@ -14,8 +14,8 @@ def load(name):
 
 
 search = load("browser_search")
-assert search.home_url(None) == "https://duckduckgo.com/"
-assert search.home_url("nonsense") == "https://duckduckgo.com/"
+assert search.home_url(None) == "https://www.google.com/"  # Google is the default since 3.0.1
+assert search.home_url("nonsense") == "https://www.google.com/"
 assert search.search_url("google", "Plexus brachialis") == "https://www.google.com/search?q=Plexus+brachialis"
 assert search.search_url("brave", "a&b") == "https://search.brave.com/search?q=a%26b"
 assert search.search_url("startpage", "x") == "https://www.startpage.com/sp/search?query=x"
