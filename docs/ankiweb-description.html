@@ -2,6 +2,13 @@
 
 <b>One Anki add-on for your whole study workflow:</b> a study plan up to your exam, plus a workspace with notebook &amp; PDF viewer, mind maps, focus timer, music, AI assistant, more. Free and open source.
 
+<b>New in 3.0.3</b>
+<ul>
+<li><b>Settings fixed:</b> on some systems the settings window stopped half-way (no logo, the accent colour could not be changed, an empty Browser tab and changelog, Save did nothing). It works again.</li>
+<li><b>Focus mode while reviewing:</b> only the card is shown; the left bar and Anki's top bar step aside and come back afterwards. Shortcuts and tools keep working. Switch it on under <i>Settings → General → Sidebar Visibility</i>.</li>
+<li><b>Review Heatmap and Life Drain are suggested instead of built in:</b> one click under <i>Settings → Add-ons</i> installs the original add-on from AnkiWeb. The controller support stays built in.</li>
+</ul>
+
 <b>New in 3.0.2</b>
 <ul>
 <li><b>Your accent colour everywhere:</b> the Today page, the study plan, the deck list and the tool bars now follow the colour you chose under <i>Settings → Appearance</i> (they stayed petrol before).</li>
@@ -61,13 +68,13 @@
 <b>Built-in add-ons</b>
 <ul>
 <li><b>Copy selections with pictures as an image</b> (on): select part of a card with pictures and it is copied as one image.</li>
-<li><b>Review heatmap</b> (on): a calendar of your reviews and your streak on the deck list, deck overview and statistics.</li>
 <li><b>Controller support</b> (on): study with a gamepad such as the <b>8BitDo Zero 2</b>; your button layouts sync to your other computers.</li>
-<li><b>Life Drain</b> (off): a life bar that drains while you think and refills when you answer.</li>
-<li>Already have one installed? Smart Study asks once whether to keep yours or use the built-in one. Switch each on or off under <i>Settings → Add-ons</i>.</li>
 </ul>
 
-<img src="https://raw.githubusercontent.com/TruckDrive/smart-study/main/screenshots/heatmap.png" width="720">
+<b>Suggested add-ons</b>
+<ul>
+<li>Smart Study does not ship other people's add-ons any more (except the controller support). Under <i>Settings → Add-ons</i> it suggests two that fit well, and one click downloads the original from AnkiWeb: <a href="https://ankiweb.net/shared/info/1771074083">Review Heatmap</a> by Glutanimate and <a href="https://ankiweb.net/shared/info/715575551">Life Drain</a> by Yutsuten.</li>
+</ul>
 
 <b>More from me: free AI study skills</b>
 Skills for terminal AI agents that work from your own lecture material:
@@ -115,11 +122,15 @@ Smart Study builds on the work of others. Thank you to all of them.
 <li>The workspace (notebook, mind maps, timers, music, levels and trophies) is based on <a href="https://ankiweb.net/shared/info/236979321">Synapse</a> by Mobsea (MobesaMedia), <a href="https://github.com/mobesamedia/Synapse">source on GitHub</a>, MIT License. Synapse's branding, images and sounds are not used.</li>
 </ul>
 
-<b>Built-in add-ons</b> – modified copies, licensed under the GNU AGPL v3:
+<b>Built-in add-on</b> – a modified copy, licensed under the GNU AGPL v3:
 <ul>
-<li>Based on the Anki add-on <a href="https://github.com/glutanimate/review-heatmap/">Review Heatmap</a> by Glutanimate. <a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate's work.</a></li>
 <li>Controller support: based on <a href="https://github.com/roxgib/anki-contanki">Contanki</a> by Sam Bradshaw.</li>
-<li>Life Drain: based on <a href="https://github.com/Yutsuten/anki-lifedrain">Life Drain</a> by Yutsuten.</li>
+</ul>
+
+<b>Suggested add-ons</b> – not part of Smart Study, installed from AnkiWeb only if you choose to:
+<ul>
+<li><a href="https://ankiweb.net/shared/info/1771074083">Review Heatmap</a> by Glutanimate. <a href="https://glutanimate.com/support-my-work/">Click here to support Glutanimate's work.</a></li>
+<li><a href="https://ankiweb.net/shared/info/715575551">Life Drain</a> by Yutsuten.</li>
 </ul>
 
 <b>Libraries and data</b>
@@ -127,7 +138,6 @@ Smart Study builds on the work of others. Thank you to all of them.
 <li><a href="https://github.com/mozilla/pdf.js">PDF.js</a> by Mozilla (Apache License 2.0) for the PDF viewer.</li>
 <li><a href="https://github.com/KaTeX/KaTeX">KaTeX</a> by Khan Academy and contributors (MIT License) for formulas.</li>
 <li><a href="https://github.com/timdream/wordcloud2.js">wordcloud2.js</a> by Tim Guan-tin Chien and contributors (MIT License).</li>
-<li><a href="https://github.com/d3/d3">D3</a> by Mike Bostock (BSD 3-Clause) and <a href="https://github.com/glutanimate/cal-heatmap">Cal-HeatMap</a> by Wan Qi Chen and Glutanimate (MIT License) inside the review heatmap.</li>
 <li><a href="https://lucide.dev">Lucide</a> icons by the Lucide contributors (ISC License) in the mind maps.</li>
 <li>The ad blocker downloads the filter lists of <a href="https://github.com/uBlockOrigin/uAssets">uBlock Origin</a>, EasyList and EasyPrivacy, maintained by their authors.</li>
 <li>Sponsor segments in videos come from <a href="https://sponsor.ajay.app/">SponsorBlock</a> by Ajay Ramachandran and its contributors.</li>

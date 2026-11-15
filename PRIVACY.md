@@ -48,14 +48,16 @@ add-on with several optional online tools.
 - **External links:** support, community, API-key, and download links open only
   after a user action.
 
-## Built-in add-ons
+## Built-in and suggested add-ons
 
-The bundled add-ons (copy selection as image, review heatmap,
-controller support, Life Drain) work offline. Their settings are stored in
-`user_files/integrations/` inside the Smart Study add-on folder (kept on
-updates); the heatmap and Life Drain also keep their settings in the Anki
-collection, as the original add-ons do. "Copy selections with pictures as an
-image" only writes to the local clipboard.
+The built-in add-ons (copy selection as image, controller support) work
+offline. Their settings are stored in `user_files/integrations/` inside the
+Smart Study add-on folder (kept on updates). "Copy selections with pictures as
+an image" only writes to the local clipboard.
+
+Review Heatmap and Life Drain are only suggested. Nothing is downloaded until
+you press *Install*; then Anki's own add-on downloader fetches the add-on from
+AnkiWeb, exactly as *Tools → Add-ons → Get Add-ons* does.
 
 ## Local and synced storage
 

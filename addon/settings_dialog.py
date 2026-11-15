@@ -418,6 +418,7 @@ class SettingsDialog(QDialog):
         self.sidebar_vis_combo = _combo()
         self.sidebar_vis_combo.addItem(_("Always Show"), "always_show")
         self.sidebar_vis_combo.addItem(_("Hide while Reviewing"), "hide_review")
+        self.sidebar_vis_combo.addItem(_("Focus mode while reviewing"), "focus_review")
         vis_val = self.current_config.get("sidebar_visibility_mode", "always_show")
         idx = self.sidebar_vis_combo.findData(vis_val)
         self.sidebar_vis_combo.setCurrentIndex(idx if idx != -1 else 0)

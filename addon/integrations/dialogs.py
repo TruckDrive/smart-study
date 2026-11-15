@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Windows for the bundled add-ons: settings, double-install question."""
+"""Windows for the bundled add-ons: settings, double-install question, and
+the one-time suggestion of the add-ons that are no longer built in."""
 from __future__ import annotations
 
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from aqt import mw
-from aqt.qt import QHBoxLayout, QWidget
+from aqt.qt import QHBoxLayout, QPushButton, Qt, QWidget
 from aqt.utils import tooltip
 
-from . import (BY_KEY, INTEGRATIONS, errors, has_options, is_enabled, load_state,
-               loaded, open_options, save_state, standalone_folder)
+from . import (BY_KEY, INTEGRATIONS, enable_copy, errors, has_options, install_suggested,
+               is_enabled, load_state, loaded, open_options, save_state, standalone_folder,
+               suggestion_rows)
 from .strings import tr
+from .suggested import SUGGESTED_BY_KEY
 from .ui import Dialog, Segments, Toggle, ask_restart, link_button
 
 
@@ -71,12 +74,41 @@ class IntegrationsDialog(Dialog):
                 text += " " + tr("Could not be started.")
             group.add_row(tr(integration.title), text, toggle, self._links(key))
 
+        self.section(tr("Suggested add-ons"))
+        group = self.group()
+        for row in suggestion_rows():
+            group.add_row(row["title"], row["desc"], self._install_button(row))
+
         self.section(tr("Credits"))
         self.note("<br>".join(i.credit for i in INTEGRATIONS if i.credit != "Smart Study"))
 
         self.button(tr("Cancel"), slot=self.reject)
         self.button(tr("Save"), primary=True, slot=self.accept)
         self.finish()
+
+    def _install_button(self, row: dict) -> QPushButton:
+        """"Install" (from AnkiWeb), or a disabled "Installed" when a copy is there."""
+        button = QPushButton(tr("Installed") if row["installed"] else tr("Install"))
+        button.setObjectName("ssSecondary")
+        button.setEnabled(not row["installed"])
+        if not row["installed"]:
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+
+            def install(_checked=False, button=button, code=row["code"]) -> None:
+                button.setEnabled(False)
+                button.setText(tr("Installing…"))
+
+                def done(ok: bool) -> None:
+                    try:
+                        button.setText(tr("Restart Anki to use it") if ok else tr("Install"))
+                        button.setEnabled(not ok)
+                    except RuntimeError:
+                        pass  # window already closed
+
+                install_suggested([code], parent=self, on_done=done)
+
+            button.clicked.connect(install)
+        return button
 
     def _links(self, key: str):
         links = []
@@ -151,4 +183,48 @@ class ConflictDialog(Dialog):
         save_state(state)
         super().accept()
         if changed:
+            ask_restart()
+
+
+class SuggestedAfterUpdateDialog(Dialog):
+    """Once after the update: the former built-in add-ons the user had on."""
+
+    def __init__(self, parent, offer: List[Tuple[str, str]]):
+        names = [SUGGESTED_BY_KEY[key].title for key, _action in offer]
+        if len(names) == 1:
+            subtitle = tr("{name} is no longer built into Smart Study. Install the original add-on from AnkiWeb?").format(name=names[0])
+        else:
+            subtitle = tr("These add-ons are no longer built into Smart Study. Install the original add-ons from AnkiWeb?")
+        super().__init__(tr("No longer built in"), subtitle, parent, width=520)
+        self.toggles: Dict[str, Toggle] = {}
+        self.actions = dict(offer)
+        group = self.group()
+        for key, action in offer:
+            s = SUGGESTED_BY_KEY[key]
+            text = tr(s.short) + " " + tr("By {author}.").format(author=s.author)
+            if action == "enable":
+                text += " " + tr("Your installed copy is switched off; it will be switched back on.")
+            toggle = Toggle(True)
+            self.toggles[key] = toggle
+            group.add_row(s.title, text, toggle)
+        self.note(tr("You can also install suggested add-ons any time under Settings → Add-ons."))
+        self.button(tr("Not now"), slot=self.reject)
+        self.button(tr("Install"), primary=True, slot=self.accept)
+        self.finish()
+
+    def accept(self) -> None:
+        chosen = [key for key, toggle in self.toggles.items() if toggle.isChecked()]
+        codes = [SUGGESTED_BY_KEY[k].code for k in chosen if self.actions.get(k) == "install"]
+        switched_on = False
+        for key in chosen:
+            if self.actions.get(key) == "enable":
+                try:
+                    switched_on = enable_copy(key) or switched_on
+                except Exception as exc:
+                    print(f"Smart Study: could not switch {key} back on: {exc}")
+        super().accept()
+        if codes:
+            # Anki reports the download and asks for a restart.
+            install_suggested(codes, parent=mw)
+        elif switched_on:
             ask_restart()

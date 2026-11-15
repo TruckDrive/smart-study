@@ -67,14 +67,27 @@ def test_settings():
 def test_integrations():
     col = FakeCol()
     sync = load_module(col)
-    pc = {"enabled": {"heatmap": False}, "choice": {"heatmap": "standalone"}}
+    pc = {"enabled": {"contanki": False}, "choice": {"contanki": "standalone"}}
     laptop = {"enabled": {}, "choice": {}}
     assert sync.pull_integrations(pc) is False
-    assert col.conf[sync.CONF_KEY]["integrations"] == {"heatmap": False}
+    assert col.conf[sync.CONF_KEY]["integrations"] == {"contanki": False}
     assert sync.pull_integrations(laptop) is True
-    assert laptop["enabled"] == {"heatmap": False} and laptop["choice"] == {}, "choice stays per device"
+    assert laptop["enabled"] == {"contanki": False} and laptop["choice"] == {}, "choice stays per device"
     assert sync.pull_integrations(laptop) is False
     print("add-on switches sync, the choice of copy does not ok")
+
+    # An older version still sends switches of add-ons that are no longer built in.
+    time.sleep(0.01)
+    old = {"enabled": {"contanki": False, "heatmap": True, "lifedrain": False}, "choice": {}}
+    sync.push_integrations(old)
+    keys = ["select2clip", "contanki"]
+    assert sync.pull_integrations(laptop, keys=keys) is False, "only removed add-ons differ: no restart"
+    assert laptop["enabled"]["heatmap"] is True, "kept for the one-time suggestion"
+    time.sleep(0.01)
+    old["enabled"]["contanki"] = True
+    sync.push_integrations(old)
+    assert sync.pull_integrations(laptop, keys=keys) is True
+    print("switches of removed add-ons are kept but do not count as a change ok")
 
 
 def test_no_collection():

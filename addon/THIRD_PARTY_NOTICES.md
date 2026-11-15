@@ -12,50 +12,14 @@ based on [Synapse](https://github.com/mobesamedia/Synapse) by MobesaMedia
 The notice is kept in `LICENSE-MIT.txt`. Synapse's branding, images and sounds
 are not used.
 
-## Bundled Anki add-ons (`integrations/`)
+## Bundled Anki add-on (`integrations/`)
 
-These add-ons are distributed as modified copies under the GNU Affero General
-Public License v3; each folder keeps its original license file.
+This add-on is distributed as a modified copy under the GNU Affero General
+Public License v3; its folder keeps its original license file.
 
-- `integrations/heatmap/` – Based on the Anki add-on
-  [Review Heatmap](https://github.com/glutanimate/review-heatmap/) by
-  Glutanimate. [Click here to support Glutanimate's work.](https://glutanimate.com/support-my-work/)
-  Licensed under the AGPL v3 with the additional terms in
-  `integrations/heatmap/LICENSE.txt`. Modified: config storage and paths.
 - `integrations/contanki/` – Contanki by Sam Bradshaw
   (<https://github.com/roxgib/anki-contanki>). Modified: config and user
   files location, controller scanning and identification.
-- `integrations/lifedrain/` – Life Drain 2.9.0 by Yutsuten
-  (<https://github.com/Yutsuten/anki-lifedrain>). Modified: config storage.
-
-## D3 3.5.17 and Cal-HeatMap (inside the review heatmap)
-
-- `integrations/heatmap/web/d3.min.js`: D3 3.5.17, Copyright (c) 2010-2016
-  Mike Bostock, BSD 3-Clause License. Source: <https://github.com/d3/d3>
-- `integrations/heatmap/web/anki-review-heatmap.js` contains Cal-HeatMap
-  3.6.3 in Glutanimate's fork (<https://github.com/glutanimate/cal-heatmap>),
-  Copyright 2014 Wan Qi Chen, Copyright 2018-2022 Glutanimate, MIT License.
-
-D3's license: Redistribution and use in source and binary forms, with or
-without modification, are permitted provided that the following conditions are
-met: (1) Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer. (2)
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution. (3) The name Michael Bostock
-may not be used to endorse or promote products derived from this software
-without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL MICHAEL BOSTOCK BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## PDF.js 3.11.174
 

@@ -853,6 +853,8 @@
  "Help & Privacy": "راهنما و حریم خصوصی",
  "Hidden": "پنهان",
  "Hide details": "پنهان کردن جزئیات",
+ "Focus mode while reviewing": "حالت تمرکز هنگام مرور",
+ "Focus mode: while you review, only the card is shown. The left bar and Anki's top bar are hidden; shortcuts, the timer and all tools keep working.": "حالت تمرکز: هنگام مرور فقط کارت نشان داده می‌شود. نوار چپ و نوار بالای Anki پنهان می‌شوند؛ میان‌برها، زمان‌سنج و همهٔ ابزارها همچنان کار می‌کنند.",
  "Hide while Reviewing": "پنهان هنگام مرور",
  "Highlight": "برجسته‌سازی",
  "Hint…": "راهنمایی…",
@@ -1530,7 +1532,6 @@
  "Review cards from 3 different decks.": "از 3 دستهٔ مختلف کارت مرور کنید.",
  "Review cards from {} different decks today.": "امروز از {} دستهٔ مختلف کارت مرور کنید.",
  "Review for at least 1 hour today": "امروز دست‌کم 1 ساعت مرور کنید",
- "Review heatmap": "نقشهٔ حرارتی مرور",
  "Review heatmap on the deck list (based on Review Heatmap by Glutanimate).": "نقشهٔ حرارتی مرور در فهرست دسته‌ها (بر پایهٔ Review Heatmap از Glutanimate).",
  "Review {} cards today.": "امروز {} کارت مرور کنید.",
  "Review<br>Rocket": "موشک<br>مرور",
@@ -2378,5 +2379,15 @@
  "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.": "ChatGPT، Claude، Gemini یا NotebookLM کنار کارت‌هایتان، با حساب خودتان.",
  "Sign in with Google": "ورود با Google",
  "Sign in once here – Gemini, NotebookLM and YouTube Music then use this Google account.": "یک بار اینجا وارد شوید – سپس Gemini، NotebookLM و YouTube Music از همین حساب Google استفاده می‌کنند.",
- "Choose the chatbot": "انتخاب چت‌بات"
+ "Choose the chatbot": "انتخاب چت‌بات",
+ "Suggested add-ons": "افزونه‌های پیشنهادی",
+ "Installed from AnkiWeb in one click. They are separate add-ons by their own authors.": "با یک کلیک از AnkiWeb نصب می‌شوند. این‌ها افزونه‌هایی جداگانه از سازندگان خودشان هستند.",
+ "Installing…": "در حال نصب…",
+ "Restart Anki to use it": "برای استفاده، Anki را دوباره اجرا کنید",
+ "By {author}.": "از {author}.",
+ "No longer built in": "دیگر داخلی نیست",
+ "{name} is no longer built into Smart Study. Install the original add-on from AnkiWeb?": "{name} دیگر در Smart Study گنجانده نشده است. افزونهٔ اصلی از AnkiWeb نصب شود؟",
+ "These add-ons are no longer built into Smart Study. Install the original add-ons from AnkiWeb?": "این افزونه‌ها دیگر در Smart Study گنجانده نشده‌اند. افزونه‌های اصلی از AnkiWeb نصب شوند؟",
+ "Your installed copy is switched off; it will be switched back on.": "نسخهٔ نصب‌شدهٔ شما خاموش است؛ دوباره روشن می‌شود.",
+ "You can also install suggested add-ons any time under Settings → Add-ons.": "افزونه‌های پیشنهادی را هر زمان می‌توانید از تنظیمات → افزونه‌ها نصب کنید."
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.3 – 2026-11-15
+
+- **Fix – settings window**: the settings page loads a helper script from its own folder, and Qt WebEngine refused that on some systems. The page then stopped half-way while it opened: no logo, the accent colour could not be changed, the *Browser* tab showed only its headings, the changelog was empty and *Save Settings* did nothing. The page may now load its own files, Python hands the script over if it is still missing, and one failing part no longer stops the rest. Page errors are printed instead of being swallowed
+- **Focus mode while reviewing**: *Settings → General → Sidebar Visibility* has a third choice. While you review, only the card and Anki's answer bar are shown; the left rail and Anki's top bar step aside and return when you leave the review. Shortcuts, the timer, music and every tool keep working (a tool opened by shortcut still appears)
+- **Review Heatmap and Life Drain are suggested, not built in**: the two modified copies are gone from the package. *Settings → Add-ons* lists them under *Suggested add-ons* with an *Install* button that downloads the original add-on from AnkiWeb. Who used the built-in heatmap (or Life Drain) is asked once after the update whether to install the original. The controller support and *Copy selections with pictures as an image* stay built in
+- **Smaller package**: without the two copies and their libraries (D3, Cal-HeatMap)
+
+
 ## 3.0.2 – 2026-11-15
 
 - **Accent colour everywhere**: the standard theme set the petrol accent on `<body>`, which overrode the colour chosen under *Settings → Appearance*. The Today page, the deck list, the *Study Now* button and the tool bars now follow it, and the study plan window does too (it had petrol written into its stylesheet) – also at once when the colour is changed while it is open

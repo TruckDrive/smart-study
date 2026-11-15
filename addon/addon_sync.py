@@ -108,16 +108,24 @@ def push(settings: Dict, save: Callable[[], None]) -> Dict[str, str]:
     return shared
 
 
-def install(ids: List[str], settings: Dict, save: Callable[[], None], parent=None) -> None:
-    """Downloads and installs add-ons from AnkiWeb, then updates the shared list."""
+def install(ids: List[str], settings: Dict, save: Callable[[], None], parent=None,
+            on_done: Optional[Callable[[bool], None]] = None) -> None:
+    """Downloads and installs add-ons from AnkiWeb, then updates the shared list.
+
+    ``on_done(ok)`` runs after Anki showed the result (ok: no download failed)."""
     mw = _mw()
     if not mw or not ids:
         return
-    from aqt.addons import download_addons, show_log_to_user
+    from aqt.addons import download_addons, download_encountered_problem, show_log_to_user
 
     def done(log) -> None:
         show_log_to_user(parent or mw, log, title="Smart Study")
         push(settings, save)
+        if on_done:
+            try:
+                on_done(not download_encountered_problem(log))
+            except Exception:
+                traceback.print_exc()
 
     download_addons(parent or mw, mw.addonManager, [int(i) for i in ids], done)
 

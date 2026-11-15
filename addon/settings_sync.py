@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 import traceback
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 CONF_KEY = "smartstudy_settings"
 # Local stamp of the settings copy that was last pushed or pulled.
@@ -110,14 +110,22 @@ def push_integrations(state: Dict[str, Any]) -> None:
     _store(remote)
 
 
-def pull_integrations(state: Dict[str, Any]) -> bool:
-    """Like pull_settings for the add-on switches; True if they changed."""
+def pull_integrations(state: Dict[str, Any], keys: Optional[Iterable[str]] = None) -> bool:
+    """Like pull_settings for the add-on switches; True if they changed.
+
+    With ``keys`` only those switches count as a change: entries of add-ons
+    that are no longer built in (still sent by older versions) are kept but
+    do not ask for a restart."""
     remote = _remote()
     if remote is None:
         return False
     enabled = remote.get("integrations")
     if isinstance(enabled, dict) and float(remote.get("integrationsAt") or 0) > float(state.get(STAMP_KEY) or 0):
-        changed = enabled != state.get("enabled")
+        before = state.get("enabled") if isinstance(state.get("enabled"), dict) else {}
+        if keys is None:
+            changed = enabled != before
+        else:
+            changed = any(enabled.get(k) != before.get(k) for k in keys)
         state["enabled"] = dict(enabled)
         state[STAMP_KEY] = float(remote["integrationsAt"])
         return changed

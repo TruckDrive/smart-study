@@ -231,6 +231,8 @@
   .btn-primary:hover{filter:brightness(1.07);}
   .btn-grey{background:var(--field-bg);color:var(--text);}
   .btn-grey:hover{background:var(--chip-hover);}
+  #suggestedGroup .btn{white-space:nowrap;}
+  #suggestedGroup .btn:disabled{opacity:.6;cursor:default;filter:none;background:var(--field-bg);color:var(--text);}
 
   /* home hero */
   .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 20px 26px;
@@ -523,9 +525,10 @@
             <div class="row">
               <div class="rl"><div class="rt">Sidebar Visibility</div><div class="rd">Show the left bar with the tabs always, or hide it while you review.</div></div>
               <div class="rc"><select class="field" id="sidebar_visibility">
-                <option value="always_show">Always Show</option><option value="hide_review">Hide while Reviewing</option>
+                <option value="always_show">Always Show</option><option value="hide_review">Hide while Reviewing</option><option value="focus_review">Focus mode while reviewing</option>
               </select></div>
             </div>
+            <p class="rd" style="margin:0;padding:0 18px 14px;">Focus mode: while you review, only the card is shown. The left bar and Anki's top bar are hidden; shortcuts, the timer and all tools keep working.</p>
           </div>
 
           <div class="community-strip">
@@ -765,6 +768,11 @@
           <div class="group" id="integrationGroup"></div>
           <p class="rd" id="addonsNote" style="margin:12px 4px 12px;"></p>
           <button type="button" class="btn btn-grey" id="addonsMore" onclick="bridge('openIntegrations')">Options & credits…</button>
+          <div id="suggestedBlock" hidden>
+            <div class="group-label" id="suggestedLabel" style="margin-top:24px">Suggested add-ons</div>
+            <div class="group" id="suggestedGroup"></div>
+            <p class="rd" id="suggestedNote" style="margin:12px 4px 0;"></p>
+          </div>
           <div id="addonSyncBlock" hidden>
             <div class="group-label" id="addonSyncLabel" style="margin-top:24px">Sync add-ons</div>
             <div class="group" id="addonSyncGroup"></div>
@@ -1106,6 +1114,7 @@
 
   // Built-in add-ons: their switches are saved as "integration:<key>".
   window.setIntegrations = function(info){
+    setSuggested(info);
     if(!info || !info.items || !info.items.length){ document.getElementById('addonsNav').hidden = true; return; }
     var labels = info.labels || {};
     if(labels.nav) document.getElementById('addonsNavLabel').textContent = labels.nav;
@@ -1116,6 +1125,47 @@
     document.getElementById('integrationGroup').innerHTML = info.items.map(function(item){
       return toggleRow('integration:'+item.key, item.title, item.desc, !!item.on, false);
     }).join('');
+  };
+
+  // Suggested add-ons (no longer built in): one click installs the original from AnkiWeb.
+  var _suggestedLabels = {};
+  function setSuggested(info){
+    var list = (info && info.suggested) || [];
+    var block = document.getElementById('suggestedBlock');
+    if(!list.length){ block.hidden = true; return; }
+    var l = _suggestedLabels = (info.labels || {});
+    block.hidden = false;
+    document.getElementById('suggestedLabel').textContent = l.suggestedTitle || 'Suggested add-ons';
+    document.getElementById('suggestedNote').textContent = l.suggestedNote || '';
+    var group = document.getElementById('suggestedGroup');
+    group.innerHTML = list.map(function(a){
+      var btn = a.installed
+        ? '<button type="button" class="btn btn-grey" disabled>'+esc(l.installed || 'Installed')+'</button>'
+        : '<button type="button" class="btn btn-primary" data-suggest-code="'+esc(a.code)+'">'+esc(l.install || 'Install')+'</button>';
+      return '<div class="row"><div class="rl"><div class="rt">'+esc(a.title)+'</div><div class="rd">'+esc(a.desc)+'</div></div>'+
+        '<div class="rc">'+btn+'</div></div>';
+    }).join('');
+    group.querySelectorAll('button[data-suggest-code]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(b.disabled) return;
+        b.disabled = true;
+        b.textContent = _suggestedLabels.installing || 'Installing…';
+        bridge('installAddon', b.getAttribute('data-suggest-code'));
+      });
+    });
+  }
+  // Called by Python when Anki finished a download (also for the code field below).
+  window.addonInstallDone = function(code, ok){
+    var b = document.querySelector('#suggestedGroup button[data-suggest-code="'+String(code).replace(/[^0-9]/g,'')+'"]');
+    if(!b) return;
+    if(ok){
+      b.className = 'btn btn-grey';
+      b.disabled = true;
+      b.textContent = _suggestedLabels.restart || 'Restart Anki to use it';
+    }else{
+      b.disabled = false;
+      b.textContent = _suggestedLabels.install || 'Install';
+    }
   };
 
   // AnkiWeb add-ons: install by code, keep the same ones on every device (addon_sync.py).
@@ -1513,7 +1563,8 @@
       };
       celebrationMaster.addEventListener('change',syncCelebrations);syncCelebrations();
       renderToggles('deckGroup', DECK, cfg);
-      renderDeckOverviewSettings(data.deckOverview);
+      // One missing helper must not stop everything after it (logo, colours, browser, changelog).
+      try{ renderDeckOverviewSettings(data.deckOverview); }catch(e){ console.log('SMARTSTUDY_SETTINGS:err:deckOverview '+e); }
       renderToggles('sideGroup', SIDE, cfg, true);
       renderBrowser(data.browser);
       setIntegrations(data.integrations);

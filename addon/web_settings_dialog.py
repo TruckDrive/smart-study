@@ -219,6 +219,11 @@ if _QT_AVAILABLE:
                     QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard,
                     True,
                 )
+                # The page loads deck_overview.js/.css from its own folder.
+                self._view.settings().setAttribute(
+                    QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls,
+                    True,
+                )
             except Exception as e:
                 print(f"WebSettings: could not enable optional web permissions: {e}")
 
@@ -289,6 +294,8 @@ if _QT_AVAILABLE:
                     self._on_save(payload)
                 elif action == "cancel":
                     self.reject()
+                elif action == "err":
+                    print(f"WebSettings: page error: {payload}")
                 elif action == "developerUnlock":
                     if not getattr(self, '_developer_opening', False):
                         self._developer_opening = True
@@ -337,9 +344,21 @@ if _QT_AVAILABLE:
                     desc += " " + tr("Could not be started.")
                 items.append({"key": i.key, "title": tr(i.title), "desc": desc,
                               "on": integrations.is_enabled(i.key, state)})
+            try:
+                suggested = integrations.suggestion_rows()
+            except Exception as e:
+                print(f"WebSettings: suggested add-ons unavailable: {e}")
+                suggested = []
             return {
                 "items": items,
+                "suggested": suggested,
                 "labels": {
+                    "suggestedTitle": tr("Suggested add-ons"),
+                    "suggestedNote": tr("Installed from AnkiWeb in one click. They are separate add-ons by their own authors."),
+                    "install": tr("Install"),
+                    "installing": tr("Installing…"),
+                    "installed": tr("Installed"),
+                    "restart": tr("Restart Anki to use it"),
                     "nav": tr("Add-ons"),
                     "title": tr("Built-in add-ons"),
                     "sub": tr("Included in Smart Study – no separate installs. Changes apply after restarting Anki."),
@@ -383,9 +402,23 @@ if _QT_AVAILABLE:
                     return
                 import sys
                 package = sys.modules[__name__.rsplit(".", 1)[0]]
-                addon_sync.install([code], package.addon_settings, package.save_addon_settings, parent=self)
+
+                def done(ok: bool, code=code) -> None:
+                    # Tells the page, so a suggested add-on's button can say "Restart Anki to use it".
+                    try:
+                        self._page.runJavaScript(
+                            "window.addonInstallDone && addonInstallDone(%s, %s);" % (json.dumps(code), json.dumps(bool(ok))))
+                    except Exception:
+                        pass  # the settings window was closed meanwhile
+
+                addon_sync.install([code], package.addon_settings, package.save_addon_settings, parent=self, on_done=done)
             except Exception as e:
                 print(f"WebSettings: add-on install failed: {e}")
+                try:
+                    self._page.runJavaScript(
+                        "window.addonInstallDone && addonInstallDone(%s, false);" % json.dumps(str(code)))
+                except Exception:
+                    pass
 
         def _open_integrations(self):
             """Opens the full window (options, credits) and shows its result here."""
@@ -420,9 +453,27 @@ if _QT_AVAILABLE:
             self._injected = True
             try:
                 payload = json.dumps(self._build_payload())
-                self._page.runJavaScript(f"window.initSettings && initSettings({payload});")
+                self._page.runJavaScript(self._local_assets_js() + f"window.initSettings && initSettings({payload});")
             except Exception as e:
                 print(f"WebSettings: inject failed: {e}")
+
+        def _local_assets_js(self) -> str:
+            """deck_overview.js and .css, handed over by Python when the page could
+            not load them itself. Some Qt WebEngine versions refuse a local page its
+            neighbour files; without the script the whole settings page stopped
+            half-way (no logo, no colours, empty Browser tab and changelog)."""
+            try:
+                folder = os.path.dirname(_html_path())
+                with open(os.path.join(folder, "deck_overview.js"), encoding="utf-8") as fh:
+                    script = fh.read()
+                with open(os.path.join(folder, "deck_overview.css"), encoding="utf-8") as fh:
+                    css = fh.read()
+                return ("if(typeof window.renderDeckOverviewSettings!=='function'){"
+                        "var s=document.createElement('style');s.textContent=%s;document.head.appendChild(s);"
+                        "(0,eval)(%s);}\n" % (json.dumps(css), json.dumps(script)))
+            except Exception as e:
+                print(f"WebSettings: local assets unavailable: {e}")
+                return ""
 
         def _on_save(self, payload: str):
             try:

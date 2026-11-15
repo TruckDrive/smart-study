@@ -486,7 +486,7 @@ def on_state_change(new_state: str, old_state: str):
     try:
         mode = addon_settings.get("sidebar_visibility_mode", "always_show")
         
-        if mode == "hide_review":
+        if mode in ("hide_review", "focus_review"):
             if new_state == "review":
                 launcher_dock_widget.setVisible(False)
             else:
@@ -646,6 +646,14 @@ def run_onboarding_if_needed():
         whats_new.show_if_updated(addon_settings, save_addon_settings, constants.ADDON_VERSION)
     except Exception:
         traceback.print_exc()
+    # Review Heatmap / Life Drain are no longer built in: offer the originals
+    # once per device to users who had them on (never to new users).
+    try:
+        if integrations is not None:
+            integrations.offer_after_update(
+                bool(addon_settings.get("onboarding_completed", False)), first_start)
+    except Exception as exc:
+        print(f"Smart Study: suggestion after the update failed: {exc}")
     if addon_settings.get("onboarding_completed", False) and not first_start:
         try:
             # Asked once per device, from the second start on and after this update.
@@ -1064,7 +1072,7 @@ def _pull_synced_settings() -> Dict[str, Any]:
             save_addon_settings()
         if integrations is not None:
             state = integrations.load_state()
-            if settings_sync.pull_integrations(state):
+            if settings_sync.pull_integrations(state, keys=list(integrations.BY_KEY)):
                 integrations.save_state(state, push=False)
                 tooltip(integrations.tr("Built-in add-ons were changed on another device. Restart Anki to apply."))
             elif settings_sync.STAMP_KEY in state:
@@ -1939,7 +1947,7 @@ if modules_loaded and mw and gui_hooks:
         gui_hooks.top_toolbar_did_init_links.append(
             _add_launcher_toggle_to_top_toolbar
         )
-    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css)|integrations/[^/]+/web/.+)$") # theme css, notebook, media and study plan files
+    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css))$") # theme css, notebook, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
     try:
         from . import smooth_ui

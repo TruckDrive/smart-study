@@ -32,7 +32,9 @@ class WhatsNewDialog(Dialog):
         self.state = load_state()
         self.toggles: Dict[str, Toggle] = {}
 
-        features = [i for e in entries for i in e["items"] if i.get("integration")]
+        # Items about add-ons that are no longer built in (Review Heatmap,
+        # Life Drain) are left out: they are suggested separately.
+        features = [i for e in entries for i in e["items"] if i.get("integration") in BY_KEY]
         others = [i for e in entries for i in e["items"] if not i.get("integration")]
         if features:
             self.section(tr("Built-in add-ons"))

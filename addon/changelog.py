@@ -7,6 +7,16 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.3",
+        "date": "November 15, 2026",
+        "items": [
+            {"tag": "Fix", "text": "Settings work again: on some systems the settings window stopped half-way while it opened. The logo was missing, the accent colour could not be changed, the Browser tab showed only headings, the changelog was empty and Save did nothing."},
+            {"tag": "New", "text": "Focus mode while reviewing (Settings → General → Sidebar Visibility): while you review, only the card is shown. The left bar and Anki's top bar step aside and come back afterwards; shortcuts, the timer and all tools keep working."},
+            {"tag": "Improved", "text": "Review Heatmap and Life Drain are no longer built in. Smart Study suggests the original add-ons instead: one click under Settings → Add-ons downloads them from AnkiWeb. If you used the built-in heatmap, Smart Study offers the download once after this update. The controller support stays built in."},
+            {"tag": "Improved", "text": "The add-on is smaller and starts with less code, and the original add-ons get their updates directly from their authors."},
+        ],
+    },
+    {
         "version": "3.0.2",
         "date": "November 15, 2026",
         "items": [

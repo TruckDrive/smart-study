@@ -450,6 +450,7 @@ class Panel(QObject):
         self._loaded = False
         self._last_json = ""
         self._closing = False
+        self._top_bar_hidden = False  # focus mode hid Anki's top bar
 
         self._open = bool(settings.get("panel_open", True))
         self._force_today = False
@@ -614,6 +615,7 @@ class Panel(QObject):
             self.header.restyle()
         self._style_window()
         self._load_page()
+        self.sync()  # e.g. the focus mode was switched in the settings
 
     apply_stylesheet = restyle  # name the settings code calls after a change
 
@@ -676,13 +678,32 @@ class Panel(QObject):
             key = self.active()
             reviewing = getattr(mw, "state", "") == "review"
             if self.rail_bar is not None:
-                hidden = reviewing and self.settings.get("sidebar_visibility_mode") == "hide_review"
+                mode = self.settings.get("sidebar_visibility_mode")
+                hidden = reviewing and mode in ("hide_review", "focus_review")
                 self.rail_bar.setVisible(bool(self.settings.get("panel_rail_open", True)) and not hidden)
+                self._focus_top_bar(reviewing and mode == "focus_review")
             self.today_dock.setVisible(self._open and key == "today" and not self._resting())
             shown = key if key != "today" else ("today" if self.today_dock.isVisible() else "")
             for name, button in self.header.tab_buttons.items():
                 button.setChecked(name == shown)
             self.ctx["panel_changed"]()
+        except RuntimeError:
+            pass
+
+    def _focus_top_bar(self, hide: bool) -> None:
+        """Focus mode: Anki's top bar steps aside while reviewing and comes back
+        afterwards. Only a bar this panel hid itself is shown again."""
+        bar = getattr(mw, "toolbarWeb", None)
+        if bar is None:
+            return
+        try:
+            if hide and not self._top_bar_hidden:
+                if bar.isVisible():
+                    bar.setVisible(False)
+                    self._top_bar_hidden = True
+            elif not hide and self._top_bar_hidden:
+                self._top_bar_hidden = False
+                bar.setVisible(True)
         except RuntimeError:
             pass
 
@@ -953,6 +974,7 @@ class Panel(QObject):
 
     # -- end -------------------------------------------------------------------
     def cleanup(self) -> None:
+        self._focus_top_bar(False)
         self._closing = True
         for hook, fn in self._hooks:
             try:

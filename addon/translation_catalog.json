@@ -5850,6 +5850,12 @@
   "Hide details": {
     "pl": "Ukryj szczegóły"
   },
+  "Focus mode while reviewing": {
+    "pl": "Tryb skupienia podczas powtórek"
+  },
+  "Focus mode: while you review, only the card is shown. The left bar and Anki's top bar are hidden; shortcuts, the timer and all tools keep working.": {
+    "pl": "Tryb skupienia: podczas powtórek widać tylko kartę. Lewy pasek i górny pasek Anki są ukryte; skróty, minutnik i wszystkie narzędzia działają dalej."
+  },
   "Hide while Reviewing": {
     "pl": "Ukryj podczas powtórek"
   },

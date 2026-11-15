@@ -40,7 +40,6 @@ class AddonManagerProxy:
     def __init__(self, key: str):
         self.key = key
         self._config_action: Optional[Callable[[], Any]] = None
-        self._update_action: Optional[Callable[[Any], Any]] = None
 
     # --- config -----------------------------------------------------------
     def getConfig(self, _module: str = "") -> Dict[str, Any]:
@@ -58,17 +57,9 @@ class AddonManagerProxy:
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(conf, f, indent=2, ensure_ascii=False)
         os.replace(tmp, _store_path(self.key))
-        if self._update_action:
-            self._update_action(conf)
-
-    def addonConfigDefaults(self, _dir: str = "") -> Dict[str, Any]:
-        return _defaults(self.key)
 
     def setConfigAction(self, _module: str, fn: Callable[[], Any]) -> None:
         self._config_action = fn
-
-    def setConfigUpdatedAction(self, _module: str, fn: Callable[[Any], Any]) -> None:
-        self._update_action = fn
 
     def open_config(self) -> bool:
         """Opens the bundled add-on's own settings, if it registered any."""
@@ -76,18 +67,6 @@ class AddonManagerProxy:
             self._config_action()
             return True
         return False
-
-    # --- paths and web exports ---------------------------------------------
-    def addonFromModule(self, _module: str) -> str:
-        return PACKAGE
-
-    def web_base(self) -> str:
-        """URL prefix for files of this bundled add-on (see setWebExports in __init__)."""
-        return f"/_addons/{PACKAGE}/integrations/{self.key}"
-
-    def setWebExports(self, _module: str, _pattern: str) -> None:
-        # Smart Study exports integrations/<key>/web/... itself; one pattern per add-on.
-        pass
 
     def __getattr__(self, name: str) -> Any:
         return getattr(mw.addonManager, name)
