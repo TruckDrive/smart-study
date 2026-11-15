@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (3.0.2)
+
+- **Accent colour everywhere**: the Today page, the study plan, the deck list, the Study Now button and the tool bars follow the colour chosen under *Settings → Appearance* (they stayed petrol before); also the browser's loading line, the chips on the trophies page, the link button in the notebook and the highlight tag in the news. Text on coloured buttons is dark or white, whichever reads better
+- **Icons**: the FreeMap tutorial entry, the assistant's *Open in browser* button and the *study* / *open* links of the study plan are drawn instead of using characters some systems cannot show
+- **Study plan**: the ⋯ menu also opens after you ticked an item or the page refreshed
+- **Pomodoro** works right after switching it on in the settings; hiding *Level and streak* updates the rail at once
+- **Settings**: the Deck Overview, Side panel, Browser and Changelog tabs, the colour swatches and the logo stayed empty because the settings page could not load its own script file; fixed
+- **Classic layout removed**: *Settings → Home → Layout* and the classic widgets above the deck list (Minimalist Dashboard, Advanced Statistics widget, Facts/Tasks widget, wide deck list switch) are gone. The side panel is the only home. The daily fact now has just its switch in *Home* and a topic choice
+- Screenshots in the README and on AnkiWeb show the current look; the old ones (classic layout, API chat, 2.1 What's new) are removed
+
 ## 3.0.1 – 2026-11-15
 
 - **Level always in sight**: a big level number with an XP bar sits at the top of the left rail, under the logo – also when the side panel is folded. A click opens the trophies
