@@ -26,7 +26,7 @@ Changelog and release notes: [CHANGELOG.md](CHANGELOG.md) · [Releases](https://
 
 ## About
 
-You tell Smart Study what you have to learn (book pages, videos, lists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
+You tell Smart Study what you have to learn (book pages, videos, ists of tasks, Anki decks), when the exam is and how much time you have each day. It spreads everything over the days until the exam, topic by topic: first read, then watch the lecture, then do the cards. Anki items tick themselves off while you study. If you fall behind, one click replans the rest. Around that, Smart Study turns Anki into a workspace so you don't have to leave it.
 
 ![Plan view](screenshots/plan-3.0.png)
 
@@ -47,7 +47,7 @@ You tell Smart Study what you have to learn (book pages, videos, lists of tasks,
 
 **While studying**
 - **Auto checkmarks**: card and review items are checked off from your Anki activity, everything else with a click
-- **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **📖 open** opens the PDF at the right page in a Smart Study browser tab (or Okular/Evince)
+- **▶ study** opens the item's own deck. No filtered decks are created, so your cards always stay in their normal decks. **open** opens the PDF at the right page in a Smart Study browser tab (or Okular/Evince)
 - **Weak spots round**: finds the topics with the most mistakes and schedules the pages, video and weak cards for them again
 - **Weak cards** open in Anki's browser with a search, nothing gets moved
 - **Mock exam** runs in the plan window: random studied cards against the clock, show the answer, mark it right or wrong (or Space, 1, 2), with a per-topic result
