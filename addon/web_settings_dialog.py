@@ -117,9 +117,6 @@ def _safe_counter_color(value: Any, fallback: str) -> str:
     return value.upper() if isinstance(value, str) and _HEX_COLOR_RE.fullmatch(value) else fallback
 
 # Home/news banner. Only the bundled image is shown; no remote image or config is fetched.
-HOME_BANNER_URL = ""
-HOME_BANNER_LINK = "https://github.com/TruckDrive/smart-study"
-NEWS_BANNER_FALLBACK_FILENAME = "news-banner.png"
 EXAMPLE_WALLPAPER_DIR = "example_wallpapers"
 EXAMPLE_WALLPAPERS = (
     ("light", "smartstudy_starter_light.webp", "Light Wallpaper",
@@ -142,7 +139,7 @@ _TOGGLE_KEYS = [
     "workspace_mindmap_tab", "workspace_roadmap_tab",
     "gamification_popups_enabled", "gamification_popup_rank",
     "gamification_popup_level", "gamification_popup_challenge",
-    "gamification_widgets_enabled", "study_plan_widget_enabled",
+    "gamification_widgets_enabled",
     "deadline_bar_enabled",
     "deck_overview_enabled", "mindmap_enabled",
     "gamification_sidebar_enabled", "music_player_enabled", "pomodoro_enabled",
@@ -750,10 +747,6 @@ if _QT_AVAILABLE:
             except Exception:
                 return ""
 
-        def _banner_fallback_uri(self) -> str:
-            """Single bundled banner shown whenever remote news is unavailable."""
-            return self._png_uri(NEWS_BANNER_FALLBACK_FILENAME)
-
         def _background_themes(self):
             items = []
             try:
@@ -802,7 +795,6 @@ if _QT_AVAILABLE:
             conf = {
                 "language": cfg.get("language", "auto"),
                 "fact_theme": cfg.get("fact_theme", "Medical"),
-                "daily_widget_content": cfg.get("daily_widget_content", "facts"),
                 "stats_time_range": int(cfg.get("stats_time_range", 7) or 7),
                 "sidebar_visibility_mode": cfg.get("sidebar_visibility_mode", "always_show"),
                 "active_theme": cfg.get("active_theme", "medical_theme.css"),
@@ -847,7 +839,6 @@ if _QT_AVAILABLE:
                     conf[key] = int(cfg.get(key, fallback) or fallback)
                 except (TypeError, ValueError):
                     conf[key] = fallback
-            banner_fallback = self._banner_fallback_uri()
             try:
                 from . import browser_features
                 browser = browser_features.settings_payload()
@@ -870,11 +861,6 @@ if _QT_AVAILABLE:
                 "accent": accent,
                 "accentPress": accent_press,
                 "logos": self._logos(),
-                "banner": {
-                    "url": HOME_BANNER_URL,
-                    "link": HOME_BANNER_LINK,
-                    "fallback": banner_fallback,
-                },
                 "backgroundThemes": self._background_themes(),
                 "shortcutDisplays": {
                     key: sidebar_shortcuts.display_sequence(value)

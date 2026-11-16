@@ -139,10 +139,6 @@
   }
 
   // ── Public control surface (called from Python) ──────────────────────────
-  function scPlay() {
-    if (!_widgetReady) { _playAfterLoad = true; return; }
-    if (widget) try { widget.play(); } catch (e) {}
-  }
   function scPause() {
     _playAfterLoad = false;
     if (_widgetReady && widget) try { widget.pause(); } catch (e) {}

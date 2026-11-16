@@ -169,7 +169,6 @@ h2.screen-title {
   gap: 14px;
 }
 .option-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-.option-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
 
 .opt {
   padding: 20px 16px;
@@ -230,40 +229,6 @@ h2.screen-title {
 .theme-card.selected {
   border-color: #2563EB;
 }
-.theme-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ── ToS row ── */
-.tos-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: auto;
-  margin-bottom: 0;
-  padding: 14px 16px;
-  background: #f9fafb;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 10px;
-}
-.tos-row input[type="checkbox"] {
-  width: 18px; height: 18px;
-  accent-color: #2563EB;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.tos-row label {
-  font-size: 14px;
-  color: #4b5563;
-  cursor: pointer;
-  line-height: 1.4;
-}
-.tos-row a { color: #2563EB; text-decoration: none; }
-.tos-row a:hover { text-decoration: underline; }
-
 /* ── Bottom row ── */
 .bottom-row {
   position: absolute;
@@ -287,7 +252,6 @@ h2.screen-title {
   transition: background 0.15s, opacity 0.15s;
   white-space: nowrap;
 }
-.btn-cta:hover:not(:disabled) { background: #1d4ed8; }
 .btn-cta:disabled {
   opacity: 0.45;
   cursor: default;
@@ -394,123 +358,24 @@ h2.screen-title {
 
 /* Dev nav removed — was prototype-only */
 
-/* ══════════════════════════════════
-   TERMS OF SERVICE MODAL
-══════════════════════════════════ */
-.tos-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(3px);
-}
-.tos-overlay.open { display: flex; }
-
-.tos-modal {
-  background: #fff;
-  border-radius: 16px;
-  width: 560px;
-  max-width: 92vw;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.22);
-  overflow: hidden;
-}
-.tos-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid #f3f4f6;
-  flex-shrink: 0;
-}
-.tos-modal-header h3 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #111827;
-  letter-spacing: -0.2px;
-}
-.tos-close {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: none;
-  background: #f3f4f6;
-  color: #6b7280;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  line-height: 1;
-  transition: background 0.12s;
-  flex-shrink: 0;
-}
-.tos-close:hover { background: #e5e7eb; color: #111827; }
-.tos-modal-body {
-  overflow-y: auto;
-  padding: 20px 24px 28px;
-  flex: 1;
-}
-.tos-modal-body h4 {
-  font-size: 13px;
-  font-weight: 700;
-  color: #111827;
-  margin-top: 18px;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-.tos-modal-body h4:first-child { margin-top: 0; }
-.tos-modal-body p {
-  font-size: 13.5px;
-  color: #4b5563;
-  line-height: 1.65;
-  margin-bottom: 4px;
-}
-.tos-modal-body ul {
-  margin-block:6px 4px;margin-inline:18px 0;
-  padding: 0;
-}
-.tos-modal-body ul li {
-  font-size: 13.5px;
-  color: #4b5563;
-  line-height: 1.65;
-  margin-bottom: 2px;
-}
-.tos-last-updated {
-  font-size: 11px;
-  color: #9ca3af;
-  margin-bottom: 18px;
-  display: block;
-}
-
 /* Anki night mode. Screenshots keep their original colours, while every
    interactive surface and text colour receives a dark counterpart. */
 html.dark { color-scheme: dark; }
 html.dark body, html.dark .dialog { background: #26282B; color: #ffffff; }
 html.dark .right-panel { background: #26282B; }
 html.dark h1.brand, html.dark h2.screen-title, html.dark .support-content h2,
-html.dark .support-p strong, html.dark .tos-modal-header h3,
-html.dark .tos-modal-body h4 { color: #ffffff; }
+html.dark .support-p strong { color: #ffffff; }
 html.dark .welcome-eyebrow, html.dark .welcome-tagline, html.dark .tip-text,
-html.dark .support-p, html.dark .tos-row label, html.dark .tos-modal-body p,
-html.dark .tos-modal-body ul li { color: #B4B4B4; }
+html.dark .support-p { color: #B4B4B4; }
 html.dark .screen-subtitle, html.dark .progress-label,
-html.dark .loading-label, html.dark .tos-last-updated { color: #B4B4B4; }
+html.dark .loading-label { color: #B4B4B4; }
 html.dark .progress-track, html.dark .loading-track { background: #34373C; }
 html.dark .opt { background: #1D1F22; border-color: #34373C; color: #ffffff; }
 html.dark .opt:hover { background: #34373C; border-color: #60a5fa; }
 html.dark .opt.selected { background: #34373C; border-color: #60a5fa; color: #ffffff; }
 html.dark .theme-card { background: #1D1F22; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
 html.dark .theme-card.selected { border-color: #60a5fa; }
-html.dark .tos-row, html.dark .support-text-box { background: #1D1F22; border-color: #34373C; }
-html.dark .tos-modal { background: #26282B; box-shadow: 0 24px 64px rgba(0,0,0,.55); }
-html.dark .tos-modal-header { border-color: #34373C; }
-html.dark .tos-close { background: #34373C; color: #B4B4B4; }
-html.dark .tos-close:hover { background: #505050; color: #fff; }
-html.dark .tos-row a { color: #93c5fd; }
+html.dark .support-text-box { background: #1D1F22; border-color: #34373C; }
 
 /* ── Smart Study look (3.x): petrol accent, neutral surfaces, round buttons ── */
 :root { --acc: #0B6570; --acc-hover: #084A52; --acc-soft: #E3F0F1; --acc-line: #56BAC6; }
@@ -524,8 +389,6 @@ html.dark { --acc: #1F7A87; --acc-hover: #155660; --acc-soft: #22383B; --acc-lin
 .opt { border-radius: 999px; }
 .opt:hover, html.dark .opt:hover { border-color: var(--acc-line); background: var(--acc-soft); }
 .opt.selected, html.dark .opt.selected { border-color: var(--acc-line); background: var(--acc-soft); color: inherit; }
-.tos-row a, html.dark .tos-row a { color: var(--acc-line); }
-.tos-row input[type="checkbox"] { accent-color: var(--acc); }
 .tip-img { filter: hue-rotate(-28deg) saturate(.7); }
 .theme-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 560px; }
 .theme-card.selected, html.dark .theme-card.selected { border-color: var(--sw, var(--acc)); }
@@ -550,7 +413,6 @@ html.dark .theme-card.selected .sw-name { filter: brightness(1.35); }
 .loading-wrap { margin-top: 8px; }
 
 /* "What do you need?" step */
-.needs-sub { margin: -14px 0 16px; }
 .needs { display: flex; flex-direction: column; gap: 8px; }
 .need { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: start; cursor: pointer;
   padding: 9px 16px 9px 44px; border-radius: 14px; border: 1.5px solid #e5e7eb; background: #fff; color: #111827; position: relative;
@@ -663,35 +525,6 @@ html.dark .need.selected { background: var(--acc-soft); border-color: var(--acc-
   </div>
 
   <!-- ═══════════════════════════════════════
-       SCREEN 3 — Where did you find out?
-  ═══════════════════════════════════════ -->
-  <div class="screen" id="screen-3">
-    <div class="left-panel slim">
-      <!-- SIDEBAR BILD 3 -->
-      <img src="img_sidebar_3.png" class="left-img" alt="">
-    </div>
-    <div class="right-panel">
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
-        <div class="progress-label">3 / 6</div>
-      </div>
-      <h2 class="screen-title" data-i18n="whereDidYouFind">Where did you find out about Smart Study?</h2>
-      <div class="option-grid cols-3" >
-        <button class="opt" data-group="source" data-value="ankiStore"   onclick="selectOpt(this)" data-i18n="ankiStore">Anki Add-On Store</button>
-        <button class="opt" data-group="source" data-value="friends"     onclick="selectOpt(this)" data-i18n="friends">Friends</button>
-        <button class="opt" data-group="source" data-value="google"      onclick="selectOpt(this)" data-i18n="google">Google</button>
-        <button class="opt" data-group="source" data-value="socialMedia" onclick="selectOpt(this)" data-i18n="socialMedia">Social Media</button>
-        <button class="opt" data-group="source" data-value="chatgptAI"   onclick="selectOpt(this)" data-i18n="chatgptAI">ChatGPT / AI</button>
-        <button class="opt" data-group="source" data-value="reddit"      onclick="selectOpt(this)" data-i18n="reddit">Reddit</button>
-        <button class="opt" data-group="source" data-value="other"       onclick="selectOpt(this)" data-i18n="other">Other</button>
-      </div>
-    </div>
-    <div class="bottom-row">
-      <button class="btn-cta" id="btn-next-3" disabled onclick="goTo(4)" data-i18n="continue">Continue</button>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════
        SCREEN 4 — Theme
   ═══════════════════════════════════════ -->
   <div class="screen full-width" id="screen-4">
@@ -787,13 +620,6 @@ const T = {
     welcomeTo: "خوش آمدید به", welcomeSub: "آماده‌اید تجربهٔ Anki خود را بهتر کنید؟",
     getStarted: "شروع کنیم", continue: "ادامه", start: "شروع",
     chooseLanguage: "زبان خود را انتخاب کنید",
-    whoAreYou: "شما که هستید؟",
-    medicalStudent: "دانشجوی پزشکی", lawStudent: "دانشجوی حقوق",
-    highschoolStudent: "دانش‌آموز دبیرستان", programmer: "برنامه‌نویس",
-    languageLearner: "زبان‌آموز", other: "دیگر",
-    whereDidYouFind: "Smart Study را از کجا شناختید؟",
-    ankiStore: "فروشگاه افزونه‌های Anki", friends: "دوستان", google: "Google",
-    socialMedia: "شبکه‌های اجتماعی", chatgptAI: "ChatGPT / هوش مصنوعی", reddit: "Reddit",
     whichTheme: "کدام پوسته را انتخاب می‌کنید؟",
     changeThemeLater: "بعداً می‌توانید آن را در تنظیمات تغییر دهید.",
     settingsTipTitle: "تنظیمات را پیدا کنید",
@@ -810,13 +636,6 @@ const T = {
     welcomeTo: "Witaj w", welcomeSub: "Chcesz lepiej korzystać z Anki?",
     getStarted: "Zaczynamy", continue: "Dalej", start: "Start",
     chooseLanguage: "Wybierz język",
-    whoAreYou: "Kim jesteś?",
-    medicalStudent: "Student medycyny", lawStudent: "Student prawa",
-    highschoolStudent: "Uczeń", programmer: "Programista",
-    languageLearner: "Uczę się języków", other: "Inne",
-    whereDidYouFind: "Skąd znasz Smart Study?",
-    ankiStore: "Dodatki Anki", friends: "Znajomi", google: "Google",
-    socialMedia: "Media społecznościowe", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "Wybierz motyw",
     changeThemeLater: "Możesz go później zmienić w ustawieniach.",
     settingsTipTitle: "Gdzie są ustawienia?",
@@ -834,13 +653,6 @@ const T = {
     welcomeTo: "Welcome to", welcomeSub: "Ready to boost your Anki Experience?",
     getStarted: "Get Started", continue: "Continue", start: "Start",
     chooseLanguage: "Choose Your Language",
-    whoAreYou: "Who Are You?",
-    medicalStudent: "Medical Student", lawStudent: "Law Student",
-    highschoolStudent: "High School Student", programmer: "Programmer",
-    languageLearner: "Language Learner", other: "Other",
-    whereDidYouFind: "Where did you find out about Smart Study?",
-    ankiStore: "Anki Add-On Store", friends: "Friends", google: "Google",
-    socialMedia: "Social Media", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "Which Theme Do You Choose?",
     changeThemeLater: "You can change it later in the settings.",
     settingsTipTitle: "Find Your Settings",
@@ -857,13 +669,6 @@ const T = {
     welcomeTo: "Willkommen bei", welcomeSub: "Bereit, deine Anki-Erfahrung zu verbessern?",
     getStarted: "Los geht's", continue: "Weiter", start: "Starten",
     chooseLanguage: "Sprache auswählen",
-    whoAreYou: "Wer bist du?",
-    medicalStudent: "Medizinstudent", lawStudent: "Jurastudent",
-    highschoolStudent: "Schüler", programmer: "Programmierer",
-    languageLearner: "Sprachenlerner", other: "Sonstiges",
-    whereDidYouFind: "Wie hast du Smart Study gefunden?",
-    ankiStore: "Anki Add-On Store", friends: "Freunde", google: "Google",
-    socialMedia: "Social Media", chatgptAI: "ChatGPT / KI", reddit: "Reddit",
     whichTheme: "Welches Theme möchtest du?",
     changeThemeLater: "Du kannst es später in den Einstellungen ändern.",
     settingsTipTitle: "Einstellungen finden",
@@ -880,13 +685,6 @@ const T = {
     welcomeTo: "Bienvenido a", welcomeSub: "¿Listo para mejorar tu experiencia en Anki?",
     getStarted: "Comenzar", continue: "Continuar", start: "Empezar",
     chooseLanguage: "Elige tu idioma",
-    whoAreYou: "¿Quién eres?",
-    medicalStudent: "Estudiante de Medicina", lawStudent: "Estudiante de Derecho",
-    highschoolStudent: "Estudiante de Secundaria", programmer: "Programador",
-    languageLearner: "Aprendiz de idiomas", other: "Otro",
-    whereDidYouFind: "¿Dónde conociste Smart Study?",
-    ankiStore: "Tienda Anki Add-On", friends: "Amigos", google: "Google",
-    socialMedia: "Redes Sociales", chatgptAI: "ChatGPT / IA", reddit: "Reddit",
     whichTheme: "¿Qué tema eliges?",
     changeThemeLater: "Puedes cambiarlo después en la configuración.",
     settingsTipTitle: "Encuentra los ajustes",
@@ -903,13 +701,6 @@ const T = {
     welcomeTo: "Bem-vindo ao", welcomeSub: "Pronto para melhorar sua experiência no Anki?",
     getStarted: "Começar", continue: "Continuar", start: "Iniciar",
     chooseLanguage: "Escolha seu idioma",
-    whoAreYou: "Quem é você?",
-    medicalStudent: "Estudante de Medicina", lawStudent: "Estudante de Direito",
-    highschoolStudent: "Estudante do Ensino Médio", programmer: "Programador",
-    languageLearner: "Aprendiz de idiomas", other: "Outro",
-    whereDidYouFind: "Onde você descobriu o Smart Study?",
-    ankiStore: "Loja Anki Add-On", friends: "Amigos", google: "Google",
-    socialMedia: "Redes Sociais", chatgptAI: "ChatGPT / IA", reddit: "Reddit",
     whichTheme: "Qual tema você escolhe?",
     changeThemeLater: "Você pode alterá-lo depois nas configurações.",
     settingsTipTitle: "Encontre as configurações",
@@ -926,13 +717,6 @@ const T = {
     welcomeTo: "Chào mừng đến với", welcomeSub: "Sẵn sàng nâng cao trải nghiệm Anki của bạn?",
     getStarted: "Bắt đầu", continue: "Tiếp tục", start: "Bắt đầu",
     chooseLanguage: "Chọn ngôn ngữ của bạn",
-    whoAreYou: "Bạn là ai?",
-    medicalStudent: "Sinh viên Y khoa", lawStudent: "Sinh viên Luật",
-    highschoolStudent: "Học sinh THPT", programmer: "Lập trình viên",
-    languageLearner: "Người học ngôn ngữ", other: "Khác",
-    whereDidYouFind: "Bạn biết đến Smart Study từ đâu?",
-    ankiStore: "Cửa hàng Anki Add-On", friends: "Bạn bè", google: "Google",
-    socialMedia: "Mạng xã hội", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "Bạn chọn giao diện nào?",
     changeThemeLater: "Bạn có thể thay đổi sau trong cài đặt.",
     settingsTipTitle: "Tìm cài đặt",
@@ -949,13 +733,6 @@ const T = {
     welcomeTo: "Bienvenue sur", welcomeSub: "Prêt à améliorer votre expérience Anki ?",
     getStarted: "Commencer", continue: "Continuer", start: "Démarrer",
     chooseLanguage: "Choisissez votre langue",
-    whoAreYou: "Qui êtes-vous ?",
-    medicalStudent: "Étudiant en médecine", lawStudent: "Étudiant en droit",
-    highschoolStudent: "Lycéen", programmer: "Programmeur",
-    languageLearner: "Apprenant de langues", other: "Autre",
-    whereDidYouFind: "Comment avez-vous découvert Smart Study ?",
-    ankiStore: "Boutique Anki Add-On", friends: "Amis", google: "Google",
-    socialMedia: "Réseaux sociaux", chatgptAI: "ChatGPT / IA", reddit: "Reddit",
     whichTheme: "Quel thème choisissez-vous ?",
     changeThemeLater: "Vous pouvez le modifier plus tard dans les paramètres.",
     settingsTipTitle: "Trouver les paramètres",
@@ -972,13 +749,6 @@ const T = {
     welcomeTo: "स्वागत है", welcomeSub: "अपने Anki अनुभव को बेहतर बनाने के लिए तैयार हैं?",
     getStarted: "शुरू करें", continue: "जारी रखें", start: "प्रारंभ",
     chooseLanguage: "अपनी भाषा चुनें",
-    whoAreYou: "आप कौन हैं?",
-    medicalStudent: "मेडिकल छात्र", lawStudent: "कानून का छात्र",
-    highschoolStudent: "हाई स्कूल छात्र", programmer: "प्रोग्रामर",
-    languageLearner: "भाषा सीखने वाला", other: "अन्य",
-    whereDidYouFind: "आपने Smart Study के बारे में कहाँ जाना?",
-    ankiStore: "Anki Add-On Store", friends: "दोस्त", google: "Google",
-    socialMedia: "सोशल मीडिया", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "आप कौन सा थीम चुनते हैं?",
     changeThemeLater: "आप इसे बाद में सेटिंग्स में बदल सकते हैं।",
     settingsTipTitle: "सेटिंग्स कहाँ मिलेंगी",
@@ -995,13 +765,6 @@ const T = {
     welcomeTo: "환영합니다", welcomeSub: "Anki 경험을 향상시킬 준비가 되셨나요?",
     getStarted: "시작하기", continue: "계속", start: "시작",
     chooseLanguage: "언어를 선택하세요",
-    whoAreYou: "당신은 누구인가요?",
-    medicalStudent: "의대생", lawStudent: "법대생",
-    highschoolStudent: "고등학생", programmer: "프로그래머",
-    languageLearner: "언어 학습자", other: "기타",
-    whereDidYouFind: "Smart Study를 어디서 알게 되셨나요?",
-    ankiStore: "Anki 애드온 스토어", friends: "친구", google: "Google",
-    socialMedia: "소셜 미디어", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "어떤 테마를 선택하시겠어요?",
     changeThemeLater: "나중에 설정에서 변경할 수 있습니다.",
     settingsTipTitle: "설정 찾기",
@@ -1018,13 +781,6 @@ const T = {
     welcomeTo: "欢迎使用", welcomeSub: "准备好提升您的 Anki 体验了吗？",
     getStarted: "开始使用", continue: "继续", start: "开始",
     chooseLanguage: "选择您的语言",
-    whoAreYou: "您是谁？",
-    medicalStudent: "医学生", lawStudent: "法学生",
-    highschoolStudent: "高中生", programmer: "程序员",
-    languageLearner: "语言学习者", other: "其他",
-    whereDidYouFind: "您是在哪里发现 Smart Study 的？",
-    ankiStore: "Anki 插件商店", friends: "朋友", google: "Google",
-    socialMedia: "社交媒体", chatgptAI: "ChatGPT / AI", reddit: "Reddit",
     whichTheme: "您选择哪个主题？",
     changeThemeLater: "您可以稍后在设置中更改。",
     settingsTipTitle: "查找设置",
@@ -1043,7 +799,6 @@ const T = {
 ───────────────────────────────── */
 let currentScreen = 0;
 let selectedLang = 'en';
-const TOTAL = 6;
 let onboardingExtra = {errors: {}, themes: {}};
 
 window.initOnboarding = function(payload) {
@@ -1070,18 +825,6 @@ function applyLang(lang) {
     const key = el.dataset.i18n;
     if (dict[key] !== undefined) el.textContent = dict[key];
   });
-  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-    const key = el.dataset.i18nAria;
-    if (dict[key] !== undefined) el.setAttribute('aria-label', dict[key]);
-  });
-  const themeNames = (onboardingExtra.themes &&
-    (onboardingExtra.themes[lang] || onboardingExtra.themes.en)) || [];
-  document.querySelectorAll('[data-theme-index]').forEach(el => {
-    const index = Number(el.dataset.themeIndex);
-    const name = themeNames[index] || ('Theme ' + (index + 1));
-    el.setAttribute('aria-label', name);
-    el.setAttribute('title', name);
-  });
   const tipEl = document.querySelector('[data-i18n="settingsTipText"]');
   if (tipEl) {
     const rawText = dict['settingsTipText'] || '';
@@ -1106,7 +849,6 @@ function goTo(n) {
   currentScreen = n;
   document.getElementById('screen-' + currentScreen).classList.add('active');
 }
-function goBack() { if (currentScreen > 0) goTo(currentScreen === 4 ? 2 : currentScreen - 1); }  // screen 3 (survey) is skipped
 
 /* ─────────────────────────────────
    Selections (mit Button-Freischaltung!)
@@ -1121,15 +863,6 @@ function selectLang(btn) {
 function toggleNeed(btn) {
   btn.classList.toggle('selected');
   btn.setAttribute('aria-pressed', btn.classList.contains('selected'));
-}
-
-function selectOpt(btn) {
-  const group = btn.dataset.group;
-  document.querySelectorAll('[data-group="' + group + '"]').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  
-  if (group === 'role') document.getElementById('btn-next-2').disabled = false; 
-  if (group === 'source') document.getElementById('btn-next-3').disabled = false; 
 }
 
 // The accents of the add-on (same list as Settings → Appearance); Petrol is the default look.
@@ -1215,21 +948,12 @@ function finish() {
   const themeIndex = selectedThemeCard ? themeCards.indexOf(selectedThemeCard) : 0;
   const themeNumber = themeIndex + 1;
 
-  // Role: use data-value (stable key, not translated text)
-  const roleBtn = document.querySelector('[data-group="role"].selected');
-  const roleKey = roleBtn ? (roleBtn.dataset.value || 'other') : 'other';
-
-  // Source: same approach
-  const sourceBtn = document.querySelector('[data-group="source"].selected');
-  const sourceKey = sourceBtn ? (sourceBtn.dataset.value || 'other') : 'other';
-
   const needs = [...document.querySelectorAll('.need.selected')].map(b => b.dataset.need);
   const payload = {
     needs:       needs,          // what the add-on shows from the start (see _apply_onboarding_result)
     themeName:   selectedThemeCard ? selectedThemeCard.dataset.themeName : 'petrol',
     lang:        selectedLang,   // e.g. "de", "en", "ko"
-    themeNumber: themeNumber,    // 1–6  →  Python maps to theme name
-    source:      sourceKey       // "ankiStore" | "friends" | "google" | ... (for later analytics)
+    themeNumber: themeNumber     // 1–6  →  Python maps to theme name
   };
 
   // Send to Python bridge — _OnboardingPage.javaScriptConsoleMessage() picks this up

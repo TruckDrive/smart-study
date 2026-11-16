@@ -2,8 +2,6 @@
 import importlib.util
 import json
 import os
-import sys
-import types
 
 ADDON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "addon", "plan")
 spec = importlib.util.spec_from_file_location("share", os.path.join(ADDON, "share.py"))

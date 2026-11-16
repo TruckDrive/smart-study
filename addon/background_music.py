@@ -21,7 +21,6 @@ from .constants import is_night as _is_night
 import json
 import os
 import shutil
-import threading
 import traceback
 import urllib.parse
 import urllib.request
@@ -95,7 +94,6 @@ SC_STATIONS = [
     ("Jazzy Lo-Fi", "https://soundcloud.com/chill-playlister/sets/chillhop-radio-jazzy-lofi-hip"),
 ]
 SC_STATION_URLS = frozenset(url for _label, url in SC_STATIONS)
-LEGACY_SC_URLS: frozenset = frozenset()
 CK_SC_URL = "smartstudy_music_sc_url"
 CK_SC_CUSTOM_URLS = "smartstudy_music_sc_custom_urls"
 MAX_SC_CUSTOM_URLS = 30
@@ -209,12 +207,6 @@ def _load_sc_url() -> str:
             v = mw.col.get_config(CK_SC_URL, default=DEFAULT_SC_URL)
             if isinstance(v, str) and v.strip():
                 normalized = _normalize_sc_url(v)
-                # Migrate the former built-in examples only once. If the new
-                # custom list exists, the user may have deliberately saved one
-                # of those URLs and it must remain selectable.
-                custom_value = mw.col.get_config(CK_SC_CUSTOM_URLS, default=None)
-                if normalized in LEGACY_SC_URLS and custom_value is None:
-                    return DEFAULT_SC_URL
                 if normalized:
                     return normalized
     except Exception as e:
@@ -506,7 +498,6 @@ class MiniMusicPlayer(QDialog):
 
         self.player: Optional[QMediaPlayer] = None
         self.audio_output: Optional['QAudioOutput'] = None
-        self._backend_error = False
 
         # State (restored from config)
         st = _load_state()
@@ -537,8 +528,6 @@ class MiniMusicPlayer(QDialog):
             self._sc_custom_urls.append(self._sc_url)
             _save_sc_custom_urls(self._sc_custom_urls)
         self._sc_now = "SoundCloud"
-        self._sc_artwork_url = ""      # remote cover URL of the current track
-        self._sc_artwork_path = None   # local cached copy for the sidebar icon
 
         # UI readiness
         self._ui_ready = False
@@ -598,7 +587,6 @@ class MiniMusicPlayer(QDialog):
                 _ignored()
         except Exception:
             traceback.print_exc()
-            self._backend_error = True
 
     def _set_raw_vol(self, frac: float):
         """0.0 … 1.0 regardless of Qt version."""
@@ -1225,13 +1213,6 @@ class MiniMusicPlayer(QDialog):
             if now != self._sc_now:
                 self._sc_now = now
                 self._push_sc_state(now=now)
-            art = (st.get("artwork") or "").strip()
-            if art and art != self._sc_artwork_url:
-                self._sc_artwork_url = art
-                self._fetch_sc_artwork(art)
-            elif not art and self._sc_artwork_url:
-                self._sc_artwork_url = ""
-                self._sc_artwork_path = None
 
     def _set_sc_url(
         self,
@@ -1314,58 +1295,6 @@ class MiniMusicPlayer(QDialog):
                 playing=False,
                 now=_("SoundCloud could not load this URL."),
             )
-
-    def _fetch_sc_artwork(self, url: str):
-        """Download the track cover in the background, then update the sidebar."""
-        # Only fetch images from SoundCloud's own hosts.
-        try:
-            parsed = urllib.parse.urlsplit(url)
-            host = (parsed.hostname or "").lower().rstrip(".")
-        except Exception:
-            return
-        if (parsed.scheme != "https" or not
-                (host == "soundcloud.com" or host.endswith(".soundcloud.com")
-                 or host == "sndcdn.com" or host.endswith(".sndcdn.com"))):
-            return
-        dest = _sc_artwork_cache_path()
-        if not dest:
-            return
-
-        def worker():
-            try:
-                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    img = resp.read(5 * 1024 * 1024 + 1)
-                if len(img) > 5 * 1024 * 1024:
-                    return
-                if not img:
-                    return
-                tmp = dest + ".tmp"
-                with open(tmp, "wb") as f:
-                    f.write(img)
-                os.replace(tmp, dest)
-            except Exception as e:
-                print(f"Music: SC artwork download failed: {e}")
-                return
-
-            def apply():
-                try:
-                    # Only apply if this is still the current track's cover.
-                    if url == self._sc_artwork_url:
-                        self._sc_artwork_path = dest
-                except Exception:
-                    _ignored()
-
-            # Marshal back to the main thread.
-            try:
-                mw.taskman.run_on_main(apply)
-            except Exception:
-                try:
-                    QTimer.singleShot(0, apply)
-                except Exception:
-                    _ignored()
-
-        threading.Thread(target=worker, daemon=True).start()
 
     # --- Add / remove user tracks (local) ------------------------------------
 
@@ -1491,18 +1420,6 @@ class MiniMusicPlayer(QDialog):
         self.save_state()
         event.ignore()
         self.hide()
-
-def _sc_artwork_cache_path() -> Optional[str]:
-    """Local cache file for the current SoundCloud cover (profile folder)."""
-    try:
-        if mw and mw.pm and mw.pm.profileFolder():
-            folder = os.path.join(mw.pm.profileFolder(), "SmartStudy_Data")
-            os.makedirs(folder, exist_ok=True)
-            return os.path.join(folder, "sc_cover.jpg")
-    except Exception:
-        _ignored()
-    return None
-
 
 # --- Global Control ---
 

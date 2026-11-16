@@ -181,11 +181,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "Google is having trouble loading or requests verification. You can try DuckDuckGo instead. Home stays unchanged.": {"de": "Google lädt nicht richtig oder verlangt eine Sicherheitsprüfung. Du kannst stattdessen DuckDuckGo ausprobieren. Home bleibt unverändert."},
     "Try DuckDuckGo": {"de": "DuckDuckGo ausprobieren"},
     "Your Synapse level {} was carried over to Smart Study.": {"de": "Dein Synapse-Level {} wurde in Smart Study übernommen."},
-    "Your statistics, explained": {"de": "Deine Statistiken erklärt"},
-    "Understand the insights on your dashboard.": {"de": "Was die Kennzahlen auf deinem Dashboard bedeuten."},
-    "Enable the celebration types selected in Settings.": {"de": "Aktiviert die in den Einstellungen ausgewählten Erfolgsmeldungen."},
-    "Google having trouble? Try DuckDuckGo": {"de": "Probleme mit Google? DuckDuckGo ausprobieren"},
-    "Switch only if you want to. Your Home page stays unchanged.": {"de": "Du entscheidest, ob du wechselst. Deine Startseite bleibt unverändert."},
     "Show celebrations on the dashboard.": {"de": "Erfolgsmeldungen auf dem Dashboard anzeigen."},
     "Celebration": {"de": "Erfolg"},
     "+{} XP claimed.": {"de": "+{} XP abgeholt."},
@@ -283,23 +278,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     'Selected weekdays': {"de": 'Ausgewählte Wochentage'},
     'Weekly tasks repeat on the weekday you configure them. Missed tasks remain open without extra copies.': {"de": 'Wöchentliche Aufgaben wiederholen sich an dem Wochentag, an dem du sie einstellst. Verpasste Aufgaben bleiben ohne zusätzliche Kopien offen.'},
     'Choose at least one weekday.': {"de": 'Wähle mindestens einen Wochentag.'},
-    'Cancel': {"de": 'Abbrechen'},
     'Save': {"de": 'Speichern'},
     'Recurring task': {"de": 'Wiederkehrende Aufgabe'},
 
-    "Task could not be saved. Please try again.": {"de": "Die Aufgabe konnte nicht gespeichert werden. Bitte versuche es erneut."},
-    'Open Manager': {"de": 'Manager öffnen'},
-    'Open tasks': {"de": 'Offene Aufgaben'},
-    'Completed tasks': {"de": 'Erledigte Aufgaben'},
-    'Complete task': {"de": 'Aufgabe erledigen'},
 
     'Widget Content': {"de": 'Widget-Inhalt'},
     'Show facts or open tasks on the home screen. Click the task widget to open your list.': {"de": 'Zeige Fakten oder offene Aufgaben auf dem Hauptbildschirm. Ein Klick auf das Aufgabenwidget öffnet deine Liste.'},
     'Facts': {"de": 'Fakten'},
     'Tasks': {"de": 'Aufgaben'},
-    'Open all tasks': {"de": 'Alle Aufgaben öffnen'},
-    'All done. No open tasks.': {"de": 'Alles erledigt. Keine offenen Aufgaben.'},
-    'Open Tasks to view your list.': {"de": 'Öffne die Aufgabenansicht, um deine Liste zu sehen.'},
     'Facts or Tasks Widget': {"de": 'Widget für Fakten oder Aufgaben'},
     'Show the selected content on your Anki home screen.': {"de": 'Zeige den ausgewählten Inhalt auf deinem Anki-Hauptbildschirm.'},
 
@@ -469,16 +455,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "设置…",
         "hi": "सेटिंग्स…",
     },
-    "Configure Study Plan...": {
-        "de": "Lernplan konfigurieren…",
-        "es": "Configurar plan de estudio…",
-        "ko": "학습 계획 설정…",
-        "pt": "Configurar plano de estudos…",
-        "fr": "Configurer le plan d'étude…",
-        "vi": "Cấu hình kế hoạch học tập…",
-        "zh": "配置学习计划…",
-        "hi": "अध्ययन योजना कॉन्फ़िगर करें…",
-    },
     "Toggle Gamification Sidebar": {
         "de": "Gamification-Sidebar ein-/ausblenden",
         "es": "Mostrar/ocultar barra de gamificación",
@@ -543,16 +519,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "常规设置",
         "hi": "सामान्य सेटिंग्स",
     },
-    "Language:": {
-        "de": "Sprache:",
-        "es": "Idioma:",
-        "ko": "언어:",
-        "pt": "Idioma:",
-        "fr": "Langue :",
-        "vi": "Ngôn ngữ:",
-        "zh": "语言：",
-        "hi": "भाषा:",
-    },
     "Auto": {
         "de": "Automatisch",
         "es": "Automático",
@@ -562,16 +528,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Tự động",
         "zh": "自动",
         "hi": "स्वचालित",
-    },
-    "Daily Fact Topic:": {
-        "de": "Thema der täglichen Fakten:",
-        "es": "Tema de los hechos diarios:",
-        "ko": "오늘의 사실 주제:",
-        "pt": "Tópico do fato diário:",
-        "fr": "Thème du fait du jour :",
-        "vi": "Chủ đề sự kiện hàng ngày:",
-        "zh": "每日知识主题：",
-        "hi": "दैनिक तथ्य विषय:",
     },
     "Medical": {
         "de": "Medizin",
@@ -733,36 +689,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "在 AnkiWeb 评分",
         "hi": "AnkiWeb पर रेटिंग दें",
     },
-    "Home Screen Dashboard": {
-        "de": "Startseiten-Dashboard",
-        "es": "Panel de inicio",
-        "ko": "홈 화면 대시보드",
-        "pt": "Painel da tela inicial",
-        "fr": "Tableau de bord d'accueil",
-        "vi": "Bảng điều khiển màn hình chính",
-        "zh": "主屏幕仪表板",
-        "hi": "होम स्क्रीन डैशबोर्ड",
-    },
-    "Gamification Widgets (Level, XP, Streak)": {
-        "de": "Gamification-Widgets (Level, XP, Streak)",
-        "es": "Widgets de gamificación (nivel, XP, racha)",
-        "ko": "게임화 위젯 (레벨, XP, 스트릭)",
-        "pt": "Widgets de gamificação (nível, XP, sequência)",
-        "fr": "Widgets de gamification (niveau, XP, série)",
-        "vi": "Widget gamification (Cấp độ, XP, Chuỗi)",
-        "zh": "游戏化小部件（等级、XP、连击）",
-        "hi": "गेमिफिकेशन विजेट (स्तर, XP, स्ट्रीक)",
-    },
-    "Daily Widgets (Study Plan & Facts)": {
-        "de": "Tages-Widgets (Lernplan & Fakten)",
-        "es": "Widgets diarios (plan de estudio y hechos)",
-        "ko": "일일 위젯 (학습 계획 & 사실)",
-        "pt": "Widgets diários (plano de estudos e fatos)",
-        "fr": "Widgets quotidiens (plan d'étude et faits)",
-        "vi": "Widget hàng ngày (kế hoạch học & sự kiện)",
-        "zh": "每日小部件（学习计划和知识）",
-        "hi": "दैनिक विजेट (अध्ययन योजना और तथ्य)",
-    },
     "Deadline Bar": {
         "de": "Deadline-Leiste",
         "es": "Barra de fechas límite",
@@ -803,16 +729,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "启用自定义牌组仪表板",
         "hi": "कस्टम डेक डैशबोर्ड सक्षम करें",
     },
-    "Replaces the standard Deck Overview screen with a modern dashboard displaying Retention, Hard Cards, and more.": {
-        "de": "Ersetzt die Standard-Stapelübersicht durch ein modernes Dashboard mit Retention, schweren Karten und mehr.",
-        "es": "Sustituye la pantalla estándar de resumen del mazo por un panel moderno que muestra retención, tarjetas difíciles y más.",
-        "ko": "기본 덱 개요 화면을 보존율, 어려운 카드 등을 표시하는 현대적인 대시보드로 대체합니다.",
-        "pt": "Substitui a tela padrão de visão geral por um painel moderno com retenção, cartões difíceis e mais.",
-        "fr": "Remplace l'écran standard par un tableau de bord moderne affichant rétention, cartes difficiles et plus.",
-        "vi": "Thay thế màn hình tổng quan tiêu chuẩn bằng bảng điều khiển hiện đại hiển thị tỷ lệ ghi nhớ, thẻ khó và nhiều hơn nữa.",
-        "zh": "将标准牌组概览替换为显示记忆率、困难卡片等内容的现代仪表板。",
-        "hi": "मानक डेक अवलोकन स्क्रीन को रिटेंशन, कठिन कार्ड आदि दिखाने वाले आधुनिक डैशबोर्ड से बदलता है।",
-    },
     "Sidebar": {
         "de": "Sidebar",
         "es": "Barra lateral",
@@ -822,16 +738,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Thanh bên",
         "zh": "侧边栏",
         "hi": "साइडबार",
-    },
-    "Show or hide the launcher sidebar.": {
-        "de": "Launcher-Sidebar ein- oder ausblenden.",
-        "es": "Mostrar u ocultar la barra lateral del lanzador.",
-        "ko": "런처 사이드바를 표시하거나 숨깁니다.",
-        "pt": "Mostrar ou ocultar a barra lateral do iniciador.",
-        "fr": "Afficher ou masquer la barre latérale du lanceur.",
-        "vi": "Hiện hoặc ẩn thanh bên của trình khởi chạy.",
-        "zh": "显示或隐藏启动器侧边栏。",
-        "hi": "लॉन्चर साइडबार दिखाएँ या छिपाएँ।",
     },
     "Mind Map": {
         "de": "Mindmap",
@@ -863,16 +769,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "音乐播放器",
         "hi": "म्यूजिक प्लेयर",
     },
-    "Pomodoro Timer": {
-        "de": "Pomodoro-Timer",
-        "es": "Temporizador Pomodoro",
-        "ko": "포모도로 타이머",
-        "pt": "Temporizador Pomodoro",
-        "fr": "Minuterie Pomodoro",
-        "vi": "Hẹn giờ Pomodoro",
-        "zh": "番茄钟",
-        "hi": "पोमोडोरो टाइमर",
-    },
     "AI Assistant": {
         "de": "KI-Assistent",
         "es": "Asistente de IA",
@@ -902,16 +798,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Sổ tay",
         "zh": "笔记本",
         "hi": "नोटबुक",
-    },
-    "You need to restart Anki to see the changes of the Sidebar Settings.": {
-        "de": "Du musst Anki neu starten, damit die Änderungen an den Sidebar-Einstellungen wirksam werden.",
-        "es": "Debes reiniciar Anki para que los cambios en los ajustes de la barra lateral surtan efecto.",
-        "ko": "사이드바 설정 변경 사항을 적용하려면 Anki를 다시 시작해야 합니다.",
-        "pt": "Você precisa reiniciar o Anki para ver as alterações das configurações da barra lateral.",
-        "fr": "Vous devez redémarrer Anki pour appliquer les changements des paramètres de la barre latérale.",
-        "vi": "Bạn cần khởi động lại Anki để thấy các thay đổi trong cài đặt thanh bên.",
-        "zh": "您需要重启 Anki 才能看到侧边栏设置的更改。",
-        "hi": "साइडबार सेटिंग्स के बदलाव देखने के लिए Anki को पुनः प्रारंभ करें।",
     },
     "Cancel": {
         "de": "Abbrechen",
@@ -957,16 +843,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "学习计划",
         "hi": "अध्ययन योजना",
     },
-    "Study Plan Timer": {
-        "de": "Lernplan-Timer",
-        "es": "Temporizador del plan de estudio",
-        "ko": "학습 계획 타이머",
-        "pt": "Temporizador do plano de estudos",
-        "fr": "Minuterie du plan d'étude",
-        "vi": "Hẹn giờ kế hoạch học tập",
-        "zh": "学习计划计时器",
-        "hi": "अध्ययन योजना टाइमर",
-    },
     "Done": {
         "de": "Fertig",
         "es": "Hecho",
@@ -987,26 +863,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "暂停",
         "hi": "रुकें",
     },
-    "Paused": {
-        "de": "Pausiert",
-        "es": "Pausado",
-        "ko": "일시정지됨",
-        "pt": "Pausado",
-        "fr": "En pause",
-        "vi": "Đã tạm dừng",
-        "zh": "已暂停",
-        "hi": "रुका हुआ",
-    },
-    "Resume": {
-        "de": "Fortsetzen",
-        "es": "Reanudar",
-        "ko": "재개",
-        "pt": "Retomar",
-        "fr": "Reprendre",
-        "vi": "Tiếp tục",
-        "zh": "继续",
-        "hi": "फिर शुरू करें",
-    },
     "Reset": {
         "de": "Zurücksetzen",
         "es": "Restablecer",
@@ -1016,86 +872,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Đặt lại",
         "zh": "重置",
         "hi": "रीसेट",
-    },
-    "Timer is running": {
-        "de": "Timer läuft",
-        "es": "El temporizador está en marcha",
-        "ko": "타이머 실행 중",
-        "pt": "Temporizador em execução",
-        "fr": "Minuterie en cours",
-        "vi": "Bộ đếm giờ đang chạy",
-        "zh": "计时器运行中",
-        "hi": "टाइमर चल रहा है",
-    },
-    "Timer is paused": {
-        "de": "Timer pausiert",
-        "es": "Temporizador en pausa",
-        "ko": "타이머 일시정지",
-        "pt": "Temporizador pausado",
-        "fr": "Minuterie en pause",
-        "vi": "Bộ đếm giờ đã tạm dừng",
-        "zh": "计时器已暂停",
-        "hi": "टाइमर रुका है",
-    },
-    "Add subjects": {
-        "de": "Fächer hinzufügen",
-        "es": "Añadir asignaturas",
-        "ko": "과목 추가",
-        "pt": "Adicionar disciplinas",
-        "fr": "Ajouter des matières",
-        "vi": "Thêm môn học",
-        "zh": "添加科目",
-        "hi": "विषय जोड़ें",
-    },
-    "Subject finished": {
-        "de": "Fach abgeschlossen",
-        "es": "Asignatura finalizada",
-        "ko": "과목 완료",
-        "pt": "Disciplina concluída",
-        "fr": "Matière terminée",
-        "vi": "Môn học hoàn thành",
-        "zh": "科目完成",
-        "hi": "विषय पूर्ण",
-    },
-    "Finished learning %s!": {
-        "de": "%s fertig gelernt!",
-        "es": "¡Has terminado de estudiar %s!",
-        "ko": "%s 학습 완료!",
-        "pt": "Aprendizado de %s concluído!",
-        "fr": "Apprentissage de %s terminé !",
-        "vi": "Đã học xong %s!",
-        "zh": "%s 学习完成！",
-        "hi": "%s सीखना पूरा हुआ!",
-    },
-    "No learning plan configured yet.": {
-        "de": "Noch kein Lernplan konfiguriert.",
-        "es": "Aún no hay ningún plan de estudio configurado.",
-        "ko": "아직 학습 계획이 설정되지 않았습니다.",
-        "pt": "Nenhum plano de estudos configurado ainda.",
-        "fr": "Aucun plan d'étude configuré pour l'instant.",
-        "vi": "Chưa cấu hình kế hoạch học tập.",
-        "zh": "尚未配置学习计划。",
-        "hi": "अभी तक कोई अध्ययन योजना कॉन्फ़िगर नहीं की गई।",
-    },
-    "No study plan configured.": {
-        "de": "Kein Lernplan konfiguriert.",
-        "es": "No hay ningún plan de estudio configurado.",
-        "ko": "설정된 학습 계획이 없습니다.",
-        "pt": "Nenhum plano de estudos configurado.",
-        "fr": "Aucun plan d’étude configuré.",
-        "vi": "Chưa cấu hình kế hoạch học tập.",
-        "zh": "尚未配置学习计划。",
-        "hi": "कोई अध्ययन योजना कॉन्फ़िगर नहीं की गई है।",
-    },
-    "Unknown Subject": {
-        "de": "Unbekanntes Fach",
-        "es": "Asignatura desconocida",
-        "ko": "알 수 없는 과목",
-        "pt": "Disciplina desconhecida",
-        "fr": "Matière inconnue",
-        "vi": "Môn học không xác định",
-        "zh": "未知科目",
-        "hi": "अज्ञात विषय",
     },
     "Daily Medical Fact": {
         "de": "Medizin-Fakt des Tages",
@@ -1107,16 +883,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "今日医学知识",
         "hi": "आज का चिकित्सा तथ्य",
     },
-    "Daily Legal Fact": {
-        "de": "Rechts-Fakt des Tages",
-        "es": "Dato jurídico del día",
-        "ko": "오늘의 법률 사실",
-        "pt": "Fato jurídico do dia",
-        "fr": "Fait juridique du jour",
-        "vi": "Sự kiện pháp luật hôm nay",
-        "zh": "今日法律知识",
-        "hi": "आज का कानूनी तथ्य",
-    },
     "Daily General Fact": {
         "de": "Allgemeiner Fakt des Tages",
         "es": "Dato general del día",
@@ -1127,66 +893,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "今日常识",
         "hi": "आज का सामान्य तथ्य",
     },
-    "Daily Country Fact": {
-        "de": "Länder-Fakt des Tages",
-        "es": "Dato de país del día",
-        "ko": "오늘의 국가 사실",
-        "pt": "Fato sobre países do dia",
-        "fr": "Fait sur les pays du jour",
-        "vi": "Sự kiện về quốc gia hôm nay",
-        "zh": "今日国家知识",
-        "hi": "आज का देश तथ्य",
-    },
-    "No daily facts available.": {
-        "de": "Keine täglichen Fakten verfügbar.",
-        "es": "No hay datos diarios disponibles.",
-        "ko": "오늘의 사실을 사용할 수 없습니다.",
-        "pt": "Nenhum fato diário disponível.",
-        "fr": "Aucun fait du jour disponible.",
-        "vi": "Không có sự kiện nào hôm nay.",
-        "zh": "没有每日知识可用。",
-        "hi": "कोई दैनिक तथ्य उपलब्ध नहीं।",
-    },
-    "Fact text missing.": {
-        "de": "Fakten-Text fehlt.",
-        "es": "Falta el texto del dato.",
-        "ko": "사실 텍스트가 없습니다.",
-        "pt": "Texto do fato ausente.",
-        "fr": "Texte du fait manquant.",
-        "vi": "Thiếu văn bản sự kiện.",
-        "zh": "缺少知识文本。",
-        "hi": "तथ्य पाठ अनुपलब्ध।",
-    },
-    "Error loading daily fact.": {
-        "de": "Fehler beim Laden des täglichen Fakts.",
-        "es": "Error al cargar el dato del día.",
-        "ko": "오늘의 사실을 불러오는 중 오류가 발생했습니다.",
-        "pt": "Erro ao carregar o fato do dia.",
-        "fr": "Erreur lors du chargement du fait du jour.",
-        "vi": "Lỗi khi tải sự kiện hàng ngày.",
-        "zh": "加载每日知识时出错。",
-        "hi": "दैनिक तथ्य लोड करने में त्रुटि।",
-    },
-    "Fact Image": {
-        "de": "Fakten-Bild",
-        "es": "Imagen del dato",
-        "ko": "사실 이미지",
-        "pt": "Imagem do fato",
-        "fr": "Image du fait",
-        "vi": "Hình ảnh sự kiện",
-        "zh": "知识图片",
-        "hi": "तथ्य छवि",
-    },
-    "Missing": {
-        "de": "Fehlt",
-        "es": "Falta",
-        "ko": "없음",
-        "pt": "Ausente",
-        "fr": "Manquant",
-        "vi": "Thiếu",
-        "zh": "缺失",
-        "hi": "अनुपलब्ध",
-    },
     "Error": {
         "de": "Fehler",
         "es": "Error",
@@ -1196,66 +902,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Lỗi",
         "zh": "错误",
         "hi": "त्रुटि",
-    },
-    "Load Error": {
-        "de": "Ladefehler",
-        "es": "Error de carga",
-        "ko": "로드 오류",
-        "pt": "Erro de carregamento",
-        "fr": "Erreur de chargement",
-        "vi": "Lỗi tải",
-        "zh": "加载错误",
-        "hi": "लोड त्रुटि",
-    },
-    "No Image": {
-        "de": "Kein Bild",
-        "es": "Sin imagen",
-        "ko": "이미지 없음",
-        "pt": "Sem imagem",
-        "fr": "Pas d'image",
-        "vi": "Không có hình ảnh",
-        "zh": "无图片",
-        "hi": "कोई छवि नहीं",
-    },
-    "{} sec": {
-        "de": "{} Sek.",
-        "es": "{} s",
-        "ko": "{} 초",
-        "pt": "{} s",
-        "fr": "{} s",
-        "vi": "{} giây",
-        "zh": "{} 秒",
-        "hi": "{} से.",
-    },
-    "{} min": {
-        "de": "{} Min.",
-        "es": "{} min",
-        "ko": "{} 분",
-        "pt": "{} min",
-        "fr": "{} min",
-        "vi": "{} phút",
-        "zh": "{} 分钟",
-        "hi": "{} मि.",
-    },
-    "{} h": {
-        "de": "{} Std.",
-        "es": "{} h",
-        "ko": "{} 시간",
-        "pt": "{} h",
-        "fr": "{} h",
-        "vi": "{} giờ",
-        "zh": "{} 小时",
-        "hi": "{} घं.",
-    },
-    "{} h {} min": {
-        "de": "{} Std. {} Min.",
-        "es": "{} h {} min",
-        "ko": "{} 시간 {} 분",
-        "pt": "{} h {} min",
-        "fr": "{} h {} min",
-        "vi": "{} giờ {} phút",
-        "zh": "{} 小时 {} 分钟",
-        "hi": "{} घं. {} मि.",
     },
 
     # ================================================================= #
@@ -1270,26 +916,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Cấp bậc không xác định",
         "zh": "未知等级",
         "hi": "अज्ञात रैंक",
-    },
-    "Level Up! Lvl {}!": {
-        "de": "Level-Up! Level {}!",
-        "es": "¡Subiste de nivel! ¡Nivel {}!",
-        "ko": "레벨 업! 레벨 {}!",
-        "pt": "Subiu de nível! Nível {}!",
-        "fr": "Niveau supérieur ! Niv. {} !",
-        "vi": "Lên cấp! Cấp {}!",
-        "zh": "升级！等级 {}！",
-        "hi": "लेवल अप! स्तर {}!",
-    },
-    "New Rank: {}!": {
-        "de": "Neuer Rang: {}!",
-        "es": "¡Nuevo rango: {}!",
-        "ko": "새 등급: {}!",
-        "pt": "Novo rank: {}!",
-        "fr": "Nouveau rang : {} !",
-        "vi": "Cấp bậc mới: {}!",
-        "zh": "新等级：{}！",
-        "hi": "नया रैंक: {}!",
     },
     "Streak: {} days!\n+{} XP Bonus": {
         "de": "Streak: {} Tage!\n+{} XP Bonus",
@@ -1331,46 +957,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "挑战完成！+{} XP",
         "hi": "चुनौती पूरी! +{} XP",
     },
-    "Reset all {} Gamification data?": {
-        "de": "Alle {}-Gamification-Daten zurücksetzen?",
-        "es": "¿Restablecer todos los datos de gamificación de {}?",
-        "ko": "모든 {} 게임화 데이터를 초기화하시겠습니까?",
-        "pt": "Redefinir todos os dados de gamificação de {}?",
-        "fr": "Réinitialiser toutes les données de gamification de {} ?",
-        "vi": "Đặt lại tất cả dữ liệu gamification của {}?",
-        "zh": "重置所有 {} 游戏化数据？",
-        "hi": "सभी {} गेमिफिकेशन डेटा रीसेट करें?",
-    },
-    "Delete Study Plan?": {
-        "de": "Lernplan löschen?",
-        "es": "¿Eliminar el plan de estudio?",
-        "ko": "학습 계획을 삭제하시겠습니까?",
-        "pt": "Excluir plano de estudos?",
-        "fr": "Supprimer le plan d'étude ?",
-        "vi": "Xóa kế hoạch học tập?",
-        "zh": "删除学习计划？",
-        "hi": "अध्ययन योजना हटाएं?",
-    },
-    "Also delete Study Plan config?": {
-        "de": "Lernplan-Konfiguration ebenfalls löschen?",
-        "es": "¿Eliminar también la configuración del plan de estudio?",
-        "ko": "학습 계획 설정도 삭제하시겠습니까?",
-        "pt": "Também excluir a configuração do plano de estudos?",
-        "fr": "Supprimer aussi la configuration du plan d'étude ?",
-        "vi": "Cũng xóa cấu hình kế hoạch học tập?",
-        "zh": "同时删除学习计划配置？",
-        "hi": "अध्ययन योजना कॉन्फ़िगरेशन भी हटाएं?",
-    },
-    "{} data reset.": {
-        "de": "{}-Daten zurückgesetzt.",
-        "es": "Datos de {} restablecidos.",
-        "ko": "{} 데이터가 초기화되었습니다.",
-        "pt": "Dados de {} redefinidos.",
-        "fr": "Données de {} réinitialisées.",
-        "vi": "Dữ liệu {} đã được đặt lại.",
-        "zh": "{} 数据已重置。",
-        "hi": "{} डेटा रीसेट हुआ।",
-    },
     "Streak": {
         "de": "Streak",
         "es": "Racha",
@@ -1380,16 +966,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Chuỗi",
         "zh": "连击",
         "hi": "स्ट्रीक",
-    },
-    "Days": {
-        "de": "Tage",
-        "es": "Días",
-        "ko": "일",
-        "pt": "Dias",
-        "fr": "Jours",
-        "vi": "Ngày",
-        "zh": "天",
-        "hi": "दिन",
     },
     "Daily Challenge": {
         "de": "Tages-Challenge",
@@ -1401,70 +977,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "每日挑战",
         "hi": "दैनिक चुनौती",
     },
-    "Next Level": {
-        "de": "Nächstes Level",
-        "es": "Siguiente nivel",
-        "ko": "다음 레벨",
-        "pt": "Próximo nível",
-        "fr": "Niveau suivant",
-        "vi": "Cấp tiếp theo",
-        "zh": "下一等级",
-        "hi": "अगला स्तर",
-    },
-    "remaining: {} XP": {
-        "de": "noch: {} XP",
-        "es": "restantes: {} XP",
-        "ko": "남은: {} XP",
-        "pt": "restantes: {} XP",
-        "fr": "restants : {} XP",
-        "vi": "còn lại: {} XP",
-        "zh": "剩余：{} XP",
-        "hi": "शेष: {} XP",
-    },
-    "Max Level Reached ({} XP Total)": {
-        "de": "Maximales Level erreicht ({} XP gesamt)",
-        "es": "Nivel máximo alcanzado ({} XP en total)",
-        "ko": "최대 레벨 달성 ({} XP 합계)",
-        "pt": "Nível máximo atingido ({} XP no total)",
-        "fr": "Niveau maximum atteint ({} XP au total)",
-        "vi": "Đạt cấp tối đa ({} XP tổng cộng)",
-        "zh": "已达最高等级（共 {} XP）",
-        "hi": "अधिकतम स्तर प्राप्त ({} XP कुल)",
-    },
 
     # ================================================================= #
     # sidebar.py
     # ================================================================= #
-    "Level: ?": {
-        "de": "Level: ?",
-        "es": "Nivel: ?",
-        "ko": "레벨: ?",
-        "pt": "Nível: ?",
-        "fr": "Niveau : ?",
-        "vi": "Cấp độ: ?",
-        "zh": "等级：?",
-        "hi": "स्तर: ?",
-    },
-    "Rank: ???": {
-        "de": "Rang: ???",
-        "es": "Rango: ???",
-        "ko": "등급: ???",
-        "pt": "Rank: ???",
-        "fr": "Rang : ???",
-        "vi": "Cấp bậc: ???",
-        "zh": "等级：???",
-        "hi": "रैंक: ???",
-    },
-    "XP: ? / ?": {
-        "de": "XP: ? / ?",
-        "es": "XP: ? / ?",
-        "ko": "XP: ? / ?",
-        "pt": "XP: ? / ?",
-        "fr": "XP : ? / ?",
-        "vi": "XP: ? / ?",
-        "zh": "XP：? / ?",
-        "hi": "XP: ? / ?",
-    },
     "Next Goal": {
         "de": "Nächstes Ziel",
         "es": "Próximo objetivo",
@@ -1474,36 +990,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Mục tiêu tiếp theo",
         "zh": "下一目标",
         "hi": "अगला लक्ष्य",
-    },
-    "Loading next goal...": {
-        "de": "Lade nächstes Ziel…",
-        "es": "Cargando próximo objetivo…",
-        "ko": "다음 목표 불러오는 중…",
-        "pt": "Carregando próximo objetivo…",
-        "fr": "Chargement du prochain objectif…",
-        "vi": "Đang tải mục tiêu tiếp theo…",
-        "zh": "加载下一目标中…",
-        "hi": "अगला लक्ष्य लोड हो रहा है…",
-    },
-    "? Day Streak": {
-        "de": "? Tage Streak",
-        "es": "Racha de ? días",
-        "ko": "? 일 스트릭",
-        "pt": "Sequência de ? dias",
-        "fr": "Série de ? jours",
-        "vi": "Chuỗi ? ngày",
-        "zh": "? 天连击",
-        "hi": "? दिन की स्ट्रीक",
-    },
-    "Loading challenge...": {
-        "de": "Lade Challenge…",
-        "es": "Cargando reto…",
-        "ko": "챌린지 불러오는 중…",
-        "pt": "Carregando desafio…",
-        "fr": "Chargement du défi…",
-        "vi": "Đang tải thử thách…",
-        "zh": "加载挑战中…",
-        "hi": "चुनौती लोड हो रही है…",
     },
     "Loading...": {
         "de": "Lade…",
@@ -1559,30 +1045,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "de": "Level", "es": "Nivel", "ko": "레벨", "pt": "Nível",
         "fr": "Niveau", "vi": "Cấp độ", "zh": "等级", "hi": "स्तर",
     },
-    "Daily Fact": {
-        "de": "Täglicher Fakt", "es": "Dato diario", "ko": "오늘의 상식", "pt": "Fato diário",
-        "fr": "Fait du jour", "vi": "Sự thật hằng ngày", "zh": "每日知识", "hi": "दैनिक तथ्य",
-    },
-    "{} Day Streak": {
-        "de": "{} Tag Streak",
-        "es": "Racha de {} día",
-        "ko": "{} 일 스트릭",
-        "pt": "Sequência de {} dia",
-        "fr": "Série de {} jour",
-        "vi": "Chuỗi {} ngày",
-        "zh": "{} 天连击",
-        "hi": "{} दिन की स्ट्रीक",
-    },
-    "{} Days Streak": {
-        "de": "{} Tage Streak",
-        "es": "Racha de {} días",
-        "ko": "{} 일 스트릭",
-        "pt": "Sequência de {} dias",
-        "fr": "Série de {} jours",
-        "vi": "Chuỗi {} ngày",
-        "zh": "{} 天连击",
-        "hi": "{} दिनों की स्ट्रीक",
-    },
     "{} Day": {
         "de": "{} Tag",
         "es": "{} día",
@@ -1633,16 +1095,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "下一等级所需：{}",
         "hi": "अगले स्तर के लिए आवश्यक: {}",
     },
-    "Current streak bonus: +{} XP per day.\n(Formula: 20 XP \u00d7 {} days)": {
-        "de": "Aktueller Streak-Bonus: +{} XP pro Tag.\n(Formel: 20 XP \u00d7 {} Tage)",
-        "es": "Bonificación actual de racha: +{} XP por día.\n(Fórmula: 20 XP \u00d7 {} días)",
-        "ko": "현재 스트릭 보너스: +{} XP/일.\n(공식: 20 XP \u00d7 {} 일)",
-        "pt": "Bônus de sequência atual: +{} XP por dia.\n(Fórmula: 20 XP \u00d7 {} dias)",
-        "fr": "Bonus de série actuel : +{} XP par jour.\n(Formule : 20 XP \u00d7 {} jours)",
-        "vi": "Thưởng chuỗi hiện tại: +{} XP/ngày.\n(Công thức: 20 XP \u00d7 {} ngày)",
-        "zh": "当前连击奖励：+{} XP/天。\n（公式：20 XP \u00d7 {} 天）",
-        "hi": "वर्तमान स्ट्रीक बोनस: +{} XP प्रति दिन।\n(सूत्र: 20 XP \u00d7 {} दिन)",
-    },
     "Completed": {
         "de": "Abgeschlossen",
         "es": "Completado",
@@ -1652,36 +1104,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Đã hoàn thành",
         "zh": "已完成",
         "hi": "पूर्ण",
-    },
-    "Complete (+{} XP)": {
-        "de": "Abschließen (+{} XP)",
-        "es": "Completar (+{} XP)",
-        "ko": "완료 (+{} XP)",
-        "pt": "Completar (+{} XP)",
-        "fr": "Terminer (+{} XP)",
-        "vi": "Hoàn thành (+{} XP)",
-        "zh": "完成 (+{} XP)",
-        "hi": "पूर्ण (+{} XP)",
-    },
-    "Click to gain {} XP.": {
-        "de": "Klicken, um {} XP zu erhalten.",
-        "es": "Haz clic para ganar {} XP.",
-        "ko": "클릭하여 {} XP 획득.",
-        "pt": "Clique para ganhar {} XP.",
-        "fr": "Cliquez pour gagner {} XP.",
-        "vi": "Nhấn để nhận {} XP.",
-        "zh": "点击获得 {} XP。",
-        "hi": "{} XP पाने के लिए क्लिक करें।",
-    },
-    "Only {} XP until:": {
-        "de": "Nur noch {} XP bis:",
-        "es": "Solo {} XP hasta:",
-        "ko": "다음까지 {} XP 남음:",
-        "pt": "Faltam apenas {} XP para:",
-        "fr": "Plus que {} XP jusqu'à :",
-        "vi": "Chỉ còn {} XP đến:",
-        "zh": "距下一目标仅剩 {} XP：",
-        "hi": "केवल {} XP और चाहिए:",
     },
     "Maximum Rank Achieved!": {
         "de": "Maximalen Rang erreicht!",
@@ -1723,26 +1145,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "（已锁定）",
         "hi": "(लॉक)",
     },
-    "Image not found: {}": {
-        "de": "Bild nicht gefunden: {}",
-        "es": "Imagen no encontrada: {}",
-        "ko": "이미지를 찾을 수 없음: {}",
-        "pt": "Imagem não encontrada: {}",
-        "fr": "Image introuvable : {}",
-        "vi": "Không tìm thấy hình ảnh: {}",
-        "zh": "找不到图片：{}",
-        "hi": "छवि नहीं मिली: {}",
-    },
-    "Error loading guide.": {
-        "de": "Fehler beim Laden der Anleitung.",
-        "es": "Error al cargar la guía.",
-        "ko": "가이드를 불러오는 중 오류가 발생했습니다.",
-        "pt": "Erro ao carregar o guia.",
-        "fr": "Erreur lors du chargement du guide.",
-        "vi": "Lỗi khi tải hướng dẫn.",
-        "zh": "加载指南时出错。",
-        "hi": "गाइड लोड करने में त्रुटि।",
-    },
     "Error: Gamification Manager not available.": {
         "de": "Fehler: Gamification-Manager nicht verfügbar.",
         "es": "Error: el gestor de gamificación no está disponible.",
@@ -1763,40 +1165,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "发生了错误。",
         "hi": "एक त्रुटि हुई।",
     },
-    "<p style=\"margin-bottom: 8px;\">Earn XP, level up, and climb the ranks while studying!</p><p style=\"margin-bottom: 2px;\"><b>How to Earn XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Study Time:</b> 10 XP per minute.</li><li><b>Daily Challenge:</b> Bonus XP based on level.</li><li><b>Streak:</b> 20 XP \u00d7 current streak day.</li></ul><p style=\"margin-bottom: 2px;\"><b>Leveling & Ranks</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Max Level: 100.</li><li>New Rank every 5 levels.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Tip: Consistency is key!</i></p>": {
-        "de": "<p style=\"margin-bottom: 8px;\">Verdiene XP, steige im Level auf und klettere die Ränge hoch, während du lernst!</p><p style=\"margin-bottom: 2px;\"><b>So verdienst du XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Lernzeit:</b> 10 XP pro Minute.</li><li><b>Tages-Challenge:</b> Bonus-XP je nach Level.</li><li><b>Streak:</b> 20 XP \u00d7 aktueller Streak-Tag.</li></ul><p style=\"margin-bottom: 2px;\"><b>Level & Ränge</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Maximales Level: 100.</li><li>Neuer Rang alle 5 Level.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Tipp: Beständigkeit ist der Schlüssel!</i></p>",
-        "es": "<p style=\"margin-bottom: 8px;\">¡Gana XP, sube de nivel y escala los rangos mientras estudias!</p><p style=\"margin-bottom: 2px;\"><b>Cómo ganar XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Tiempo de estudio:</b> 10 XP por minuto.</li><li><b>Reto diario:</b> XP de bonificación según el nivel.</li><li><b>Racha:</b> 20 XP \u00d7 día actual de la racha.</li></ul><p style=\"margin-bottom: 2px;\"><b>Niveles y rangos</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Nivel máximo: 100.</li><li>Nuevo rango cada 5 niveles.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Consejo: ¡la constancia es la clave!</i></p>",
-        "ko": "<p style=\"margin-bottom: 8px;\">학습하면서 XP를 얻고 레벨을 올려 등급을 높이세요!</p><p style=\"margin-bottom: 2px;\"><b>XP 획득 방법</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>학습 시간:</b> 분당 10 XP.</li><li><b>오늘의 챌린지:</b> 레벨에 따른 보너스 XP.</li><li><b>스트릭:</b> 20 XP \u00d7 현재 스트릭 일수.</li></ul><p style=\"margin-bottom: 2px;\"><b>레벨 & 등급</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>최대 레벨: 100.</li><li>5레벨마다 새 등급.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>팁: 꾸준함이 핵심입니다!</i></p>",
-        "pt": "<p style=\"margin-bottom: 8px;\">Ganhe XP, suba de nível e escale os ranks enquanto estuda!</p><p style=\"margin-bottom: 2px;\"><b>Como Ganhar XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Tempo de Estudo:</b> 10 XP por minuto.</li><li><b>Desafio Diário:</b> XP de bônus baseado no nível.</li><li><b>Sequência:</b> 20 XP \u00d7 dia atual da sequência.</li></ul><p style=\"margin-bottom: 2px;\"><b>Níveis e Ranks</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Nível Máximo: 100.</li><li>Novo rank a cada 5 níveis.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Dica: Consistência é a chave!</i></p>",
-        "fr": "<p style=\"margin-bottom: 8px;\">Gagnez des XP, montez de niveau et grimpez les rangs en étudiant !</p><p style=\"margin-bottom: 2px;\"><b>Comment gagner des XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Temps d'étude :</b> 10 XP par minute.</li><li><b>Défi quotidien :</b> XP bonus selon le niveau.</li><li><b>Série :</b> 20 XP \u00d7 jour actuel de la série.</li></ul><p style=\"margin-bottom: 2px;\"><b>Niveaux et rangs</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Niveau maximum : 100.</li><li>Nouveau rang tous les 5 niveaux.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Conseil : la régularité est la clé !</i></p>",
-        "vi": "<p style=\"margin-bottom: 8px;\">Kiếm XP, lên cấp và leo hạng khi học!</p><p style=\"margin-bottom: 2px;\"><b>Cách Kiếm XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>Thời gian học:</b> 10 XP mỗi phút.</li><li><b>Thử thách hàng ngày:</b> XP thưởng theo cấp độ.</li><li><b>Chuỗi:</b> 20 XP \u00d7 ngày chuỗi hiện tại.</li></ul><p style=\"margin-bottom: 2px;\"><b>Cấp độ & Hạng</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>Cấp tối đa: 100.</li><li>Hạng mới mỗi 5 cấp.</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>Mẹo: Kiên trì là chìa khóa!</i></p>",
-        "zh": "<p style=\"margin-bottom: 8px;\">学习时积累 XP，提升等级，攀登排行榜！</p><p style=\"margin-bottom: 2px;\"><b>如何获取 XP</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>学习时间：</b>每分钟 10 XP。</li><li><b>每日挑战：</b>基于等级的奖励 XP。</li><li><b>连击：</b>20 XP \u00d7 当前连击天数。</li></ul><p style=\"margin-bottom: 2px;\"><b>升级与排名</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>最高等级：100。</li><li>每 5 级晋升新等级。</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>提示：坚持是关键！</i></p>",
-        "hi": "<p style=\"margin-bottom: 8px;\">पढ़ते हुए XP कमाएं, लेवल अप करें और रैंक चढ़ें!</p><p style=\"margin-bottom: 2px;\"><b>XP कैसे कमाएं</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li><b>अध्ययन समय:</b> प्रति मिनट 10 XP।</li><li><b>दैनिक चुनौती:</b> स्तर के अनुसार बोनस XP।</li><li><b>स्ट्रीक:</b> 20 XP \u00d7 वर्तमान स्ट्रीक दिन।</li></ul><p style=\"margin-bottom: 2px;\"><b>लेवलिंग और रैंक</b></p><ul style=\"margin-top: 0px; margin-bottom: 8px; padding-left: 20px;\"><li>अधिकतम स्तर: 100।</li><li>हर 5 स्तरों पर नया रैंक।</li></ul><p style=\"margin-top: 5px; color: {sec_color};\"><i>सुझाव: निरंतरता ही कुंजी है!</i></p>",
-    },
 
     # ================================================================= #
     # study_plan_trigger.py
     # ================================================================= #
-    "Error triggering Study Plan Deadline action: {}": {
-        "de": "Fehler beim Auslösen der Lernplan-Deadline-Aktion: {}",
-        "es": "Error al activar la acción del plan de estudio: {}",
-        "ko": "학습 계획 마감일 작업 실행 오류: {}",
-        "pt": "Erro ao acionar ação de prazo do plano de estudos: {}",
-        "fr": "Erreur lors du déclenchement de l'action d'échéance du plan d'étude : {}",
-        "vi": "Lỗi kích hoạt hành động thời hạn kế hoạch học tập: {}",
-        "zh": "触发学习计划截止日期操作时出错：{}",
-        "hi": "अध्ययन योजना डेडलाइन क्रिया ट्रिगर करने में त्रुटि: {}",
-    },
-    "Cannot trigger Study Plan Deadline: Function not initialized by main addon.": {
-        "de": "Lernplan-Deadline kann nicht ausgelöst werden: Funktion wurde vom Haupt-Add-on nicht initialisiert.",
-        "es": "No se puede activar el plan de estudio: el add-on principal no inicializó la función.",
-        "ko": "학습 계획 마감일을 실행할 수 없음: 기능이 메인 애드온에 의해 초기화되지 않았습니다.",
-        "pt": "Não é possível acionar o prazo do plano de estudos: função não inicializada pelo complemento principal.",
-        "fr": "Impossible de déclencher l'échéance du plan d'étude : fonction non initialisée par le module principal.",
-        "vi": "Không thể kích hoạt thời hạn kế hoạch học tập: chức năng chưa được khởi tạo bởi tiện ích chính.",
-        "zh": "无法触发学习计划截止日期：功能未由主插件初始化。",
-        "hi": "अध्ययन योजना डेडलाइन ट्रिगर नहीं हो सकती: मुख्य ऐड-ऑन द्वारा फ़ंक्शन प्रारंभ नहीं किया गया।",
-    },
     "Error triggering Gamification Sidebar action: {}": {
         "de": "Fehler beim Auslösen der Gamification-Sidebar-Aktion: {}",
         "es": "Error al activar la acción de la barra de gamificación: {}",
@@ -1821,26 +1193,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ================================================================= #
     # deadline_bar.py
     # ================================================================= #
-    "My Project Deadline": {
-        "de": "Mein Projekt-Deadline",
-        "es": "Fecha límite de mi proyecto",
-        "ko": "내 프로젝트 마감일",
-        "pt": "Prazo do meu projeto",
-        "fr": "Échéance de mon projet",
-        "vi": "Thời hạn dự án của tôi",
-        "zh": "我的项目截止日期",
-        "hi": "मेरी परियोजना की समयसीमा",
-    },
-    "Default Title": {
-        "de": "Standardtitel",
-        "es": "Título predeterminado",
-        "ko": "기본 제목",
-        "pt": "Título padrão",
-        "fr": "Titre par défaut",
-        "vi": "Tiêu đề mặc định",
-        "zh": "默认标题",
-        "hi": "डिफ़ॉल्ट शीर्षक",
-    },
     "Deadline": {
         "de": "Deadline",
         "es": "Fecha límite",
@@ -1921,120 +1273,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "错误：{}",
         "hi": "त्रुटि: {}",
     },
-    "Configure Deadline via Tools Menu": {
-        "de": "Deadline über das Werkzeuge-Menü konfigurieren",
-        "es": "Configurar la fecha límite desde el menú Herramientas",
-        "ko": "도구 메뉴에서 마감일 설정",
-        "pt": "Configurar prazo pelo menu Ferramentas",
-        "fr": "Configurer l'échéance via le menu Outils",
-        "vi": "Cấu hình thời hạn qua menu Công cụ",
-        "zh": "通过工具菜单配置截止日期",
-        "hi": "टूल्स मेनू के माध्यम से समयसीमा कॉन्फ़िगर करें",
-    },
-    "Configure in Tools -> Gamification Widgets -> Configure Study Plan & Deadline": {
-        "de": "Konfiguration über Werkzeuge \u2192 Gamification-Widgets \u2192 Lernplan & Deadline konfigurieren",
-        "es": "Configura en Herramientas \u2192 Widgets de gamificación \u2192 Configurar plan de estudio y fecha límite",
-        "ko": "도구 \u2192 게임화 위젯 \u2192 학습 계획 및 마감일 설정에서 구성하세요",
-        "pt": "Configure em Ferramentas \u2192 Widgets de gamificação \u2192 Configurar plano de estudos e prazo",
-        "fr": "Configurez dans Outils \u2192 Widgets de gamification \u2192 Configurer le plan d'étude et l'échéance",
-        "vi": "Cấu hình trong Công cụ \u2192 Widget gamification \u2192 Cấu hình kế hoạch học tập & thời hạn",
-        "zh": "在工具 \u2192 游戏化小部件 \u2192 配置学习计划和截止日期中设置",
-        "hi": "टूल्स \u2192 गेमिफिकेशन विजेट \u2192 अध्ययन योजना और समयसीमा कॉन्फ़िगर करें में सेट करें",
-    },
 
     # ================================================================= #
     # learning_plan.py
     # ================================================================= #
-    "Cannot start timer: '{}' not planned for today.": {
-        "de": "Timer kann nicht gestartet werden: '{}' ist heute nicht geplant.",
-        "es": "No se puede iniciar el temporizador: '{}' no está planeado para hoy.",
-        "ko": "타이머를 시작할 수 없음: '{}'은(는) 오늘 계획되지 않았습니다.",
-        "pt": "Não é possível iniciar o temporizador: '{}' não está planejado para hoje.",
-        "fr": "Impossible de démarrer la minuterie : '{}' n'est pas prévu aujourd'hui.",
-        "vi": "Không thể bắt đầu bộ đếm giờ: '{}' không được lên kế hoạch hôm nay.",
-        "zh": "无法启动计时器：'{}'今天没有计划。",
-        "hi": "टाइमर शुरू नहीं हो सकता: '{}' आज के लिए योजनाबद्ध नहीं है।",
-    },
-    "'{}' is already completed.": {
-        "de": "'{}' ist bereits abgeschlossen.",
-        "es": "'{}' ya está completado.",
-        "ko": "'{}'은(는) 이미 완료되었습니다.",
-        "pt": "'{}' já está concluído.",
-        "fr": "'{}' est déjà terminé.",
-        "vi": "'{}' đã hoàn thành.",
-        "zh": "'{}' 已完成。",
-        "hi": "'{}' पहले ही पूरा हो चुका है।",
-    },
-    "Timer for '{}' is already running.": {
-        "de": "Timer für '{}' läuft bereits.",
-        "es": "El temporizador de '{}' ya está en marcha.",
-        "ko": "'{}'의 타이머가 이미 실행 중입니다.",
-        "pt": "O temporizador de '{}' já está em execução.",
-        "fr": "La minuterie de '{}' est déjà en cours.",
-        "vi": "Bộ đếm giờ cho '{}' đang chạy rồi.",
-        "zh": "'{}'的计时器已在运行。",
-        "hi": "'{}' के लिए टाइमर पहले से चल रहा है।",
-    },
-    "Cannot pause timer: '{}' not planned for today.": {
-        "de": "Timer kann nicht pausiert werden: '{}' ist heute nicht geplant.",
-        "es": "No se puede pausar el temporizador: '{}' no está planeado para hoy.",
-        "ko": "타이머를 일시정지할 수 없음: '{}'은(는) 오늘 계획되지 않았습니다.",
-        "pt": "Não é possível pausar o temporizador: '{}' não está planejado para hoje.",
-        "fr": "Impossible de mettre en pause la minuterie : '{}' n'est pas prévu aujourd'hui.",
-        "vi": "Không thể tạm dừng bộ đếm giờ: '{}' không được lên kế hoạch hôm nay.",
-        "zh": "无法暂停计时器：'{}'今天没有计划。",
-        "hi": "टाइमर रोका नहीं जा सकता: '{}' आज के लिए योजनाबद्ध नहीं है।",
-    },
-    "Error: Status for '{}' not found.": {
-        "de": "Fehler: Status für '{}' nicht gefunden.",
-        "es": "Error: no se encontró el estado de '{}'.",
-        "ko": "오류: '{}'의 상태를 찾을 수 없습니다.",
-        "pt": "Erro: status de '{}' não encontrado.",
-        "fr": "Erreur : statut de '{}' introuvable.",
-        "vi": "Lỗi: Không tìm thấy trạng thái của '{}'.",
-        "zh": "错误：找不到'{}'的状态。",
-        "hi": "त्रुटि: '{}' की स्थिति नहीं मिली।",
-    },
-    "Timer for '{}' is already paused.": {
-        "de": "Timer für '{}' ist bereits pausiert.",
-        "es": "El temporizador de '{}' ya está en pausa.",
-        "ko": "'{}'의 타이머가 이미 일시정지되어 있습니다.",
-        "pt": "O temporizador de '{}' já está pausado.",
-        "fr": "La minuterie de '{}' est déjà en pause.",
-        "vi": "Bộ đếm giờ cho '{}' đã tạm dừng rồi.",
-        "zh": "'{}'的计时器已暂停。",
-        "hi": "'{}' के लिए टाइमर पहले से रुका हुआ है।",
-    },
-    "Timer for '{}' has not been started yet.": {
-        "de": "Timer für '{}' wurde noch nicht gestartet.",
-        "es": "El temporizador de '{}' aún no se ha iniciado.",
-        "ko": "'{}'의 타이머가 아직 시작되지 않았습니다.",
-        "pt": "O temporizador de '{}' ainda não foi iniciado.",
-        "fr": "La minuterie de '{}' n'a pas encore été démarrée.",
-        "vi": "Bộ đếm giờ cho '{}' chưa được bắt đầu.",
-        "zh": "'{}'的计时器尚未开始。",
-        "hi": "'{}' के लिए टाइमर अभी शुरू नहीं हुआ।",
-    },
-    "Cannot mark done: '{}' not planned for today.": {
-        "de": "Kann nicht als erledigt markiert werden: '{}' ist heute nicht geplant.",
-        "es": "No se puede marcar como hecho: '{}' no está planeado para hoy.",
-        "ko": "완료로 표시할 수 없음: '{}'은(는) 오늘 계획되지 않았습니다.",
-        "pt": "Não é possível marcar como concluído: '{}' não está planejado para hoje.",
-        "fr": "Impossible de marquer comme terminé : '{}' n'est pas prévu aujourd'hui.",
-        "vi": "Không thể đánh dấu hoàn thành: '{}' không được lên kế hoạch hôm nay.",
-        "zh": "无法标记为完成：'{}'今天没有计划。",
-        "hi": "पूर्ण के रूप में चिह्नित नहीं किया जा सकता: '{}' आज के लिए योजनाबद्ध नहीं है।",
-    },
-    "'{}' is already marked as done.": {
-        "de": "'{}' ist bereits als erledigt markiert.",
-        "es": "'{}' ya está marcado como hecho.",
-        "ko": "'{}'은(는) 이미 완료로 표시되어 있습니다.",
-        "pt": "'{}' já está marcado como concluído.",
-        "fr": "'{}' est déjà marqué comme terminé.",
-        "vi": "'{}' đã được đánh dấu hoàn thành rồi.",
-        "zh": "'{}'已标记为完成。",
-        "hi": "'{}' पहले ही पूर्ण के रूप में चिह्नित है।",
-    },
 
     # ================================================================= #
     # deck_overview.py
@@ -2058,16 +1300,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Tiến độ",
         "zh": "进度",
         "hi": "प्रगति",
-    },
-    "{}% Completed": {
-        "de": "{}% abgeschlossen",
-        "es": "{}% completado",
-        "ko": "{}% 완료",
-        "pt": "{}% concluído",
-        "fr": "{}% terminé",
-        "vi": "{}% hoàn thành",
-        "zh": "已完成 {}%",
-        "hi": "{}% पूर्ण",
     },
     "Retention": {
         "de": "Behaltensrate",
@@ -2149,16 +1381,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "开始学习",
         "hi": "अध्ययन शुरू करें",
     },
-    "Retention rate for this deck over its entire lifetime.": {
-        "de": "Retention-Rate dieses Stapels über seine gesamte Lebensdauer.",
-        "es": "Tasa de retención de este mazo durante toda su vida.",
-        "ko": "이 덱의 전체 사용 기간 동안의 기억률.",
-        "pt": "Taxa de retenção deste baralho ao longo de toda a sua vida.",
-        "fr": "Taux de rétention de ce paquet sur toute sa durée de vie.",
-        "vi": "Tỷ lệ ghi nhớ của bộ thẻ này trong toàn bộ thời gian sử dụng.",
-        "zh": "此牌组整个使用周期的记忆率。",
-        "hi": "इस डेक की पूरी अवधि में प्रतिधारण दर।",
-    },
     "Hard cards are cards you have forgotten 8 or more times.": {
         "de": "Schwere Karten sind Karten, die du 8 oder mehr Mal vergessen hast.",
         "es": "Las tarjetas difíciles son tarjetas que has olvidado 8 o más veces.",
@@ -2178,26 +1400,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Hiển thị thẻ khó",
         "zh": "显示困难卡片",
         "hi": "कठिन कार्ड दिखाएं",
-    },
-    "Finished cards are 'Mature' cards with an interval of 21 days or more.": {
-        "de": "Fertige Karten sind 'reife' Karten mit einem Intervall von 21 Tagen oder mehr.",
-        "es": "Las tarjetas terminadas son tarjetas «maduras» con un intervalo de 21 días o más.",
-        "ko": "완료된 카드는 21일 이상의 간격을 가진 '성숙한' 카드입니다.",
-        "pt": "Cartões concluídos são cartões 'maduros' com intervalo de 21 dias ou mais.",
-        "fr": "Les cartes terminées sont des cartes «matures» avec un intervalle de 21 jours ou plus.",
-        "vi": "Thẻ hoàn thành là thẻ 'trưởng thành' có khoảng cách ôn tập 21 ngày trở lên.",
-        "zh": "已完成卡片是间隔21天或更长时间的'成熟'卡片。",
-        "hi": "पूर्ण कार्ड वे 'परिपक्व' कार्ड हैं जिनका अंतराल 21 दिन या अधिक है।",
-    },
-    "Difficulty is based on the average Ease Factor of this deck.": {
-        "de": "Die Schwierigkeit basiert auf dem durchschnittlichen Ease-Faktor dieses Stapels.",
-        "es": "La dificultad se basa en el factor de facilidad medio de este mazo.",
-        "ko": "난이도는 이 덱의 평균 용이성 요인을 기반으로 합니다.",
-        "pt": "A dificuldade é baseada no fator de facilidade médio deste baralho.",
-        "fr": "La difficulté est basée sur le facteur de facilité moyen de ce paquet.",
-        "vi": "Độ khó dựa trên hệ số dễ dàng trung bình của bộ thẻ này.",
-        "zh": "难度基于此牌组的平均难易系数。",
-        "hi": "कठिनाई इस डेक के औसत आसानी कारक पर आधारित है।",
     },
     "Analyzing...": {
         "de": "Analysiere…",
@@ -2311,214 +1513,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "舒适",
         "hi": "आरामदायक",
     },
-    "Deep Focus": {
-        "de": "Tiefe Konzentration",
-        "es": "Concentración profunda",
-        "ko": "깊은 집중",
-        "pt": "Foco profundo",
-        "fr": "Concentration profonde",
-        "vi": "Tập trung sâu",
-        "zh": "深度专注",
-        "hi": "गहरा फोकस",
-    },
-    "Chill Vibes": {
-        "de": "Chill-Vibes",
-        "es": "Ambiente relajado",
-        "ko": "힐링 분위기",
-        "pt": "Atmosfera relaxante",
-        "fr": "Ambiance détendue",
-        "vi": "Không khí thư giãn",
-        "zh": "放松氛围",
-        "hi": "चिल वाइब्स",
-    },
-    "Lofi Beats": {
-        "de": "Lofi-Beats",
-        "es": "Lofi Beats",
-        "ko": "로파이 비트",
-        "pt": "Lofi Beats",
-        "fr": "Lofi Beats",
-        "vi": "Nhạc Lofi",
-        "zh": "Lofi 节拍",
-        "hi": "लोफाई बीट्स",
-    },
 
     # help_dialog.py
-    "Smart Study - Help": {
-        "de": "Smart Study – Hilfe",
-        "es": "Smart Study – Ayuda",
-        "ko": "Smart Study – 도움말",
-        "pt": "Smart Study – Ajuda",
-        "fr": "Smart Study – Aide",
-        "vi": "Smart Study – Trợ giúp",
-        "zh": "Smart Study – 帮助",
-        "hi": "Smart Study – सहायता",
-    },
-    """
-<h2>Troubleshooting & Manual Removal</h2>
-<p>If you are unable to activate the addon or close Anki, you can manually remove Smart Study to regain access.</p>
-
-<b>Follow these steps:</b>
-<ol>
-    <li>Close this window and click the "Quit Anki" button in the activation dialog. If that fails, force-quit Anki (e.g., via Activity Monitor on Mac or Task Manager on Windows).</li>
-    <li>Open Anki while holding down the <b>Shift key</b>. This will temporarily disable all addons.</li>
-    <li>Go to <b>Tools > Add-ons</b> from the Anki menu.</li>
-    <li>Select "Smart Study" from the list.</li>
-    <li>Click the "Delete" button on the right side.</li>
-    <li>Restart Anki normally.</li>
-</ol>
-
-<p>If you believe your key is valid but not working, or for any other issues, please contact us:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""": {
-        "de": """
-<h2>Fehlerbehebung &amp; Manuelle Entfernung</h2>
-<p>Wenn du das Addon nicht aktivieren oder Anki nicht schließen kannst, kannst du Smart Study manuell entfernen, um wieder Zugriff zu erhalten.</p>
-
-<b>Befolge diese Schritte:</b>
-<ol>
-    <li>Schließe dieses Fenster und klicke im Aktivierungsdialog auf den Button 'Anki beenden'. Falls das nicht funktioniert, erzwinge das Beenden von Anki (z. B. über die Aktivitätsanzeige auf dem Mac oder den Task-Manager unter Windows).</li>
-    <li>Starte Anki mit gedrückter <b>Umschalttaste (Shift)</b>. Dadurch werden alle Addons vorübergehend deaktiviert.</li>
-    <li>Gehe im Anki-Menü zu <b>Werkzeuge &gt; Add-ons</b>.</li>
-    <li>Wähle 'Smart Study' aus der Liste aus.</li>
-    <li>Klicke rechts auf den Button 'Löschen'.</li>
-    <li>Starte Anki normal neu.</li>
-</ol>
-
-<p>Falls du glaubst, dass dein Schlüssel gültig ist, aber nicht funktioniert, oder bei anderen Problemen, kontaktiere uns bitte:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "es": """
-<h2>Solución de problemas y eliminación manual</h2>
-<p>Si no puedes activar el complemento o cerrar Anki, puedes eliminar Smart Study manualmente para recuperar el acceso.</p>
-
-<b>Sigue estos pasos:</b>
-<ol>
-    <li>Cierra esta ventana y haz clic en el botón «Salir de Anki» del diálogo de activación. Si eso falla, fuerza el cierre de Anki (por ejemplo, mediante el Monitor de Actividad en Mac o el Administrador de tareas en Windows).</li>
-    <li>Abre Anki manteniendo pulsada la <b>tecla Shift</b>. Esto desactivará temporalmente todos los complementos.</li>
-    <li>Ve a <b>Herramientas &gt; Complementos</b> en el menú de Anki.</li>
-    <li>Selecciona «Smart Study» de la lista.</li>
-    <li>Haz clic en el botón «Eliminar» del lado derecho.</li>
-    <li>Reinicia Anki con normalidad.</li>
-</ol>
-
-<p>Si crees que tu clave es válida pero no funciona, o para cualquier otro problema, contáctanos:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "ko": """
-<h2>문제 해결 및 수동 제거</h2>
-<p>애드온을 활성화하거나 Anki를 닫을 수 없는 경우 Smart Study를 수동으로 제거하여 접근권을 되찾을 수 있습니다.</p>
-
-<b>다음 단계를 따르세요:</b>
-<ol>
-    <li>이 창을 닫고 활성화 대화상자에서 "Anki 종료" 버튼을 클릭하세요. 실패하면 Anki를 강제 종료하세요 (Mac의 활동 모니터 또는 Windows의 작업 관리자 사용).</li>
-    <li><b>Shift 키</b>를 누른 채 Anki를 실행하세요. 이렇게 하면 모든 애드온이 일시적으로 비활성화됩니다.</li>
-    <li>Anki 메뉴에서 <b>도구 &gt; 애드온</b>으로 이동하세요.</li>
-    <li>목록에서 "Smart Study"를 선택하세요.</li>
-    <li>오른쪽의 "삭제" 버튼을 클릭하세요.</li>
-    <li>Anki를 정상적으로 재시작하세요.</li>
-</ol>
-
-<p>키가 유효하지만 작동하지 않는다고 생각되거나 다른 문제가 있으면 문의하세요:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "pt": """
-<h2>Solução de Problemas e Remoção Manual</h2>
-<p>Se não conseguir ativar o complemento ou fechar o Anki, você pode remover o Smart Study manualmente para recuperar o acesso.</p>
-
-<b>Siga estes passos:</b>
-<ol>
-    <li>Feche esta janela e clique no botão "Sair do Anki" no diálogo de ativação. Se isso falhar, force o encerramento do Anki (por exemplo, via Monitor de Atividade no Mac ou Gerenciador de Tarefas no Windows).</li>
-    <li>Abra o Anki mantendo pressionada a <b>tecla Shift</b>. Isso desativará temporariamente todos os complementos.</li>
-    <li>Vá para <b>Ferramentas &gt; Complementos</b> no menu do Anki.</li>
-    <li>Selecione "Smart Study" na lista.</li>
-    <li>Clique no botão "Excluir" no lado direito.</li>
-    <li>Reinicie o Anki normalmente.</li>
-</ol>
-
-<p>Se acreditar que sua chave é válida mas não está funcionando, ou para quaisquer outros problemas, entre em contato:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "fr": """
-<h2>Dépannage et suppression manuelle</h2>
-<p>Si vous ne pouvez pas activer le module ou fermer Anki, vous pouvez supprimer Smart Study manuellement pour retrouver l'accès.</p>
-
-<b>Suivez ces étapes :</b>
-<ol>
-    <li>Fermez cette fenêtre et cliquez sur le bouton « Quitter Anki » dans la boîte de dialogue d'activation. Si cela échoue, forcez la fermeture d'Anki (par exemple via le Moniteur d'activité sur Mac ou le Gestionnaire des tâches sous Windows).</li>
-    <li>Ouvrez Anki en maintenant la <b>touche Maj</b> enfoncée. Cela désactivera temporairement tous les modules.</li>
-    <li>Allez dans <b>Outils &gt; Extensions</b> dans le menu Anki.</li>
-    <li>Sélectionnez « Smart Study » dans la liste.</li>
-    <li>Cliquez sur le bouton « Supprimer » à droite.</li>
-    <li>Redémarrez Anki normalement.</li>
-</ol>
-
-<p>Si vous pensez que votre clé est valide mais ne fonctionne pas, ou pour tout autre problème, contactez-nous :</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "vi": """
-<h2>Khắc phục sự cố và Gỡ cài đặt thủ công</h2>
-<p>Nếu bạn không thể kích hoạt tiện ích hoặc đóng Anki, bạn có thể gỡ Smart Study thủ công để lấy lại quyền truy cập.</p>
-
-<b>Thực hiện các bước sau:</b>
-<ol>
-    <li>Đóng cửa sổ này và nhấn nút "Thoát Anki" trong hộp thoại kích hoạt. Nếu không được, hãy buộc thoát Anki (ví dụ: qua Activity Monitor trên Mac hoặc Task Manager trên Windows).</li>
-    <li>Mở Anki trong khi giữ phím <b>Shift</b>. Điều này sẽ tạm thời vô hiệu hóa tất cả tiện ích.</li>
-    <li>Vào <b>Công cụ &gt; Tiện ích</b> từ menu Anki.</li>
-    <li>Chọn "Smart Study" trong danh sách.</li>
-    <li>Nhấn nút "Xóa" ở bên phải.</li>
-    <li>Khởi động lại Anki bình thường.</li>
-</ol>
-
-<p>Nếu bạn cho rằng khóa của mình hợp lệ nhưng không hoạt động, hoặc có vấn đề khác, hãy liên hệ:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "zh": """
-<h2>故障排除与手动卸载</h2>
-<p>如果您无法激活插件或关闭 Anki，可以手动删除 Smart Study 以恢复访问权限。</p>
-
-<b>请按以下步骤操作：</b>
-<ol>
-    <li>关闭此窗口并在激活对话框中点击"退出 Anki"按钮。若失败，请强制退出 Anki（例如通过 Mac 的活动监视器或 Windows 的任务管理器）。</li>
-    <li>按住 <b>Shift 键</b> 打开 Anki。这将临时禁用所有插件。</li>
-    <li>在 Anki 菜单中选择 <b>工具 &gt; 插件</b>。</li>
-    <li>从列表中选择"Smart Study"。</li>
-    <li>点击右侧的"删除"按钮。</li>
-    <li>正常重启 Anki。</li>
-</ol>
-
-<p>如果您认为密钥有效但无法使用，或遇到其他问题，请联系我们：</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-        "hi": """
-<h2>समस्या निवारण और मैन्युअल निष्कासन</h2>
-<p>यदि आप ऐड-ऑन सक्रिय नहीं कर सकते या Anki बंद नहीं कर सकते, तो आप Smart Study को मैन्युअल रूप से हटाकर पहुंच वापस पा सकते हैं।</p>
-
-<b>इन चरणों का पालन करें:</b>
-<ol>
-    <li>यह विंडो बंद करें और सक्रियण डायलॉग में "Anki बंद करें" बटन पर क्लिक करें। यदि वह विफल हो, तो Anki को बलपूर्वक बंद करें (उदा. Mac पर Activity Monitor या Windows पर Task Manager से)।</li>
-    <li><b>Shift कुंजी</b> दबाए रखते हुए Anki खोलें। यह सभी ऐड-ऑन अस्थायी रूप से अक्षम कर देगा।</li>
-    <li>Anki मेनू से <b>Tools &gt; Add-ons</b> पर जाएं।</li>
-    <li>सूची से "Smart Study" चुनें।</li>
-    <li>दाईं ओर "Delete" बटन पर क्लिक करें।</li>
-    <li>Anki को सामान्य रूप से पुनः प्रारंभ करें।</li>
-</ol>
-
-<p>यदि आपको लगता है कि आपकी कुंजी वैध है लेकिन काम नहीं कर रही, या किसी अन्य समस्या के लिए, हमसे संपर्क करें:</p>
-<p><a href='https://github.com/TruckDrive/smart-study/issues'>https://github.com/TruckDrive/smart-study/issues</a></p>
-""",
-    },
 
     # launcher_widget.py
-    "Logo": {
-        "de": "Logo",
-        "es": "Logo",
-        "ko": "로고",
-        "pt": "Logo",
-        "fr": "Logo",
-        "vi": "Logo",
-        "zh": "Logo",
-        "hi": "लोगो",
-    },
     "Open Add-on Settings": {
         "de": "Add-on-Einstellungen öffnen",
         "es": "Abrir la configuración del complemento",
@@ -2528,56 +1526,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Mở cài đặt tiện ích",
         "zh": "打开插件设置",
         "hi": "ऐड-ऑन सेटिंग्स खोलें",
-    },
-    "Show/Hide AI Assistant": {
-        "de": "KI-Assistent anzeigen/ausblenden",
-        "es": "Mostrar/ocultar el asistente de IA",
-        "ko": "AI 어시스턴트 표시/숨기기",
-        "pt": "Mostrar/ocultar assistente de IA",
-        "fr": "Afficher/masquer l'assistant IA",
-        "vi": "Hiện/ẩn trợ lý AI",
-        "zh": "显示/隐藏 AI 助手",
-        "hi": "AI सहायक दिखाएं/छिपाएं",
-    },
-    "Show/Hide Website Viewer": {
-        "de": "Website-Ansicht anzeigen/ausblenden",
-        "es": "Mostrar/ocultar el visor de sitios web",
-        "ko": "웹사이트 뷰어 표시/숨기기",
-        "pt": "Mostrar/ocultar visualizador de sites",
-        "fr": "Afficher/masquer le navigateur web",
-        "vi": "Hiện/ẩn trình xem trang web",
-        "zh": "显示/隐藏网页查看器",
-        "hi": "वेबसाइट व्यूअर दिखाएं/छिपाएं",
-    },
-    "Show/Hide Notebook": {
-        "de": "Notizbuch anzeigen/ausblenden",
-        "es": "Mostrar/ocultar el cuaderno",
-        "ko": "노트북 표시/숨기기",
-        "pt": "Mostrar/ocultar caderno",
-        "fr": "Afficher/masquer le carnet",
-        "vi": "Hiện/ẩn sổ tay",
-        "zh": "显示/隐藏笔记本",
-        "hi": "नोटबुक दिखाएं/छिपाएं",
-    },
-    "Show/Hide Mind Map": {
-        "de": "Mindmap anzeigen/ausblenden",
-        "es": "Mostrar/ocultar el mapa mental",
-        "ko": "마인드맵 표시/숨기기",
-        "pt": "Mostrar/ocultar mapa mental",
-        "fr": "Afficher/masquer la carte mentale",
-        "vi": "Hiện/ẩn sơ đồ tư duy",
-        "zh": "显示/隐藏思维导图",
-        "hi": "माइंड मैप दिखाएं/छिपाएं",
-    },
-    "Configure Study Plan": {
-        "de": "Lernplan konfigurieren",
-        "es": "Configurar el plan de estudios",
-        "ko": "학습 계획 설정",
-        "pt": "Configurar plano de estudos",
-        "fr": "Configurer le plan d'étude",
-        "vi": "Cấu hình kế hoạch học tập",
-        "zh": "配置学习计划",
-        "hi": "अध्ययन योजना कॉन्फ़िगर करें",
     },
     "Start/Pause Timer": {
         "de": "Timer starten/pausieren",
@@ -2619,16 +1567,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "计时器设置",
         "hi": "टाइमर सेटिंग्स",
     },
-    "Pomodoro Timer Settings": {
-        "de": "Pomodoro-Timer-Einstellungen",
-        "es": "Ajustes del temporizador Pomodoro",
-        "ko": "포모도로 타이머 설정",
-        "pt": "Configurações do temporizador Pomodoro",
-        "fr": "Paramètres de la minuterie Pomodoro",
-        "vi": "Cài đặt hẹn giờ Pomodoro",
-        "zh": "番茄钟设置",
-        "hi": "पोमोडोरो टाइमर सेटिंग्स",
-    },
     "Play Music": {
         "de": "Musik abspielen",
         "es": "Reproducir música",
@@ -2638,16 +1576,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Phát nhạc",
         "zh": "播放音乐",
         "hi": "संगीत चलाएं",
-    },
-    "Settings dialog could not be opened.": {
-        "de": "Einstellungsdialog konnte nicht geöffnet werden.",
-        "es": "No se pudo abrir el diálogo de configuración.",
-        "ko": "설정 대화상자를 열 수 없습니다.",
-        "pt": "Não foi possível abrir o diálogo de configurações.",
-        "fr": "Impossible d'ouvrir la boîte de dialogue des paramètres.",
-        "vi": "Không thể mở hộp thoại cài đặt.",
-        "zh": "无法打开设置对话框。",
-        "hi": "सेटिंग्स डायलॉग नहीं खुल सका।",
     },
 
     # mode.py
@@ -3010,16 +1938,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ------------------------------------------------------------------
     # statistics_widget.py
     # ------------------------------------------------------------------
-    "Last 24 hours": {
-        "de": "Letzte 24 Stunden",
-        "es": "Últimas 24 horas",
-        "ko": "최근 24시간",
-        "pt": "Últimas 24 horas",
-        "fr": "24 dernières heures",
-        "vi": "24 giờ qua",
-        "zh": "过去24小时",
-        "hi": "पिछले 24 घंटे",
-    },
     "Last {} days": {
         "de": "Letzte {} Tage",
         "es": "Últimos {} días",
@@ -3030,130 +1948,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "过去 {} 天",
         "hi": "पिछले {} दिन",
     },
-    "Your study activity (Last 7 days). Blue = Streak, Gray = Rest.": {
-        "de": "Deine Lernaktivität (letzte 7 Tage). Blau = Streak, Grau = Pause.",
-        "es": "Tu actividad de estudio (últimos 7 días). Azul = racha, gris = descanso.",
-        "ko": "학습 활동 (최근 7일). 파란색 = 스트릭, 회색 = 휴식.",
-        "pt": "Sua atividade de estudo (últimos 7 dias). Azul = sequência, cinza = descanso.",
-        "fr": "Votre activité d'étude (7 derniers jours). Bleu = série, gris = repos.",
-        "vi": "Hoạt động học tập của bạn (7 ngày qua). Xanh = chuỗi, xám = nghỉ.",
-        "zh": "您的学习活动（过去7天）。蓝色=连击，灰色=休息。",
-        "hi": "आपकी अध्ययन गतिविधि (पिछले 7 दिन)। नीला = स्ट्रीक, ग्रे = आराम।",
-    },
-    "Cards per minute ({}). Time capped at 45s/card.": {
-        "de": "Karten pro Minute ({}). Zeit pro Karte auf 45 s begrenzt.",
-        "es": "Tarjetas por minuto ({}). Tiempo limitado a 45 s por tarjeta.",
-        "ko": "분당 카드 수 ({}). 카드당 최대 45초.",
-        "pt": "Cartões por minuto ({}). Tempo limitado a 45s por cartão.",
-        "fr": "Cartes par minute ({}). Temps limité à 45 s/carte.",
-        "vi": "Thẻ mỗi phút ({}). Giới hạn 45s/thẻ.",
-        "zh": "每分钟卡片数（{}）。每张卡上限45秒。",
-        "hi": "प्रति मिनट कार्ड ({}). प्रति कार्ड अधिकतम 45 सेकंड।",
-    },
-    "Correct answers: {:.1f}% ({}).": {
-        "de": "Richtige Antworten: {:.1f}% ({}).",
-        "es": "Respuestas correctas: {:.1f}% ({}).",
-        "ko": "정답률: {:.1f}% ({}).",
-        "pt": "Respostas corretas: {:.1f}% ({}).",
-        "fr": "Réponses correctes : {:.1f}% ({}).",
-        "vi": "Trả lời đúng: {:.1f}% ({}).",
-        "zh": "正确率：{:.1f}%（{}）。",
-        "hi": "सही उत्तर: {:.1f}% ({})।",
-    },
-    "Retention on reviews ({}).": {
-        "de": "Behaltensrate bei Wiederholungen ({}).",
-        "es": "Retención en repasos ({}).",
-        "ko": "복습 기억률 ({}).",
-        "pt": "Retenção nas revisões ({}).",
-        "fr": "Rétention sur les révisions ({}).",
-        "vi": "Tỷ lệ ghi nhớ khi ôn tập ({}).",
-        "zh": "复习记忆率（{}）。",
-        "hi": "समीक्षाओं पर प्रतिधारण ({})।",
-    },
-    "Percentage of unseen cards in collection.": {
-        "de": "Anteil ungesehener Karten in der Sammlung.",
-        "es": "Porcentaje de tarjetas sin ver en la colección.",
-        "ko": "컬렉션에서 아직 보지 않은 카드의 비율.",
-        "pt": "Porcentagem de cartões não vistos na coleção.",
-        "fr": "Pourcentage de cartes non vues dans la collection.",
-        "vi": "Tỷ lệ thẻ chưa xem trong bộ sưu tập.",
-        "zh": "收藏中未查看卡片的百分比。",
-        "hi": "संग्रह में न देखे गए कार्डों का प्रतिशत।",
-    },
-    "Consistency": {
-        "de": "Beständigkeit",
-        "es": "Constancia",
-        "ko": "일관성",
-        "pt": "Consistência",
-        "fr": "Régularité",
-        "vi": "Tính nhất quán",
-        "zh": "一致性",
-        "hi": "निरंतरता",
-    },
-    "Efficiency": {
-        "de": "Effizienz",
-        "es": "Eficiencia",
-        "ko": "효율성",
-        "pt": "Eficiência",
-        "fr": "Efficacité",
-        "vi": "Hiệu quả",
-        "zh": "效率",
-        "hi": "दक्षता",
-    },
-    "Eff.": {
-        "de": "Eff.",
-        "es": "Efic.",
-        "ko": "효율",
-        "pt": "Efic.",
-        "fr": "Eff.",
-        "vi": "Hq.",
-        "zh": "效率",
-        "hi": "दक्ष.",
-    },
-    "Acc.": {
-        "de": "Gen.",
-        "es": "Prec.",
-        "ko": "정확",
-        "pt": "Prec.",
-        "fr": "Préc.",
-        "vi": "Độ cx.",
-        "zh": "准确",
-        "hi": "सटी.",
-    },
-    "New Cards": {
-        "de": "Neue Karten",
-        "es": "Tarjetas nuevas",
-        "ko": "새 카드",
-        "pt": "Novos cartões",
-        "fr": "Nouvelles cartes",
-        "vi": "Thẻ mới",
-        "zh": "新卡片",
-        "hi": "नए कार्ड",
-    },
 
     # ------------------------------------------------------------------
     # settings_dialog.py – Themes card + theme_editor_dialog.py
     # ------------------------------------------------------------------
-    "Themes": {
-        "de": "Themes",
-        "es": "Temas",
-        "ko": "테마",
-        "pt": "Temas",
-        "fr": "Thèmes",
-        "vi": "Giao diện",
-        "zh": "主题",
-        "hi": "थीम",
-    },
-    "Color Theme:": {
-        "de": "Farbthema:",
-        "es": "Tema de color:",
-        "ko": "색상 테마:",
-        "pt": "Tema de cor:",
-        "fr": "Thème de couleur :",
-        "vi": "Chủ đề màu sắc:",
-        "zh": "颜色主题：",
-        "hi": "रंग थीम:",
-    },
     "Blue": {
         "de": "Blau",
         "es": "Azul",
@@ -3339,16 +2137,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "导出失败：{}",
         "hi": "निर्यात विफल: {}",
     },
-    "<h1>Error: {}/index.html missing</h1>": {
-        "de": "<h1>Fehler: {}/index.html fehlt</h1>",
-        "es": "<h1>Error: falta {}/index.html</h1>",
-        "ko": "<h1>오류: {}/index.html이 없습니다</h1>",
-        "pt": "<h1>Erro: {}/index.html ausente</h1>",
-        "fr": "<h1>Erreur : {}/index.html manquant</h1>",
-        "vi": "<h1>Lỗi: Thiếu {}/index.html</h1>",
-        "zh": "<h1>错误：缺少 {}/index.html</h1>",
-        "hi": "<h1>त्रुटि: {}/index.html अनुपलब्ध</h1>",
-    },
 
     # ------------------------------------------------------------------
     # website_sidebar.py
@@ -3518,16 +2306,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "已达到 {} 个自定义网站上限",
         "hi": "{} कस्टम साइट की अधिकतम सीमा पहुंच गई",
     },
-    "Open: {}": {
-        "de": "Öffnen: {}",
-        "es": "Abrir: {}",
-        "ko": "열기: {}",
-        "pt": "Abrir: {}",
-        "fr": "Ouvrir : {}",
-        "vi": "Mở: {}",
-        "zh": "打开：{}",
-        "hi": "खोलें: {}",
-    },
     "Remove '{}'": {
         "de": "'{}' entfernen",
         "es": "Eliminar '{}'",
@@ -3642,166 +2420,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ------------------------------------------------------------------
     # ai_assistant.py
     # ------------------------------------------------------------------
-    "Could not save settings to Anki Database: {}": {
-        "de": "Einstellungen konnten nicht in der Anki-Datenbank gespeichert werden: {}",
-        "es": "No se pudieron guardar los ajustes en la base de datos de Anki: {}",
-        "ko": "설정을 Anki 데이터베이스에 저장할 수 없습니다: {}",
-        "pt": "Não foi possível salvar as configurações no banco de dados do Anki: {}",
-        "fr": "Impossible d'enregistrer les paramètres dans la base de données Anki : {}",
-        "vi": "Không thể lưu cài đặt vào cơ sở dữ liệu Anki: {}",
-        "zh": "无法将设置保存到 Anki 数据库：{}",
-        "hi": "सेटिंग्स Anki डेटाबेस में सहेजी नहीं जा सकीं: {}",
-    },
-    "Could not save license file: {}\nPlease check permissions.": {
-        "de": "Lizenzdatei konnte nicht gespeichert werden: {}\nBitte Berechtigungen prüfen.",
-        "es": "No se pudo guardar el archivo de licencia: {}\nPor favor, verifica los permisos.",
-        "ko": "라이선스 파일을 저장할 수 없습니다: {}\n권한을 확인하세요.",
-        "pt": "Não foi possível salvar o arquivo de licença: {}\nVerifique as permissões.",
-        "fr": "Impossible d'enregistrer le fichier de licence : {}\nVérifiez les permissions.",
-        "vi": "Không thể lưu tệp giấy phép: {}\nVui lòng kiểm tra quyền truy cập.",
-        "zh": "无法保存许可证文件：{}\n请检查权限。",
-        "hi": "लाइसेंस फ़ाइल सहेजी नहीं जा सकी: {}\nकृपया अनुमतियां जांचें।",
-    },
-    "Smart Study AI License": {
-        "de": "Smart Study KI-Lizenz",
-        "es": "Licencia de Smart Study IA",
-        "ko": "Smart Study AI 라이선스",
-        "pt": "Licença Smart Study AI",
-        "fr": "Licence IA Smart Study",
-        "vi": "Giấy phép AI Smart Study",
-        "zh": "Smart Study AI 许可证",
-        "hi": "Smart Study AI लाइसेंस",
-    },
-    "Please enter your Smart Study License Key to activate the AI Assistant.": {
-        "de": "Bitte gib Deinen Smart Study Lizenzschlüssel ein, um den KI-Assistenten zu aktivieren.",
-        "es": "Introduce tu clave de licencia de Smart Study para activar el asistente de IA.",
-        "ko": "AI 어시스턴트를 활성화하려면 Smart Study 라이선스 키를 입력하세요.",
-        "pt": "Insira sua chave de licença do Smart Study para ativar o assistente de IA.",
-        "fr": "Entrez votre clé de licence Smart Study pour activer l'assistant IA.",
-        "vi": "Nhập khóa giấy phép Smart Study để kích hoạt trợ lý AI.",
-        "zh": "请输入您的 Smart Study 许可证密钥以激活 AI 助手。",
-        "hi": "AI सहायक सक्रिय करने के लिए Smart Study लाइसेंस कुंजी दर्ज करें।",
-    },
-    "Enter your license key here...": {
-        "de": "Lizenzschlüssel hier eingeben...",
-        "es": "Introduce aquí tu clave de licencia...",
-        "ko": "여기에 라이선스 키를 입력하세요...",
-        "pt": "Digite sua chave de licença aqui...",
-        "fr": "Entrez votre clé de licence ici...",
-        "vi": "Nhập khóa giấy phép của bạn tại đây...",
-        "zh": "在此输入您的许可证密钥...",
-        "hi": "यहाँ लाइसेंस कुंजी दर्ज करें...",
-    },
-    "Enter your <b>OpenRouter</b> API Key to use the AI Assistant.\n\nThis add-on is completely non-profit — I earn nothing from it. However, AI API calls have unavoidable costs that I can't cover for all users for free. With your own key, you pay only for what you actually use.": {
-        "de": "Gib Deinen <b>OpenRouter</b>-API-Schlüssel ein, um den KI-Assistenten zu nutzen.\n\nDieses Add-on ist vollständig gemeinnützig – ich verdiene nichts damit. KI-API-Aufrufe verursachen jedoch unvermeidliche Kosten, die ich nicht für alle Nutzer kostenlos übernehmen kann. Mit deinem eigenen Schlüssel zahlst du nur für das, was du tatsächlich verwendest.",
-        "es": "Introduce tu clave API de <b>OpenRouter</b> para usar el asistente de IA.\n\nEste complemento es completamente sin ánimo de lucro: no gano nada con él. Sin embargo, las llamadas a la API de IA tienen costes inevitables que no puedo asumir gratis para todos los usuarios. Con tu propia clave, pagas solo por lo que realmente usas.",
-        "ko": "<b>OpenRouter</b> API 키를 입력하여 AI 어시스턴트를 사용하세요.\n\n이 애드온은 완전히 비영리입니다 — 저는 아무것도 벌지 않습니다. 그러나 AI API 호출은 피할 수 없는 비용이 발생하며, 모든 사용자에게 무료로 제공할 수 없습니다. 자신의 키를 사용하면 실제로 사용한 것만 비용을 지불합니다.",
-        "pt": "Insira sua chave de API do <b>OpenRouter</b> para usar o assistente de IA.\n\nEste complemento é completamente sem fins lucrativos — não ganho nada com ele. No entanto, as chamadas à API de IA têm custos inevitáveis que não posso cobrir gratuitamente para todos os usuários. Com sua própria chave, você paga apenas pelo que realmente usa.",
-        "fr": "Entrez votre clé API <b>OpenRouter</b> pour utiliser l'assistant IA.\n\nCe module est entièrement à but non lucratif — je n'en tire aucun revenu. Cependant, les appels à l'API IA ont des coûts inévitables que je ne peux pas couvrir gratuitement pour tous les utilisateurs. Avec votre propre clé, vous ne payez que ce que vous utilisez réellement.",
-        "vi": "Nhập khóa API <b>OpenRouter</b> để sử dụng trợ lý AI.\n\nTiện ích này hoàn toàn phi lợi nhuận — tôi không kiếm gì từ nó. Tuy nhiên, các lệnh gọi API AI có chi phí không thể tránh khỏi mà tôi không thể chi trả miễn phí cho tất cả người dùng. Với khóa của riêng bạn, bạn chỉ trả tiền cho những gì bạn thực sự sử dụng.",
-        "zh": "输入您的 <b>OpenRouter</b> API 密钥以使用 AI 助手。\n\n此插件完全非营利 — 我不从中获益。但是，AI API 调用有不可避免的成本，我无法为所有用户免费承担。使用您自己的密钥，您只需为实际使用的内容付费。",
-        "hi": "AI सहायक उपयोग करने के लिए अपनी <b>OpenRouter</b> API कुंजी दर्ज करें।\n\nयह ऐड-ऑन पूरी तरह से गैर-लाभकारी है — मुझे इससे कोई कमाई नहीं। हालांकि, AI API कॉल में अपरिहार्य लागतें हैं जो मैं सभी उपयोगकर्ताओं के लिए मुफ्त में नहीं दे सकता। अपनी खुद की कुंजी से, आप केवल वही भुगतान करते हैं जो आप वास्तव में उपयोग करते हैं।",
-    },
-    "Enter your <b>OpenRouter</b> API Key.": {
-        "de": "Gib Deinen <b>OpenRouter</b>-API-Schlüssel ein.",
-        "es": "Introduce tu clave API de <b>OpenRouter</b>.",
-        "ko": "<b>OpenRouter</b> API 키를 입력하세요.",
-        "pt": "Insira sua chave de API do <b>OpenRouter</b>.",
-        "fr": "Entrez votre clé API <b>OpenRouter</b>.",
-        "vi": "Nhập khóa API <b>OpenRouter</b> của bạn.",
-        "zh": "输入您的 <b>OpenRouter</b> API 密钥。",
-        "hi": "अपनी <b>OpenRouter</b> API कुंजी दर्ज करें।",
-    },
-    "How to get a key": {
-        "de": "Wie bekomme ich einen Schlüssel?",
-        "es": "¿Cómo obtener una clave?",
-        "ko": "키 얻는 방법",
-        "pt": "Como obter uma chave",
-        "fr": "Comment obtenir une clé",
-        "vi": "Cách lấy khóa",
-        "zh": "如何获取密钥",
-        "hi": "कुंजी कैसे प्राप्त करें",
-    },
-    "Why not free?": {
-        "de": "Warum nicht kostenlos?",
-        "es": "¿Por qué no es gratuito?",
-        "ko": "왜 무료가 아닌가요?",
-        "pt": "Por que não é gratuito?",
-        "fr": "Pourquoi pas gratuit ?",
-        "vi": "Tại sao không miễn phí?",
-        "zh": "为什么不免费？",
-        "hi": "मुफ्त क्यों नहीं?",
-    },
-    "The Smart Study AI Assistant is completely non-profit — I earn nothing from it.\n\nHowever, every AI response has a real cost: the model providers charge per token used. It is simply not possible to cover these API fees for all users for free.\n\nBy entering your own OpenRouter key, you connect directly to your own account and only pay for exactly what you use — typically just a few cents per session. No subscription, no markup.": {
-        "de": "Der Smart Study-KI-Assistent ist vollständig gemeinnützig – ich verdiene nichts damit.\n\nJede KI-Antwort kostet jedoch echtes Geld: Die Modellanbieter berechnen pro verwendetem Token. Es ist schlicht nicht möglich, diese API-Kosten für alle Nutzer kostenlos zu übernehmen.\n\nMit deinem eigenen OpenRouter-Schlüssel verbindest du dich direkt mit deinem eigenen Konto und zahlst nur für genau das, was du nutzt – in der Regel nur wenige Cent pro Sitzung. Kein Abo, keine Aufschläge.",
-        "es": "El asistente de IA de Smart Study es completamente sin ánimo de lucro: no gano nada con él.\n\nSin embargo, cada respuesta de IA tiene un coste real: los proveedores de modelos cobran por cada token usado. Sencillamente no es posible cubrir esos costes de API para todos los usuarios de forma gratuita.\n\nAl introducir tu propia clave de OpenRouter, te conectas directamente a tu cuenta y solo pagas por lo que realmente usas, normalmente solo unos céntimos por sesión. Sin suscripción, sin margen.",
-        "ko": "Smart Study AI 어시스턴트는 완전히 비영리입니다 — 저는 아무것도 벌지 않습니다.\n\n그러나 모든 AI 응답에는 실제 비용이 발생합니다: 모델 제공업체는 사용된 토큰당 요금을 부과합니다. 모든 사용자에게 이 API 비용을 무료로 제공하는 것은 불가능합니다.\n\n자신의 OpenRouter 키를 입력하면 자신의 계정에 직접 연결되며, 실제로 사용한 것만 비용을 지불합니다 — 일반적으로 세션당 몇 센트에 불과합니다. 구독 없이, 마크업 없이.",
-        "pt": "O assistente de IA do Smart Study é completamente sem fins lucrativos — não ganho nada com ele.\n\nNo entanto, cada resposta de IA tem um custo real: os provedores de modelos cobram por token usado. Simplesmente não é possível cobrir essas taxas de API para todos os usuários gratuitamente.\n\nAo inserir sua própria chave OpenRouter, você se conecta diretamente à sua conta e paga apenas pelo que realmente usa — normalmente apenas alguns centavos por sessão. Sem assinatura, sem margem.",
-        "fr": "L'assistant IA de Smart Study est entièrement à but non lucratif — je n'en tire aucun revenu.\n\nCependant, chaque réponse IA a un coût réel : les fournisseurs de modèles facturent par token utilisé. Il est tout simplement impossible de couvrir ces frais d'API pour tous les utilisateurs gratuitement.\n\nEn entrant votre propre clé OpenRouter, vous vous connectez directement à votre compte et ne payez que pour ce que vous utilisez réellement — généralement quelques centimes par session. Pas d'abonnement, pas de majoration.",
-        "vi": "Trợ lý AI của Smart Study hoàn toàn phi lợi nhuận — tôi không kiếm gì từ nó.\n\nTuy nhiên, mỗi phản hồi AI có chi phí thực tế: các nhà cung cấp mô hình tính phí theo token sử dụng. Đơn giản là không thể chi trả các phí API này miễn phí cho tất cả người dùng.\n\nBằng cách nhập khóa OpenRouter của riêng bạn, bạn kết nối trực tiếp với tài khoản của mình và chỉ trả tiền cho những gì bạn thực sự sử dụng — thường chỉ vài xu mỗi phiên. Không có đăng ký, không có phụ phí.",
-        "zh": "Smart Study AI 助手完全非营利 — 我不从中获益。\n\n但是，每次 AI 响应都有实际成本：模型提供商按使用的 token 收费。根本不可能为所有用户免费承担这些 API 费用。\n\n输入您自己的 OpenRouter 密钥后，您直接连接到自己的账户，只为实际使用的内容付费 — 通常每次会话只需几分钱。无需订阅，无附加费。",
-        "hi": "Smart Study AI सहायक पूरी तरह से गैर-लाभकारी है — मुझे इससे कोई कमाई नहीं।\n\nहालांकि, हर AI प्रतिक्रिया की वास्तविक लागत है: मॉडल प्रदाता प्रयोग किए गए टोकन के अनुसार शुल्क लेते हैं। सभी उपयोगकर्ताओं के लिए इन API शुल्कों को मुफ्त में कवर करना असंभव है।\n\nअपनी खुद की OpenRouter कुंजी दर्ज करके, आप सीधे अपने खाते से जुड़ते हैं और केवल वही भुगतान करते हैं जो आप वास्तव में उपयोग करते हैं — आमतौर पर प्रति सत्र कुछ सेंट। कोई सदस्यता नहीं, कोई मार्कअप नहीं।",
-    },
-    "Only OpenRouter keys are supported currently.": {
-        "de": "Zurzeit werden nur OpenRouter-Schlüssel unterstützt.",
-        "es": "Actualmente solo se admiten claves de OpenRouter.",
-        "ko": "현재 OpenRouter 키만 지원됩니다.",
-        "pt": "Atualmente, apenas chaves do OpenRouter são suportadas.",
-        "fr": "Seules les clés OpenRouter sont actuellement prises en charge.",
-        "vi": "Hiện tại chỉ hỗ trợ khóa OpenRouter.",
-        "zh": "目前仅支持 OpenRouter 密钥。",
-        "hi": "वर्तमान में केवल OpenRouter कुंजियां समर्थित हैं।",
-    },
-    "Why paid?": {
-        "de": "Warum kostenpflichtig?",
-        "es": "¿Por qué de pago?",
-        "ko": "왜 유료인가요?",
-        "pt": "Por que é pago?",
-        "fr": "Pourquoi payant ?",
-        "vi": "Tại sao phải trả phí?",
-        "zh": "为什么收费？",
-        "hi": "भुगतान क्यों?",
-    },
-    "Need Help?": {
-        "de": "Hilfe?",
-        "es": "¿Necesitas ayuda?",
-        "ko": "도움이 필요하세요?",
-        "pt": "Precisa de ajuda?",
-        "fr": "Besoin d'aide ?",
-        "vi": "Cần trợ giúp?",
-        "zh": "需要帮助？",
-        "hi": "मदद चाहिए?",
-    },
-    "Enter own Key": {
-        "de": "Eigenen Schlüssel eingeben",
-        "es": "Introducir clave propia",
-        "ko": "직접 키 입력",
-        "pt": "Inserir chave própria",
-        "fr": "Entrer sa propre clé",
-        "vi": "Nhập khóa của riêng bạn",
-        "zh": "输入自己的密钥",
-        "hi": "अपनी कुंजी दर्ज करें",
-    },
-    "Back to Smart Study License": {
-        "de": "Zurück zur Smart Study-Lizenz",
-        "es": "Volver a la licencia de Smart Study",
-        "ko": "Smart Study 라이선스로 돌아가기",
-        "pt": "Voltar à licença Smart Study",
-        "fr": "Retour à la licence Smart Study",
-        "vi": "Quay lại giấy phép Smart Study",
-        "zh": "返回 Smart Study 许可证",
-        "hi": "Smart Study लाइसेंस पर वापस जाएं",
-    },
-    "Save Key": {
-        "de": "Schlüssel speichern",
-        "es": "Guardar clave",
-        "ko": "키 저장",
-        "pt": "Salvar chave",
-        "fr": "Enregistrer la clé",
-        "vi": "Lưu khóa",
-        "zh": "保存密钥",
-        "hi": "कुंजी सहेजें",
-    },
     "OK": {
         "de": "OK",
         "es": "Aceptar",
@@ -3811,66 +2429,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "OK",
         "zh": "确认",
         "hi": "ठीक है",
-    },
-    "Please enter a license key.": {
-        "de": "Bitte gib einen Lizenzschlüssel ein.",
-        "es": "Introduce una clave de licencia.",
-        "ko": "라이선스 키를 입력하세요.",
-        "pt": "Por favor, insira uma chave de licença.",
-        "fr": "Veuillez entrer une clé de licence.",
-        "vi": "Vui lòng nhập khóa giấy phép.",
-        "zh": "请输入许可证密钥。",
-        "hi": "कृपया लाइसेंस कुंजी दर्ज करें।",
-    },
-    "Invalid Key": {
-        "de": "Ungültiger Schlüssel",
-        "es": "Clave no válida",
-        "ko": "유효하지 않은 키",
-        "pt": "Chave inválida",
-        "fr": "Clé invalide",
-        "vi": "Khóa không hợp lệ",
-        "zh": "无效密钥",
-        "hi": "अमान्य कुंजी",
-    },
-    "Please enter a valid OpenRouter API Key (starting with 'sk-or-').": {
-        "de": "Bitte gib einen gültigen OpenRouter-API-Schlüssel ein (beginnt mit 'sk-or-').",
-        "es": "Introduce una clave API válida de OpenRouter (debe comenzar con 'sk-or-').",
-        "ko": "유효한 OpenRouter API 키를 입력하세요 ('sk-or-'로 시작).",
-        "pt": "Insira uma chave de API OpenRouter válida (começando com 'sk-or-').",
-        "fr": "Entrez une clé API OpenRouter valide (commençant par 'sk-or-').",
-        "vi": "Nhập khóa API OpenRouter hợp lệ (bắt đầu bằng 'sk-or-').",
-        "zh": "请输入有效的 OpenRouter API 密钥（以 'sk-or-' 开头）。",
-        "hi": "एक वैध OpenRouter API कुंजी दर्ज करें ('sk-or-' से शुरू)।",
-    },
-    "Please enter an API key.": {
-        "de": "Bitte gib einen API-Schlüssel ein.",
-        "es": "Introduce una clave API.",
-        "ko": "API 키를 입력하세요.",
-        "pt": "Por favor, insira uma chave de API.",
-        "fr": "Veuillez entrer une clé API.",
-        "vi": "Vui lòng nhập khóa API.",
-        "zh": "请输入 API 密钥。",
-        "hi": "कृपया API कुंजी दर्ज करें।",
-    },
-    "Why is this a Paid Feature?": {
-        "de": "Warum ist das ein kostenpflichtiges Feature?",
-        "es": "¿Por qué es una función de pago?",
-        "ko": "왜 유료 기능인가요?",
-        "pt": "Por que este é um recurso pago?",
-        "fr": "Pourquoi est-ce une fonctionnalité payante ?",
-        "vi": "Tại sao đây là tính năng trả phí?",
-        "zh": "为什么这是一个付费功能？",
-        "hi": "यह भुगतान वाली सुविधा क्यों है?",
-    },
-    "Thank you for using the Smart Study Addon!\n\nWhile the vast majority of the addon is and will always remain free, the AI Assistant feature has significant running costs. These include API fees for the powerful language models and server expenses.\n\nYour license purchase directly supports these operational costs.": {
-        "de": "Danke, dass Du das Smart Study-Pro-Add-on verwendest!\n\nDer Großteil des Add-ons ist und bleibt kostenlos, aber die KI-Assistent-Funktion verursacht erhebliche laufende Kosten. Dazu gehören API-Gebühren für die leistungsstarken Sprachmodelle sowie Serverkosten.\n\nMit Deinem Lizenzkauf unterstützt Du diese Betriebskosten direkt.",
-        "es": "¡Gracias por usar el complemento Smart Study!\n\nLa gran mayoría del complemento es y seguirá siendo gratuita, pero la función de asistente de IA tiene costes de funcionamiento significativos. Estos incluyen las tarifas de API de los potentes modelos de lenguaje y los gastos del servidor.\n\nTu compra de licencia apoya directamente estos costes operativos.",
-        "ko": "Smart Study 애드온을 사용해 주셔서 감사합니다!\n\n애드온의 대부분은 항상 무료이지만, AI 어시스턴트 기능에는 상당한 운영 비용이 있습니다. 여기에는 강력한 언어 모델의 API 비용과 서버 비용이 포함됩니다.\n\n라이선스 구매를 통해 이러한 운영 비용을 직접 지원하게 됩니다.",
-        "pt": "Obrigado por usar o complemento Smart Study!\n\nEmbora a grande maioria do complemento seja e sempre permaneça gratuita, o recurso de assistente de IA tem custos operacionais significativos. Estes incluem taxas de API para os poderosos modelos de linguagem e despesas com servidor.\n\nSua compra de licença apoia diretamente esses custos operacionais.",
-        "fr": "Merci d'utiliser le module Smart Study !\n\nBien que la grande majorité du module soit et reste toujours gratuite, la fonctionnalité d'assistant IA a des coûts de fonctionnement significatifs. Ceux-ci comprennent les frais d'API pour les puissants modèles de langage et les dépenses de serveur.\n\nVotre achat de licence soutient directement ces coûts opérationnels.",
-        "vi": "Cảm ơn bạn đã sử dụng tiện ích Smart Study!\n\nMặc dù phần lớn tiện ích luôn miễn phí, tính năng trợ lý AI có chi phí vận hành đáng kể. Bao gồm phí API cho các mô hình ngôn ngữ mạnh và chi phí máy chủ.\n\nViệc mua giấy phép của bạn trực tiếp hỗ trợ các chi phí vận hành này.",
-        "zh": "感谢您使用 Smart Study 插件！\n\n虽然插件的绝大部分是且将始终保持免费，但 AI 助手功能有显著的运营成本。这包括强大语言模型的 API 费用和服务器开支。\n\n您的许可证购买直接支持这些运营成本。",
-        "hi": "Smart Study ऐड-ऑन उपयोग करने के लिए धन्यवाद!\n\nहालांकि ऐड-ऑन का अधिकांश भाग हमेशा मुफ्त रहेगा, AI सहायक सुविधा में महत्वपूर्ण परिचालन लागतें हैं। इनमें शक्तिशाली भाषा मॉडल के API शुल्क और सर्वर खर्च शामिल हैं।\n\nआपकी लाइसेंस खरीद इन परिचालन लागतों का सीधे समर्थन करती है।",
     },
     "Help": {
         "de": "Hilfe",
@@ -3882,56 +2440,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "帮助",
         "hi": "सहायता",
     },
-    "Contact github.com/TruckDrive/smart-study/issues if you have issues with your license key.": {
-        "de": "Wende Dich an github.com/TruckDrive/smart-study/issues, falls Du Probleme mit Deinem Lizenzschlüssel hast.",
-        "es": "Contacta con github.com/TruckDrive/smart-study/issues si tienes problemas con tu clave de licencia.",
-        "ko": "라이선스 키 문제가 있으면 github.com/TruckDrive/smart-study/issues으로 연락하세요.",
-        "pt": "Entre em contato com github.com/TruckDrive/smart-study/issues se tiver problemas com sua chave de licença.",
-        "fr": "Contactez github.com/TruckDrive/smart-study/issues si vous avez des problèmes avec votre clé de licence.",
-        "vi": "Liên hệ github.com/TruckDrive/smart-study/issues nếu bạn có vấn đề với khóa giấy phép.",
-        "zh": "如果您的许可证密钥有问题，请联系 github.com/TruckDrive/smart-study/issues。",
-        "hi": "यदि आपकी लाइसेंस कुंजी में समस्या है तो github.com/TruckDrive/smart-study/issues से संपर्क करें।",
-    },
-    "Manage Your License Key": {
-        "de": "Lizenzschlüssel verwalten",
-        "es": "Gestionar tu clave de licencia",
-        "ko": "라이선스 키 관리",
-        "pt": "Gerenciar sua chave de licença",
-        "fr": "Gérer votre clé de licence",
-        "vi": "Quản lý khóa giấy phép của bạn",
-        "zh": "管理您的许可证密钥",
-        "hi": "अपनी लाइसेंस कुंजी प्रबंधित करें",
-    },
-    "Smart Study License": {
-        "de": "Smart Study Lizenz",
-        "es": "Licencia de Smart Study",
-        "ko": "Smart Study 라이선스",
-        "pt": "Licença Smart Study",
-        "fr": "Licence Smart Study",
-        "vi": "Giấy phép Smart Study",
-        "zh": "Smart Study 许可证",
-        "hi": "Smart Study लाइसेंस",
-    },
-    "Custom OpenRouter Key": {
-        "de": "Eigener OpenRouter-Schlüssel",
-        "es": "Clave de OpenRouter personalizada",
-        "ko": "커스텀 OpenRouter 키",
-        "pt": "Chave OpenRouter personalizada",
-        "fr": "Clé OpenRouter personnalisée",
-        "vi": "Khóa OpenRouter tùy chỉnh",
-        "zh": "自定义 OpenRouter 密钥",
-        "hi": "कस्टम OpenRouter कुंजी",
-    },
-    "Active Key Type: <b>{}</b>": {
-        "de": "Aktiver Schlüsseltyp: <b>{}</b>",
-        "es": "Tipo de clave activa: <b>{}</b>",
-        "ko": "활성 키 유형: <b>{}</b>",
-        "pt": "Tipo de chave ativa: <b>{}</b>",
-        "fr": "Type de clé active : <b>{}</b>",
-        "vi": "Loại khóa đang dùng: <b>{}</b>",
-        "zh": "当前密钥类型：<b>{}</b>",
-        "hi": "सक्रिय कुंजी प्रकार: <b>{}</b>",
-    },
     "Copy": {
         "de": "Kopieren",
         "es": "Copiar",
@@ -3941,556 +2449,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Sao chép",
         "zh": "复制",
         "hi": "कॉपी करें",
-    },
-    "Remove Key": {
-        "de": "Schlüssel entfernen",
-        "es": "Eliminar clave",
-        "ko": "키 제거",
-        "pt": "Remover chave",
-        "fr": "Supprimer la clé",
-        "vi": "Xóa khóa",
-        "zh": "删除密钥",
-        "hi": "कुंजी हटाएं",
-    },
-    "Key copied!": {
-        "de": "Schlüssel kopiert!",
-        "es": "¡Clave copiada!",
-        "ko": "키가 복사되었습니다!",
-        "pt": "Chave copiada!",
-        "fr": "Clé copiée !",
-        "vi": "Đã sao chép khóa!",
-        "zh": "密钥已复制！",
-        "hi": "कुंजी कॉपी हुई!",
-    },
-    "Confirm Reset": {
-        "de": "Zurücksetzen bestätigen",
-        "es": "Confirmar restablecimiento",
-        "ko": "초기화 확인",
-        "pt": "Confirmar redefinição",
-        "fr": "Confirmer la réinitialisation",
-        "vi": "Xác nhận đặt lại",
-        "zh": "确认重置",
-        "hi": "रीसेट की पुष्टि करें",
-    },
-    "Remove this key? You will need to enter it again to use the AI Assistant.": {
-        "de": "Diesen Schlüssel entfernen? Du musst ihn erneut eingeben, um den KI-Assistenten zu verwenden.",
-        "es": "¿Eliminar esta clave? Tendrás que volver a introducirla para usar el asistente de IA.",
-        "ko": "이 키를 제거하시겠습니까? AI 어시스턴트를 사용하려면 다시 입력해야 합니다.",
-        "pt": "Remover esta chave? Você precisará inseri-la novamente para usar o assistente de IA.",
-        "fr": "Supprimer cette clé ? Vous devrez la saisir à nouveau pour utiliser l'assistant IA.",
-        "vi": "Xóa khóa này? Bạn sẽ cần nhập lại để sử dụng trợ lý AI.",
-        "zh": "删除此密钥？您将需要重新输入才能使用 AI 助手。",
-        "hi": "यह कुंजी हटाएं? AI सहायक उपयोग करने के लिए आपको इसे फिर से दर्ज करना होगा।",
-    },
-    "Key removed.": {
-        "de": "Schlüssel entfernt.",
-        "es": "Clave eliminada.",
-        "ko": "키가 제거되었습니다.",
-        "pt": "Chave removida.",
-        "fr": "Clé supprimée.",
-        "vi": "Đã xóa khóa.",
-        "zh": "密钥已删除。",
-        "hi": "कुंजी हटाई गई।",
-    },
-    "Failed to reset key: {}": {
-        "de": "Schlüssel konnte nicht zurückgesetzt werden: {}",
-        "es": "No se pudo restablecer la clave: {}",
-        "ko": "키 초기화 실패: {}",
-        "pt": "Falha ao redefinir a chave: {}",
-        "fr": "Échec de la réinitialisation de la clé : {}",
-        "vi": "Không thể đặt lại khóa: {}",
-        "zh": "重置密钥失败：{}",
-        "hi": "कुंजी रीसेट विफल: {}",
-    },
-    "Cannot open dialog.": {
-        "de": "Dialog kann nicht geöffnet werden.",
-        "es": "No se puede abrir el cuadro de diálogo.",
-        "ko": "대화상자를 열 수 없습니다.",
-        "pt": "Não é possível abrir o diálogo.",
-        "fr": "Impossible d'ouvrir la boîte de dialogue.",
-        "vi": "Không thể mở hộp thoại.",
-        "zh": "无法打开对话框。",
-        "hi": "डायलॉग नहीं खुल सका।",
-    },
-    "License activated!": {
-        "de": "Lizenz aktiviert!",
-        "es": "¡Licencia activada!",
-        "ko": "라이선스가 활성화되었습니다!",
-        "pt": "Licença ativada!",
-        "fr": "Licence activée !",
-        "vi": "Giấy phép đã được kích hoạt!",
-        "zh": "许可证已激活！",
-        "hi": "लाइसेंस सक्रिय हुआ!",
-    },
-    "Custom Key saved!": {
-        "de": "Eigener Schlüssel gespeichert!",
-        "es": "¡Clave personalizada guardada!",
-        "ko": "커스텀 키가 저장되었습니다!",
-        "pt": "Chave personalizada salva!",
-        "fr": "Clé personnalisée enregistrée !",
-        "vi": "Đã lưu khóa tùy chỉnh!",
-        "zh": "自定义密钥已保存！",
-        "hi": "कस्टम कुंजी सहेजी गई!",
-    },
-    "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Error Loading AI Assistant</h2><p>URL invalid/blocked:<code>{url_str}</code></p><p>Check connection/firewall. Report if persists.</p></div>": {
-        "de": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Fehler beim Laden des KI-Assistenten</h2><p>URL ungültig/blockiert:<code>{url_str}</code></p><p>Verbindung/Firewall prüfen. Bei anhaltendem Problem melden.</p></div>",
-        "es": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Error al cargar el asistente de IA</h2><p>URL no válida o bloqueada:<code>{url_str}</code></p><p>Revisa la conexión o el cortafuegos. Informa si el problema persiste.</p></div>",
-        "ko": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>AI 어시스턴트 로드 오류</h2><p>URL 유효하지 않음/차단됨:<code>{url_str}</code></p><p>연결/방화벽 확인. 지속되면 보고하세요.</p></div>",
-        "pt": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Erro ao carregar o assistente de IA</h2><p>URL inválida/bloqueada:<code>{url_str}</code></p><p>Verifique a conexão/firewall. Informe se persistir.</p></div>",
-        "fr": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Erreur de chargement de l'assistant IA</h2><p>URL invalide/bloquée :<code>{url_str}</code></p><p>Vérifiez la connexion/pare-feu. Signalez si ça persiste.</p></div>",
-        "vi": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>Lỗi tải trợ lý AI</h2><p>URL không hợp lệ/bị chặn:<code>{url_str}</code></p><p>Kiểm tra kết nối/tường lửa. Báo cáo nếu vẫn còn lỗi.</p></div>",
-        "zh": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>加载 AI 助手出错</h2><p>URL 无效/被屏蔽：<code>{url_str}</code></p><p>检查连接/防火墙。如问题持续请报告。</p></div>",
-        "hi": "<div style='font-family:sans-serif;padding:20px;color:#333;'><h2>AI सहायक लोड करने में त्रुटि</h2><p>URL अमान्य/अवरुद्ध:<code>{url_str}</code></p><p>कनेक्शन/फ़ायरवॉल जांचें। यदि जारी रहे तो रिपोर्ट करें।</p></div>",
-    },
-    "Internal Error: Invalid URL for AI Assistant: {}": {
-        "de": "Interner Fehler: Ungültige URL für den KI-Assistenten: {}",
-        "es": "Error interno: URL no válida para el asistente de IA: {}",
-        "ko": "내부 오류: AI 어시스턴트의 잘못된 URL: {}",
-        "pt": "Erro interno: URL inválida para o assistente de IA: {}",
-        "fr": "Erreur interne : URL invalide pour l'assistant IA : {}",
-        "vi": "Lỗi nội bộ: URL không hợp lệ cho trợ lý AI: {}",
-        "zh": "内部错误：AI 助手的 URL 无效：{}",
-        "hi": "आंतरिक त्रुटि: AI सहायक के लिए अमान्य URL: {}",
-    },
-    "Error loading AI Assistant URL: {}": {
-        "de": "Fehler beim Laden der KI-Assistent-URL: {}",
-        "es": "Error al cargar la URL del asistente de IA: {}",
-        "ko": "AI 어시스턴트 URL 로드 오류: {}",
-        "pt": "Erro ao carregar URL do assistente de IA: {}",
-        "fr": "Erreur lors du chargement de l'URL de l'assistant IA : {}",
-        "vi": "Lỗi tải URL trợ lý AI: {}",
-        "zh": "加载 AI 助手 URL 时出错：{}",
-        "hi": "AI सहायक URL लोड करने में त्रुटि: {}",
-    },
-    "<p>Failed to load URL.</p>": {
-        "de": "<p>URL konnte nicht geladen werden.</p>",
-        "es": "<p>No se pudo cargar la URL.</p>",
-        "ko": "<p>URL을 로드할 수 없습니다.</p>",
-        "pt": "<p>Falha ao carregar URL.</p>",
-        "fr": "<p>Échec du chargement de l'URL.</p>",
-        "vi": "<p>Không tải được URL.</p>",
-        "zh": "<p>无法加载 URL。</p>",
-        "hi": "<p>URL लोड करने में विफल।</p>",
-    },
-    "Trial Mode: Use buttons above...": {
-        "de": "Testmodus: Bitte die Buttons oben verwenden...",
-        "es": "Modo de prueba: usa los botones de arriba...",
-        "ko": "체험 모드: 위 버튼을 사용하세요...",
-        "pt": "Modo de teste: use os botões acima...",
-        "fr": "Mode essai : utilisez les boutons ci-dessus...",
-        "vi": "Chế độ dùng thử: sử dụng các nút ở trên...",
-        "zh": "试用模式：使用上方按钮…",
-        "hi": "ट्रायल मोड: ऊपर के बटन उपयोग करें...",
-    },
-    "Ask a question...": {
-        "de": "Stelle eine Frage...",
-        "es": "Haz una pregunta...",
-        "ko": "질문하기...",
-        "pt": "Faça uma pergunta...",
-        "fr": "Posez une question...",
-        "vi": "Đặt câu hỏi...",
-        "zh": "提问…",
-        "hi": "एक प्रश्न पूछें...",
-    },
-    "Web component (QWebEngineView) not available.": {
-        "de": "Web-Komponente (QWebEngineView) nicht verfügbar.",
-        "es": "El componente web (QWebEngineView) no está disponible.",
-        "ko": "웹 컴포넌트 (QWebEngineView)를 사용할 수 없습니다.",
-        "pt": "Componente web (QWebEngineView) não disponível.",
-        "fr": "Composant web (QWebEngineView) non disponible.",
-        "vi": "Thành phần web (QWebEngineView) không khả dụng.",
-        "zh": "Web 组件 (QWebEngineView) 不可用。",
-        "hi": "वेब घटक (QWebEngineView) उपलब्ध नहीं।",
-    },
-    "AI Assistant webview not initialized.": {
-        "de": "KI-Assistent-Webview nicht initialisiert.",
-        "es": "La vista web del asistente de IA no está inicializada.",
-        "ko": "AI 어시스턴트 웹뷰가 초기화되지 않았습니다.",
-        "pt": "Webview do assistente de IA não inicializado.",
-        "fr": "Vue web de l'assistant IA non initialisée.",
-        "vi": "Webview trợ lý AI chưa được khởi tạo.",
-        "zh": "AI 助手 webview 未初始化。",
-        "hi": "AI सहायक वेबव्यू प्रारंभ नहीं हुआ।",
-    },
-    "AI Assistant sidebar must be visible.": {
-        "de": "Die KI-Assistent-Seitenleiste muss sichtbar sein.",
-        "es": "La barra lateral del asistente de IA debe estar visible.",
-        "ko": "AI 어시스턴트 사이드바가 표시되어 있어야 합니다.",
-        "pt": "A barra lateral do assistente de IA deve estar visível.",
-        "fr": "La barre latérale de l'assistant IA doit être visible.",
-        "vi": "Thanh bên trợ lý AI phải hiển thị.",
-        "zh": "AI 助手侧边栏必须可见。",
-        "hi": "AI सहायक साइडबार दृश्यमान होना चाहिए।",
-    },
-    "AI Assistant page is still loading or not available.": {
-        "de": "Die KI-Assistent-Seite wird noch geladen oder ist nicht verfügbar.",
-        "es": "La página del asistente de IA aún se está cargando o no está disponible.",
-        "ko": "AI 어시스턴트 페이지가 아직 로드 중이거나 사용할 수 없습니다.",
-        "pt": "A página do assistente de IA ainda está carregando ou não está disponível.",
-        "fr": "La page de l'assistant IA est toujours en chargement ou n'est pas disponible.",
-        "vi": "Trang trợ lý AI vẫn đang tải hoặc không khả dụng.",
-        "zh": "AI 助手页面仍在加载或不可用。",
-        "hi": "AI सहायक पृष्ठ अभी भी लोड हो रहा है या उपलब्ध नहीं है।",
-    },
-    "Prompt sent to AI Assistant.": {
-        "de": "Prompt an den KI-Assistenten gesendet.",
-        "es": "Prompt enviado al asistente de IA.",
-        "ko": "프롬프트가 AI 어시스턴트로 전송되었습니다.",
-        "pt": "Prompt enviado ao assistente de IA.",
-        "fr": "Invite envoyée à l'assistant IA.",
-        "vi": "Đã gửi prompt đến trợ lý AI.",
-        "zh": "提示已发送给 AI 助手。",
-        "hi": "प्रॉम्प्ट AI सहायक को भेजा गया।",
-    },
-    "{addon_name}: Could find text input field (id='{selector}') in AI. Website changed?": {
-        "de": "{addon_name}: Eingabefeld (id='{selector}') der KI nicht gefunden. Hat sich die Website geändert?",
-        "es": "{addon_name}: no se encontró el campo de entrada (id='{selector}') en la IA. ¿Cambió el sitio web?",
-        "ko": "{addon_name}: AI에서 텍스트 입력 필드 (id='{selector}')를 찾을 수 없습니다. 웹사이트가 변경되었나요?",
-        "pt": "{addon_name}: Campo de texto (id='{selector}') não encontrado na IA. O site mudou?",
-        "fr": "{addon_name}: Impossible de trouver le champ de saisie (id='{selector}') dans l'IA. Le site a changé ?",
-        "vi": "{addon_name}: Không tìm thấy trường nhập văn bản (id='{selector}') trong AI. Trang web đã thay đổi?",
-        "zh": "{addon_name}：在 AI 中找不到文本输入框（id='{selector}'）。网站更改了？",
-        "hi": "{addon_name}: AI में टेक्स्ट इनपुट फ़ील्ड (id='{selector}') नहीं मिली। वेबसाइट बदल गई?",
-    },
-    "{addon_name}: Could not find/interact with send button (id='{selector}'). Check Remote Debugger.": {
-        "de": "{addon_name}: Sende-Button (id='{selector}') konnte nicht gefunden oder verwendet werden. Remote Debugger prüfen.",
-        "es": "{addon_name}: no se pudo encontrar o interactuar con el botón de enviar (id='{selector}'). Revisa el depurador remoto.",
-        "ko": "{addon_name}: 전송 버튼 (id='{selector}')을 찾거나 상호작용할 수 없습니다. 원격 디버거를 확인하세요.",
-        "pt": "{addon_name}: Não foi possível encontrar/interagir com o botão enviar (id='{selector}'). Verifique o depurador remoto.",
-        "fr": "{addon_name}: Impossible de trouver/interagir avec le bouton d'envoi (id='{selector}'). Vérifiez le débogueur distant.",
-        "vi": "{addon_name}: Không thể tìm/tương tác với nút gửi (id='{selector}'). Kiểm tra Remote Debugger.",
-        "zh": "{addon_name}：无法找到/与发送按钮（id='{selector}'）交互。检查远程调试器。",
-        "hi": "{addon_name}: भेजें बटन (id='{selector}') नहीं मिला/इंटरैक्ट नहीं किया जा सका। Remote Debugger जांचें।",
-    },
-    "{addon_name}: AI JS Error - {result}. Check Remote Debugger.": {
-        "de": "{addon_name}: KI-JS-Fehler – {result}. Remote Debugger prüfen.",
-        "es": "{addon_name}: error de JS de IA: {result}. Revisa el depurador remoto.",
-        "ko": "{addon_name}: AI JS 오류 - {result}. 원격 디버거를 확인하세요.",
-        "pt": "{addon_name}: Erro JS da IA - {result}. Verifique o depurador remoto.",
-        "fr": "{addon_name}: Erreur JS IA - {result}. Vérifiez le débogueur distant.",
-        "vi": "{addon_name}: Lỗi JS AI - {result}. Kiểm tra Remote Debugger.",
-        "zh": "{addon_name}：AI JS 错误 - {result}。检查远程调试器。",
-        "hi": "{addon_name}: AI JS त्रुटि - {result}। Remote Debugger जांचें।",
-    },
-    "{addon_name}: Unexpected JS result: {result}. Check Remote Debugger.": {
-        "de": "{addon_name}: Unerwartetes JS-Ergebnis: {result}. Remote Debugger prüfen.",
-        "es": "{addon_name}: resultado de JS inesperado: {result}. Revisa el depurador remoto.",
-        "ko": "{addon_name}: 예상치 못한 JS 결과: {result}. 원격 디버거를 확인하세요.",
-        "pt": "{addon_name}: Resultado JS inesperado: {result}. Verifique o depurador remoto.",
-        "fr": "{addon_name}: Résultat JS inattendu : {result}. Vérifiez le débogueur distant.",
-        "vi": "{addon_name}: Kết quả JS bất ngờ: {result}. Kiểm tra Remote Debugger.",
-        "zh": "{addon_name}：意外的 JS 结果：{result}。检查远程调试器。",
-        "hi": "{addon_name}: अनपेक्षित JS परिणाम: {result}। Remote Debugger जांचें।",
-    },
-    "{}: Error executing script. Check Remote Debugger.": {
-        "de": "{}: Fehler beim Ausführen des Skripts. Remote Debugger prüfen.",
-        "es": "{}: error al ejecutar el script. Revisa el depurador remoto.",
-        "ko": "{}: 스크립트 실행 오류. 원격 디버거를 확인하세요.",
-        "pt": "{}: Erro ao executar script. Verifique o depurador remoto.",
-        "fr": "{}: Erreur lors de l'exécution du script. Vérifiez le débogueur distant.",
-        "vi": "{}: Lỗi thực thi script. Kiểm tra Remote Debugger.",
-        "zh": "{}：执行脚本时出错。检查远程调试器。",
-        "hi": "{}: स्क्रिप्ट चलाने में त्रुटि। Remote Debugger जांचें।",
-    },
-    "{}: Unexpected script result. Check Remote Debugger.": {
-        "de": "{}: Unerwartetes Skriptergebnis. Remote Debugger prüfen.",
-        "es": "{}: resultado de script inesperado. Revisa el depurador remoto.",
-        "ko": "{}: 예상치 못한 스크립트 결과. 원격 디버거를 확인하세요.",
-        "pt": "{}: Resultado de script inesperado. Verifique o depurador remoto.",
-        "fr": "{}: Résultat de script inattendu. Vérifiez le débogueur distant.",
-        "vi": "{}: Kết quả script bất ngờ. Kiểm tra Remote Debugger.",
-        "zh": "{}：意外的脚本结果。检查远程调试器。",
-        "hi": "{}: अनपेक्षित स्क्रिप्ट परिणाम। Remote Debugger जांचें।",
-    },
-    "{addon_name}: Critical error sending prompt: {err}": {
-        "de": "{addon_name}: Kritischer Fehler beim Senden des Prompts: {err}",
-        "es": "{addon_name}: error crítico al enviar el prompt: {err}",
-        "ko": "{addon_name}: 프롬프트 전송 중 치명적 오류: {err}",
-        "pt": "{addon_name}: Erro crítico ao enviar prompt: {err}",
-        "fr": "{addon_name}: Erreur critique lors de l'envoi du prompt : {err}",
-        "vi": "{addon_name}: Lỗi nghiêm trọng khi gửi prompt: {err}",
-        "zh": "{addon_name}：发送提示时发生严重错误：{err}",
-        "hi": "{addon_name}: प्रॉम्प्ट भेजने में गंभीर त्रुटि: {err}",
-    },
-    "No card content found.": {
-        "de": "Kein Karteninhalt gefunden.",
-        "es": "No se encontró contenido de la tarjeta.",
-        "ko": "카드 내용을 찾을 수 없습니다.",
-        "pt": "Nenhum conteúdo de cartão encontrado.",
-        "fr": "Aucun contenu de carte trouvé.",
-        "vi": "Không tìm thấy nội dung thẻ.",
-        "zh": "未找到卡片内容。",
-        "hi": "कोई कार्ड सामग्री नहीं मिली।",
-    },
-    "No card content to use in custom prompt.": {
-        "de": "Kein Karteninhalt für eigenen Prompt verfügbar.",
-        "es": "No hay contenido de tarjeta para usar en el prompt personalizado.",
-        "ko": "커스텀 프롬프트에 사용할 카드 내용이 없습니다.",
-        "pt": "Nenhum conteúdo de cartão para usar no prompt personalizado.",
-        "fr": "Aucun contenu de carte à utiliser dans le prompt personnalisé.",
-        "vi": "Không có nội dung thẻ để sử dụng trong prompt tùy chỉnh.",
-        "zh": "没有可在自定义提示中使用的卡片内容。",
-        "hi": "कस्टम प्रॉम्प्ट में उपयोग के लिए कोई कार्ड सामग्री नहीं।",
-    },
-    "Custom prompt not set up correctly. Please define or edit it.": {
-        "de": "Eigener Prompt ist nicht korrekt eingerichtet. Bitte definieren oder bearbeiten.",
-        "es": "El prompt personalizado no está configurado correctamente. Defínelo o edítalo.",
-        "ko": "커스텀 프롬프트가 올바르게 설정되지 않았습니다. 정의하거나 편집하세요.",
-        "pt": "Prompt personalizado não configurado corretamente. Por favor, defina ou edite-o.",
-        "fr": "Le prompt personnalisé n'est pas correctement configuré. Veuillez le définir ou le modifier.",
-        "vi": "Prompt tùy chỉnh chưa được thiết lập đúng. Vui lòng định nghĩa hoặc chỉnh sửa nó.",
-        "zh": "自定义提示设置不正确。请定义或编辑它。",
-        "hi": "कस्टम प्रॉम्प्ट सही तरीके से सेट नहीं है। कृपया परिभाषित करें या संपादित करें।",
-    },
-    "Cannot open prompt dialog (missing components).": {
-        "de": "Prompt-Dialog kann nicht geöffnet werden (fehlende Komponenten).",
-        "es": "No se puede abrir el cuadro de diálogo del prompt (faltan componentes).",
-        "ko": "프롬프트 대화상자를 열 수 없습니다 (필요한 컴포넌트 없음).",
-        "pt": "Não é possível abrir o diálogo de prompt (componentes ausentes).",
-        "fr": "Impossible d'ouvrir la boîte de dialogue du prompt (composants manquants).",
-        "vi": "Không thể mở hộp thoại prompt (thiếu thành phần).",
-        "zh": "无法打开提示对话框（缺少组件）。",
-        "hi": "प्रॉम्प्ट डायलॉग नहीं खुल सकता (घटक अनुपलब्ध)।",
-    },
-    "Edit Custom Prompt Template": {
-        "de": "Eigene Prompt-Vorlage bearbeiten",
-        "es": "Editar plantilla de prompt personalizada",
-        "ko": "맞춤 프롬프트 템플릿 편집",
-        "pt": "Editar modelo de prompt personalizado",
-        "fr": "Modifier le modèle de prompt personnalisé",
-        "vi": "Chỉnh sửa mẫu prompt tùy chỉnh",
-        "zh": "编辑自定义提示模板",
-        "hi": "कस्टम प्रॉम्प्ट टेम्पलेट संपादित करें",
-    },
-    "Enter your custom prompt template for the AI Assistant.\nUse the placeholder '{content}' (with curly braces) where you want the current card's front side content to be inserted.\nThe language suffix will be added automatically based on your selection.": {
-        "de": "Gib Deine eigene Prompt-Vorlage für den KI-Assistenten ein.\nVerwende den Platzhalter '{content}' (mit geschweiften Klammern), wo der Inhalt der Kartenvorderseite eingefügt werden soll.\nDer Sprach-Suffix wird automatisch basierend auf Deiner Auswahl hinzugefügt.",
-        "es": "Introduce tu plantilla de prompt personalizada para el asistente de IA.\nUsa el marcador '{content}' (con llaves) donde quieras que se inserte el contenido del anverso de la tarjeta actual.\nEl sufijo de idioma se añadirá automáticamente según tu selección.",
-        "ko": "AI 어시스턴트의 맞춤 프롬프트 템플릿을 입력하세요.\n현재 카드 앞면 내용이 삽입될 위치에 '{content}' 자리표시자(중괄호 포함)를 사용하세요.\n언어 접미사는 선택에 따라 자동으로 추가됩니다.",
-        "pt": "Digite seu modelo de prompt personalizado para o Assistente de IA.\nUse o espaço reservado '{content}' (com chaves) onde deseja inserir o conteúdo do lado frontal do cartão atual.\nO sufixo de idioma será adicionado automaticamente com base na sua seleção.",
-        "fr": "Entrez votre modèle de prompt personnalisé pour l'Assistant IA.\nUtilisez l'espace réservé '{content}' (avec accolades) là où vous souhaitez insérer le contenu du recto de la carte actuelle.\nLe suffixe de langue sera ajouté automatiquement en fonction de votre sélection.",
-        "vi": "Nhập mẫu prompt tùy chỉnh cho Trợ lý AI.\nSử dụng '{content}' (có dấu ngoặc nhọn) ở nơi bạn muốn chèn nội dung mặt trước của thẻ hiện tại.\nHậu tố ngôn ngữ sẽ được thêm tự động theo lựa chọn của bạn.",
-        "zh": "输入您的 AI 助手自定义提示模板。\n在您希望插入当前卡片正面内容的位置使用占位符 '{content}'（含花括号）。\n语言后缀将根据您的选择自动添加。",
-        "hi": "AI असिस्टेंट के लिए अपना कस्टम प्रॉम्प्ट टेम्पलेट दर्ज करें।\nजहाँ आप वर्तमान कार्ड के सामने की सामग्री डालना चाहते हैं वहाँ '{content}' प्लेसहोल्डर (घुंघराले कोष्ठक सहित) का उपयोग करें।\nभाषा प्रत्यय आपकी चयन के आधार पर स्वतः जोड़ा जाएगा।",
-    },
-    "Placeholder Missing": {
-        "de": "Platzhalter fehlt",
-        "es": "Falta marcador",
-        "ko": "자리표시자 누락",
-        "pt": "Espaço reservado ausente",
-        "fr": "Espace réservé manquant",
-        "vi": "Thiếu trình giữ chỗ",
-        "zh": "缺少占位符",
-        "hi": "प्लेसहोल्डर गायब",
-    },
-    "The placeholder '{content}' is missing in your prompt template. Card content will not be inserted.\n\nSave anyway?": {
-        "de": "Der Platzhalter '{content}' fehlt in Deiner Prompt-Vorlage. Der Karteninhalt wird nicht eingefügt.\n\nTrotzdem speichern?",
-        "es": "Falta el marcador '{content}' en tu plantilla de prompt. El contenido de la tarjeta no se insertará.\n\n¿Guardar de todas formas?",
-        "ko": "프롬프트 템플릿에 '{content}' 자리표시자가 없습니다. 카드 내용이 삽입되지 않습니다.\n\n그래도 저장하시겠습니까?",
-        "pt": "O espaço reservado '{content}' está ausente no seu modelo de prompt. O conteúdo do cartão não será inserido.\n\nSalvar mesmo assim?",
-        "fr": "L'espace réservé '{content}' est absent de votre modèle de prompt. Le contenu de la carte ne sera pas inséré.\n\nEnregistrer quand même?",
-        "vi": "Trình giữ chỗ '{content}' bị thiếu trong mẫu prompt. Nội dung thẻ sẽ không được chèn.\n\nVẫn lưu?",
-        "zh": "您的提示模板中缺少占位符 '{content}'。卡片内容将不会被插入。\n\n仍然保存吗？",
-        "hi": "आपके प्रॉम्प्ट टेम्पलेट में '{content}' प्लेसहोल्डर गायब है। कार्ड सामग्री नहीं डाली जाएगी।\n\nफिर भी सहेजें?",
-    },
-    "Custom prompt not saved (placeholder missing).": {
-        "de": "Eigener Prompt nicht gespeichert (Platzhalter fehlt).",
-        "es": "Prompt personalizado no guardado (falta el marcador).",
-        "ko": "맞춤 프롬프트가 저장되지 않았습니다 (자리표시자 없음).",
-        "pt": "Prompt personalizado não salvo (espaço reservado ausente).",
-        "fr": "Prompt personnalisé non enregistré (espace réservé manquant).",
-        "vi": "Prompt tùy chỉnh chưa được lưu (thiếu trình giữ chỗ).",
-        "zh": "自定义提示未保存（缺少占位符）。",
-        "hi": "कस्टम प्रॉम्प्ट सहेजा नहीं गया (प्लेसहोल्डर गायब)।",
-    },
-    "Custom prompt template saved!": {
-        "de": "Eigene Prompt-Vorlage gespeichert!",
-        "es": "¡Plantilla de prompt personalizada guardada!",
-        "ko": "맞춤 프롬프트 템플릿이 저장되었습니다!",
-        "pt": "Modelo de prompt personalizado salvo!",
-        "fr": "Modèle de prompt personnalisé enregistré!",
-        "vi": "Đã lưu mẫu prompt tùy chỉnh!",
-        "zh": "自定义提示模板已保存！",
-        "hi": "कस्टम प्रॉम्प्ट टेम्पलेट सहेजा गया!",
-    },
-    " Click 'Own Prompt' again to use it.": {
-        "de": " Klicke erneut auf 'Eigener Prompt', um sie zu verwenden.",
-        "es": " Haz clic de nuevo en 'Prompt propio' para usarla.",
-        "ko": " '직접 프롬프트'를 다시 클릭하여 사용하세요.",
-        "pt": " Clique em 'Prompt próprio' novamente para usá-lo.",
-        "fr": " Cliquez à nouveau sur 'Prompt perso' pour l'utiliser.",
-        "vi": " Nhấn 'Prompt riêng' lần nữa để sử dụng.",
-        "zh": " 再次点击'自定义提示'以使用它。",
-        "hi": " इसे उपयोग करने के लिए 'स्वयं प्रॉम्प्ट' पर फिर से क्लिक करें।",
-    },
-    "Custom prompt template not changed (empty).": {
-        "de": "Eigene Prompt-Vorlage nicht geändert (leer).",
-        "es": "Plantilla de prompt personalizada sin cambios (vacía).",
-        "ko": "맞춤 프롬프트 템플릿이 변경되지 않았습니다 (비어 있음).",
-        "pt": "Modelo de prompt personalizado não alterado (vazio).",
-        "fr": "Modèle de prompt personnalisé non modifié (vide).",
-        "vi": "Mẫu prompt tùy chỉnh chưa thay đổi (trống).",
-        "zh": "自定义提示模板未更改（为空）。",
-        "hi": "कस्टम प्रॉम्प्ट टेम्पलेट नहीं बदला (खाली)।",
-    },
-    "No license key is currently saved.": {
-        "de": "Zurzeit ist kein Lizenzschlüssel gespeichert.",
-        "es": "No hay ninguna clave de licencia guardada actualmente.",
-        "ko": "현재 저장된 라이선스 키가 없습니다.",
-        "pt": "Nenhuma chave de licença está salva atualmente.",
-        "fr": "Aucune clé de licence n'est actuellement enregistrée.",
-        "vi": "Hiện không có khóa giấy phép nào được lưu.",
-        "zh": "当前没有保存的许可证密钥。",
-        "hi": "वर्तमान में कोई लाइसेंस कुंजी सहेजी नहीं है।",
-    },
-    "AI Assistant: Addon path issue. Default profile location.": {
-        "de": "KI-Assistent: Problem mit dem Add-on-Pfad. Standard-Profilpfad wird verwendet.",
-        "es": "Asistente de IA: problema con la ruta del complemento. Se usará la ubicación de perfil predeterminada.",
-        "ko": "AI 어시스턴트: 애드온 경로 문제. 기본 프로필 위치 사용.",
-        "pt": "Assistente de IA: problema com o caminho do complemento. Local de perfil padrão.",
-        "fr": "Assistant IA: problème de chemin du module. Emplacement de profil par défaut.",
-        "vi": "Trợ lý AI: Lỗi đường dẫn tiện ích. Sử dụng vị trí hồ sơ mặc định.",
-        "zh": "AI 助手：插件路径问题。使用默认配置文件位置。",
-        "hi": "AI असिस्टेंट: ऐड-ऑन पथ समस्या। डिफ़ॉल्ट प्रोफ़ाइल स्थान।",
-    },
-    "AI Assistant profile error ({}). Non-persistent.": {
-        "de": "KI-Assistent-Profilfehler ({}). Nicht persistent.",
-        "es": "Error del perfil del asistente de IA ({}). No persistente.",
-        "ko": "AI 어시스턴트 프로필 오류 ({}). 비영구적.",
-        "pt": "Erro de perfil do Assistente de IA ({}). Não persistente.",
-        "fr": "Erreur de profil de l'Assistant IA ({}). Non persistant.",
-        "vi": "Lỗi hồ sơ Trợ lý AI ({}). Không lưu trữ.",
-        "zh": "AI 助手配置文件错误 ({})。非持久性。",
-        "hi": "AI असिस्टेंट प्रोफ़ाइल त्रुटि ({})। गैर-स्थायी।",
-    },
-    "Short": {
-        "de": "Kurz",
-        "es": "Breve",
-        "ko": "짧게",
-        "pt": "Curto",
-        "fr": "Court",
-        "vi": "Ngắn",
-        "zh": "简短",
-        "hi": "संक्षिप्त",
-    },
-    "Brief further explanation": {
-        "de": "Kurze, weiterführende Erklärung",
-        "es": "Explicación adicional breve",
-        "ko": "간략한 추가 설명",
-        "pt": "Breve explicação adicional",
-        "fr": "Brève explication complémentaire",
-        "vi": "Giải thích ngắn gọn thêm",
-        "zh": "简短进一步说明",
-        "hi": "संक्षिप्त अतिरिक्त स्पष्टीकरण",
-    },
-    "Concise": {
-        "de": "Prägnant",
-        "es": "Conciso",
-        "ko": "간결하게",
-        "pt": "Conciso",
-        "fr": "Concis",
-        "vi": "Súc tích",
-        "zh": "简洁",
-        "hi": "संक्षिप्त",
-    },
-    "Concise but comprehensive explanation": {
-        "de": "Prägnante, aber umfassende Erklärung",
-        "es": "Explicación concisa pero completa",
-        "ko": "간결하지만 포괄적인 설명",
-        "pt": "Explicação concisa, mas abrangente",
-        "fr": "Explication concise mais complète",
-        "vi": "Giải thích súc tích nhưng toàn diện",
-        "zh": "简洁但全面的解释",
-        "hi": "संक्षिप्त किंतु व्यापक स्पष्टीकरण",
-    },
-    "Detailed": {
-        "de": "Ausführlich",
-        "es": "Detallado",
-        "ko": "자세히",
-        "pt": "Detalhado",
-        "fr": "Détaillé",
-        "vi": "Chi tiết",
-        "zh": "详细",
-        "hi": "विस्तृत",
-    },
-    "Detailed explanation": {
-        "de": "Ausführliche Erklärung",
-        "es": "Explicación detallada",
-        "ko": "자세한 설명",
-        "pt": "Explicação detalhada",
-        "fr": "Explication détaillée",
-        "vi": "Giải thích chi tiết",
-        "zh": "详细说明",
-        "hi": "विस्तृत स्पष्टीकरण",
-    },
-    "MCQ": {
-        "de": "MCQ",
-        "es": "MCQ",
-        "ko": "객관식",
-        "pt": "MCQ",
-        "fr": "QCM",
-        "vi": "MCQ",
-        "zh": "选择题",
-        "hi": "MCQ",
-    },
-    "Generate MCQ": {
-        "de": "MCQ erzeugen",
-        "es": "Generar MCQ",
-        "ko": "객관식 생성",
-        "pt": "Gerar MCQ",
-        "fr": "Générer QCM",
-        "vi": "Tạo MCQ",
-        "zh": "生成选择题",
-        "hi": "MCQ बनाएं",
-    },
-    "Mnemonic": {
-        "de": "Eselsbrücke",
-        "es": "Regla mnemotécnica",
-        "ko": "기억술",
-        "pt": "Mnemônico",
-        "fr": "Mnémotechnique",
-        "vi": "Mẹo ghi nhớ",
-        "zh": "记忆术",
-        "hi": "स्मृति सहायक",
-    },
-    "Generate mnemonic": {
-        "de": "Eselsbrücke erzeugen",
-        "es": "Generar regla mnemotécnica",
-        "ko": "기억술 생성",
-        "pt": "Gerar mnemônico",
-        "fr": "Générer un mnémotechnique",
-        "vi": "Tạo mẹo ghi nhớ",
-        "zh": "生成记忆术",
-        "hi": "स्मृति सहायक बनाएं",
-    },
-    "Own Prompt": {
-        "de": "Eigener Prompt",
-        "es": "Prompt propio",
-        "ko": "직접 프롬프트",
-        "pt": "Prompt próprio",
-        "fr": "Prompt perso",
-        "vi": "Prompt riêng",
-        "zh": "自定义提示",
-        "hi": "स्वयं प्रॉम्प्ट",
-    },
-    "Execute saved custom prompt": {
-        "de": "Gespeicherten eigenen Prompt ausführen",
-        "es": "Ejecutar el prompt personalizado guardado",
-        "ko": "저장된 맞춤 프롬프트 실행",
-        "pt": "Executar prompt personalizado salvo",
-        "fr": "Exécuter le prompt personnalisé enregistré",
-        "vi": "Thực thi prompt tùy chỉnh đã lưu",
-        "zh": "执行已保存的自定义提示",
-        "hi": "सहेजा गया कस्टम प्रॉम्प्ट चलाएं",
-    },
-    "Edit Own Prompt": {
-        "de": "Eigenen Prompt bearbeiten",
-        "es": "Editar prompt propio",
-        "ko": "직접 프롬프트 편집",
-        "pt": "Editar prompt próprio",
-        "fr": "Modifier le prompt perso",
-        "vi": "Chỉnh sửa prompt riêng",
-        "zh": "编辑自定义提示",
-        "hi": "स्वयं प्रॉम्प्ट संपादित करें",
     },
     "Key": {
         "de": "Schlüssel",
@@ -4502,300 +2460,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "密钥",
         "hi": "कुंजी",
     },
-    "Response language": {
-        "de": "Antwortsprache",
-        "es": "Idioma de respuesta",
-        "ko": "응답 언어",
-        "pt": "Idioma de resposta",
-        "fr": "Langue de réponse",
-        "vi": "Ngôn ngữ phản hồi",
-        "zh": "响应语言",
-        "hi": "प्रतिक्रिया भाषा",
-    },
-    "Content to include": {
-        "de": "Einzubeziehender Inhalt",
-        "es": "Contenido a incluir",
-        "ko": "포함할 내용",
-        "pt": "Conteúdo a incluir",
-        "fr": "Contenu à inclure",
-        "vi": "Nội dung cần bao gồm",
-        "zh": "要包含的内容",
-        "hi": "शामिल करने की सामग्री",
-    },
-    "Edit your saved custom prompt template": {
-        "de": "Gespeicherte eigene Prompt-Vorlage bearbeiten",
-        "es": "Editar tu plantilla de prompt personalizada guardada",
-        "ko": "저장된 맞춤 프롬프트 템플릿 편집",
-        "pt": "Editar seu modelo de prompt personalizado salvo",
-        "fr": "Modifier votre modèle de prompt personnalisé enregistré",
-        "vi": "Chỉnh sửa mẫu prompt tùy chỉnh đã lưu",
-        "zh": "编辑您保存的自定义提示模板",
-        "hi": "सहेजा गया कस्टम प्रॉम्प्ट टेम्पलेट संपादित करें",
-    },
-    "View and manage your saved license key": {
-        "de": "Gespeicherten Lizenzschlüssel anzeigen und verwalten",
-        "es": "Ver y gestionar tu clave de licencia guardada",
-        "ko": "저장된 라이선스 키 보기 및 관리",
-        "pt": "Ver e gerenciar sua chave de licença salva",
-        "fr": "Afficher et gérer votre clé de licence enregistrée",
-        "vi": "Xem và quản lý khóa giấy phép đã lưu",
-        "zh": "查看和管理您保存的许可证密钥",
-        "hi": "सहेजी गई लाइसेंस कुंजी देखें और प्रबंधित करें",
-    },
-    "Error setting up AI Assistant: {}. See console.": {
-        "de": "Fehler beim Einrichten des KI-Assistenten: {}. Siehe Konsole.",
-        "es": "Error al configurar el asistente de IA: {}. Consulta la consola.",
-        "ko": "AI 어시스턴트 설정 오류: {}. 콘솔을 확인하세요.",
-        "pt": "Erro ao configurar o Assistente de IA: {}. Veja o console.",
-        "fr": "Erreur lors de la configuration de l'Assistant IA: {}. Voir la console.",
-        "vi": "Lỗi thiết lập Trợ lý AI: {}. Xem bảng điều khiển.",
-        "zh": "设置 AI 助手时出错：{}。请查看控制台。",
-        "hi": "AI असिस्टेंट सेट अप करने में त्रुटि: {}। कंसोल देखें।",
-    },
-    "AI language: {}": {
-        "de": "KI-Sprache: {}",
-        "es": "Idioma de IA: {}",
-        "ko": "AI 언어: {}",
-        "pt": "Idioma de IA: {}",
-        "fr": "Langue IA: {}",
-        "vi": "Ngôn ngữ AI: {}",
-        "zh": "AI 语言：{}",
-        "hi": "AI भाषा: {}",
-    },
-    "AI Source: {}": {
-        "de": "KI-Quelle: {}",
-        "es": "Fuente de IA: {}",
-        "ko": "AI 소스: {}",
-        "pt": "Fonte de IA: {}",
-        "fr": "Source IA: {}",
-        "vi": "Nguồn AI: {}",
-        "zh": "AI 来源：{}",
-        "hi": "AI स्रोत: {}",
-    },
-    "AI Assistant cannot show. Check deps.": {
-        "de": "KI-Assistent kann nicht angezeigt werden. Abhängigkeiten prüfen.",
-        "es": "No se puede mostrar el asistente de IA. Verifica las dependencias.",
-        "ko": "AI 어시스턴트를 표시할 수 없습니다. 종속성을 확인하세요.",
-        "pt": "Assistente de IA não pode ser exibido. Verifique as dependências.",
-        "fr": "L'Assistant IA ne peut pas s'afficher. Vérifiez les dépendances.",
-        "vi": "Không thể hiển thị Trợ lý AI. Kiểm tra các phụ thuộc.",
-        "zh": "AI 助手无法显示。请检查依赖项。",
-        "hi": "AI असिस्टेंट नहीं दिखाया जा सकता। निर्भरताएं जांचें।",
-    },
-    "Error showing/hiding AI Assistant: {}": {
-        "de": "Fehler beim Anzeigen/Verbergen des KI-Assistenten: {}",
-        "es": "Error al mostrar/ocultar el asistente de IA: {}",
-        "ko": "AI 어시스턴트 표시/숨기기 오류: {}",
-        "pt": "Erro ao mostrar/ocultar o Assistente de IA: {}",
-        "fr": "Erreur lors de l'affichage/masquage de l'Assistant IA: {}",
-        "vi": "Lỗi khi hiện/ẩn Trợ lý AI: {}",
-        "zh": "显示/隐藏 AI 助手时出错：{}",
-        "hi": "AI असिस्टेंट दिखाने/छिपाने में त्रुटि: {}",
-    },
 
     # ================================================================= #
     # Daily Challenges  (gamification.py – DAILY_CHALLENGES[i]["text"])
     # ================================================================= #
-    "Review cards for 15 minutes straight.": {
-        "de": "15 Minuten Karten wiederholen.",
-        "es": "Repasa tarjetas 15 min seguidos.",
-        "ko": "15분 연속으로 카드 복습.",
-        "pt": "Revise cartões por 15 minutos seguidos.",
-        "fr": "Révisez 15 min d’affilée.",
-        "vi": "Ôn thẻ liên tục 15 phút.",
-        "zh": "连续复习卡片15分钟。",
-        "hi": "लगातार 15 मिनट तक कार्ड की समीक्षा करें।",
-    },
-    "Learn 10 new cards today.": {
-        "de": "Heute 10 neue Karten lernen.",
-        "es": "Aprende 10 tarjetas nuevas hoy.",
-        "ko": "오늘 새 카드 10장 학습.",
-        "pt": "Aprenda 10 novos cartões hoje.",
-        "fr": "Apprenez 10 nouvelles cartes aujourd'hui.",
-        "vi": "Học 10 thẻ mới hôm nay.",
-        "zh": "今天学习10张新卡片。",
-        "hi": "आज 10 नए कार्ड सीखें।",
-    },
-    "Review for at least 1 hour today": {
-        "de": "Heute mindestens 1 Stunde wiederholen",
-        "es": "Repasa al menos 1 hora hoy",
-        "ko": "오늘 최소 1시간 복습",
-        "pt": "Revise por pelo menos 1 hora hoje",
-        "fr": "Révisez 1 h aujourd’hui.",
-        "vi": "Ôn tập ít nhất 1 giờ hôm nay",
-        "zh": "今天至少复习1小时",
-        "hi": "आज कम से कम 1 घंटे समीक्षा करें",
-    },
-    "Review cards from 3 different decks.": {
-        "de": "Karten aus 3 Stapeln wiederholen.",
-        "es": "Repasa tarjetas de 3 mazos distintos.",
-        "ko": "3개의 다른 덱에서 카드 복습.",
-        "pt": "Revise cartões de 3 baralhos diferentes.",
-        "fr": "Révisez 3 paquets différents.",
-        "vi": "Ôn thẻ từ 3 bộ thẻ khác nhau.",
-        "zh": "复习来自3个不同牌组的卡片。",
-        "hi": "3 अलग-अलग डेक से कार्ड की समीक्षा करें।",
-    },
-    "Review 200 cards today": {
-        "de": "Heute 200 Karten wiederholen",
-        "es": "Repasa 200 tarjetas hoy",
-        "ko": "오늘 카드 200장 복습",
-        "pt": "Revise 200 cartões hoje",
-        "fr": "Révisez 200 cartes aujourd'hui",
-        "vi": "Ôn 200 thẻ hôm nay",
-        "zh": "今天复习200张卡片",
-        "hi": "आज 200 कार्ड की समीक्षा करें",
-    },
-    "Finish all due reviews before noon.": {
-        "de": "Alle fälligen Wiederholungen erledigen.",
-        "es": "Termina las revisiones antes del mediodía.",
-        "ko": "정오 전에 모든 복습 완료.",
-        "pt": "Termine revisões antes do meio-dia.",
-        "fr": "Terminez toutes les révisions avant midi.",
-        "vi": "Hoàn thành tất cả ôn tập trước trưa.",
-        "zh": "在中午前完成所有待复习卡片。",
-        "hi": "दोपहर से पहले सभी बकाया समीक्षाएं पूरी करें।",
-    },
-    "Review 50 cards.": {
-        "de": "50 Karten wiederholen.",
-        "es": "Repasa 50 tarjetas.",
-        "ko": "카드 50장 복습.",
-        "pt": "Revise 50 cartões.",
-        "fr": "Révisez 50 cartes.",
-        "vi": "Ôn 50 thẻ.",
-        "zh": "复习50张卡片。",
-        "hi": "50 कार्ड की समीक्षा करें।",
-    },
-    "Do your reviews with no distractions": {
-        "de": "Ohne Ablenkung lernen",
-        "es": "Repasa sin distracciones",
-        "ko": "방해 없이 복습하기",
-        "pt": "Faça suas revisões sem distrações",
-        "fr": "Révisez sans distractions",
-        "vi": "Ôn tập không bị phân tâm",
-        "zh": "专注复习，不受干扰",
-        "hi": "बिना विचलित हुए समीक्षा करें",
-    },
-    "Review 150 cards": {
-        "de": "150 Karten wiederholen",
-        "es": "Repasa 150 tarjetas",
-        "ko": "카드 150장 복습",
-        "pt": "Revise 150 cartões",
-        "fr": "Révisez 150 cartes",
-        "vi": "Ôn 150 thẻ",
-        "zh": "复习150张卡片",
-        "hi": "150 कार्ड की समीक्षा करें",
-    },
-    "Do Anki for 30 minutes straight.": {
-        "de": "30 Minuten Anki ohne Unterbrechung.",
-        "es": "Haz Anki 30 minutos seguidos.",
-        "ko": "30분 연속으로 Anki 공부.",
-        "pt": "Faça Anki por 30 minutos seguidos.",
-        "fr": "Faites Anki pendant 30 minutes d'affilée.",
-        "vi": "Học Anki liên tục 30 phút.",
-        "zh": "连续使用Anki学习30分钟。",
-        "hi": "लगातार 30 मिनट Anki करें।",
-    },
-    "Add 3 new notes with images.": {
-        "de": "3 neue Notizen mit Bildern hinzufügen.",
-        "es": "Añade 3 notas nuevas con imágenes.",
-        "ko": "이미지가 있는 새 노트 3개 추가.",
-        "pt": "Adicione 3 novas notas com imagens.",
-        "fr": "Ajoutez 3 notes avec images.",
-        "vi": "Thêm 3 ghi chú mới có hình ảnh.",
-        "zh": "添加3条带图片的新笔记。",
-        "hi": "छवियों के साथ 3 नए नोट जोड़ें।",
-    },
-    "Review 50 cards": {
-        "de": "50 Karten wiederholen",
-        "es": "Repasa 50 tarjetas",
-        "ko": "카드 50장 복습",
-        "pt": "Revise 50 cartões",
-        "fr": "Révisez 50 cartes",
-        "vi": "Ôn 50 thẻ",
-        "zh": "复习50张卡片",
-        "hi": "50 कार्ड की समीक्षा करें",
-    },
-    "Study one filtered deck completely.": {
-        "de": "Einen Stapel durcharbeiten.",
-        "es": "Estudia un mazo filtrado completo.",
-        "ko": "필터 덱 하나 완전히 학습.",
-        "pt": "Estude um baralho filtrado completamente.",
-        "fr": "Étudiez entièrement un paquet filtré.",
-        "vi": "Học hết một bộ thẻ lọc.",
-        "zh": "完整学习一个筛选牌组。",
-        "hi": "एक फ़िल्टर्ड डेक पूरी तरह अध्ययन करें।",
-    },
-    "Review 100 cards total": {
-        "de": "Insgesamt 100 Karten wiederholen",
-        "es": "Repasa 100 tarjetas en total",
-        "ko": "총 카드 100장 복습",
-        "pt": "Revise 100 cartões no total",
-        "fr": "Révisez 100 cartes au total",
-        "vi": "Ôn tổng cộng 100 thẻ",
-        "zh": "总共复习100张卡片",
-        "hi": "कुल 100 कार्ड की समीक्षा करें",
-    },
-    "Review 250 Cards.": {
-        "de": "250 Karten wiederholen.",
-        "es": "Repasa 250 tarjetas.",
-        "ko": "카드 250장 복습.",
-        "pt": "Revise 250 cartões.",
-        "fr": "Révisez 250 cartes.",
-        "vi": "Ôn 250 thẻ.",
-        "zh": "复习250张卡片。",
-        "hi": "250 कार्ड की समीक्षा करें।",
-    },
-    "Learn 30 new cards": {
-        "de": "30 neue Karten lernen",
-        "es": "Aprende 30 tarjetas nuevas",
-        "ko": "새 카드 30장 학습",
-        "pt": "Aprenda 30 novos cartões",
-        "fr": "Apprenez 30 nouvelles cartes",
-        "vi": "Học 30 thẻ mới",
-        "zh": "学习30张新卡片",
-        "hi": "30 नए कार्ड सीखें",
-    },
-    "Review 100 cards.": {
-        "de": "100 Karten wiederholen.",
-        "es": "Repasa 100 tarjetas.",
-        "ko": "카드 100장 복습.",
-        "pt": "Revise 100 cartões.",
-        "fr": "Révisez 100 cartes.",
-        "vi": "Ôn 100 thẻ.",
-        "zh": "复习100张卡片。",
-        "hi": "100 कार्ड की समीक्षा करें।",
-    },
-    "Learn 15 new cards.": {
-        "de": "15 neue Karten lernen.",
-        "es": "Aprende 15 tarjetas nuevas.",
-        "ko": "새 카드 15장 학습.",
-        "pt": "Aprenda 15 novos cartões.",
-        "fr": "Apprenez 15 nouvelles cartes.",
-        "vi": "Học 15 thẻ mới.",
-        "zh": "学习15张新卡片。",
-        "hi": "15 नए कार्ड सीखें।",
-    },
-    "Sync your collection to AnkiWeb.": {
-        "de": "Sammlung synchronisieren.",
-        "es": "Sincroniza tu colección.",
-        "ko": "컬렉션을 AnkiWeb과 동기화.",
-        "pt": "Sincronize sua coleção com AnkiWeb.",
-        "fr": "Synchronisez avec AnkiWeb.",
-        "vi": "Đồng bộ bộ thẻ với AnkiWeb.",
-        "zh": "将收藏同步到AnkiWeb。",
-        "hi": "अपने संग्रह को AnkiWeb से सिंक करें।",
-    },
-    "Review all due cards for today.": {
-        "de": "Heutige fälligen Karten wiederholen.",
-        "es": "Repasa las tarjetas de hoy.",
-        "ko": "오늘 모든 예정 카드 복습.",
-        "pt": "Revise todos os cartões pendentes de hoje.",
-        "fr": "Révisez toutes les cartes du jour.",
-        "vi": "Ôn tất cả thẻ đến hạn hôm nay.",
-        "zh": "复习今天所有到期的卡片。",
-        "hi": "आज के सभी देय कार्ड की समीक्षा करें।",
-    },
 
     # ================================================================= #
     # Daily Medical Facts  (daily_widgets.py – MEDICAL_FACTS[i]["text"])
@@ -5816,170 +3484,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ================================================================= #
     # configuration.py – AIPlanHelperDialog
     # ================================================================= #
-    "AI Study Plan Generator Helper": {
-        "de": "KI-Lernplan-Generator",
-        "es": "Generador de plan de estudio con IA",
-        "ko": "AI 학습 계획 생성기",
-        "pt": "Gerador de plano de estudos com IA",
-        "fr": "Générateur de plan d\'étude IA",
-        "vi": "Trình tạo kế hoạch học tập AI",
-        "zh": "AI 学习计划生成器",
-        "hi": "AI अध्ययन योजना जेनरेटर",
-    },
-    "Generate with AI": {
-        "de": "Mit KI generieren",
-        "es": "Generar con IA",
-        "ko": "AI로 생성",
-        "pt": "Gerar com IA",
-        "fr": "Générer avec l\'IA",
-        "vi": "Tạo bằng AI",
-        "zh": "用 AI 生成",
-        "hi": "AI से बनाएं",
-    },
-    "Follow these steps to generate a study plan with an AI (like ChatGPT, Claude) and import it.": {
-        "de": "Folge diesen Schritten, um einen Lernplan mit einer KI (z. B. ChatGPT, Claude) zu erstellen und zu importieren.",
-        "es": "Sigue estos pasos para generar un plan de estudio con una IA (como ChatGPT, Claude) e importarlo.",
-        "ko": "AI(예: ChatGPT, Claude)로 학습 계획을 생성하고 가져오려면 다음 단계를 따르세요.",
-        "pt": "Siga estes passos para gerar um plano de estudos com IA (como ChatGPT, Claude) e importá-lo.",
-        "fr": "Suivez ces étapes pour générer un plan d\'étude avec une IA (comme ChatGPT, Claude) et l\'importer.",
-        "vi": "Thực hiện các bước sau để tạo kế hoạch học tập bằng AI (như ChatGPT, Claude) và nhập nó.",
-        "zh": "按照以下步骤使用 AI（如 ChatGPT、Claude）生成学习计划并导入。",
-        "hi": "AI (जैसे ChatGPT, Claude) से अध्ययन योजना बनाने और आयात करने के लिए ये चरण अपनाएं।",
-    },
-    "Watch Tutorial on YouTube": {
-        "de": "Tutorial auf YouTube ansehen",
-        "es": "Ver tutorial en YouTube",
-        "ko": "YouTube에서 튜토리얼 보기",
-        "pt": "Assistir tutorial no YouTube",
-        "fr": "Voir le tutoriel sur YouTube",
-        "vi": "Xem hướng dẫn trên YouTube",
-        "zh": "在 YouTube 上观看教程",
-        "hi": "YouTube पर ट्यूटोरियल देखें",
-    },
-    "Fill in your details, then copy this to your AI.": {
-        "de": "Fülle deine Details aus und kopiere dies dann zu deiner KI.",
-        "es": "Rellena tus datos y cópialos a tu IA.",
-        "ko": "세부 정보를 입력한 후 AI에 복사하세요.",
-        "pt": "Preencha seus detalhes e copie para a sua IA.",
-        "fr": "Remplissez vos informations, puis copiez-les dans votre IA.",
-        "vi": "Điền thông tin của bạn, sau đó sao chép vào AI.",
-        "zh": "填写你的详细信息，然后复制到你的 AI。",
-        "hi": "अपना विवरण भरें, फिर इसे अपनी AI में कॉपी करें।",
-    },
-    "Step 2: Paste JSON Result": {
-        "de": "Schritt 2: JSON-Ergebnis einfügen",
-        "es": "Paso 2: Pegar resultado JSON",
-        "ko": "2단계: JSON 결과 붙여넣기",
-        "pt": "Passo 2: Colar resultado JSON",
-        "fr": "Étape 2 : Coller le résultat JSON",
-        "vi": "Bước 2: Dán kết quả JSON",
-        "zh": "第 2 步：粘贴 JSON 结果",
-        "hi": "चरण 2: JSON परिणाम पेस्ट करें",
-    },
-    "Paste the JSON code block here.": {
-        "de": "Füge den JSON-Codeblock hier ein.",
-        "es": "Pega el bloque de código JSON aquí.",
-        "ko": "여기에 JSON 코드 블록을 붙여넣으세요.",
-        "pt": "Cole o bloco de código JSON aqui.",
-        "fr": "Collez le bloc de code JSON ici.",
-        "vi": "Dán khối mã JSON vào đây.",
-        "zh": "在此处粘贴 JSON 代码块。",
-        "hi": "यहाँ JSON कोड ब्लॉक पेस्ट करें।",
-    },
-    "Paste the { ... } JSON code here...": {
-        "de": "{ ... } JSON-Code hier einfügen…",
-        "es": "Pega el código JSON { ... } aquí…",
-        "ko": "{ ... } JSON 코드를 여기에 붙여넣으세요…",
-        "pt": "Cole o código JSON { ... } aqui…",
-        "fr": "Collez le code JSON { ... } ici…",
-        "vi": "Dán mã JSON { ... } vào đây…",
-        "zh": "在此粘贴 { ... } JSON 代码…",
-        "hi": "यहाँ { ... } JSON कोड पेस्ट करें…",
-    },
-    "Import Plan": {
-        "de": "Plan importieren",
-        "es": "Importar plan",
-        "ko": "계획 가져오기",
-        "pt": "Importar plano",
-        "fr": "Importer le plan",
-        "vi": "Nhập kế hoạch",
-        "zh": "导入计划",
-        "hi": "योजना आयात करें",
-    },
-    "Confirm Import": {
-        "de": "Import bestätigen",
-        "es": "Confirmar importación",
-        "ko": "가져오기 확인",
-        "pt": "Confirmar importação",
-        "fr": "Confirmer l\'importation",
-        "vi": "Xác nhận nhập",
-        "zh": "确认导入",
-        "hi": "आयात की पुष्टि करें",
-    },
-    "Replace plan with AI generated one?": {
-        "de": "Plan durch KI-generierten ersetzen?",
-        "es": "¿Reemplazar el plan con uno generado por IA?",
-        "ko": "AI가 생성한 계획으로 교체하시겠습니까?",
-        "pt": "Substituir o plano pelo gerado pela IA?",
-        "fr": "Remplacer le plan par celui généré par l\'IA ?",
-        "vi": "Thay thế kế hoạch bằng kế hoạch do AI tạo?",
-        "zh": "用 AI 生成的计划替换当前计划？",
-        "hi": "योजना को AI द्वारा बनाई योजना से बदलें?",
-    },
-    "Import Error": {
-        "de": "Importfehler",
-        "es": "Error de importación",
-        "ko": "가져오기 오류",
-        "pt": "Erro de importação",
-        "fr": "Erreur d\'importation",
-        "vi": "Lỗi nhập",
-        "zh": "导入错误",
-        "hi": "आयात त्रुटि",
-    },
-    "Invalid JSON.": {
-        "de": "Ungültiges JSON.",
-        "es": "JSON no válido.",
-        "ko": "유효하지 않은 JSON.",
-        "pt": "JSON inválido.",
-        "fr": "JSON invalide.",
-        "vi": "JSON không hợp lệ.",
-        "zh": "无效的 JSON。",
-        "hi": "अमान्य JSON।",
-    },
-    "Save Error": {
-        "de": "Speicherfehler",
-        "es": "Error al guardar",
-        "ko": "저장 오류",
-        "pt": "Erro ao salvar",
-        "fr": "Erreur de sauvegarde",
-        "vi": "Lỗi lưu",
-        "zh": "保存错误",
-        "hi": "सहेजने में त्रुटि",
-    },
 
     # ================================================================= #
     # configuration.py – LearningPlanConfigDialog
     # ================================================================= #
-    "Select Date": {
-        "de": "Datum auswählen",
-        "es": "Seleccionar fecha",
-        "ko": "날짜 선택",
-        "pt": "Selecionar data",
-        "fr": "Sélectionner une date",
-        "vi": "Chọn ngày",
-        "zh": "选择日期",
-        "hi": "तारीख चुनें",
-    },
-    "Subject (e.g., Anatomy)": {
-        "de": "Fach (z. B. Anatomie)",
-        "es": "Asignatura (p. ej., Anatomía)",
-        "ko": "과목 (예: 해부학)",
-        "pt": "Disciplina (ex.: Anatomia)",
-        "fr": "Matière (ex. : Anatomie)",
-        "vi": "Môn học (vd: Giải phẫu học)",
-        "zh": "科目（如：解剖学）",
-        "hi": "विषय (जैसे, शरीर रचना)",
-    },
     "Add": {
         "de": "Hinzufügen",
         "es": "Añadir",
@@ -5989,36 +3497,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Thêm",
         "zh": "添加",
         "hi": "जोड़ें",
-    },
-    "Time:": {
-        "de": "Zeit:",
-        "es": "Tiempo:",
-        "ko": "시간:",
-        "pt": "Tempo:",
-        "fr": "Durée :",
-        "vi": "Thời gian:",
-        "zh": "时间：",
-        "hi": "समय:",
-    },
-    "View Timeline": {
-        "de": "Zeitstrahl anzeigen",
-        "es": "Ver línea de tiempo",
-        "ko": "타임라인 보기",
-        "pt": "Ver linha do tempo",
-        "fr": "Voir la chronologie",
-        "vi": "Xem dòng thời gian",
-        "zh": "查看时间轴",
-        "hi": "टाइमलाइन देखें",
-    },
-    "Clear All": {
-        "de": "Alles löschen",
-        "es": "Borrar todo",
-        "ko": "모두 지우기",
-        "pt": "Limpar tudo",
-        "fr": "Tout effacer",
-        "vi": "Xóa tất cả",
-        "zh": "清除所有",
-        "hi": "सब साफ करें",
     },
     "Remove Selected": {
         "de": "Ausgewählte entfernen",
@@ -6040,16 +3518,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "截止日期",
         "hi": "समय सीमाएं",
     },
-    "View Deadlines": {
-        "de": "Fristen anzeigen",
-        "es": "Ver plazos",
-        "ko": "마감일 보기",
-        "pt": "Ver prazos",
-        "fr": "Voir les échéances",
-        "vi": "Xem hạn chót",
-        "zh": "查看截止日期",
-        "hi": "समय सीमाएं देखें",
-    },
     "Configure Deadlines": {
         "de": "Fristen konfigurieren",
         "es": "Configurar plazos",
@@ -6059,36 +3527,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Cấu hình hạn chót",
         "zh": "配置截止日期",
         "hi": "समय सीमाएं कॉन्फ़िगर करें",
-    },
-    "AI Plan Generator": {
-        "de": "KI-Plan-Generator",
-        "es": "Generador de plan IA",
-        "ko": "AI 계획 생성기",
-        "pt": "Gerador de plano IA",
-        "fr": "Générateur de plan IA",
-        "vi": "Trình tạo kế hoạch AI",
-        "zh": "AI 计划生成器",
-        "hi": "AI योजना जेनरेटर",
-    },
-    "Create a full schedule using ChatGPT.": {
-        "de": "Erstelle einen vollständigen Zeitplan mit ChatGPT.",
-        "es": "Crea un horario completo con ChatGPT.",
-        "ko": "ChatGPT를 사용하여 전체 일정을 만드세요.",
-        "pt": "Crie um cronograma completo usando ChatGPT.",
-        "fr": "Créez un calendrier complet avec ChatGPT.",
-        "vi": "Tạo lịch học đầy đủ bằng ChatGPT.",
-        "zh": "使用 ChatGPT 创建完整的学习计划。",
-        "hi": "ChatGPT से पूरा शेड्यूल बनाएं।",
-    },
-    "Open AI Assistant": {
-        "de": "KI-Assistent öffnen",
-        "es": "Abrir asistente de IA",
-        "ko": "AI 어시스턴트 열기",
-        "pt": "Abrir assistente de IA",
-        "fr": "Ouvrir l\'assistant IA",
-        "vi": "Mở trợ lý AI",
-        "zh": "打开 AI 助手",
-        "hi": "AI असिस्टेंट खोलें",
     },
 
     # ================================================================= #
@@ -6275,40 +3713,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "导入",
         "hi": "आयात करें",
     },
-    "Import your own audio file": {
-        "de": "Eigene Audiodatei importieren",
-        "es": "Importar tu propio archivo de audio",
-        "ko": "내 오디오 파일 가져오기",
-        "pt": "Importar seu próprio arquivo de áudio",
-        "fr": "Importer votre propre fichier audio",
-        "vi": "Nhập tệp âm thanh của bạn",
-        "zh": "导入你自己的音频文件",
-        "hi": "अपनी ऑडियो फ़ाइल आयात करें",
-    },
-    "Remove this user track": {
-        "de": "Diesen Benutzer-Track entfernen",
-        "es": "Eliminar esta pista de usuario",
-        "ko": "이 사용자 트랙 제거",
-        "pt": "Remover esta faixa do usuário",
-        "fr": "Supprimer cette piste utilisateur",
-        "vi": "Xóa bản nhạc người dùng này",
-        "zh": "删除此用户音轨",
-        "hi": "यह यूज़र ट्रैक हटाएं",
-    },
 
     # ================================================================= #
     # changelog_manager.py
     # ================================================================= #
-    "Awesome\\!": {
-        "de": "Super\\!",
-        "es": "¡Genial\\!",
-        "ko": "훌륭해요\\!",
-        "pt": "Incrível\\!",
-        "fr": "Super \\!",
-        "vi": "Tuyệt vời\\!",
-        "zh": "太棒了！",
-        "hi": "शानदार\\!",
-    },
 
     # ================================================================= #
     # mindmap_sidebar.py
@@ -6322,16 +3730,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Bản đồ tư duy – Toàn màn hình",
         "zh": "思维导图 – 全屏",
         "hi": "माइंड मैप – फ़ुल स्क्रीन",
-    },
-    "Open Fullscreen": {
-        "de": "Vollbild öffnen",
-        "es": "Abrir pantalla completa",
-        "ko": "전체 화면 열기",
-        "pt": "Abrir tela cheia",
-        "fr": "Ouvrir en plein écran",
-        "vi": "Mở toàn màn hình",
-        "zh": "打开全屏",
-        "hi": "फ़ुल स्क्रीन खोलें",
     },
     "Error: QtWebEngine not available.": {
         "de": "Fehler: QtWebEngine nicht verfügbar.",
@@ -6375,36 +3773,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ================================================================= #
     # version_check_dialog.py
     # ================================================================= #
-    "Anki Version Check - Smart Study": {
-        "de": "Anki-Versionsprüfung – Smart Study",
-        "es": "Comprobación de versión de Anki – Smart Study",
-        "ko": "Anki 버전 확인 – Smart Study",
-        "pt": "Verificação de versão do Anki – Smart Study",
-        "fr": "Vérification de version Anki – Smart Study",
-        "vi": "Kiểm tra phiên bản Anki – Smart Study",
-        "zh": "Anki 版本检查 – Smart Study",
-        "hi": "Anki संस्करण जाँच – Smart Study",
-    },
-    "Download a Tested Version": {
-        "de": "Getestete Version herunterladen",
-        "es": "Descargar una versión probada",
-        "ko": "테스트된 버전 다운로드",
-        "pt": "Baixar uma versão testada",
-        "fr": "Télécharger une version testée",
-        "vi": "Tải xuống phiên bản đã kiểm tra",
-        "zh": "下载经过测试的版本",
-        "hi": "परीक्षित संस्करण डाउनलोड करें",
-    },
-    "Continue Anyway": {
-        "de": "Trotzdem fortfahren",
-        "es": "Continuar de todos modos",
-        "ko": "어쨌든 계속",
-        "pt": "Continuar assim mesmo",
-        "fr": "Continuer quand même",
-        "vi": "Tiếp tục dù sao",
-        "zh": "继续",
-        "hi": "फिर भी जारी रखें",
-    },
 
     # ================================================================= #
     # web_notebook/index.html  (Notebook tool UI strings)
@@ -6987,26 +4355,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "已从文件夹中移除",
         "hi": "फ़ोल्डर से हटाया गया",
     },
-    "PDF Viewer only": {
-        "de": "Nur PDF-Betrachter",
-        "es": "Solo visor de PDF",
-        "ko": "PDF 뷰어 전용",
-        "pt": "Apenas visualizador de PDF",
-        "fr": "Visionneuse PDF uniquement",
-        "vi": "Chỉ xem PDF",
-        "zh": "仅 PDF 查看器",
-        "hi": "केवल PDF व्यूअर",
-    },
-    "PDFs can be viewed but not edited here. Keep your files at their original paths; moving or deleting them will break the link.": {
-        "de": "PDFs können hier angesehen, aber nicht bearbeitet werden. Belasse deine Dateien an ihrem ursprünglichen Speicherort; das Verschieben oder Löschen bricht die Verknüpfung.",
-        "es": "Los PDFs se pueden ver pero no editar aquí. Mantén tus archivos en sus rutas originales; moverlos o eliminarlos romperá el enlace.",
-        "ko": "PDF는 여기에서 볼 수 있지만 편집할 수 없습니다. 파일을 원래 경로에 유지하세요. 이동하거나 삭제하면 링크가 끊깁니다.",
-        "pt": "PDFs podem ser visualizados mas não editados aqui. Mantenha seus arquivos nos caminhos originais; movê-los ou excluí-los quebrará o link.",
-        "fr": "Les PDFs peuvent être visualisés mais pas modifiés ici. Conservez vos fichiers à leurs chemins d'origine ; les déplacer ou les supprimer brisera le lien.",
-        "vi": "PDF có thể xem nhưng không thể chỉnh sửa tại đây. Giữ nguyên vị trí tệp gốc; di chuyển hoặc xóa sẽ làm mất liên kết.",
-        "zh": "PDF 只能在此查看，不能编辑。请保持文件在原路径；移动或删除将断开链接。",
-        "hi": "PDF यहाँ केवल देखे जा सकते हैं, संपादित नहीं किए जा सकते। अपनी फ़ाइलें मूल पथ पर रखें; उन्हें हटाने या स्थानांतरित करने से लिंक टूट जाएगा।",
-    },
     "PDF study viewer": {
         "de": "PDF-Lernansicht",
         "es": "Visor de estudio de PDF",
@@ -7167,46 +4515,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "页",
         "hi": "पृष्ठ",
     },
-    "Card draft opened in Anki": {
-        "de": "Kartenentwurf in Anki geöffnet",
-        "es": "Borrador de tarjeta abierto en Anki",
-        "ko": "Anki에서 카드 초안을 열었습니다",
-        "pt": "Rascunho de cartão aberto no Anki",
-        "fr": "Brouillon de carte ouvert dans Anki",
-        "vi": "Đã mở bản nháp thẻ trong Anki",
-        "zh": "已在 Anki 中打开卡片草稿",
-        "hi": "कार्ड ड्राफ़्ट Anki में खोला गया",
-    },
-    "Select text for the card front first.": {
-        "de": "Markiere zuerst Text für die Kartenvorderseite.",
-        "es": "Selecciona primero texto para el anverso de la tarjeta.",
-        "ko": "먼저 카드 앞면에 넣을 텍스트를 선택하세요.",
-        "pt": "Selecione primeiro o texto para a frente do cartão.",
-        "fr": "Sélectionnez d’abord le texte du recto de la carte.",
-        "vi": "Hãy chọn văn bản cho mặt trước của thẻ trước.",
-        "zh": "请先选择卡片正面的文本。",
-        "hi": "पहले कार्ड के सामने के लिए पाठ चुनें।",
-    },
-    "The selected text is too long for a card.": {
-        "de": "Der markierte Text ist zu lang für eine Karte.",
-        "es": "El texto seleccionado es demasiado largo para una tarjeta.",
-        "ko": "선택한 텍스트가 카드에 넣기에는 너무 깁니다.",
-        "pt": "O texto selecionado é longo demais para um cartão.",
-        "fr": "Le texte sélectionné est trop long pour une carte.",
-        "vi": "Văn bản đã chọn quá dài cho một thẻ.",
-        "zh": "所选文本太长，无法用于一张卡片。",
-        "hi": "चुना हुआ पाठ एक कार्ड के लिए बहुत लंबा है।",
-    },
-    "The Add Cards window already contains an unfinished note. Finish or clear it, then try again.": {
-        "de": "Im Hinzufügen-Fenster befindet sich bereits eine unfertige Notiz. Schließe sie ab oder leere sie und versuche es erneut.",
-        "es": "La ventana Añadir tarjetas ya contiene una nota sin terminar. Termínala o bórrala y vuelve a intentarlo.",
-        "ko": "카드 추가 창에 완성되지 않은 노트가 이미 있습니다. 완료하거나 지운 뒤 다시 시도하세요.",
-        "pt": "A janela Adicionar cartões já contém uma nota inacabada. Conclua-a ou limpe-a e tente novamente.",
-        "fr": "La fenêtre Ajouter contient déjà une note inachevée. Terminez-la ou effacez-la, puis réessayez.",
-        "vi": "Cửa sổ Thêm thẻ đã có một ghi chú chưa hoàn thành. Hãy hoàn tất hoặc xóa nó rồi thử lại.",
-        "zh": "“添加卡片”窗口中已有未完成的笔记。请先完成或清空它，然后重试。",
-        "hi": "कार्ड जोड़ें विंडो में पहले से एक अधूरा नोट है। उसे पूरा या साफ़ करके फिर प्रयास करें।",
-    },
     "Could not copy the selected text.": {
         "de": "Der markierte Text konnte nicht kopiert werden.",
         "es": "No se pudo copiar el texto seleccionado.",
@@ -7226,16 +4534,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "vi": "Văn bản đã chọn quá dài để sao chép cùng một lúc.",
         "zh": "所选文本太长，无法一次复制。",
         "hi": "चुना हुआ पाठ एक बार में कॉपी करने के लिए बहुत लंबा है।",
-    },
-    "Could not open the card draft in Anki.": {
-        "de": "Der Kartenentwurf konnte nicht in Anki geöffnet werden.",
-        "es": "No se pudo abrir el borrador de tarjeta en Anki.",
-        "ko": "Anki에서 카드 초안을 열 수 없습니다.",
-        "pt": "Não foi possível abrir o rascunho de cartão no Anki.",
-        "fr": "Impossible d’ouvrir le brouillon de carte dans Anki.",
-        "vi": "Không thể mở bản nháp thẻ trong Anki.",
-        "zh": "无法在 Anki 中打开卡片草稿。",
-        "hi": "कार्ड ड्राफ़्ट Anki में नहीं खोला जा सका।",
     },
 
     # ================================================================= #
@@ -7315,36 +4613,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ================================================================= #
     # ai_assistant.py – loading / error page strings
     # ================================================================= #
-    "Loading AI Assistant\u2026": {
-        "de": "KI-Assistent wird geladen\u2026",
-        "es": "Cargando asistente de IA\u2026",
-        "ko": "AI 어시스턴트 로딩 중\u2026",
-        "pt": "Carregando assistente de IA\u2026",
-        "fr": "Chargement de l'assistant IA\u2026",
-        "vi": "Đang tải trợ lý AI\u2026",
-        "zh": "正在加载 AI 助手\u2026",
-        "hi": "AI असिस्टेंट लोड हो रहा है\u2026",
-    },
-    "Connection failed": {
-        "de": "Verbindung fehlgeschlagen",
-        "es": "Conexión fallida",
-        "ko": "연결 실패",
-        "pt": "Conexão falhou",
-        "fr": "Connexion échouée",
-        "vi": "Kết nối thất bại",
-        "zh": "连接失败",
-        "hi": "कनेक्शन विफल",
-    },
-    "The AI Assistant could not be reached.\nPlease check your internet connection and try again.": {
-        "de": "Der KI-Assistent konnte nicht erreicht werden.\nBitte Internetverbindung prüfen und erneut versuchen.",
-        "es": "No se pudo conectar con el asistente de IA.\nPor favor, verifica tu conexión e inténtalo de nuevo.",
-        "ko": "AI 어시스턴트에 연결할 수 없습니다.\n인터넷 연결을 확인하고 다시 시도하세요.",
-        "pt": "O assistente de IA não pôde ser alcançado.\nVerifique sua conexão com a internet e tente novamente.",
-        "fr": "L'assistant IA n'a pas pu être atteint.\nVérifiez votre connexion internet et réessayez.",
-        "vi": "Không thể kết nối với trợ lý AI.\nVui lòng kiểm tra kết nối internet và thử lại.",
-        "zh": "无法连接到 AI 助手。\n请检查您的网络连接并重试。",
-        "hi": "AI असिस्टेंट से कनेक्ट नहीं हो सका।\nकृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
-    },
     "Retry": {
         "de": "Erneut versuchen",
         "es": "Reintentar",
@@ -7359,16 +4627,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # ================================================================= #
     # background_music.py – Linux audio backend error
     # ================================================================= #
-    "Audio playback is not available on this system.\nOn Linux, please install the GStreamer plugins:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad": {
-        "de": "Audiowiedergabe ist auf diesem System nicht verfügbar.\nUnter Linux bitte die GStreamer-Plugins installieren:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "es": "La reproducción de audio no está disponible en este sistema.\nEn Linux, instala los plugins de GStreamer:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "ko": "이 시스템에서는 오디오 재생을 사용할 수 없습니다.\nLinux에서는 GStreamer 플러그인을 설치하세요:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "pt": "A reprodução de áudio não está disponível neste sistema.\nNo Linux, instale os plugins do GStreamer:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "fr": "La lecture audio n'est pas disponible sur ce système.\nSous Linux, installez les plugins GStreamer :\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "vi": "Phát âm thanh không khả dụng trên hệ thống này.\nTrên Linux, hãy cài đặt các plugin GStreamer:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "zh": "此系统不支持音频播放。\n在 Linux 上，请安装 GStreamer 插件：\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-        "hi": "इस सिस्टम पर ऑडियो प्लेबैक उपलब्ध नहीं है।\nLinux पर GStreamer प्लगइन इंस्टॉल करें:\n  gstreamer1.0-plugins-good\n  gstreamer1.0-plugins-bad",
-    },
 
     # ================================================================= #
     # mindmap_sidebar.py / index.html – Mindmap UI strings
@@ -7534,102 +4792,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
 
     # ── Ollama setup assistant (AI Assistant) ─────────────────────────────
-    "Set up Ollama – Local AI": {
-        "de": "Ollama einrichten – Lokale KI", "es": "Configurar Ollama – IA local", "ko": "Ollama 설정 – 로컬 AI", "pt": "Configurar Ollama – IA local",
-        "fr": "Configurer Ollama – IA locale", "vi": "Thiết lập Ollama – AI cục bộ", "zh": "设置 Ollama – 本地 AI", "hi": "Ollama सेटअप – लोकल AI",
-    },
-    "Checking Ollama status…": {
-        "de": "Prüfe Ollama-Status…", "es": "Comprobando el estado de Ollama…", "ko": "Ollama 상태 확인 중…", "pt": "Verificando o status do Ollama…",
-        "fr": "Vérification du statut d'Ollama…", "vi": "Đang kiểm tra trạng thái Ollama…", "zh": "正在检查 Ollama 状态…", "hi": "Ollama स्थिति जाँची जा रही है…",
-    },
-    "Ollama is not running": {
-        "de": "Ollama läuft nicht", "es": "Ollama no se está ejecutando", "ko": "Ollama가 실행되고 있지 않습니다", "pt": "O Ollama não está em execução",
-        "fr": "Ollama n'est pas lancé", "vi": "Ollama chưa chạy", "zh": "Ollama 未运行", "hi": "Ollama नहीं चल रहा है",
-    },
-    "Ollama lets you run AI models locally — free, private, no API key needed. Nothing you type ever leaves your computer.": {
-        "de": "Mit Ollama laufen KI-Modelle lokal auf deinem Rechner — kostenlos, privat, ohne API-Key. Nichts, was du eingibst, verlässt deinen Computer.",
-        "es": "Ollama ejecuta modelos de IA localmente: gratis, privado y sin clave API. Nada de lo que escribes sale de tu ordenador.",
-        "ko": "Ollama는 AI 모델을 내 컴퓨터에서 로컬로 실행합니다 — 무료, 프라이빗, API 키 불필요. 입력한 내용은 컴퓨터 밖으로 나가지 않습니다.",
-        "pt": "O Ollama executa modelos de IA localmente — grátis, privado, sem chave de API. Nada do que você digita sai do seu computador.",
-        "fr": "Ollama exécute des modèles d'IA localement — gratuit, privé, sans clé API. Rien de ce que vous tapez ne quitte votre ordinateur.",
-        "vi": "Ollama chạy các mô hình AI ngay trên máy của bạn — miễn phí, riêng tư, không cần khóa API. Những gì bạn nhập không rời khỏi máy tính.",
-        "zh": "Ollama 让 AI 模型完全在本地运行——免费、私密、无需 API 密钥。您输入的内容不会离开您的电脑。",
-        "hi": "Ollama AI मॉडल को आपके कंप्यूटर पर लोकल रूप से चलाता है — मुफ़्त, निजी, बिना API कुंजी। आपका टाइप किया कुछ भी कंप्यूटर से बाहर नहीं जाता।",
-    },
-    "<b>Step 1:</b> Click <i>Download Ollama</i> below and choose the macOS version.<br><b>Step 2:</b> Open the downloaded file and drag Ollama into your Applications folder.<br><b>Step 3:</b> Launch Ollama once — a small icon appears in the menu bar. That means it is running in the background.<br><b>Step 4:</b> Come back here and click <i>Check again</i>.": {
-        "de": "<b>Schritt 1:</b> Klicke unten auf <i>Ollama herunterladen</i> und wähle die macOS-Version.<br><b>Schritt 2:</b> Öffne die heruntergeladene Datei und ziehe Ollama in deinen Programme-Ordner.<br><b>Schritt 3:</b> Starte Ollama einmal — ein kleines Symbol erscheint in der Menüleiste. Das heißt, es läuft im Hintergrund.<br><b>Schritt 4:</b> Komm hierher zurück und klicke auf <i>Erneut prüfen</i>.",
-        "es": "<b>Paso 1:</b> Haz clic abajo en <i>Descargar Ollama</i> y elige la versión para macOS.<br><b>Paso 2:</b> Abre el archivo descargado y arrastra Ollama a tu carpeta de Aplicaciones.<br><b>Paso 3:</b> Inicia Ollama una vez — aparecerá un pequeño icono en la barra de menús. Eso significa que se ejecuta en segundo plano.<br><b>Paso 4:</b> Vuelve aquí y pulsa <i>Comprobar de nuevo</i>.",
-        "ko": "<b>1단계:</b> 아래의 <i>Ollama 다운로드</i>를 클릭하고 macOS 버전을 선택하세요.<br><b>2단계:</b> 다운로드한 파일을 열고 Ollama를 응용 프로그램 폴더로 드래그하세요.<br><b>3단계:</b> Ollama를 한 번 실행하세요 — 메뉴 막대에 작은 아이콘이 나타나면 백그라운드에서 실행 중이라는 뜻입니다.<br><b>4단계:</b> 여기로 돌아와 <i>다시 확인</i>을 클릭하세요.",
-        "pt": "<b>Passo 1:</b> Clique em <i>Baixar Ollama</i> abaixo e escolha a versão para macOS.<br><b>Passo 2:</b> Abra o arquivo baixado e arraste o Ollama para a pasta Aplicativos.<br><b>Passo 3:</b> Inicie o Ollama uma vez — um pequeno ícone aparece na barra de menus. Isso significa que ele está rodando em segundo plano.<br><b>Passo 4:</b> Volte aqui e clique em <i>Verificar novamente</i>.",
-        "fr": "<b>Étape 1 :</b> Cliquez sur <i>Télécharger Ollama</i> ci-dessous et choisissez la version macOS.<br><b>Étape 2 :</b> Ouvrez le fichier téléchargé et faites glisser Ollama dans votre dossier Applications.<br><b>Étape 3 :</b> Lancez Ollama une fois — une petite icône apparaît dans la barre de menus. Cela signifie qu'il tourne en arrière-plan.<br><b>Étape 4 :</b> Revenez ici et cliquez sur <i>Vérifier à nouveau</i>.",
-        "vi": "<b>Bước 1:</b> Nhấn <i>Tải Ollama</i> bên dưới và chọn phiên bản macOS.<br><b>Bước 2:</b> Mở tệp đã tải và kéo Ollama vào thư mục Applications.<br><b>Bước 3:</b> Khởi động Ollama một lần — một biểu tượng nhỏ xuất hiện trên thanh menu, nghĩa là nó đang chạy nền.<br><b>Bước 4:</b> Quay lại đây và nhấn <i>Kiểm tra lại</i>.",
-        "zh": "<b>第 1 步：</b>点击下方的<i>下载 Ollama</i>并选择 macOS 版本。<br><b>第 2 步：</b>打开下载的文件，将 Ollama 拖入“应用程序”文件夹。<br><b>第 3 步：</b>启动一次 Ollama — 菜单栏会出现一个小图标，表示它正在后台运行。<br><b>第 4 步：</b>回到这里并点击<i>重新检查</i>。",
-        "hi": "<b>चरण 1:</b> नीचे <i>Ollama डाउनलोड करें</i> पर क्लिक करें और macOS संस्करण चुनें।<br><b>चरण 2:</b> डाउनलोड की गई फ़ाइल खोलें और Ollama को Applications फ़ोल्डर में खींचें।<br><b>चरण 3:</b> Ollama एक बार चलाएँ — मेनू बार में एक छोटा आइकन दिखेगा, यानी यह बैकग्राउंड में चल रहा है।<br><b>चरण 4:</b> यहाँ वापस आएँ और <i>फिर से जाँचें</i> पर क्लिक करें।",
-    },
-    "<b>Step 1:</b> Click <i>Download Ollama</i> below and choose the Windows version.<br><b>Step 2:</b> Run the downloaded installer (OllamaSetup.exe) and follow the steps.<br><b>Step 3:</b> After installation Ollama starts automatically and keeps running in the background (look for its icon in the system tray).<br><b>Step 4:</b> Come back here and click <i>Check again</i>.": {
-        "de": "<b>Schritt 1:</b> Klicke unten auf <i>Ollama herunterladen</i> und wähle die Windows-Version.<br><b>Schritt 2:</b> Führe den heruntergeladenen Installer (OllamaSetup.exe) aus und folge den Schritten.<br><b>Schritt 3:</b> Nach der Installation startet Ollama automatisch und läuft im Hintergrund weiter (achte auf das Symbol im Infobereich).<br><b>Schritt 4:</b> Komm hierher zurück und klicke auf <i>Erneut prüfen</i>.",
-        "es": "<b>Paso 1:</b> Haz clic abajo en <i>Descargar Ollama</i> y elige la versión para Windows.<br><b>Paso 2:</b> Ejecuta el instalador descargado (OllamaSetup.exe) y sigue los pasos.<br><b>Paso 3:</b> Tras la instalación, Ollama se inicia automáticamente y sigue ejecutándose en segundo plano (busca su icono en la bandeja del sistema).<br><b>Paso 4:</b> Vuelve aquí y pulsa <i>Comprobar de nuevo</i>.",
-        "ko": "<b>1단계:</b> 아래의 <i>Ollama 다운로드</i>를 클릭하고 Windows 버전을 선택하세요.<br><b>2단계:</b> 다운로드한 설치 파일(OllamaSetup.exe)을 실행하고 단계를 따르세요.<br><b>3단계:</b> 설치 후 Ollama는 자동으로 시작되어 백그라운드에서 계속 실행됩니다(시스템 트레이의 아이콘을 확인하세요).<br><b>4단계:</b> 여기로 돌아와 <i>다시 확인</i>을 클릭하세요.",
-        "pt": "<b>Passo 1:</b> Clique em <i>Baixar Ollama</i> abaixo e escolha a versão para Windows.<br><b>Passo 2:</b> Execute o instalador baixado (OllamaSetup.exe) e siga as etapas.<br><b>Passo 3:</b> Após a instalação, o Ollama inicia automaticamente e continua em segundo plano (procure o ícone na bandeja do sistema).<br><b>Passo 4:</b> Volte aqui e clique em <i>Verificar novamente</i>.",
-        "fr": "<b>Étape 1 :</b> Cliquez sur <i>Télécharger Ollama</i> ci-dessous et choisissez la version Windows.<br><b>Étape 2 :</b> Lancez l'installateur téléchargé (OllamaSetup.exe) et suivez les étapes.<br><b>Étape 3 :</b> Après l'installation, Ollama démarre automatiquement et reste actif en arrière-plan (cherchez son icône dans la zone de notification).<br><b>Étape 4 :</b> Revenez ici et cliquez sur <i>Vérifier à nouveau</i>.",
-        "vi": "<b>Bước 1:</b> Nhấn <i>Tải Ollama</i> bên dưới và chọn phiên bản Windows.<br><b>Bước 2:</b> Chạy trình cài đặt đã tải (OllamaSetup.exe) và làm theo các bước.<br><b>Bước 3:</b> Sau khi cài đặt, Ollama tự khởi động và chạy nền (tìm biểu tượng ở khay hệ thống).<br><b>Bước 4:</b> Quay lại đây và nhấn <i>Kiểm tra lại</i>.",
-        "zh": "<b>第 1 步：</b>点击下方的<i>下载 Ollama</i>并选择 Windows 版本。<br><b>第 2 步：</b>运行下载的安装程序（OllamaSetup.exe）并按步骤操作。<br><b>第 3 步：</b>安装后 Ollama 会自动启动并在后台持续运行（可在系统托盘中找到它的图标）。<br><b>第 4 步：</b>回到这里并点击<i>重新检查</i>。",
-        "hi": "<b>चरण 1:</b> नीचे <i>Ollama डाउनलोड करें</i> पर क्लिक करें और Windows संस्करण चुनें।<br><b>चरण 2:</b> डाउनलोड किया इंस्टॉलर (OllamaSetup.exe) चलाएँ और चरणों का पालन करें।<br><b>चरण 3:</b> इंस्टॉल के बाद Ollama अपने आप शुरू होता है और बैकग्राउंड में चलता रहता है (सिस्टम ट्रे में इसका आइकन देखें)।<br><b>चरण 4:</b> यहाँ वापस आएँ और <i>फिर से जाँचें</i> पर क्लिक करें।",
-    },
-    "<b>Step 1:</b> Open a terminal window.<br><b>Step 2:</b> Run this command:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Step 3:</b> Start it with <code>ollama serve</code> (on most systems it starts automatically).<br><b>Step 4:</b> Come back here and click <i>Check again</i>.": {
-        "de": "<b>Schritt 1:</b> Öffne ein Terminal-Fenster.<br><b>Schritt 2:</b> Führe diesen Befehl aus:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Schritt 3:</b> Starte es mit <code>ollama serve</code> (auf den meisten Systemen startet es automatisch).<br><b>Schritt 4:</b> Komm hierher zurück und klicke auf <i>Erneut prüfen</i>.",
-        "es": "<b>Paso 1:</b> Abre una ventana de terminal.<br><b>Paso 2:</b> Ejecuta este comando:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Paso 3:</b> Inícialo con <code>ollama serve</code> (en la mayoría de los sistemas se inicia automáticamente).<br><b>Paso 4:</b> Vuelve aquí y pulsa <i>Comprobar de nuevo</i>.",
-        "ko": "<b>1단계:</b> 터미널 창을 여세요.<br><b>2단계:</b> 이 명령을 실행하세요:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>3단계:</b> <code>ollama serve</code>로 시작하세요(대부분의 시스템에서는 자동으로 시작됩니다).<br><b>4단계:</b> 여기로 돌아와 <i>다시 확인</i>을 클릭하세요.",
-        "pt": "<b>Passo 1:</b> Abra uma janela de terminal.<br><b>Passo 2:</b> Execute este comando:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Passo 3:</b> Inicie com <code>ollama serve</code> (na maioria dos sistemas ele inicia automaticamente).<br><b>Passo 4:</b> Volte aqui e clique em <i>Verificar novamente</i>.",
-        "fr": "<b>Étape 1 :</b> Ouvrez une fenêtre de terminal.<br><b>Étape 2 :</b> Exécutez cette commande :<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Étape 3 :</b> Démarrez-le avec <code>ollama serve</code> (sur la plupart des systèmes, il démarre automatiquement).<br><b>Étape 4 :</b> Revenez ici et cliquez sur <i>Vérifier à nouveau</i>.",
-        "vi": "<b>Bước 1:</b> Mở cửa sổ terminal.<br><b>Bước 2:</b> Chạy lệnh này:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>Bước 3:</b> Khởi động bằng <code>ollama serve</code> (đa số hệ thống sẽ tự khởi động).<br><b>Bước 4:</b> Quay lại đây và nhấn <i>Kiểm tra lại</i>.",
-        "zh": "<b>第 1 步：</b>打开终端窗口。<br><b>第 2 步：</b>运行此命令：<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>第 3 步：</b>用 <code>ollama serve</code> 启动（大多数系统会自动启动）。<br><b>第 4 步：</b>回到这里并点击<i>重新检查</i>。",
-        "hi": "<b>चरण 1:</b> टर्मिनल विंडो खोलें।<br><b>चरण 2:</b> यह कमांड चलाएँ:<br><code>curl -fsSL https://ollama.com/install.sh | sh</code><br><b>चरण 3:</b> <code>ollama serve</code> से शुरू करें (अधिकांश सिस्टम पर यह अपने आप शुरू होता है)।<br><b>चरण 4:</b> यहाँ वापस आएँ और <i>फिर से जाँचें</i> पर क्लिक करें।",
-    },
-    "Download Ollama": {
-        "de": "Ollama herunterladen", "es": "Descargar Ollama", "ko": "Ollama 다운로드", "pt": "Baixar Ollama",
-        "fr": "Télécharger Ollama", "vi": "Tải Ollama", "zh": "下载 Ollama", "hi": "Ollama डाउनलोड करें",
-    },
-    "Check again": {
-        "de": "Erneut prüfen", "es": "Comprobar de nuevo", "ko": "다시 확인", "pt": "Verificar novamente",
-        "fr": "Vérifier à nouveau", "vi": "Kiểm tra lại", "zh": "重新检查", "hi": "फिर से जाँचें",
-    },
-    "Choose a Model": {
-        "de": "Modell auswählen", "es": "Elige un modelo", "ko": "모델 선택", "pt": "Escolha um modelo",
-        "fr": "Choisissez un modèle", "vi": "Chọn mô hình", "zh": "选择模型", "hi": "मॉडल चुनें",
-    },
-    "Installed models:": {
-        "de": "Installierte Modelle:", "es": "Modelos instalados:", "ko": "설치된 모델:", "pt": "Modelos instalados:",
-        "fr": "Modèles installés :", "vi": "Mô hình đã cài:", "zh": "已安装的模型：", "hi": "इंस्टॉल किए गए मॉडल:",
-    },
-    "Recommended models to download:": {
-        "de": "Empfohlene Modelle zum Download:", "es": "Modelos recomendados para descargar:", "ko": "다운로드 추천 모델:", "pt": "Modelos recomendados para baixar:",
-        "fr": "Modèles recommandés à télécharger :", "vi": "Mô hình đề xuất để tải:", "zh": "推荐下载的模型：", "hi": "डाउनलोड हेतु अनुशंसित मॉडल:",
-    },
-    "Pull": {
-        "de": "Laden", "es": "Descargar", "ko": "받기", "pt": "Baixar",
-        "fr": "Télécharger", "vi": "Tải", "zh": "拉取", "hi": "डाउनलोड",
-    },
-    "Use Selected Model": {
-        "de": "Ausgewähltes Modell verwenden", "es": "Usar el modelo seleccionado", "ko": "선택한 모델 사용", "pt": "Usar o modelo selecionado",
-        "fr": "Utiliser le modèle sélectionné", "vi": "Dùng mô hình đã chọn", "zh": "使用所选模型", "hi": "चयनित मॉडल उपयोग करें",
-    },
-    "Pulling {}…": {
-        "de": "Lade {} herunter…", "es": "Descargando {}…", "ko": "{} 다운로드 중…", "pt": "Baixando {}…",
-        "fr": "Téléchargement de {}…", "vi": "Đang tải {}…", "zh": "正在下载 {}…", "hi": "{} डाउनलोड हो रहा है…",
-    },
-    "✓ {} downloaded": {
-        "de": "✓ {} heruntergeladen", "es": "✓ {} descargado", "ko": "✓ {} 다운로드 완료", "pt": "✓ {} baixado",
-        "fr": "✓ {} téléchargé", "vi": "✓ Đã tải {}", "zh": "✓ {} 已下载", "hi": "✓ {} डाउनलोड हुआ",
-    },
-    "Using Ollama model: {}": {
-        "de": "Verwende Ollama-Modell: {}", "es": "Usando el modelo de Ollama: {}", "ko": "Ollama 모델 사용 중: {}", "pt": "Usando o modelo Ollama: {}",
-        "fr": "Modèle Ollama utilisé : {}", "vi": "Đang dùng mô hình Ollama: {}", "zh": "正在使用 Ollama 模型：{}", "hi": "Ollama मॉडल उपयोग में: {}",
-    },
-    "AI settings saved.": {
-        "de": "KI-Einstellungen gespeichert.", "es": "Ajustes de IA guardados.", "ko": "AI 설정이 저장되었습니다.", "pt": "Configurações de IA salvas.",
-        "fr": "Paramètres d'IA enregistrés.", "vi": "Đã lưu cài đặt AI.", "zh": "AI 设置已保存。", "hi": "AI सेटिंग्स सहेजी गईं।",
-    },
     "AI Assistant is not available (missing Qt/Anki components).": {
         "de": "KI-Assistent ist nicht verfügbar (fehlende Qt-/Anki-Komponenten).", "es": "El asistente de IA no está disponible (faltan componentes de Qt/Anki).",
         "ko": "AI 어시스턴트를 사용할 수 없습니다 (Qt/Anki 구성 요소 없음).", "pt": "O assistente de IA não está disponível (componentes Qt/Anki ausentes).",
@@ -7645,10 +4807,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "Local": {
         "de": "Lokal", "es": "Local", "ko": "로컬", "pt": "Local",
         "fr": "Local", "vi": "Cục bộ", "zh": "本地", "hi": "लोकल",
-    },
-    "Load": {
-        "de": "Laden", "es": "Cargar", "ko": "불러오기", "pt": "Carregar",
-        "fr": "Charger", "vi": "Tải", "zh": "加载", "hi": "लोड करें",
     },
     "Custom URL…": {
         "de": "Eigene URL…", "es": "URL personalizada…", "ko": "사용자 지정 URL…", "pt": "URL personalizada…",
@@ -7678,45 +4836,17 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "fr": "Nécessite QtWebEngine (indisponible dans cette version d'Anki).", "vi": "Cần QtWebEngine (không có trong bản Anki này).",
         "zh": "需要 QtWebEngine（此 Anki 版本不可用）。", "hi": "QtWebEngine आवश्यक है (इस Anki बिल्ड में उपलब्ध नहीं)।",
     },
-    "SoundCloud player could not be initialised.": {
-        "de": "SoundCloud-Player konnte nicht initialisiert werden.", "es": "No se pudo inicializar el reproductor de SoundCloud.",
-        "ko": "SoundCloud 플레이어를 초기화할 수 없습니다.", "pt": "Não foi possível inicializar o player do SoundCloud.",
-        "fr": "Le lecteur SoundCloud n'a pas pu être initialisé.", "vi": "Không thể khởi tạo trình phát SoundCloud.",
-        "zh": "无法初始化 SoundCloud 播放器。", "hi": "SoundCloud प्लेयर प्रारंभ नहीं हो सका।",
-    },
     "SoundCloud player file is missing.": {
         "de": "SoundCloud-Player-Datei fehlt.", "es": "Falta el archivo del reproductor de SoundCloud.",
         "ko": "SoundCloud 플레이어 파일이 없습니다.", "pt": "O arquivo do player do SoundCloud está ausente.",
         "fr": "Le fichier du lecteur SoundCloud est manquant.", "vi": "Thiếu tệp trình phát SoundCloud.",
         "zh": "缺少 SoundCloud 播放器文件。", "hi": "SoundCloud प्लेयर फ़ाइल गायब है।",
     },
-    "SoundCloud streaming needs QtWebEngine, which isn't available in this Anki build.": {
-        "de": "SoundCloud-Streaming benötigt QtWebEngine, das in dieser Anki-Version nicht verfügbar ist.",
-        "es": "La reproducción de SoundCloud necesita QtWebEngine, que no está disponible en esta versión de Anki.",
-        "ko": "SoundCloud 스트리밍에는 QtWebEngine이 필요하지만 이 Anki 빌드에서는 사용할 수 없습니다.",
-        "pt": "O streaming do SoundCloud precisa do QtWebEngine, que não está disponível nesta versão do Anki.",
-        "fr": "Le streaming SoundCloud nécessite QtWebEngine, indisponible dans cette version d'Anki.",
-        "vi": "Phát SoundCloud cần QtWebEngine, không có trong bản Anki này.",
-        "zh": "SoundCloud 流媒体需要 QtWebEngine，此 Anki 版本不可用。",
-        "hi": "SoundCloud स्ट्रीमिंग के लिए QtWebEngine चाहिए, जो इस Anki बिल्ड में उपलब्ध नहीं है।",
-    },
 
     # ── Misc previously untranslated UI strings ────────────────────────────
-    "Time's up — finished studying: %s": {
-        "de": "Zeit um — Lernen beendet: %s", "es": "Se acabó el tiempo — estudio terminado: %s", "ko": "시간 종료 — 학습 완료: %s", "pt": "Tempo esgotado — estudo concluído: %s",
-        "fr": "Temps écoulé — étude terminée : %s", "vi": "Hết giờ — đã học xong: %s", "zh": "时间到 — 学习完成：%s", "hi": "समय समाप्त — पढ़ाई पूरी: %s",
-    },
-    "Mark as done": {
-        "de": "Als erledigt markieren", "es": "Marcar como hecho", "ko": "완료로 표시", "pt": "Marcar como concluído",
-        "fr": "Marquer comme terminé", "vi": "Đánh dấu đã xong", "zh": "标记为完成", "hi": "पूर्ण चिह्नित करें",
-    },
     "My Deadline": {
         "de": "Meine Deadline", "es": "Mi fecha límite", "ko": "내 마감일", "pt": "Meu prazo",
         "fr": "Mon échéance", "vi": "Hạn chót của tôi", "zh": "我的截止日期", "hi": "मेरी समय-सीमा",
-    },
-    "Next deadline": {
-        "de": "Nächste Deadline", "es": "Próxima fecha límite", "ko": "다음 마감일", "pt": "Próximo prazo",
-        "fr": "Échéance suivante", "vi": "Hạn chót tiếp theo", "zh": "下一个截止日期", "hi": "अगली समय-सीमा",
     },
     "Learn": {
         "de": "Lernen", "es": "Aprender", "ko": "학습", "pt": "Aprender",
@@ -7820,10 +4950,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "此 PDF 大小为 {size:.1f} MB。加载到侧边栏可能较慢或占用大量内存。\n\n仍要继续吗？",
         "hi": "यह PDF {size:.1f} MB का है। साइडबार में लोड करना धीमा हो सकता है या बहुत मेमोरी ले सकता है।\n\nफिर भी जारी रखें?",
     },
-    "Back to sidebar": {
-        "de": "Zurück zur Seitenleiste", "es": "Volver a la barra lateral", "ko": "사이드바로 돌아가기", "pt": "Voltar à barra lateral",
-        "fr": "Retour à la barre latérale", "vi": "Quay lại thanh bên", "zh": "返回侧边栏", "hi": "साइडबार पर वापस",
-    },
     "Open in main window": {
         "de": "Im Hauptfenster öffnen", "es": "Abrir en la ventana principal", "ko": "메인 창에서 열기", "pt": "Abrir na janela principal",
         "fr": "Ouvrir dans la fenêtre principale", "vi": "Mở trong cửa sổ chính", "zh": "在主窗口中打开", "hi": "मुख्य विंडो में खोलें",
@@ -7871,10 +4997,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "Daily Fact Topic": {
         "de": "Thema des täglichen Fakts", "es": "Tema del dato diario", "ko": "오늘의 상식 주제", "pt": "Tema do fato diário",
         "fr": "Thème du fait du jour", "vi": "Chủ đề sự thật hằng ngày", "zh": "每日知识主题", "hi": "दैनिक तथ्य विषय",
-    },
-    "Daily Widgets": {
-        "de": "Tägliche Widgets", "es": "Widgets diarios", "ko": "데일리 위젯", "pt": "Widgets diários",
-        "fr": "Widgets quotidiens", "vi": "Widget hằng ngày", "zh": "每日小部件", "hi": "दैनिक विजेट",
     },
     "Study Plan Widget": {
         "de": "Lernplan-Widget", "es": "Widget del plan de estudio",
@@ -8026,27 +5148,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "zh": "Anki 侧边启动栏中可用的工具。",
         "hi": "Anki के किनारे लॉन्चर बार में उपलब्ध उपकरण।",
     },
-    "You need to restart Anki to apply changes to the sidebar tools.": {
-        "de": "Starte Anki neu, um Änderungen an den Seitenleisten-Werkzeugen zu übernehmen.",
-        "es": "Debes reiniciar Anki para aplicar los cambios en las herramientas de la barra lateral.",
-        "ko": "사이드바 도구 변경을 적용하려면 Anki를 다시 시작하세요.",
-        "pt": "Reinicie o Anki para aplicar as mudanças nas ferramentas da barra lateral.",
-        "fr": "Redémarrez Anki pour appliquer les modifications des outils de la barre latérale.",
-        "vi": "Bạn cần khởi động lại Anki để áp dụng thay đổi cho công cụ thanh bên.",
-        "zh": "需要重启 Anki 才能应用侧边栏工具的更改。",
-        "hi": "साइडबार टूल में बदलाव लागू करने के लिए Anki पुनः प्रारंभ करें।",
-    },
     "Your level, XP and daily streak.": {
         "de": "Dein Level, XP und deine tägliche Serie.", "es": "Tu nivel, XP y racha diaria.",
         "ko": "내 레벨, XP, 일일 스트릭.", "pt": "Seu nível, XP e sequência diária.",
         "fr": "Votre niveau, XP et série quotidienne.", "vi": "Cấp độ, XP và chuỗi ngày của bạn.",
         "zh": "您的等级、XP 和每日连击。", "hi": "आपका स्तर, XP और दैनिक स्ट्रीक।",
-    },
-    "Your study plan and the daily fact.": {
-        "de": "Dein Lernplan und der tägliche Fakt.", "es": "Tu plan de estudio y el dato diario.",
-        "ko": "학습 계획과 오늘의 상식.", "pt": "Seu plano de estudos e o fato diário.",
-        "fr": "Votre plan d'étude et le fait du jour.", "vi": "Kế hoạch học và sự thật hằng ngày.",
-        "zh": "您的学习计划和每日知识。", "hi": "आपकी अध्ययन योजना और दैनिक तथ्य।",
     },
     "A countdown bar towards your exam or deadline.": {
         "de": "Ein Countdown-Balken bis zu deiner Prüfung oder Deadline.", "es": "Una barra de cuenta regresiva hacia tu examen o fecha límite.",
@@ -8342,12 +5448,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "de": "Anki-Tastenkürzel", "es": "atajo de Anki", "ko": "Anki 단축키", "pt": "atalho do Anki",
         "fr": "raccourci Anki", "vi": "phím tắt Anki", "zh": "Anki 快捷键", "hi": "Anki शॉर्टकट",
     },
-    "No current card content was found. Open a card in the reviewer or turn off card context.": {
-        "de": "Es wurde kein Inhalt der aktuellen Karte gefunden. Öffne eine Karte im Lernmodus oder schalte den Kartenkontext aus.", "es": "No se encontró contenido de la tarjeta actual. Abre una tarjeta en el repaso o desactiva el contexto de tarjeta.",
-        "ko": "현재 카드 내용을 찾을 수 없습니다. 복습 화면에서 카드를 열거나 카드 컨텍스트를 끄세요.", "pt": "Nenhum conteúdo do cartão atual foi encontrado. Abra um cartão no revisor ou desative o contexto do cartão.",
-        "fr": "Aucun contenu n’a été trouvé pour la carte actuelle. Ouvrez une carte dans le réviseur ou désactivez le contexte de la carte.", "vi": "Không tìm thấy nội dung của thẻ hiện tại. Hãy mở một thẻ trong trình ôn tập hoặc tắt ngữ cảnh thẻ.",
-        "zh": "未找到当前卡片的内容。请在复习界面打开一张卡片，或关闭卡片上下文。", "hi": "वर्तमान कार्ड की सामग्री नहीं मिली। रिव्यूअर में कार्ड खोलें या कार्ड संदर्भ बंद करें।",
-    },
 
     # ── Release 1.3 UI additions ──────────────────────────────────────────
     "+{} XP earned": {
@@ -8370,10 +5470,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "de": "Tages-Challenge geschafft!", "es": "¡Desafío diario completado!", "ko": "일일 챌린지 완료!", "pt": "Desafio diário concluído!",
         "fr": "Défi quotidien terminé !", "vi": "Đã hoàn thành thử thách hằng ngày!", "zh": "每日挑战已完成！", "hi": "दैनिक चुनौती पूरी हुई!",
     },
-    "Don't show this again": {
-        "de": "Nicht mehr anzeigen", "es": "No volver a mostrar", "ko": "다시 표시하지 않기", "pt": "Não mostrar novamente",
-        "fr": "Ne plus afficher", "vi": "Không hiển thị lại", "zh": "不再显示", "hi": "इसे फिर न दिखाएँ",
-    },
     "Level Up!": {
         "de": "Levelaufstieg!", "es": "¡Subida de nivel!", "ko": "레벨 업!", "pt": "Subiu de nível!",
         "fr": "Niveau supérieur !", "vi": "Lên cấp!", "zh": "升级了！", "hi": "लेवल बढ़ा!",
@@ -8389,10 +5485,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "New Rank!": {
         "de": "Neuer Rang!", "es": "¡Nuevo rango!", "ko": "새 랭크!", "pt": "Novo ranking!",
         "fr": "Nouveau rang !", "vi": "Hạng mới!", "zh": "新段位！", "hi": "नई रैंक!",
-    },
-    "Nice!": {
-        "de": "Klasse!", "es": "¡Genial!", "ko": "좋아요!", "pt": "Muito bem!",
-        "fr": "Bravo !", "vi": "Tuyệt!", "zh": "真棒！", "hi": "बहुत बढ़िया!",
     },
     "PDF": {
         "de": "PDF", "es": "PDF", "ko": "PDF", "pt": "PDF", "fr": "PDF", "vi": "PDF", "zh": "PDF", "hi": "PDF",
@@ -8428,16 +5520,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "de": "Sitzungsübersicht", "es": "Resumen de la sesión", "ko": "세션 요약", "pt": "Resumo da sessão",
         "fr": "Résumé de la session", "vi": "Tóm tắt phiên", "zh": "学习总结", "hi": "सत्र सारांश",
     },
-    "Show a popup on the home screen for new ranks, level-ups and completed challenges.": {
-        "de": "Zeige auf der Startseite ein Pop-up für neue Ränge, Levelaufstiege und abgeschlossene Challenges.", "es": "Muestra una ventana en la pantalla principal para nuevos rangos, niveles y desafíos completados.", "ko": "새 랭크, 레벨 업, 완료한 챌린지를 홈 화면 팝업으로 표시합니다.", "pt": "Mostra um pop-up na tela inicial para novos rankings, níveis e desafios concluídos.",
-        "fr": "Affiche une fenêtre d’accueil pour les nouveaux rangs, niveaux et défis terminés.", "vi": "Hiện cửa sổ trên màn hình chính cho hạng mới, lên cấp và thử thách đã hoàn thành.", "zh": "在主屏幕显示新段位、升级和完成挑战的弹窗。", "hi": "नई रैंक, लेवल और पूरी चुनौतियों के लिए होम स्क्रीन पर पॉप-अप दिखाएँ।",
-    },
     "Sounds": {
         "de": "Klänge", "es": "Sonidos", "ko": "소리", "pt": "Sons", "fr": "Sons", "vi": "Âm thanh", "zh": "声音", "hi": "ध्वनियाँ",
-    },
-    "The deadline dates are invalid: {}": {
-        "de": "Die Deadline-Daten sind ungültig: {}", "es": "Las fechas del plazo no son válidas: {}", "ko": "마감 날짜가 올바르지 않습니다: {}", "pt": "As datas do prazo são inválidas: {}",
-        "fr": "Les dates de l’échéance sont invalides : {}", "vi": "Ngày hạn chót không hợp lệ: {}", "zh": "截止日期无效：{}", "hi": "समय-सीमा की तारीखें अमान्य हैं: {}",
     },
     "The start date must not be after the end date.": {
         "de": "Das Startdatum darf nicht nach dem Enddatum liegen.", "es": "La fecha de inicio no puede ser posterior a la fecha final.", "ko": "시작 날짜는 종료 날짜보다 늦을 수 없습니다.", "pt": "A data inicial não pode ser posterior à data final.",
@@ -8460,10 +5544,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "{} cards": {
         "de": "{} Karten", "es": "{} tarjetas", "ko": "카드 {}장", "pt": "{} cartões", "fr": "{} cartes", "vi": "{} thẻ", "zh": "{} 张卡片", "hi": "{} कार्ड",
     },
-    "Reviews per day (last 30 days). The best day in this period is the top of the curve.": {
-        "de": "Wiederholungen pro Tag (letzte 30 Tage). Der beste Tag dieses Zeitraums bildet die Kurvenspitze.", "es": "Repasos por día (últimos 30 días). El mejor día del periodo marca la parte superior de la curva.", "ko": "일별 복습 수(최근 30일). 이 기간의 최고 기록이 곡선의 최댓값입니다.", "pt": "Revisões por dia (últimos 30 dias). O melhor dia do período define o topo da curva.",
-        "fr": "Révisions par jour (30 derniers jours). Le meilleur jour de la période définit le sommet de la courbe.", "vi": "Số lượt ôn mỗi ngày (30 ngày qua). Ngày tốt nhất trong giai đoạn là đỉnh của đường cong.", "zh": "每日复习量（最近 30 天）。此期间表现最好的一天对应曲线顶点。", "hi": "प्रतिदिन रिव्यू (पिछले 30 दिन)। इस अवधि का सबसे अच्छा दिन वक्र का शीर्ष है।",
-    },
     "<p>Earn XP, level up, and climb the ranks while studying!</p><p><b>How to Earn XP</b></p><ul><li><b>Study Time:</b> 10 XP per minute.</li><li><b>Daily Challenge:</b> Bonus XP based on level.</li><li><b>Streak:</b> 20 XP × current streak day.</li></ul><p><b>Leveling &amp; Ranks</b></p><ul><li>Max Level: 100.</li><li>New Rank every 5 levels.</li></ul><p class=\"tip\">Tip: Consistency is key!</p>": {
         "de": "<p>Sammle beim Lernen XP, steige Level auf und erreiche neue Ränge!</p><p><b>So verdienst du XP</b></p><ul><li><b>Lernzeit:</b> 10 XP pro Minute.</li><li><b>Tages-Challenge:</b> Bonus-XP abhängig vom Level.</li><li><b>Streak:</b> 20 XP × aktueller Streak-Tag.</li></ul><p><b>Level &amp; Ränge</b></p><ul><li>Maximales Level: 100.</li><li>Alle 5 Level ein neuer Rang.</li></ul><p class=\"tip\">Tipp: Regelmäßigkeit ist entscheidend!</p>",
         "es": "<p>¡Gana XP, sube de nivel y avanza de rango mientras estudias!</p><p><b>Cómo ganar XP</b></p><ul><li><b>Tiempo de estudio:</b> 10 XP por minuto.</li><li><b>Desafío diario:</b> XP extra según el nivel.</li><li><b>Racha:</b> 20 XP × día actual de racha.</li></ul><p><b>Niveles y rangos</b></p><ul><li>Nivel máximo: 100.</li><li>Nuevo rango cada 5 niveles.</li></ul><p class=\"tip\">Consejo: ¡La constancia es clave!</p>",
@@ -8476,35 +5556,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     },
 
     # Statistics widget and its dedicated settings dialog
-    "Statistics Settings": {"de":"Statistik-Einstellungen","es":"Ajustes de estadísticas","ko":"통계 설정","pt":"Configurações de estatísticas","fr":"Paramètres des statistiques","vi":"Cài đặt thống kê","zh":"统计设置","hi":"सांख्यिकी सेटिंग्स"},
-    "Choose the periods and decide which insights appear on your dashboard.": {"de":"Wähle die Zeiträume und entscheide, welche Werte im Dashboard erscheinen.","es":"Elige los períodos y decide qué datos aparecen en el panel.","ko":"기간과 대시보드에 표시할 지표를 선택하세요.","pt":"Escolha os períodos e quais dados aparecem no painel.","fr":"Choisissez les périodes et les données affichées sur le tableau de bord.","vi":"Chọn khoảng thời gian và dữ liệu hiển thị trên bảng điều khiển.","zh":"选择时间范围以及仪表板中显示的指标。","hi":"अवधि चुनें और तय करें कि डैशबोर्ड पर कौन-से आँकड़े दिखें।"},
-    "Time ranges": {"de":"Zeiträume","es":"Períodos","ko":"기간","pt":"Períodos","fr":"Périodes","vi":"Khoảng thời gian","zh":"时间范围","hi":"समय अवधि"},
-    "Statistics period": {"de":"Statistikzeitraum","es":"Período de estadísticas","ko":"통계 기간","pt":"Período das estatísticas","fr":"Période des statistiques","vi":"Khoảng thống kê","zh":"统计周期","hi":"सांख्यिकी अवधि"},
-    "Used for Efficiency, Accuracy and Retention.": {"de":"Wird für Effizienz, Genauigkeit und Retention verwendet.","es":"Se usa para eficiencia, precisión y retención.","ko":"효율성, 정확도 및 기억률에 사용됩니다.","pt":"Usado para eficiência, precisão e retenção.","fr":"Utilisée pour l’efficacité, la précision et la rétention.","vi":"Dùng cho hiệu suất, độ chính xác và khả năng ghi nhớ.","zh":"用于效率、准确率和记忆保持率。","hi":"दक्षता, सटीकता और प्रतिधारण के लिए उपयोग होता है।"},
-    "Consistency period": {"de":"Consistency-Zeitraum","es":"Período de constancia","ko":"일관성 기간","pt":"Período de consistência","fr":"Période de régularité","vi":"Khoảng nhất quán","zh":"一致性周期","hi":"निरंतरता अवधि"},
-    "Controls only the review activity graph.": {"de":"Steuert nur den Graphen der Wiederholungsaktivität.","es":"Controla solo el gráfico de actividad de repaso.","ko":"복습 활동 그래프에만 적용됩니다.","pt":"Controla apenas o gráfico de atividade de revisão.","fr":"Contrôle uniquement le graphique d’activité de révision.","vi":"Chỉ điều khiển biểu đồ hoạt động ôn tập.","zh":"仅控制复习活动图表。","hi":"केवल समीक्षा गतिविधि ग्राफ़ को नियंत्रित करता है।"},
-    "Visible insights": {"de":"Sichtbare Werte","es":"Datos visibles","ko":"표시할 지표","pt":"Dados visíveis","fr":"Données visibles","vi":"Dữ liệu hiển thị","zh":"显示的指标","hi":"दिखने वाले आँकड़े"},
-    "Review activity graph.": {"de":"Graph der Wiederholungsaktivität.","es":"Gráfico de actividad de repaso.","ko":"복습 활동 그래프입니다.","pt":"Gráfico de atividade de revisão.","fr":"Graphique d’activité de révision.","vi":"Biểu đồ hoạt động ôn tập.","zh":"复习活动图表。","hi":"समीक्षा गतिविधि ग्राफ़।"},
-    "Efficiency and Accuracy bars.": {"de":"Balken für Effizienz und Genauigkeit.","es":"Barras de eficiencia y precisión.","ko":"효율성과 정확도 막대입니다.","pt":"Barras de eficiência e precisão.","fr":"Barres d’efficacité et de précision.","vi":"Thanh hiệu suất và độ chính xác.","zh":"效率和准确率条形图。","hi":"दक्षता और सटीकता बार।"},
-    "Retention percentage circle.": {"de":"Kreis für die prozentuale Retention.","es":"Círculo del porcentaje de retención.","ko":"기억률 원형 표시입니다.","pt":"Círculo da porcentagem de retenção.","fr":"Cercle du pourcentage de rétention.","vi":"Vòng tròn phần trăm ghi nhớ.","zh":"记忆保持率圆环。","hi":"प्रतिधारण प्रतिशत वृत्त।"},
-    "Unseen cards percentage circle.": {"de":"Kreis für den Anteil ungesehener Karten.","es":"Círculo del porcentaje de tarjetas sin ver.","ko":"보지 않은 카드 비율 원형 표시입니다.","pt":"Círculo da porcentagem de cartões não vistos.","fr":"Cercle du pourcentage de cartes non vues.","vi":"Vòng tròn tỷ lệ thẻ chưa xem.","zh":"未学习卡片比例圆环。","hi":"अनदेखे कार्डों के प्रतिशत का वृत्त।"},
-    "Customize statistics": {"de":"Statistiken anpassen","es":"Personalizar estadísticas","ko":"통계 맞춤 설정","pt":"Personalizar estatísticas","fr":"Personnaliser les statistiques","vi":"Tùy chỉnh thống kê","zh":"自定义统计","hi":"सांख्यिकी अनुकूलित करें"},
-    "What do these statistics show?": {"de":"Was zeigen diese Statistiken?","es":"¿Qué muestran estas estadísticas?","ko":"이 통계는 무엇을 보여 주나요?","pt":"O que mostram estas estatísticas?","fr":"Que montrent ces statistiques ?","vi":"Các thống kê này thể hiện điều gì?","zh":"这些统计数据显示什么？","hi":"ये आँकड़े क्या दिखाते हैं?"},
     "Last year": {"de":"Letztes Jahr","es":"Último año","ko":"지난 1년","pt":"Último ano","fr":"Année écoulée","vi":"Năm qua","zh":"过去一年","hi":"पिछला वर्ष"},
-    "the last year": {"de":"das letzte Jahr","es":"el último año","ko":"지난 1년","pt":"o último ano","fr":"l’année écoulée","vi":"năm qua","zh":"过去一年","hi":"पिछले वर्ष"},
-    "the last {} days": {"de":"die letzten {} Tage","es":"los últimos {} días","ko":"최근 {}일","pt":"os últimos {} dias","fr":"les {} derniers jours","vi":"{} ngày qua","zh":"过去 {} 天","hi":"पिछले {} दिन"},
-    "Reviews per day ({}). The best day in this period is the top of the curve.": {"de":"Wiederholungen pro Tag ({}). Der beste Tag dieses Zeitraums bildet die Kurvenspitze.","es":"Repasos por día ({}). El mejor día del período marca la parte superior de la curva.","ko":"일별 복습 수({}). 이 기간의 최고 기록이 곡선의 최댓값입니다.","pt":"Revisões por dia ({}). O melhor dia do período define o topo da curva.","fr":"Révisions par jour ({}). Le meilleur jour de la période définit le sommet de la courbe.","vi":"Số lượt ôn mỗi ngày ({}). Ngày tốt nhất trong giai đoạn là đỉnh đường cong.","zh":"每日复习量（{}）。此期间表现最好的一天对应曲线顶点。","hi":"प्रतिदिन समीक्षा ({}). इस अवधि का सबसे अच्छा दिन वक्र का शीर्ष है।"},
-    "Efficiency (Eff.)": {"de":"Effizienz (Eff.)","es":"Eficiencia (Efic.)","ko":"효율성 (효율)","pt":"Eficiência (Efic.)","fr":"Efficacité (Eff.)","vi":"Hiệu suất (Hq.)","zh":"效率（效率）","hi":"दक्षता (दक्ष.)"},
-    "Accuracy (Acc.)": {"de":"Genauigkeit (Gen.)","es":"Precisión (Prec.)","ko":"정확도 (정확)","pt":"Precisão (Prec.)","fr":"Précision (Préc.)","vi":"Độ chính xác (Độ cx.)","zh":"准确率（准确）","hi":"सटीकता (सटी.)"},
-    "How many cards you answer correctly per minute of study time ({}). A full bar equals 7.5 correct cards per minute. Time per card is capped at 45 seconds so breaks don't distort the value.": {"de":"Wie viele Karten du pro Lernminute richtig beantwortest ({}). Ein voller Balken entspricht 7,5 richtigen Karten pro Minute. Die Zeit pro Karte ist auf 45 Sekunden begrenzt, damit Pausen den Wert nicht verfälschen.","es":"Cuántas tarjetas respondes correctamente por minuto de estudio ({}). Una barra completa equivale a 7,5 tarjetas correctas por minuto. El tiempo por tarjeta se limita a 45 segundos para que las pausas no distorsionen el valor.","ko":"학습 시간 1분당 정답 카드 수({})입니다. 막대가 가득 차면 분당 7.5개 정답을 뜻합니다. 휴식이 값을 왜곡하지 않도록 카드당 시간은 45초로 제한됩니다.","pt":"Quantos cartões você responde corretamente por minuto de estudo ({}). Uma barra cheia equivale a 7,5 cartões corretos por minuto. O tempo por cartão é limitado a 45 segundos para que pausas não distorçam o valor.","fr":"Nombre de cartes correctement répondues par minute d’étude ({}). Une barre pleine correspond à 7,5 cartes correctes par minute. Le temps par carte est limité à 45 secondes afin que les pauses ne faussent pas la valeur.","vi":"Số thẻ bạn trả lời đúng mỗi phút học ({}). Thanh đầy tương ứng 7,5 thẻ đúng mỗi phút. Thời gian mỗi thẻ được giới hạn ở 45 giây để thời gian nghỉ không làm sai lệch kết quả.","zh":"每分钟学习时间内正确回答的卡片数（{}）。满条代表每分钟正确回答 7.5 张卡片。每张卡片的用时上限为 45 秒，避免休息时间影响数值。","hi":"प्रति अध्ययन मिनट सही उत्तर दिए गए कार्डों की संख्या ({}). पूरा बार प्रति मिनट 7.5 सही कार्ड के बराबर है। विराम से मान प्रभावित न हो, इसलिए प्रति कार्ड समय 45 सेकंड तक सीमित है।"},
-    "The percentage of all answered cards you got right ({}). The bar is scaled for readability — hover over it to see the exact value.": {"de":"Der Anteil aller richtig beantworteten Karten ({}). Der Balken ist zur besseren Lesbarkeit skaliert – fahre darüber, um den exakten Wert zu sehen.","es":"El porcentaje de todas las tarjetas respondidas correctamente ({}). La barra está escalada para facilitar la lectura; pasa el cursor para ver el valor exacto.","ko":"전체 응답 카드 중 정답 비율({})입니다. 읽기 쉽도록 막대가 조정되어 있으며 마우스를 올리면 정확한 값을 볼 수 있습니다.","pt":"A porcentagem de todos os cartões respondidos corretamente ({}). A barra é dimensionada para facilitar a leitura; passe o cursor para ver o valor exato.","fr":"Le pourcentage de toutes les cartes correctement répondues ({}). La barre est mise à l’échelle pour rester lisible ; survolez-la pour voir la valeur exacte.","vi":"Tỷ lệ tất cả thẻ được trả lời đúng ({}). Thanh được điều chỉnh để dễ đọc; di chuột để xem giá trị chính xác.","zh":"所有已回答卡片中的正确率（{}）。条形图为便于阅读进行了缩放；悬停可查看精确值。","hi":"सभी उत्तर दिए कार्डों में सही उत्तरों का प्रतिशत ({}). पढ़ने में आसानी के लिए बार का पैमाना बदला गया है—सटीक मान देखने के लिए उस पर होवर करें।"},
-    "The percentage of correct answers on review cards ({}) — cards you had already learned. This shows how well you retain content long-term.": {"de":"Der Anteil richtiger Antworten bei Wiederholungskarten ({}) – also bereits gelernten Karten. Dies zeigt, wie gut du Inhalte langfristig behältst.","es":"El porcentaje de respuestas correctas en tarjetas de repaso ({}) —tarjetas que ya habías aprendido—. Muestra qué tan bien retienes el contenido a largo plazo.","ko":"이미 학습한 복습 카드의 정답 비율({})입니다. 내용을 장기적으로 얼마나 잘 기억하는지 보여 줍니다.","pt":"A porcentagem de respostas corretas em cartões de revisão ({}) — cartões já aprendidos. Mostra como você retém o conteúdo a longo prazo.","fr":"Le pourcentage de bonnes réponses aux cartes de révision ({}) — des cartes déjà apprises. Cela indique la qualité de la mémorisation à long terme.","vi":"Tỷ lệ trả lời đúng trên các thẻ ôn tập ({}) — những thẻ đã học. Chỉ số này cho biết khả năng ghi nhớ lâu dài.","zh":"复习卡片（已学习过的卡片）的正确率（{}）。这反映了长期记忆效果。","hi":"समीक्षा कार्डों—यानी पहले सीखे कार्डों—पर सही उत्तरों का प्रतिशत ({}). यह दीर्घकालीन याददाश्त दर्शाता है।"},
-    "The percentage of cards in your active collection that you have never studied.": {"de":"Der Anteil der Karten in deiner aktiven Sammlung, die du noch nie gelernt hast.","es":"El porcentaje de tarjetas de tu colección activa que nunca has estudiado.","ko":"활성 컬렉션에서 아직 한 번도 학습하지 않은 카드의 비율입니다.","pt":"A porcentagem de cartões da coleção ativa que você nunca estudou.","fr":"Le pourcentage de cartes de votre collection active que vous n’avez jamais étudiées.","vi":"Tỷ lệ thẻ trong bộ sưu tập đang hoạt động mà bạn chưa từng học.","zh":"活动集合中从未学习过的卡片比例。","hi":"आपके सक्रिय संग्रह में उन कार्डों का प्रतिशत जिन्हें आपने कभी नहीं पढ़ा।"},
-    "Your reviews per day over {}. The curve is relative to this period: the day with the most reviews forms the peak, days without reviews sit on the baseline. The dot marks today.": {"de":"Deine Wiederholungen pro Tag über {}. Die Kurve ist relativ zu diesem Zeitraum: Der Tag mit den meisten Wiederholungen bildet die Spitze, Tage ohne Wiederholungen liegen auf der Grundlinie. Der Punkt markiert heute.","es":"Tus repasos diarios durante {}. La curva es relativa a este período: el día con más repasos forma el pico y los días sin repasos quedan en la línea base. El punto marca hoy.","ko":"{} 동안의 일별 복습 수입니다. 곡선은 이 기간을 기준으로 하며 복습이 가장 많은 날이 정점, 복습이 없는 날은 기준선에 놓입니다. 점은 오늘을 표시합니다.","pt":"Suas revisões por dia durante {}. A curva é relativa a esse período: o dia com mais revisões forma o pico e dias sem revisões ficam na linha de base. O ponto marca hoje.","fr":"Vos révisions quotidiennes sur {}. La courbe est relative à cette période : le jour avec le plus de révisions forme le sommet et les jours sans révision restent sur la ligne de base. Le point indique aujourd’hui.","vi":"Số lượt ôn mỗi ngày trong {}. Đường cong tương đối với giai đoạn này: ngày ôn nhiều nhất tạo đỉnh, ngày không ôn nằm trên đường cơ sở. Chấm tròn đánh dấu hôm nay.","zh":"{}内的每日复习量。曲线相对于该时间段：复习最多的一天形成峰值，无复习的日期位于基线，圆点表示今天。","hi":"{} में आपकी प्रतिदिन समीक्षाएँ। वक्र इस अवधि के सापेक्ष है: सबसे अधिक समीक्षाओं वाला दिन शिखर बनता है, बिना समीक्षा वाले दिन आधार रेखा पर रहते हैं। बिंदु आज को दर्शाता है।"},
-    "Use the gear button on the statistics widget to change periods and visible insights.": {"de":"Mit dem Zahnrad im Statistik-Widget kannst du Zeiträume und sichtbare Werte ändern.","es":"Usa el engranaje del widget de estadísticas para cambiar los períodos y los datos visibles.","ko":"통계 위젯의 톱니바퀴 버튼으로 기간과 표시할 지표를 변경하세요.","pt":"Use a engrenagem no widget de estatísticas para alterar períodos e dados visíveis.","fr":"Utilisez le bouton en forme d’engrenage du widget pour modifier les périodes et les données visibles.","vi":"Dùng nút bánh răng trên tiện ích thống kê để đổi khoảng thời gian và dữ liệu hiển thị.","zh":"使用统计组件上的齿轮按钮更改时间范围和显示的指标。","hi":"अवधि और दिखने वाले आँकड़े बदलने के लिए सांख्यिकी विजेट का गियर बटन उपयोग करें।"},
-    "Smart Study - Statistics": {"de":"Smart Study – Statistiken","es":"Smart Study - Estadísticas","ko":"Smart Study - 통계","pt":"Smart Study - Estatísticas","fr":"Smart Study – Statistiques","vi":"Smart Study - Thống kê","zh":"Smart Study - 统计","hi":"Smart Study - सांख्यिकी"},
     "Next": {"de":"Weiter","es":"Siguiente","ko":"다음","pt":"Próximo","fr":"Suivant","vi":"Tiếp theo","zh":"下一步","hi":"अगला"},
-    "More": {"de":"Mehr","es":"Más","ko":"더 보기","pt":"Mais","fr":"Plus","vi":"Thêm","zh":"更多","hi":"अधिक"},
     "Choose Background Image": {"de":"Hintergrundbild auswählen","es":"Elegir imagen de fondo","ko":"배경 이미지 선택","pt":"Escolher imagem de fundo","fr":"Choisir une image d’arrière-plan","vi":"Chọn ảnh nền","zh":"选择背景图片","hi":"पृष्ठभूमि चित्र चुनें"},
     "Images (*.jpg *.jpeg *.png *.webp)": {"de":"Bilder (*.jpg *.jpeg *.png *.webp)","es":"Imágenes (*.jpg *.jpeg *.png *.webp)","ko":"이미지 (*.jpg *.jpeg *.png *.webp)","pt":"Imagens (*.jpg *.jpeg *.png *.webp)","fr":"Images (*.jpg *.jpeg *.png *.webp)","vi":"Hình ảnh (*.jpg *.jpeg *.png *.webp)","zh":"图片 (*.jpg *.jpeg *.png *.webp)","hi":"चित्र (*.jpg *.jpeg *.png *.webp)"},
     "The image must be smaller than 20 MB.": {"de":"Das Bild muss kleiner als 20 MB sein.","es":"La imagen debe tener menos de 20 MB.","ko":"이미지는 20MB보다 작아야 합니다.","pt":"A imagem deve ter menos de 20 MB.","fr":"L’image doit faire moins de 20 Mo.","vi":"Ảnh phải nhỏ hơn 20 MB.","zh":"图片必须小于 20 MB。","hi":"चित्र 20 MB से छोटा होना चाहिए।"},
@@ -8560,24 +5613,6 @@ TRANSLATIONS.update({
     "Overview": {
         "de": "Übersicht"
     },
-    "Comfortable": {
-        "de": "Großzügig"
-    },
-    "Compact": {
-        "de": "Kompakt"
-    },
-    "Spacing": {
-        "de": "Abstände"
-    },
-    "Show button": {
-        "de": "Als Button anzeigen"
-    },
-    "Only in menu": {
-        "de": "Nur im Menü"
-    },
-    "Hidden": {
-        "de": "Ausblenden"
-    },
     "Last 7 days": {
         "de": "Letzte 7 Tage"
     },
@@ -8587,23 +5622,8 @@ TRANSLATIONS.update({
     "All time": {
         "de": "Gesamter Zeitraum"
     },
-    "Retention period": {
-        "de": "Zeitraum der Behaltensrate"
-    },
-    "Today’s cards": {
-        "de": "Heute anstehende Karten"
-    },
-    "Card distribution": {
-        "de": "Kartenverteilung"
-    },
-    "Mature cards": {
-        "de": "Langfristig gelernte Karten"
-    },
     "Recall indicator": {
         "de": "Lernindikator (Smiley)"
-    },
-    "Study history (overview layout)": {
-        "de": "Lernverlauf im Übersichts-Layout"
     },
     "Green from (%)": {
         "de": "Grün ab (%)"
@@ -8611,32 +5631,14 @@ TRANSLATIONS.update({
     "Orange from (%)": {
         "de": "Orange ab (%)"
     },
-    "Visible content": {
-        "de": "Sichtbare Inhalte"
-    },
-    "Based on remembered review answers in the last 30 days, not Ease Factor. Neutral until 20 reviews. Green and orange include their threshold; red is below orange.": {
-        "de": "Basiert auf erinnerten Wiederholungsantworten der letzten 30 Tage, nicht auf dem Ease-Faktor. Bei weniger als 20 Wiederholungen bleibt die Anzeige neutral. Grün und Orange gelten ab dem eingestellten Wert; darunter wird Rot angezeigt."
-    },
     "The green threshold must be higher than the orange threshold.": {
         "de": "Der Grenzwert für Grün muss höher sein als der für Orange."
-    },
-    "Layout preview · example values": {
-        "de": "Layout-Vorschau · Beispielwerte"
-    },
-    "Deck details": {
-        "de": "Deckdetails"
-    },
-    "Last 14 days": {
-        "de": "Letzte 14 Tage"
     },
     "Not enough reviews yet": {
         "de": "Noch zu wenige Wiederholungen"
     },
     "Customize Deck Overview": {
         "de": "Deckübersicht anpassen"
-    },
-    "More options": {
-        "de": "Weitere Optionen"
     },
     "Remembered answers across all learning and review steps. Period: {}.": {
         "de": "Erinnerte Antworten aus Lernschritten und Wiederholungen. Zeitraum: {}."
@@ -8660,28 +5662,23 @@ TRANSLATIONS.update({
  "Confident": {"de":"Sicher"},
  "Still practicing": {"de":"Noch am Üben"},
  "Needs work": {"de":"Noch unsicher"},
- "Automatic suggestion": {"de":"Automatischer Vorschlag"},
- "Choose how you feel about this deck. Your choice stays until you change it or return to Automatic suggestion.": {"de":"Wähle, wie sicher du dich mit diesem Deck fühlst. Deine Auswahl bleibt, bis du sie änderst oder zum automatischen Vorschlag zurückkehrst."},
  "Could not save the smiley. Please try again.": {"de":"Der Smiley konnte nicht gespeichert werden. Bitte versuche es erneut."}
 })
 
 TRANSLATIONS.update({
  "Auto": {"de":"Auto"},
  "Show indicator in Deck Browser for this deck": {"de":"Punkt für dieses Deck in der Deckübersicht anzeigen"},
- "Only this deck gets a dot. Auto appears after 20 review answers; manual choices appear immediately.": {"de":"Nur dieses Deck erhält einen Punkt. Bei Auto erscheint er ab 20 Wiederholungsantworten, bei manueller Auswahl sofort."},
  "Choose how you feel about this deck. Your choice stays until you change it or return to Auto.": {"de":"Wähle, wie sicher du dich mit diesem Deck fühlst. Deine Auswahl bleibt, bis du sie änderst oder zu Auto zurückkehrst."},
  "Could not save the setting. Please try again.": {"de":"Die Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut."}
 })
 
 TRANSLATIONS.update({
  "Show indicators in Deck Browser for all decks": {"de":"Punkte für alle Decks in der Deckübersicht anzeigen"},
- "Off: enable individual decks via the smiley. On: show all eligible decks. Dots require at least 20 review answers in the last 30 days, including manual smileys.": {"de":"Aus: Einzelne Decks über den Smiley aktivieren. An: Alle geeigneten Decks anzeigen. Punkte erscheinen ab 20 Wiederholungsantworten in den letzten 30 Tagen, auch bei manueller Smiley-Auswahl."},
  "Remaining": {"de":"Verbleibend"},
  "No cards waiting right now": {"de":"Gerade stehen keine Karten an"},
  "Reviews · last 14 days": {"de":"Wiederholungen · letzte 14 Tage"},
  "No reviews in the last 14 days": {"de":"Keine Wiederholungen in den letzten 14 Tagen"},
  "All decks are enabled in Settings.": {"de":"In den Einstellungen sind alle Decks aktiviert."},
- "Dots appear after 20 review answers in the last 30 days.": {"de":"Punkte erscheinen ab 20 Wiederholungsantworten in den letzten 30 Tagen."}
 })
 
 TRANSLATIONS.update({
@@ -9424,7 +6421,6 @@ TRANSLATIONS.update({
     "Trophies": {"de": "Trophäen"},
     "Smart Study settings": {"de": "Smart-Study-Einstellungen"},
     "Pomodoro: reset, skip, settings": {"de": "Pomodoro: zurücksetzen, überspringen, Einstellungen"},
-    "Hide side panel": {"de": "Seitenleiste ausblenden"},
     "Show or hide the Smart Study panel.": {"de": "Smart-Study-Leiste ein- oder ausblenden."},
     "Break": {"de": "Pause"},
     "days until": {"de": "Tage bis"},

@@ -45,14 +45,6 @@
   .nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;
     font-size:13px;font-weight:500;color:var(--text);user-select:none;}
   .nav-item .ic{width:17px;height:17px;flex-shrink:0;color:var(--muted);display:flex;}
-  .nav-item:hover{background:var(--chip-hover);}
-  .nav-item.active{background:var(--accent);color:#fff;}
-  .nav-item.active .ic{color:#fff;}
-  .nav-sep{flex:1;}
-  .side-foot{display:flex;align-items:center;padding:6px 6px 2px;}
-  .mode-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);cursor:pointer;
-    padding:6px 9px;border-radius:8px;}
-  .mode-toggle:hover{background:var(--chip-hover);}
 
   /* content */
   .content{flex:1;min-width:0;background:var(--content-bg);overflow:auto;}
@@ -61,14 +53,11 @@
   @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
   .page-title{font-size:23px;font-weight:700;letter-spacing:-0.02em;margin:0 0 4px;}
   .page-sub{font-size:13px;color:var(--muted);margin:0 0 20px;line-height:1.45;max-width:48ch;}
-  .group-label{font-size:11px;font-weight:650;letter-spacing:0.04em;text-transform:uppercase;
-    color:var(--muted);margin:22px 4px 8px;}
 
   .group{background:var(--group-bg);border:1px solid var(--group-border);border-radius:11px;overflow:hidden;}
   .row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-top:1px solid var(--hairline);}
   .row:first-child{border-top:none;}
   .row .rl{flex:1;min-width:0;}
-  .row .rt{font-size:14px;font-weight:550;letter-spacing:-0.01em;}
   .row .rd{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
   .row .rc{flex-shrink:0;}
 
@@ -78,14 +67,8 @@
   .slider{position:absolute;inset:0;background:var(--switch-off);border-radius:26px;transition:background .2s;cursor:pointer;}
   .slider::before{content:"";position:absolute;height:22px;width:22px;inset-inline-start:2px;top:2px;background:#fff;border-radius:50%;
     transition:transform .2s cubic-bezier(.4,1.3,.5,1);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
-  .switch input:checked + .slider{background:var(--accent);}
   .switch input:checked + .slider::before{transform:translateX(16px);}
   #celebrationGroup .row[hidden]{display:none;}
-  .row.mode-locked{opacity:.48;}
-  .row.mode-locked .slider{background:var(--switch-off)!important;cursor:not-allowed;}
-  .row.mode-locked .slider::before{transform:none!important;}
-  .dashboard-lock-note{display:none;margin:10px 4px 0;color:var(--muted);font-size:12px;line-height:1.45;}
-  .dashboard-lock-note.visible{display:block;}
   .row.setting-locked{opacity:.48;pointer-events:none;}
   .custom-bg-panel{display:none;}
   .custom-bg-panel.open{display:block;}
@@ -213,7 +196,6 @@
     outline:none;min-width:170px;text-align:start;font-family:inherit;line-height:1.35;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
     background-repeat:no-repeat;background-position:right 10px center;}
-  .dd-btn:focus{border-color:var(--accent);}
   .dd-menu{position:fixed;z-index:9999;background:var(--group-bg);border:1px solid var(--group-border);
     border-radius:10px;box-shadow:0 10px 32px rgba(0,0,0,0.18);padding:5px;overflow-y:auto;overflow-x:hidden;}
   html.dark .dd-menu, body.dark .dd-menu{box-shadow:0 10px 32px rgba(0,0,0,0.55);}
@@ -234,14 +216,6 @@
   #suggestedGroup .btn{white-space:nowrap;}
   #suggestedGroup .btn:disabled{opacity:.6;cursor:default;filter:none;background:var(--field-bg);color:var(--text);}
 
-  /* home hero */
-  .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 20px 26px;
-    border-radius:14px;background:var(--group-bg);border:1px solid var(--group-border);}
-  .hero img{width:76px;height:76px;border-radius:18px;object-fit:contain;margin-bottom:12px;}
-  .hero h2{margin:0;font-size:21px;font-weight:700;letter-spacing:-0.02em;}
-  .hero .meta{font-size:12.5px;color:var(--muted);margin-top:4px;}
-  .hero .by{font-size:11px;color:var(--muted);opacity:.85;margin-top:1px;}
-  .hero .links{display:flex;gap:10px;margin-top:18px;}
 
   /* home: community cards (GitHub purple, Reddit orange — subtle tinted
      borders, only the action button carries the full colour) */
@@ -252,41 +226,10 @@
   .comm-btn{color:#fff;flex-shrink:0;}
   /* soft tinted backgrounds, same recipe as the green rating CTA */
   .comm-github{border-color:rgba(110,64,201,0.40);background:rgba(110,64,201,0.11);}
-  .comm-github .comm-btn{background:#6e40c9;}
   .comm-github .comm-btn:hover{filter:brightness(1.1);}
-  .comm-reddit{border-color:rgba(255,69,0,0.38);background:rgba(255,69,0,0.10);}
-  .comm-reddit .comm-btn{background:#FF4500;}
-  .comm-reddit .comm-btn:hover{filter:brightness(1.08);}
   html.dark .comm-github, body.dark .comm-github{background:rgba(140,95,225,0.14);}
-  html.dark .comm-reddit, body.dark .comm-reddit{background:rgba(255,90,25,0.13);}
 
-  .cta{margin-top:18px;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:13px;
-    background:var(--green-soft);border:1px solid var(--green-border);}
-  .cta .thumb{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:var(--green);
-    display:flex;align-items:center;justify-content:center;color:#fff;}
-  /* Home banner (remote, swappable image with an offline fallback) */
-  /* Banner box locked to the image's 1800x1000 (9:5) ratio; padding-bottom hack
-     keeps it working even on older WebEngine builds. */
-  .banner-wrap{position:relative;display:block;width:100%;padding-bottom:55.56%;
-    border-radius:12px;overflow:hidden;background:var(--field-bg);border:1px solid var(--group-border);}
-  .banner{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;
-    opacity:0;transition:opacity .35s ease;}
-  .banner.banner-visible{opacity:1;}
-  .banner-wrap.clickable{cursor:pointer;}
-  .conflict-card{margin-top:14px;padding:15px 17px;border-radius:12px;
-    background:rgba(255,149,0,.09);border:1px solid rgba(214,126,0,.28);}
-  .conflict-head{display:flex;align-items:center;gap:9px;margin-bottom:7px;color:#a45d00;}
-  .conflict-head svg{width:18px;height:18px;flex:none;}
-  .conflict-head b{font-size:14px;font-weight:680;}
-  .conflict-card p{margin:5px 0;color:var(--muted);font-size:12px;line-height:1.5;}
   .conflict-addon{margin:9px 0!important;color:var(--text)!important;font-weight:650;}
-  html.dark .conflict-card,body.dark .conflict-card{background:rgba(255,159,10,.10);border-color:rgba(255,159,10,.28);}
-  html.dark .conflict-head,body.dark .conflict-head{color:#ffb340;}
-  .cta .ct{flex:1;}
-  .cta .ct b{font-size:14px;font-weight:650;}
-  .cta .ct p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.4;}
-  .cta .btn{background:var(--green);color:#fff;}
-  .cta .btn:hover{filter:brightness(1.06);}
 
   /* swatches */
   .swatches{display:flex;gap:13px;flex-wrap:wrap;align-items:flex-start;}
@@ -322,8 +265,6 @@
     justify-content:center;margin-bottom:14px;color:var(--accent);}
   .empty b{color:var(--text);font-size:15px;font-weight:600;}
   .empty p{margin:6px 0 0;font-size:13px;max-width:38ch;line-height:1.5;}
-  .supp-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
-  .supp-chip{background:var(--field-bg);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;}
   /* Deliberately understated: the list will grow with many supporters. */
   .supporter-card{padding:13px 16px;}
   .supporter-card + .supporter-card{border-top:1px solid var(--hairline);}
@@ -401,7 +342,6 @@
   .btn{border-radius:19px;min-height:38px;padding:0 18px;font-size:14px;}
   .code-input,.shortcut-btn,.bchip,.btextarea{border-radius:12px;}
   .footer{padding:12px max(24px,calc((100% - 820px)/2));}
-  .banner-wrap[hidden]{display:none;}
   .comm-card,.comm-github,html.dark .comm-github,body.dark .comm-github{background:var(--group-bg)!important;border:1px solid var(--group-border)!important;border-radius:14px!important;padding:12px 18px!important;}
   .comm-github .comm-btn{background:var(--field-bg)!important;color:var(--text)!important;}
   .news-item{font-size:14px!important;color:var(--text)!important;margin:0!important;}
@@ -488,12 +428,10 @@
 
       <main class="content" id="content">
         <p class="search-empty" id="searchEmpty">No setting matches your search.</p>
-        <!-- HOME -->
         <!-- NEWS -->
         <section class="page" data-page="news">
           <h1 class="page-title">News</h1>
           <p class="page-sub">What changed in this version, and things worth knowing.</p>
-          <a class="banner-wrap" id="bannerWrap" hidden><img id="homeBanner" class="banner" alt=""></a>
           <div id="newsLatest"></div>
           <div class="group-label">Known Add-on Conflict</div>
           <div class="group news-note">
@@ -1041,7 +979,7 @@
           var rows=group.querySelectorAll('.row');
           if(rows.length && !group.querySelector('.row:not(.search-hide)')) group.classList.add('search-hide');
         });
-        page.querySelectorAll(':scope > p:not(.page-title),.group-label,.group-note,.page-sub,.community-strip,.dashboard-lock-note').forEach(function(el){ el.classList.add('search-hide'); });
+        page.querySelectorAll(':scope > p:not(.page-title),.group-label,.group-note,.page-sub,.community-strip').forEach(function(el){ el.classList.add('search-hide'); });
         if(!hit && page.querySelector('.page-title').textContent.toLowerCase().indexOf(q)<0) page.classList.add('no-hit');
         else any=true;
       });
@@ -1226,75 +1164,6 @@
         '<b>'+esc(tr('Supporters will be listed here soon'))+'</b><p>'+esc(tr('A heartfelt thank you to everyone who supports Smart Study. This space is reserved for you.'))+'</p></div>';
     }
     document.getElementById('supportersNote').textContent = note || '';
-  }
-
-  // Home banner without the "flash of fallback": the <img> starts invisible.
-  // The remote image gets a short head start (BANNER_GRACE_MS); if it loads
-  // in time it fades in directly and the offline fallback is never shown.
-  // Only when the remote image is slow/unreachable does the fallback fade in,
-  // and a late-arriving remote image then replaces it via a soft cross-fade.
-  var BANNER_GRACE_MS = 900;
-  var _bannerShown = false;   // something is currently displayed
-  var _bannerRemote = false;  // the displayed image is the remote one
-
-  function _bannerImg(){ return document.getElementById('homeBanner'); }
-
-  function _fadeInBanner(src){
-    var img = _bannerImg();
-    if(!img) return;
-    img.onload = function(){ img.classList.add('banner-visible'); };
-    img.src = src;
-    _bannerShown = true;
-  }
-
-  function _crossSwapBanner(src){
-    var img = _bannerImg();
-    if(!img) return;
-    img.classList.remove('banner-visible');
-    setTimeout(function(){ _fadeInBanner(src); }, 260);
-  }
-
-  function _showRemote(src){
-    if(_bannerRemote) return;
-    _bannerRemote = true;
-    if(_bannerShown){ _crossSwapBanner(src); }
-    else{ _fadeInBanner(src); }
-  }
-
-  function _showFallback(fallback){
-    if(_bannerShown || !fallback) return;
-    _fadeInBanner(fallback);
-  }
-
-  function _probeBanner(url, onOk, onFail){
-    var probe = new Image();
-    probe.onload = function(){ onOk(url); };
-    probe.onerror = function(){ if(onFail) onFail(); };
-    probe.src = url;
-  }
-
-  function _setBannerLink(link){
-    var wrap = document.getElementById('bannerWrap');
-    if(!wrap || !link) return;
-    wrap.classList.add('clickable');
-    wrap.onclick = function(){ openUrl(link); };
-  }
-
-  function loadBanner(b){
-    var img = _bannerImg();
-    var wrap = document.getElementById('bannerWrap');
-    if(!img || !wrap) return;
-    var fallback = b.fallback || '';
-    _setBannerLink(b.link);
-    if(!fallback && !b.url){ wrap.style.display = 'none'; return; }
-
-    if(b.url){
-      _probeBanner(b.url, _showRemote, function(){ _showFallback(fallback); });
-      // Fallback only appears if the remote image hasn't made it in time.
-      setTimeout(function(){ _showFallback(fallback); }, BANNER_GRACE_MS);
-    } else {
-      _showFallback(fallback);
-    }
   }
 
   function setSelect(id, value){
@@ -1517,8 +1386,6 @@
         document.getElementById('aboutLogo').src = data.aboutLogo;
         document.getElementById('aboutLogoFrame').hidden = false;
       }
-      // The banner lives on the News tab; loading it here means it is
-      // already in place (no flash) by the time the tab is opened.
       renderLatest(data.changelog);
       if(data.initialPage)gotoPage(data.initialPage);
       if(data.initialPage==='dashboard' && data.initialSection==='celebrations'){

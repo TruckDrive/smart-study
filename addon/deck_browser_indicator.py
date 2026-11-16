@@ -43,6 +43,18 @@ def render(tree, col, settings, translate):
     # Read the manual smiley map once instead of one config lookup per deck.
     smileys = col.get_config(options.SMILEY_KEY, default={})
     smileys = smileys if isinstance(smileys, dict) else {}
+    # Sum each deck's reviews into itself and every parent in one pass, instead
+    # of asking the backend for the child ids of every deck on each render.
+    names = {d.id: d.name for d in col.decks.all_names_and_ids()}
+    totals = {}
+    for counted, (deck_n, deck_ok) in counts.items():
+        name = names.get(counted)
+        if name is None:
+            continue
+        parts = name.split('::')
+        for depth in range(1, len(parts) + 1):
+            total = totals.setdefault('::'.join(parts[:depth]), [0, 0])
+            total[0] += deck_n; total[1] += deck_ok or 0
     states = {}
     for did in candidates:
         state = smileys.get(str(did))
@@ -50,10 +62,7 @@ def render(tree, col, settings, translate):
         if state != 'auto':
             states[did] = state
             continue
-        n = ok = 0
-        for child in col.decks.deck_and_child_ids(did):
-            child_n, child_ok = counts.get(child,(0,0))
-            n += child_n; ok += child_ok
+        n, ok = totals.get(names.get(did), (0, 0))
         if n < 20:
             continue
         states[did] = options.indicator(ok,n,opts)

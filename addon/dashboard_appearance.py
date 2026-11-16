@@ -109,21 +109,6 @@ def glass_backdrop_html(image_uri, geometry, overlay=0, position='center'):
     })(''' + payload + ''');</script>'''
 
 
-def deck_list_width_css(wide=True):
-    if wide is not False:
-        return ''
-    return '''<style id="smartstudy-compact-deck-list">
-    body.deckbrowser.deckbrowser:not(.smartstudy-minimal-dashboard) .decks-container,
-    body.deckbrowser.deckbrowser:not(.smartstudy-minimal-dashboard) > center > table {
-      width:min(600px,calc(100vw - 48px)) !important;
-      min-width:0 !important;max-width:600px !important;
-    }
-    body.deckbrowser.deckbrowser:not(.smartstudy-minimal-dashboard) .decks-container table {
-      width:100% !important;min-width:0 !important;max-width:100% !important;
-    }
-    </style>'''
-
-
 def surface_effects_css():
     """Static material highlights, shared by dashboard and settings preview."""
     return """

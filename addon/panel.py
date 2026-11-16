@@ -486,7 +486,9 @@ class Panel(QObject):
             (gui_hooks.reviewer_did_answer_card, lambda *_a: (self.refresh(4000), QTimer.singleShot(300, self._level))),
             (gui_hooks.state_did_change, lambda *_a: (setattr(self, "_force_today", False), self.sync(), self.refresh(150), self._level())),
             (gui_hooks.sync_did_finish, lambda *_a: self.refresh(300)),
-            (gui_hooks.operation_did_execute, lambda *_a: self.refresh(1500)),
+            # Every answered card is an operation too: while reviewing, keep the
+            # slower pace of reviewer_did_answer_card instead of undercutting it.
+            (gui_hooks.operation_did_execute, lambda *_a: self.refresh(4000 if mw.state == "review" else 1500)),
             (gui_hooks.theme_did_change, self.restyle),
         ]
         for hook, fn in self._hooks:
@@ -956,7 +958,6 @@ class Panel(QObject):
             if days in choices:
                 settings[key] = days
                 self.ctx["save"]()
-                self.ctx["stats_changed"]()
                 self.refresh()
         elif cmd == "show":
             key = SHOW_KEYS[a["which"]]
@@ -1051,6 +1052,9 @@ def _plan_part(col, settings) -> Dict[str, Any]:
         countdown = {"days": days, "title": first["title"], "source": "plan", "plan": first["id"]}
     done_items, open_items = [], []
     for plan in running:
+        # Only today's rows are shown; a plan without any spares the card counts.
+        if not any(day["d"] == today for day in plan.get("days", [])):
+            continue
         try:
             ev = planner.evaluate(plan, ankidata.stats(col, plan))
         except Exception:  # one broken plan must not hide the others

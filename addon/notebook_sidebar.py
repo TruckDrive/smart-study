@@ -19,7 +19,6 @@ import sys
 import threading
 from typing import Callable, Optional
 
-import aqt
 from anki.collection import AddNoteRequest
 from aqt import mw
 from aqt.operations import CollectionOp
@@ -1425,7 +1424,6 @@ class NotebookPanel(QWidget):
         self._layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self._layout)
         self.web: Optional[AnkiWebView] = None
-        self.is_initialized    = False
         self.current_tool      = "notebook"
         self._database_path = db_path()
         self._load_failed = False
@@ -1459,7 +1457,6 @@ class NotebookPanel(QWidget):
         self._layout.addWidget(self.web)
 
         self._load_tool(self.current_tool)
-        self.is_initialized = True
 
     def unload_content(
         self, on_complete: Optional[Callable[[bool], None]] = None
@@ -1503,17 +1500,8 @@ class NotebookPanel(QWidget):
 
     def _on_load_finished(self, ok: bool) -> None:
         self._page_ready = bool(ok) and not self._load_failed
-        if ok and self.current_tool == "todo":
-            self._consume_dashboard_completions()
         if ok and self.current_tool == "pdf" and self._pending_pdf_reference:
             QTimer.singleShot(0, self._consume_pending_pdf_reference)
-
-    def _consume_dashboard_completions(self):
-        pending = getattr(self, "_dashboard_completions", set())
-        if not pending or not self.web or self.current_tool != "todo" or not self._page_ready:
-            return
-        self._dashboard_completions = set()
-        self.web.eval("if(window.completeDashboardTasks) window.completeDashboardTasks(" + json.dumps(list(pending)) + ");")
 
     def open_pdf_reference(self, file_path: str, page: int = 1) -> None:
         """Open a library PDF from a review-card source link."""
@@ -1555,7 +1543,6 @@ class NotebookPanel(QWidget):
             print(f"Notebook: webview cleanup failed: {exc}")
         web_ref.deleteLater()
         self.web = None
-        self.is_initialized = False
         self._page_ready = False
 
     @staticmethod
@@ -1595,8 +1582,6 @@ class NotebookPanel(QWidget):
         _background_writer.submit(table, body, database_path, callback)
 
     def _notify_save_result(self, tool: str, saved: bool) -> None:
-        if tool == "todo" and saved:
-            _refresh_dashboard_tasks()
         if not self.web:
             return
         if tool == "notebook":
@@ -1972,15 +1957,6 @@ class NotebookPanel(QWidget):
         from . import rtl; rtl.prepare_view(self.web)
         self.web.setHtml(html)
 
-    def _reload_current_tool(self) -> None:
-        """Re-fetch data for whichever tool is visible."""
-        if self.current_tool == "notebook":
-            self.reload_from_db()
-        elif self.current_tool == "todo":
-            self._reload_todos()
-        elif self.current_tool == "pdf":
-            self._reload_pdfs()
-
     # ── Data reload helpers ───────────────────
 
     def reload_from_db(self) -> None:
@@ -2194,15 +2170,9 @@ class NotebookPanel(QWidget):
         elif payload.startswith("pdf:copy-selection:"):
             body = payload[len("pdf:copy-selection:"):]
             self._copy_pdf_selection(body)
-        elif payload.startswith("pdf:create-card:"):
-            body = payload[len("pdf:create-card:"):]
-            self._open_pdf_card_draft(body)
         elif payload.startswith("pdf:create-batch:"):
             body = payload[len("pdf:create-batch:"):]
             self._create_pdf_card_batch(body)
-        elif payload == "pdf:back":
-            self._current_pdf_path = ""
-            self._load_tool("pdf")
         elif payload.startswith("pdf:relink:"):
             pdf_id = payload[len("pdf:relink:"):]
             self._relink_pdf_dialog(pdf_id)
@@ -2213,10 +2183,6 @@ class NotebookPanel(QWidget):
         self._pending_tool_switch = None
         if saved and target and target != self.current_tool:
             self._load_tool(target)
-        elif saved and self.current_tool == "todo":
-            self._consume_dashboard_completions()
-        elif not saved:
-            self._dashboard_completions = set()
 
     def _add_pdf_dialog(self) -> None:
         """Open a file-chooser and pass the chosen path back to JavaScript."""
@@ -2362,117 +2328,6 @@ class NotebookPanel(QWidget):
         """Convert untrusted plain PDF text into safe Anki field HTML."""
         normalized = text.replace("\x00", "").replace("\r\n", "\n").replace("\r", "\n")
         return html.escape(normalized).replace("\n", "<br>")
-
-    def _open_pdf_card_draft(self, body: str) -> None:
-        """Open Anki's Add Cards window with a safe, unsaved PDF draft."""
-        callback = "onPdfCardDraftOpened"
-        try:
-            data = self._decode_pdf_action_payload(body)
-            front = data.get("front", "")
-            back = data.get("back", "")
-            if not isinstance(front, str) or not isinstance(back, str):
-                raise ValueError("PDF card fields must be strings")
-            front = front.strip()
-            back = back.strip()
-            if not front:
-                self._notify_pdf_action(
-                    callback, False, _("Select text for the card front first.")
-                )
-                return
-            if len(front) + len(back) > MAX_PDF_CARD_CHARS:
-                self._notify_pdf_action(
-                    callback,
-                    False,
-                    _("The selected text is too long for a card."),
-                )
-                return
-
-            pages_raw = data.get("pages", [])
-            pages: list[int] = []
-            if isinstance(pages_raw, list):
-                for value in pages_raw:
-                    try:
-                        page = int(value)
-                    except (TypeError, ValueError):
-                        continue
-                    if 1 <= page <= 1_000_000 and page not in pages:
-                        pages.append(page)
-            pages.sort()
-
-            # Opening an existing Add Cards window is safe: its reopen() method
-            # leaves non-empty fields untouched. Check again before set_note(),
-            # because set_note() itself would replace the current draft.
-            add_cards = aqt.dialogs.open("AddCards", mw)
-            editor = getattr(add_cards, "editor", None)
-            existing_note = getattr(editor, "note", None) if editor else None
-            existing_tags = getattr(existing_note, "tags", []) if existing_note else []
-            if editor is None or not editor.fieldsAreBlank() or bool(existing_tags):
-                self._notify_pdf_action(
-                    callback,
-                    False,
-                    _(
-                        "The Add Cards window already contains an unfinished note. "
-                        "Finish or clear it, then try again."
-                    ),
-                )
-                return
-
-            # Respect the notetype and deck already selected in a blank Add
-            # Cards window. On a newly opened window these are Anki's defaults.
-            notetype = existing_note.note_type() if existing_note else None
-            deck_chooser = getattr(add_cards, "deck_chooser", None)
-            deck_id = getattr(deck_chooser, "selected_deck_id", None)
-            if not notetype or deck_id is None:
-                reviewer = getattr(mw, "reviewer", None)
-                defaults = mw.col.defaults_for_adding(
-                    current_review_card=getattr(reviewer, "card", None)
-                )
-                if not notetype:
-                    notetype = mw.col.models.get(defaults.notetype_id)
-                if deck_id is None:
-                    deck_id = defaults.deck_id
-            if not notetype:
-                raise RuntimeError("Anki did not provide a default note type")
-            note = mw.col.new_note(notetype)
-            if not note.fields:
-                raise RuntimeError("The default note type has no fields")
-
-            filename = os.path.basename(self._current_pdf_path) or _("PDF")
-            source = "{}: {}".format(_("Source"), filename)
-            if pages:
-                page_label = _("Page") if len(pages) == 1 else _("Pages")
-                source += f" — {page_label} {', '.join(str(page) for page in pages)}"
-            source_html = (
-                '<div style="margin-top:12px;color:#777;font-size:0.85em">'
-                f"{html.escape(source)}</div>"
-            )
-
-            front_html = self._pdf_text_to_html(front)
-            back_html = self._pdf_text_to_html(back)
-            note.fields[0] = front_html
-            if len(note.fields) >= 2:
-                note.fields[1] = back_html + source_html
-            else:
-                extra = back_html + source_html
-                if extra:
-                    note.fields[0] += "<hr>" + extra
-
-            add_cards.set_note(note, deck_id)
-            add_cards.show()
-            add_cards.raise_()
-            add_cards.activateWindow()
-        except Exception as exc:
-            print(f"Notebook PDF card draft failed: {exc}")
-            self._notify_pdf_action(
-                callback,
-                False,
-                _("Could not open the card draft in Anki."),
-            )
-            return
-
-        self._notify_pdf_action(
-            callback, True, _("Card draft opened in Anki")
-        )
 
     def _create_pdf_card_batch(self, body: str) -> None:
         """Validate and create one undoable deck/card batch from the PDF UI."""
@@ -2794,7 +2649,6 @@ def _maintain_task_calendar():
             if not _save_snapshot("todos", normalized, database_path=day[0], sqlite_timeout=0):
                 return
         _task_maintenance_day = day
-        _refresh_dashboard_tasks()
     except Exception as exc:
         print(f"Task calendar maintenance failed: {exc}")
 
@@ -2823,106 +2677,6 @@ def _sync_notebook_launcher():
             launcher.sync_dock_button("IntegratedNotebookSidebarDock_SmartStudy_v1")
     except Exception as exc:
         print(f"Notebook launcher sync failed: {exc}")
-
-
-def toggle_todo_sidebar():
-    panel = _dock.widget() if _dock is not None else None
-    if isinstance(panel, NotebookPanel) and panel.current_tool == "todo" and (
-        _dock.isVisible() or panel.is_in_fullscreen or panel.is_embedded
-    ):
-        if panel.fullscreen_window:
-            panel.fullscreen_window.close()
-        if panel.is_embedded:
-            panel.exit_window()
-        _dock.hide()
-        _sync_notebook_launcher()
-    else:
-        open_todo_sidebar()
-
-
-def _refresh_dashboard_tasks():
-    if not mw or mw.state != "deckBrowser":
-        return
-    try:
-        from . import addon_settings, daily_widgets
-        if addon_settings.get("daily_widget_content", "facts") == "tasks":
-            preview = daily_widgets.generate_todo_widget()
-            mw.deckBrowser.web.eval("document.querySelectorAll('.sp-todo-widget').forEach(el => {const t=document.createElement('template');t.innerHTML=" + json.dumps(preview) + ";el.replaceWith(t.content.querySelector('.sp-todo-widget'));});")
-    except Exception as exc:
-        print(f"Task preview refresh failed: {exc}")
-
-def complete_dashboard_task(task_id: str, _profile_path=None, _attempt=0):
-    """Complete against live editor state, or the latest durable snapshot.
-
-    Never create/show a dock. Deferred calls recheck both profile and editor
-    state, and wait for outstanding snapshot writes before reading from disk.
-    """
-    if not task_id or len(task_id) > 256 or not mw or not mw.pm:
-        return
-    path = db_path()
-    if _profile_path is not None and path != _profile_path:
-        return
-    panel = _dock.widget() if _dock is not None else None
-
-    def retry():
-        if _attempt < 50:
-            QTimer.singleShot(100, lambda: complete_dashboard_task(task_id, path, _attempt + 1))
-        else:
-            tooltip(_("Task could not be saved. Please try again."))
-
-    # Flushes can still enqueue a snapshot after their JS callback returns.
-    if isinstance(panel, NotebookPanel) and panel._flush_in_progress:
-        retry()
-        return
-    if isinstance(panel, NotebookPanel) and panel.web and panel.current_tool == "todo":
-        if not panel._page_ready:
-            retry()
-            return
-        pending = getattr(panel, "_dashboard_completions", set())
-        pending.add(task_id)
-        panel._dashboard_completions = pending
-        panel._consume_dashboard_completions()
-        return
-    if not _background_writer.is_idle():
-        retry()
-        return
-    try:
-        tasks = json.loads(load_todo_preview_snapshot())
-        if not isinstance(tasks, list):
-            retry()
-            return
-        changed = False
-        for item in tasks:
-            if isinstance(item, dict) and str(item.get("id")) == task_id and not item.get("done"):
-                item["done"] = True
-                from datetime import date
-                item["completed_on"] = date.today().isoformat()
-                changed = True
-        # This main-thread operation cannot interleave with opening/editing the
-        # manager. Use the existing transactional save and recovery fallback,
-        # without waiting on database locks or creating any additional WebView.
-        if changed and not _save_snapshot("todos", _normalize_todo_body(json.dumps(tasks)), database_path=path, sqlite_timeout=0):
-            tooltip(_("Task could not be saved. Please try again."))
-            return
-        _refresh_dashboard_tasks()
-    except Exception as exc:
-        print(f"Dashboard task completion failed: {exc}")
-        tooltip(_("Task could not be saved. Please try again."))
-
-
-def open_todo_sidebar():
-    dock = _ensure_dock()
-    panel = dock.widget()
-    if isinstance(panel, NotebookPanel) and not panel.web:
-        panel.current_tool = "todo"
-    dock.show()
-    dock.raise_()
-    if isinstance(panel, NotebookPanel):
-        panel.load_content()
-        panel._on_bridge_cmd(f"{ADDON_NAME_FOR_BRIDGE}:switch:todo")
-        if panel.fullscreen_window:
-            panel.fullscreen_window.raise_()
-    _sync_notebook_launcher()
 
 
 def toggle_notebook_dock():

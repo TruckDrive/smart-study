@@ -9,7 +9,7 @@ except ImportError:  # the module is loaded on its own (tests)
         pass
 
 from .constants import is_night as _is_night
-import os, json, re, traceback, shutil
+import os, json, traceback, shutil
 from typing import Optional, Union, Any, Dict
 
 from . import settings_sync, addon_sync, rtl, anki_persian
@@ -41,7 +41,7 @@ try:
     from aqt.reviewer import Reviewer, ReviewerBottomBar
     from aqt.toolbar import TopToolbar
 except ImportError:
-    print(f"SmartStudy1: ERROR - Failed to import Anki modules.")
+    print("SmartStudy1: ERROR - Failed to import Anki modules.")
     QDockWidget, QWidget, Qt, QTimer = object, object, None, None
 
 
@@ -82,11 +82,11 @@ try:
         open_pdf_review_link,
     )
     from . import deck_overview, sidebar_shortcuts
-    from . import statistics_widget, daily_widgets, settings_dialog, custom_background
-    from .gamification import GamificationManager, CMD_RESET_DATA, CMD_CLAIM_CHALLENGE
+    from . import custom_background
+    from .gamification import GamificationManager
     from .sidebar import GamificationSidebar
     from .deadline_bar import DeadlineManager
-    from .configuration import DeadlineViewerDialog, DeadlineConfigDialog
+    from .configuration import DeadlineViewerDialog
     modules_loaded = True
 except Exception as e:
     print(f"SmartStudy1: ERROR - Failed to import sub-modules: {e}")
@@ -111,7 +111,6 @@ sidebar_widget_instance: Optional[Any] = None
 panel_instance: Optional[Any] = None
 gamification_manager: Optional[Any] = None
 gamification_sidebar: Optional[Any] = None
-learning_plan_manager: Optional[Any] = None
 deadline_manager: Optional[Any] = None
 _dashboard_rendered_with_models = False
 _daily_maintenance_done = False
@@ -143,8 +142,7 @@ def get_default_settings() -> Dict[str, Any]:
         "sidebar_visibility_mode": "always_show",
         "launcher_sidebar_open": True,
         "gamification_widgets_enabled": True,
-        "study_plan_widget_enabled": False, "daily_fact_widget_enabled": True,
-        "deadline_bar_enabled": True, "statistics_widget_enabled": True,
+        "deadline_bar_enabled": True,
         "deck_overview_enabled": True,
         **deck_defaults,
         "pomodoro_enabled": True, "ai_assistant_enabled": True,
@@ -157,9 +155,7 @@ def get_default_settings() -> Dict[str, Any]:
         "music_player_enabled": True, "stats_time_range": 7,
         "stats_consistency_days": 30,
         "stats_show_consistency": True,
-        "stats_show_efficiency": True,
         "stats_show_retention": True,
-        "stats_show_new_cards": True,
         "sidebar_shortcuts": {},
         "language": "auto",  # UI language: "auto", "en", "de", "es"
         "active_color_theme": "petrol",   # Colour theme: "ocean","orchid","forest","deluge","horizon","dusty","orange","custom"
@@ -167,7 +163,6 @@ def get_default_settings() -> Dict[str, Any]:
         "custom_bg_light": "#F1F1EF",    # Custom solid background (light mode)
         "custom_bg_dark":  "#1f1f21",    # Custom solid background (dark mode)
         "dashboard_surface_opacity": 100,
-        "dashboard_wide_deck_list": True,
         "dashboard_glass_enabled": False,
         "dashboard_glass_strength": 6,
         "dashboard_widget_shadow": 0,
@@ -231,11 +226,6 @@ def load_addon_settings():
     try:
         with open(addon_settings_path, 'r', encoding='utf-8') as f:
             saved_settings = json.load(f)
-        # Older versions used one switch for both daily widgets.  Preserve its
-        # value for each new independent switch during migration.
-        legacy_daily_enabled = saved_settings.get("daily_widgets_enabled", True)
-        saved_settings.setdefault("study_plan_widget_enabled", legacy_daily_enabled)
-        saved_settings.setdefault("daily_fact_widget_enabled", legacy_daily_enabled)
         defaults.update(saved_settings)
     except FileNotFoundError:
         pass  # First run / no settings yet — defaults are correct.
@@ -459,10 +449,6 @@ def on_state_change(new_state: str, old_state: str):
         # (and persist it for same-day restarts), then let the next dashboard
         # render reuse that value instead of scanning the full revlog again.
         try:
-            statistics_widget.invalidate_statistics_cache()
-        except Exception:
-            _ignored()
-        try:
             if gamification_manager:
                 gamification_manager.credit_study_xp(getattr(mw, "_sp_session_start_ms", None))
                 gamification_manager.invalidate_dashboard_cache()
@@ -545,10 +531,6 @@ def _apply_onboarding_result(result: dict):
     except Exception as e:
         print(f"SmartStudy Onboarding: could not apply theme '{theme_name}': {e}")
 
-    # ── Fact category (driven by user role) ───────────────────────────────────
-    role_key = result.get("roleKey")  # only older wizard pages asked for a role
-    if role_key in onboarding_dialog.ROLE_TO_FACT_THEME:
-        addon_settings["fact_theme"] = onboarding_dialog.ROLE_TO_FACT_THEME[role_key]
     fact_theme = addon_settings.get("fact_theme")
 
     # ── What the new user wants: only that is switched on from the start ────
@@ -921,26 +903,6 @@ def show_settings_dialog(initial_page=None, initial_section=None):
         traceback.print_exc()
 
 
-def show_statistics_settings_dialog():
-    """Open statistics settings after the dashboard web callback returned.
-
-    Creating a second modal QWebEngine dialog directly inside DeckBrowser's
-    pycmd handler can leave its renderer waiting on the still-active callback,
-    producing a permanently white window on macOS.
-    """
-    try:
-        from .statistics_settings_dialog import StatisticsSettingsDialog
-        dialog = StatisticsSettingsDialog(addon_settings, mw)
-        if dialog.exec():
-            addon_settings.update(dialog.get_new_settings())
-            save_addon_settings()
-            statistics_widget.invalidate_statistics_cache()
-            if mw.state == "deckBrowser":
-                mw.deckBrowser.refresh()
-    except Exception as e:
-        print(f"SmartStudy: statistics settings dialog error: {e}")
-        traceback.print_exc()
-
 def _ensure_gamification_sidebar():
     """Create the Chromium-backed sidebar only when the user opens it."""
     global gamification_sidebar
@@ -1076,10 +1038,6 @@ def on_sync_finished(*_args) -> None:
     if changed:
         _apply_saved_settings(changed, message=integrations.tr("Settings updated from your other device.") if integrations else None)
     try:
-        statistics_widget.invalidate_statistics_cache()
-    except Exception:
-        _ignored()
-    try:
         if gamification_manager:
             gamification_manager.invalidate_dashboard_cache(full=True)
             gamification_manager.refresh_streak_cache(persist=True)
@@ -1097,7 +1055,7 @@ def _init_data_managers() -> None:
     data models and bounded daily maintenance so the first Deck Browser HTML
     already has its final structure and values.
     """
-    global gamification_manager, learning_plan_manager, deadline_manager
+    global gamification_manager, deadline_manager
     global _daily_maintenance_done
     if not mw or not getattr(mw, "col", None):
         return
@@ -1159,7 +1117,6 @@ def _init_panel() -> None:
             "toggle_trophies": toggle_gamification_sidebar,
             "open_plan": show_configuration_dialog,
             "open_deadlines": lambda: QTimer.singleShot(0, _open_deadlines),
-            "stats_changed": statistics_widget.invalidate_statistics_cache,
             "panel_changed": _sync_launcher_toolbar_button,
         })
         sidebar_widget_instance = panel_instance  # the tools report to it when they open
@@ -1244,10 +1201,6 @@ def on_profile_open():
         _ignored()
     _dashboard_rendered_with_models = False
     _daily_maintenance_done = False
-    try:
-        statistics_widget.invalidate_statistics_cache()
-    except Exception:
-        _ignored()
     if mw:
         mw.progress.single_shot(
             200,
@@ -1269,7 +1222,7 @@ def on_profile_open():
                 300, lambda g=profile_generation: _init_ui_delayed(g))
 
 def _init_ui_delayed(expected_profile_generation=None):
-    global launcher_dock_widget, sidebar_widget_instance, gamification_manager, learning_plan_manager, deadline_manager
+    global launcher_dock_widget, sidebar_widget_instance, gamification_manager, deadline_manager
     global _daily_maintenance_done
     
     if (not mw or not modules_loaded or not getattr(mw, "col", None)
@@ -1328,12 +1281,10 @@ def on_profile_close():
         diagnostics.stop('profile_closed')
     except Exception:
         _ignored()
-    global launcher_dock_widget, sidebar_widget_instance, gamification_manager, gamification_sidebar, learning_plan_manager, deadline_manager
+    global launcher_dock_widget, sidebar_widget_instance, gamification_manager, gamification_sidebar, deadline_manager
     global _dashboard_rendered_with_models, _daily_maintenance_done
     global _top_toolbar_redraw_generation, _profile_generation, _smartstudy_tools_menu
     _profile_generation += 1
-    for subject in list(_plan_timers):
-        _plan_timer_cancel(subject)
     if gamification_manager: gamification_manager.save_data()
     if deadline_manager: deadline_manager.save_data()
 
@@ -1379,21 +1330,17 @@ def on_profile_close():
             except (RuntimeError, AttributeError):
                 pass
     gamification_manager = None; gamification_sidebar = None
-    learning_plan_manager = None; deadline_manager = None
+    deadline_manager = None
     sidebar_widget_instance = None; launcher_dock_widget = None
     _dashboard_rendered_with_models = False
     _daily_maintenance_done = False
     _top_toolbar_redraw_generation += 1
-    try:
-        statistics_widget.invalidate_statistics_cache()
-    except Exception:
-        _ignored()
     if _smartstudy_tools_menu is not None:
         try: mw.form.menuTools.removeAction(_smartstudy_tools_menu.menuAction())
         except Exception: _ignored()
         _smartstudy_tools_menu = None
     
-    for attr in ["gamification_manager", "deadline_manager", "learning_plan_manager", "daily_widgets", "gamification_sidebar"]:
+    for attr in ["gamification_manager", "deadline_manager", "gamification_sidebar"]:
         if hasattr(mw, attr): delattr(mw, attr)
 
 # --- Webview & Rendering Hooks ---
@@ -1415,44 +1362,6 @@ def render_all_deck_browser_widgets(deck_browser: DeckBrowser, content: DeckBrow
     if panel_instance is not None:
         panel_instance.refresh(200)
 
-# --- Study-plan countdown timers ------------------------------------------------
-# Fire a "time's up" notification when a subject's timer runs out — even while the
-# user is reviewing cards (the deck-browser JS timer is not running then).
-_plan_timers: Dict[str, Any] = {}
-
-def _plan_timer_cancel(subject: str):
-    t = _plan_timers.pop(subject, None)
-    if t is not None:
-        try: t.stop(); t.deleteLater()
-        except Exception: _ignored()
-
-def _plan_timer_fire(subject: str):
-    _plan_timers.pop(subject, None)
-    try: tooltip(_("Time's up — finished studying: %s") % subject, period=6000)
-    except Exception as e: print(f"SmartStudy plan timer notify error: {e}")
-
-def _plan_timer_start(subject: str, end_ms: int):
-    _plan_timer_cancel(subject)
-    if QTimer is None or QTimer is object or mw is None: return
-    import time as _time
-    delay = max(0, min(86400000, int(end_ms - _time.time() * 1000)))
-    try:
-        t = QTimer(mw); t.setSingleShot(True)
-        t.timeout.connect(lambda s=subject: _plan_timer_fire(s))
-        t.start(delay)
-        _plan_timers[subject] = t
-    except Exception as e:
-        print(f"SmartStudy plan timer start error: {e}")
-
-def _handle_plan_timer(cmd: str):
-    import urllib.parse as _up
-    parts = cmd.split(":", 3)  # ["planTimer", action, ...]
-    action = parts[1] if len(parts) > 1 else ""
-    if action == "start" and len(parts) >= 4:
-        _plan_timer_start(_up.unquote(parts[3]), int(parts[2]))
-    elif action == "cancel" and len(parts) >= 3:
-        _plan_timer_cancel(_up.unquote(parts[2]))
-
 def webview_did_receive_js_message(handled: bool, message: str, context: object) -> Union[bool, object]:
     pdf_link_prefix = "pycmd:smartstudy:pdf:"
     if (
@@ -1471,91 +1380,8 @@ def webview_did_receive_js_message(handled: bool, message: str, context: object)
     if not isinstance(context, DeckBrowser):
         return handled
     cmd = message[6:]
-    if cmd.startswith("planTimer:"):
-        try: _handle_plan_timer(cmd)
-        except Exception as e: print(f"SmartStudy plan timer error: {e}")
-        return (True, None)
-    if cmd == CMD_RESET_DATA:
-        gm = getattr(mw, 'gamification_manager', None)
-        if gm and gm.reset_all_data() and gamification_sidebar: gamification_sidebar.update_display()
-        return (True, None)
-    if cmd == CMD_CLAIM_CHALLENGE:
-        gm = getattr(mw, 'gamification_manager', None)
-        if gm:
-            try:
-                gm.on_complete_challenge()
-                if gamification_sidebar:
-                    gamification_sidebar.update_display()
-            except Exception as e:
-                print(f"SmartStudy: claim challenge error: {e}")
-        return (True, None)
-    # ── Multi-deadline navigation & viewer ───────────────────────────────
-    if cmd in ("smartstudy:deadline_next", "smartstudy:deadline_viewer", "smartstudy:deadline_settings"):
-        dm = getattr(mw, 'deadline_manager', None)
-        if cmd == "smartstudy:deadline_next":
-            if dm:
-                dm.cycle_deadline(+1)
-                if mw.state == "deckBrowser":
-                    mw.deckBrowser.refresh()
-        elif cmd == "smartstudy:deadline_viewer":
-            try:
-                DeadlineViewerDialog(dm, parent=mw).exec()
-            except Exception as e:
-                print(f"SmartStudy: DeadlineViewerDialog error: {e}")
-            if mw.state == "deckBrowser":
-                mw.deckBrowser.refresh()
-        elif cmd == "smartstudy:deadline_settings":
-            try:
-                DeadlineConfigDialog(dm, parent=mw).exec()
-            except Exception as e:
-                print(f"SmartStudy: DeadlineConfigDialog error: {e}")
-            if mw.state == "deckBrowser":
-                mw.deckBrowser.refresh()
-        return (True, None)
-    if cmd.startswith("smartstudy:todo_complete:"):
-        from urllib.parse import unquote
-        from .notebook_sidebar import complete_dashboard_task
-        task_id = unquote(cmd[len("smartstudy:todo_complete:"):])
-        QTimer.singleShot(0, lambda: complete_dashboard_task(task_id))
-        return (True, None)
-    if cmd == "smartstudy:todo_viewer":
-        from .notebook_sidebar import toggle_todo_sidebar
-        QTimer.singleShot(0, toggle_todo_sidebar)
-        return (True, None)
-    if cmd == "smartstudy:study_plan_viewer":
-        show_configuration_dialog()
-        if mw.state == "deckBrowser":
-            mw.deckBrowser.refresh()
-        return (True, None)
-    if cmd == "smartstudy:gamification_viewer":
-        toggle_gamification_sidebar()
-        return (True, None)
-    # Info button ("i") in the statistics widget — explains every statistic.
-    if cmd == "smartstudy:stats_info":
-        try:
-            statistics_widget.show_statistics_info_dialog(
-                parent=mw,
-                stats_days=int(addon_settings.get("stats_time_range", 7)),
-                chart_days=int(addon_settings.get("stats_consistency_days", 30)),
-            )
-        except Exception as e:
-            print(f"SmartStudy: statistics info dialog error: {e}")
-        return (True, None)
-    if cmd == "smartstudy:stats_settings":
-        try:
-            # Return from the QWebEngine pycmd callback before constructing the
-            # second web view. This prevents a white modal window on macOS.
-            QTimer.singleShot(0, show_statistics_settings_dialog)
-        except Exception as e:
-            print(f"SmartStudy: could not schedule statistics settings: {e}")
-        return (True, None)
     if cmd == "smartstudy:celebration_settings":
         QTimer.singleShot(0, lambda: show_settings_dialog("dashboard", "celebrations"))
-        return (True, None)
-    # Legacy popup opt-out command remains supported.
-    if cmd == "smartstudy:celebrate_optout:1":
-        addon_settings["gamification_popups_enabled"] = False
-        save_addon_settings()
         return (True, None)
     return handled
 
@@ -1609,7 +1435,7 @@ def inject_theme_assets(web_content: WebContent, context: Optional[Any]):
                 # Prepend so the width-mode class is present before the deck
                 # table is parsed and no 860px -> native-width jump is painted.
                 web_content.body = (
-                    f"<script>document.body.classList.add('deckbrowser');</script>"
+                    "<script>document.body.classList.add('deckbrowser');</script>"
                     + web_content.body
                 )
                 if addon_settings.get("deck_counter_colors_enabled", False):
@@ -1738,8 +1564,7 @@ except Exception as exc:
 
 # --- Init Hooks ---
 if modules_loaded and mw and gui_hooks:
-    if hasattr(gui_hooks, "operation_did_execute"):
-        gui_hooks.operation_did_execute.append(on_gamification_collection_change)
+    gui_hooks.operation_did_execute.append(on_gamification_collection_change)
     rtl.install()
     anki_persian.apply()
     gui_hooks.profile_did_open.append(on_profile_open)
@@ -1748,10 +1573,7 @@ if modules_loaded and mw and gui_hooks:
     gui_hooks.webview_did_receive_js_message.append(webview_did_receive_js_message)
     gui_hooks.profile_did_open.append(_add_menus)
     gui_hooks.state_did_change.append(on_state_change)
-    if hasattr(gui_hooks, "top_toolbar_did_init_links"):
-        gui_hooks.top_toolbar_did_init_links.append(
-            _add_launcher_toggle_to_top_toolbar
-        )
+    gui_hooks.top_toolbar_did_init_links.append(_add_launcher_toggle_to_top_toolbar)
     mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css))$") # theme css, notebook, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
     try:
@@ -1759,14 +1581,8 @@ if modules_loaded and mw and gui_hooks:
         smooth_ui.setup()
     except Exception as e:
         print(f"SmartStudy: smooth scrolling/animations not set up: {e}")
-    if hasattr(gui_hooks, "webview_did_inject_style_into_page"):
-        gui_hooks.webview_did_inject_style_into_page.append(
-            custom_background.on_internal_page_styled
-        )
+    gui_hooks.webview_did_inject_style_into_page.append(custom_background.on_internal_page_styled)
+    gui_hooks.theme_did_change.append(on_theme_changed)
+    gui_hooks.sync_did_finish.append(on_sync_finished)
     
-    if hasattr(gui_hooks, "theme_did_change"):
-        gui_hooks.theme_did_change.append(on_theme_changed)
-    if hasattr(gui_hooks, "sync_did_finish"):
-        gui_hooks.sync_did_finish.append(on_sync_finished)
-    
-    print(f"SmartStudy1 loaded.")
+    print("SmartStudy1 loaded.")

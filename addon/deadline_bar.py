@@ -6,14 +6,10 @@ except ImportError:  # the module is loaded on its own (tests)
     def _ignored(*_args):
         pass
 
-from .constants import is_night as _is_night
-import os
-import base64
-import html
 import traceback
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional
 
 # --- Anki/Qt Imports ---
 from aqt import mw
@@ -22,42 +18,14 @@ from aqt import mw
 # startup. Resolve the immutable package path/name directly instead.
 ADDON_NAME = __name__.split('.')[0]
 
-def get_addon_config_dir_path() -> Optional[str]:
-    return os.path.dirname(__file__)
-
-try:
-    from .rtl import dir_attribute
-except ImportError:
-    def dir_attribute():  # type: ignore
-        return ""
-
 try:
     from .locales import _
 except ImportError:
     def _(text):  # type: ignore
         return text
 
-# --- Night Mode Detection ---
-is_night_mode = False
-try:
-    if mw and _is_night():
-        is_night_mode = True
-except Exception:
-    _ignored()
-
-try:
-    from .theme import palette as _palette, FONT_FAMILY as _FONT_FAMILY
-except ImportError:
-    def _palette(night): return {"blue": "#0B6570", "blue_bright": "#40A8FF" if night else "#1A8A98", "surface": "#ffffff", "grey_light": "#e0e0e0"}  # type: ignore
-    _FONT_FAMILY = "sans-serif"
-
-if TYPE_CHECKING:
-    pass
-
 # --- Konstanten ---
 DEADLINE_CONFIG_KEY = f"addon_{ADDON_NAME}_deadline_data"
-DEADLINE_ICON_FILENAME = "deadline.svg"
-DEADLINE_BAR_MAX_WIDTH = "860px"
 
 
 # ---------------------------------------------------------------------------
@@ -68,10 +36,8 @@ class DeadlineManager:
     DATE_FORMAT = "%Y-%m-%d"
 
     def __init__(self):
-        self._config_dir_path: Optional[str] = get_addon_config_dir_path()
         self.data: Dict = self._default_data()
         self.load_data()
-        self.svg_icon_base64: Optional[str] = self._load_svg_icon()
 
     # ── Defaults & Migration ────────────────────────────────────────────────
 
@@ -97,31 +63,6 @@ class DeadlineManager:
                 "enabled": conf.get("enabled", True),
             }
         return conf
-
-    # ── SVG Icon ────────────────────────────────────────────────────────────
-
-    def _load_svg_icon(self) -> Optional[str]:
-        if not self._config_dir_path:
-            return self._fallback_svg_icon()
-        icon_path = os.path.join(self._config_dir_path, "images", DEADLINE_ICON_FILENAME)
-        if os.path.exists(icon_path):
-            try:
-                with open(icon_path, "rb") as f:
-                    svg_bytes = f.read()
-                encoded = base64.b64encode(svg_bytes).decode("utf-8")
-                return f"data:image/svg+xml;base64,{encoded}"
-            except Exception as e:
-                print(f"{ADDON_NAME} (Deadline): ERROR reading SVG: {e}")
-        return self._fallback_svg_icon()
-
-    def _fallback_svg_icon(self) -> str:
-        svg = ('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">'
-               '<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M8 12.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v4'
-               'a.5.5 0 0 1-.5-.5M8 8a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1"/></svg>')
-        try:
-            return f"data:image/svg+xml;base64,{base64.b64encode(svg.encode()).decode()}"
-        except Exception:
-            return ""
 
     # ── Persistence ─────────────────────────────────────────────────────────
 
@@ -160,34 +101,6 @@ class DeadlineManager:
         except Exception:
             return list(deadlines)
 
-    def add_deadline(self, name: str, start_date: str, end_date: str) -> Dict:
-        start = datetime.strptime(start_date, self.DATE_FORMAT).date()
-        end = datetime.strptime(end_date, self.DATE_FORMAT).date()
-        if start > end:
-            raise ValueError("start_date must not be after end_date")
-        entry = {
-            "id": str(uuid.uuid4())[:8],
-            "name": name,
-            "start_date": start_date,
-            "end_date": end_date,
-        }
-        self.data.setdefault("deadlines", []).append(entry)
-        self.save_data()
-        return entry
-
-    def remove_deadline(self, deadline_id: str):
-        self.data["deadlines"] = [
-            d for d in self.data.get("deadlines", []) if d.get("id") != deadline_id
-        ]
-        if self.data.get("pinned_id") == deadline_id:
-            self.data["pinned_id"] = None
-        self.save_data()
-
-    def set_pinned(self, deadline_id: Optional[str]):
-        """Pin a specific deadline (None = auto-select nearest upcoming)."""
-        self.data["pinned_id"] = deadline_id
-        self.save_data()
-
     def get_active_deadline(self) -> Optional[Dict]:
         """Return pinned deadline, or nearest upcoming, or most recent past."""
         deadlines = self.get_all_deadlines()
@@ -214,20 +127,6 @@ class DeadlineManager:
         if upcoming:
             return upcoming[0]  # sorted by end_date, so first = nearest
         return deadlines[-1]   # all past → show most recent
-
-    def cycle_deadline(self, direction: int):
-        """Advance active deadline by +1 or -1 through the sorted list."""
-        deadlines = self.get_all_deadlines()
-        if len(deadlines) <= 1:
-            return
-        active = self.get_active_deadline()
-        ids = [d["id"] for d in deadlines]
-        try:
-            current_index = ids.index(active["id"]) if active else 0
-        except ValueError:
-            current_index = 0
-        new_index = (current_index + direction) % len(deadlines)
-        self.set_pinned(deadlines[new_index]["id"])
 
     # ── Progress Calculation ─────────────────────────────────────────────────
 
@@ -284,136 +183,3 @@ class DeadlineManager:
             traceback.print_exc()
             return {"title": _("Deadline Error"), "progress": 0,
                     "tooltip": _("Error: {}").format(e)}
-
-    # ── HTML Rendering ───────────────────────────────────────────────────────
-
-    def get_icon_html_for_deck_browser(self) -> str:
-        """Deadline icon — clicking opens the DeadlineViewerDialog via pycmd."""
-        icon_style = ("flex-shrink: 0; width: 24px; height: 24px; opacity: 0.7; "
-                      "transition: opacity 0.2s ease; cursor: pointer;")
-        tip = html.escape(_("View Deadlines"), quote=True)
-        onclick = "pycmd('pycmd:smartstudy:deadline_viewer')"
-        if self.svg_icon_base64:
-            return (f'<img src="{self.svg_icon_base64}" style="{icon_style}" title="{tip}" '
-                    f'onclick="{onclick}" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">')
-        return (f'<span style="{icon_style} font-size:18px;" title="{tip}" onclick="{onclick}" '
-                f'onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">📋</span>')
-
-    def render_deadline_bar_html(self) -> str:
-        """Full HTML + CSS for the deadline bar, including multi-deadline navigation."""
-        progress_data = self.calculate_progress()
-        if not progress_data:
-            return ""
-
-        progress       = progress_data.get("progress", 0)
-        tooltip_text   = progress_data.get("tooltip", "")
-        days_remaining = progress_data.get("days_remaining")
-        title          = progress_data.get("title", "")
-        config_icon    = self.get_icon_html_for_deck_browser()
-
-        _cl = _palette(False)
-        _cd = _palette(True)
-        _c  = _palette(is_night_mode)
-        lighter_blue = _c.get("blue_bright", "#40A8FF")
-
-        # Show "next →" only when there are multiple deadlines
-        deadlines = self.get_all_deadlines()
-        show_nav  = len(deadlines) > 1
-
-        nav_html = ""
-        if show_nav:
-            nav_html = (
-                f'<button onclick="pycmd(\'pycmd:smartstudy:deadline_next\')" '
-                f'title="{html.escape(_("Next deadline"), quote=True)}" '
-                f'style="background:none;border:none;cursor:pointer;font-size:16px;'
-                f'color:#aaa;padding:0 2px;line-height:1;flex-shrink:0;">&#8250;</button>'
-            )
-
-        css = f"""
-        <style>
-            :root {{
-                --stat-bg: {_cl["surface"]};
-                --stat-border: {_cl["grey_light"]};
-                --progress-bg: {_cl["grey_light"]};
-                --deadline-fill-color: {_cl["blue"]};
-            }}
-            body.night_mode {{
-                --stat-bg: {_cd["surface"]};
-                --stat-border: {_cd.get("grey_mid", "#444")};
-                --progress-bg: {_cd.get("grey_mid", "#444")};
-                --deadline-fill-color: {_cd["blue"]};
-            }}
-            .deadline-bar-container {{
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                background-color: var(--stat-bg);
-                border-radius: 12px;
-                padding: 10px 16px;
-                margin: 0px auto 15px;
-                max-width: {DEADLINE_BAR_MAX_WIDTH};
-                border: 1px solid var(--stat-border);
-                box-sizing: border-box;
-            }}
-            body.night_mode .deadline-bar-container {{
-                border: 1px solid {_cd.get("grey_mid", "#444")};
-            }}
-            .deadline-title-label {{
-                font-size: 12px;
-                font-weight: 600;
-                color: #888;
-                white-space: nowrap;
-                flex-shrink: 0;
-                max-width: 140px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }}
-            .deadline-progress-bg {{
-                flex-grow: 1;
-                height: 12px;
-                background-color: var(--progress-bg);
-                border-radius: 6px;
-                overflow: hidden;
-                text-align: start;
-            }}
-            .deadline-progress-fill {{
-                height: 100%;
-                border-radius: 6px;
-                transition: width 0.3s ease-in-out;
-                background-image: linear-gradient(
-                    90deg,
-                    var(--deadline-fill-color),
-                    {lighter_blue}
-                );
-            }}
-            .deadline-days-label {{
-                font-size: 12px;
-                color: #888;
-                white-space: nowrap;
-                flex-shrink: 0;
-                line-height: 1;
-            }}
-        </style>"""
-
-        tooltip_text = html.escape(str(tooltip_text), quote=True)
-        title = html.escape(str(title))
-        days_label_html = ""
-        if days_remaining is not None:
-            days_label_html = (f'<span class="deadline-days-label">{int(days_remaining)} '
-                               f'{html.escape(_("Days"))}</span>')
-
-        # NOTE: keep this variable named anything but "html" — a local called
-        # "html" would shadow the imported html module for the whole function
-        # and break the html.escape() calls above (UnboundLocalError).
-        bar_html = f"""
-        <div class="deadline-bar-container"{dir_attribute()} title="{tooltip_text}">
-            <span class="deadline-title-label">{title}</span>
-            {nav_html}
-            <div class="deadline-progress-bg">
-                <div class="deadline-progress-fill" style="width: {progress}%;"></div>
-            </div>
-            {days_label_html}
-            {config_icon}
-        </div>"""
-
-        return css + bar_html

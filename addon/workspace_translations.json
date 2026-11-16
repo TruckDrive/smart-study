@@ -87,28 +87,6 @@
     "hi": "त्रिभुज",
     "pl": "Trójkąt"
   },
-  "Invalid roadmap file.": {
-    "de": "Ungültige Roadmap-Datei.",
-    "es": "Archivo de hoja de ruta no válido.",
-    "ko": "잘못된 로드맵 파일입니다.",
-    "pt": "Arquivo de roteiro inválido.",
-    "fr": "Fichier de feuille de route invalide.",
-    "vi": "Tệp lộ trình không hợp lệ.",
-    "zh": "路线图文件无效。",
-    "hi": "रोडमैप फ़ाइल अमान्य है।",
-    "pl": "Nieprawidłowy plik planu."
-  },
-  "Invalid roadmap.": {
-    "de": "Ungültige Roadmap.",
-    "es": "Hoja de ruta no válida.",
-    "ko": "잘못된 로드맵입니다.",
-    "pt": "Roteiro inválido.",
-    "fr": "Feuille de route invalide.",
-    "vi": "Lộ trình không hợp lệ.",
-    "zh": "路线图无效。",
-    "hi": "रोडमैप अमान्य है।",
-    "pl": "Nieprawidłowy plan."
-  },
   "Invalid object.": {
     "de": "Ungültiges Objekt.",
     "es": "Objeto no válido.",
@@ -229,17 +207,6 @@
     "zh": "预览",
     "hi": "पूर्वावलोकन",
     "pl": "Podgląd"
-  },
-  "New roadmap": {
-    "de": "Neue Roadmap",
-    "es": "Nueva hoja de ruta",
-    "ko": "새 로드맵",
-    "pt": "Novo roteiro",
-    "fr": "Nouvelle feuille de route",
-    "vi": "Lộ trình mới",
-    "zh": "新路线图",
-    "hi": "नया रोडमैप",
-    "pl": "Nowy plan"
   },
   "Edit text": {
     "de": "Text bearbeiten",
@@ -615,39 +582,6 @@
     "hi": "एक परत पीछे भेजें",
     "pl": "Przenieś niżej"
   },
-  "New roadmap name": {
-    "de": "Name der neuen Roadmap",
-    "es": "Nombre de la nueva hoja de ruta",
-    "ko": "새 로드맵 이름",
-    "pt": "Nome do novo roteiro",
-    "fr": "Nom de la nouvelle feuille de route",
-    "vi": "Tên lộ trình mới",
-    "zh": "新路线图名称",
-    "hi": "नए रोडमैप का नाम",
-    "pl": "Nazwa nowego planu"
-  },
-  "Roadmap name": {
-    "de": "Name der Roadmap",
-    "es": "Nombre de la hoja de ruta",
-    "ko": "로드맵 이름",
-    "pt": "Nome do roteiro",
-    "fr": "Nom de la feuille de route",
-    "vi": "Tên lộ trình",
-    "zh": "路线图名称",
-    "hi": "रोडमैप का नाम",
-    "pl": "Nazwa planu"
-  },
-  "Delete this roadmap?": {
-    "de": "Diese Roadmap wirklich löschen?",
-    "es": "¿Eliminar esta hoja de ruta?",
-    "ko": "이 로드맵을 삭제할까요?",
-    "pt": "Excluir este roteiro?",
-    "fr": "Supprimer cette feuille de route ?",
-    "vi": "Xóa lộ trình này?",
-    "zh": "删除此路线图？",
-    "hi": "यह रोडमैप हटाएँ?",
-    "pl": "Usunąć ten plan?"
-  },
   "The file is larger than 20 MB.": {
     "de": "Die Datei ist größer als 20 MB.",
     "es": "El archivo supera los 20 MB.",
@@ -658,17 +592,6 @@
     "zh": "文件超过 20 MB。",
     "hi": "फ़ाइल 20 MB से बड़ी है।",
     "pl": "Plik jest większy niż 20 MB."
-  },
-  "Roadmap imported.": {
-    "de": "Roadmap importiert.",
-    "es": "Hoja de ruta importada.",
-    "ko": "로드맵을 가져왔습니다.",
-    "pt": "Roteiro importado.",
-    "fr": "Feuille de route importée.",
-    "vi": "Đã nhập lộ trình.",
-    "zh": "路线图已导入。",
-    "hi": "रोडमैप आयात हो गया।",
-    "pl": "Zaimportowano plan."
   },
   "Could not load file.": {
     "de": "Datei konnte nicht geladen werden.",
@@ -681,17 +604,6 @@
     "hi": "फ़ाइल लोड नहीं हो सकी।",
     "pl": "Nie udało się wczytać pliku."
   },
-  "Select roadmap": {
-    "de": "Roadmap auswählen",
-    "es": "Seleccionar hoja de ruta",
-    "ko": "로드맵 선택",
-    "pt": "Selecionar roteiro",
-    "fr": "Choisir une feuille de route",
-    "vi": "Chọn lộ trình",
-    "zh": "选择路线图",
-    "hi": "रोडमैप चुनें",
-    "pl": "Wybierz plan"
-  },
   "New": {
     "de": "Neu",
     "es": "Nuevo",
@@ -702,17 +614,6 @@
     "zh": "新建",
     "hi": "नया",
     "pl": "Nowe"
-  },
-  "Roadmap menu": {
-    "de": "Roadmap-Menü",
-    "es": "Menú de hoja de ruta",
-    "ko": "로드맵 메뉴",
-    "pt": "Menu do roteiro",
-    "fr": "Menu de la feuille de route",
-    "vi": "Menu lộ trình",
-    "zh": "路线图菜单",
-    "hi": "रोडमैप मेन्यू",
-    "pl": "Menu planu"
   },
   "Rename": {
     "de": "Umbenennen",
@@ -758,28 +659,6 @@
     "hi": "आयात करें",
     "pl": "Importuj"
   },
-  "Delete roadmap": {
-    "de": "Roadmap löschen",
-    "es": "Eliminar hoja de ruta",
-    "ko": "로드맵 삭제",
-    "pt": "Excluir roteiro",
-    "fr": "Supprimer la feuille de route",
-    "vi": "Xóa lộ trình",
-    "zh": "删除路线图",
-    "hi": "रोडमैप हटाएँ",
-    "pl": "Usuń plan"
-  },
-  "Free roadmap workspace": {
-    "de": "Freier Roadmap-Arbeitsbereich",
-    "es": "Espacio libre de hoja de ruta",
-    "ko": "자유 로드맵 작업 공간",
-    "pt": "Área livre de roteiro",
-    "fr": "Espace libre de feuille de route",
-    "vi": "Không gian lộ trình tự do",
-    "zh": "自由路线图工作区",
-    "hi": "मुक्त रोडमैप कार्यक्षेत्र",
-    "pl": "Przestrzeń planu"
-  },
   "Your next idea starts here.": {
     "de": "Deine nächste Idee beginnt hier.",
     "es": "Tu próxima idea empieza aquí.",
@@ -823,28 +702,6 @@
     "zh": "形状",
     "hi": "आकृतियाँ",
     "pl": "Kształty"
-  },
-  "T · Free text": {
-    "de": "T · Freier Text",
-    "es": "T · Texto libre",
-    "ko": "T · 자유 텍스트",
-    "pt": "T · Texto livre",
-    "fr": "T · Texte libre",
-    "vi": "T · Văn bản tự do",
-    "zh": "T · 自由文本",
-    "hi": "T · स्वतंत्र पाठ",
-    "pl": "T · Dowolny tekst"
-  },
-  "↗ · Free arrow": {
-    "de": "↗ · Freier Pfeil",
-    "es": "↗ · Flecha libre",
-    "ko": "↗ · 자유 화살표",
-    "pt": "↗ · Seta livre",
-    "fr": "↗ · Flèche libre",
-    "vi": "↗ · Mũi tên tự do",
-    "zh": "↗ · 自由箭头",
-    "hi": "↗ · स्वतंत्र तीर",
-    "pl": "↗ · Dowolna strzałka"
   },
   "Automatic (A): pan the canvas, select objects": {
     "de": "Automatik (A): Fläche verschieben, Objekte auswählen",
@@ -955,28 +812,6 @@
     "zh": "缩小",
     "hi": "छोटा करें",
     "pl": "Zmniejsz"
-  },
-  "Show entire roadmap": {
-    "de": "Gesamte Roadmap anzeigen",
-    "es": "Mostrar toda la hoja de ruta",
-    "ko": "전체 로드맵 보기",
-    "pt": "Mostrar todo o roteiro",
-    "fr": "Afficher toute la feuille de route",
-    "vi": "Hiện toàn bộ lộ trình",
-    "zh": "显示完整路线图",
-    "hi": "पूरा रोडमैप दिखाएँ",
-    "pl": "Pokaż cały plan"
-  },
-  "Center roadmap": {
-    "de": "Roadmap zentrieren",
-    "es": "Centrar hoja de ruta",
-    "ko": "로드맵 가운데 정렬",
-    "pt": "Centralizar roteiro",
-    "fr": "Centrer la feuille de route",
-    "vi": "Căn giữa lộ trình",
-    "zh": "路线图居中",
-    "hi": "रोडमैप केंद्र में लाएँ",
-    "pl": "Wyśrodkuj plan"
   },
   "Center view": {
     "de": "Ansicht zentrieren",
@@ -1209,61 +1044,6 @@
     "hi": "डिफ़ॉल्ट",
     "pl": "Domyślny"
   },
-  "Mindmap tab": {
-    "de": "Mindmap-Reiter",
-    "es": "Pestaña de mapa mental",
-    "ko": "마인드맵 탭",
-    "pt": "Aba de mapa mental",
-    "fr": "Onglet carte mentale",
-    "vi": "Thẻ sơ đồ tư duy",
-    "zh": "思维导图标签页",
-    "hi": "माइंडमैप टैब",
-    "pl": "Karta MindMap"
-  },
-  "Roadmap tab": {
-    "de": "Roadmap-Reiter",
-    "es": "Pestaña de hoja de ruta",
-    "ko": "로드맵 탭",
-    "pt": "Aba de roteiro",
-    "fr": "Onglet feuille de route",
-    "vi": "Thẻ lộ trình",
-    "zh": "路线图标签页",
-    "hi": "रोडमैप टैब",
-    "pl": "Karta planu"
-  },
-  "Show Mindmap in the shared workspace.": {
-    "de": "Zeigt Mindmap im gemeinsamen Arbeitsbereich an.",
-    "es": "Mostrar Mapa mental en el espacio compartido.",
-    "ko": "공유 작업 공간에 마인드맵을 표시합니다.",
-    "pt": "Mostrar Mapa mental na área compartilhada.",
-    "fr": "Afficher Carte mentale dans l’espace partagé.",
-    "vi": "Hiện Sơ đồ tư duy trong không gian chung.",
-    "zh": "在共享工作区显示思维导图。",
-    "hi": "साझा कार्यक्षेत्र में माइंडमैप दिखाएँ।",
-    "pl": "Pokaż MindMap we wspólnym obszarze."
-  },
-  "Show Roadmap in the shared workspace.": {
-    "de": "Zeigt Roadmap im gemeinsamen Arbeitsbereich an.",
-    "es": "Mostrar Hoja de ruta en el espacio compartido.",
-    "ko": "공유 작업 공간에 로드맵을 표시합니다.",
-    "pt": "Mostrar Roteiro na área compartilhada.",
-    "fr": "Afficher Feuille de route dans l’espace partagé.",
-    "vi": "Hiện Lộ trình trong không gian chung.",
-    "zh": "在共享工作区显示路线图。",
-    "hi": "साझा कार्यक्षेत्र में रोडमैप दिखाएँ।",
-    "pl": "Pokaż plan we wspólnym obszarze."
-  },
-  "At least one tab remains available.": {
-    "de": "Mindestens ein Reiter bleibt verfügbar.",
-    "es": "Al menos una pestaña permanece disponible.",
-    "ko": "최소 하나의 탭이 유지됩니다.",
-    "pt": "Pelo menos uma aba permanece disponível.",
-    "fr": "Au moins un onglet reste disponible.",
-    "vi": "Ít nhất một thẻ luôn khả dụng.",
-    "zh": "至少保留一个标签页。",
-    "hi": "कम से कम एक टैब उपलब्ध रहेगा।",
-    "pl": "Co najmniej jedna karta pozostaje dostępna."
-  },
   "Could not load image.": {
     "de": "Bild konnte nicht geladen werden.",
     "es": "No se pudo cargar la imagen.",
@@ -1296,17 +1076,6 @@
     "zh": "导出失败。",
     "hi": "निर्यात विफल रहा।",
     "pl": "Eksport nie powiódł się."
-  },
-  "Maximum 40 images per document.": {
-    "de": "Maximal 40 Bilder pro Dokument.",
-    "es": "Máximo 40 imágenes por documento.",
-    "ko": "문서당 최대 40개 이미지.",
-    "pt": "Máximo de 40 imagens por documento.",
-    "fr": "40 images maximum par document.",
-    "vi": "Tối đa 40 ảnh mỗi tài liệu.",
-    "zh": "每个文档最多 40 张图片。",
-    "hi": "प्रति दस्तावेज़ अधिकतम 40 चित्र।",
-    "pl": "Maksymalnie 40 obrazów w dokumencie."
   },
   "Images are resized and stored locally.": {
     "de": "Bilder werden verkleinert und lokal gespeichert.",
@@ -1450,17 +1219,6 @@
     "zh": "请保持窗口打开并导出更改。将错误详情发送至 github.com/TruckDrive/smart-study/issues。",
     "hi": "विंडो खुली रखें और बदलाव निर्यात करें। त्रुटि विवरण github.com/TruckDrive/smart-study/issues पर भेजें।",
     "pl": "Nie zamykaj okna i wyeksportuj zmiany. Wyślij szczegóły błędu na github.com/TruckDrive/smart-study/issues."
-  },
-  "Link to Anki": {
-    "de": "Mit Anki verknüpfen",
-    "es": "Vincular con Anki",
-    "ko": "Anki에 연결",
-    "pt": "Vincular ao Anki",
-    "fr": "Lier à Anki",
-    "vi": "Liên kết với Anki",
-    "zh": "关联 Anki",
-    "hi": "Anki से जोड़ें",
-    "pl": "Połącz z Anki"
   },
   "Add link": {
     "de": "Verknüpfung hinzufügen",
@@ -1836,17 +1594,6 @@
     "hi": "नोट या अलग कार्ड जोड़ें। लिंक Anki ब्राउज़र में खुलते हैं; अध्ययन प्रगति नहीं बदलती।",
     "pl": "Łącz notatki lub pojedyncze karty. Link otwiera je w przeglądarce Anki, bez zmiany postępu nauki."
   },
-  "This link was not found in this collection. Use Link to Anki to choose a replacement. The map has not been changed.": {
-    "de": "Das Ziel wurde in dieser Sammlung nicht gefunden. Wähle über „Mit Anki verknüpfen“ einen Ersatz. Die Map wurde nicht geändert.",
-    "es": "El destino no está en esta colección. Usa Vincular con Anki para elegir otro. El mapa no ha cambiado.",
-    "ko": "이 컬렉션에서 대상을 찾지 못했습니다. Anki에 연결에서 다른 대상을 선택하세요. 맵은 변경되지 않았습니다.",
-    "pt": "O destino não foi encontrado nesta coleção. Use Vincular ao Anki para escolher outro. O mapa não foi alterado.",
-    "fr": "La cible est introuvable dans cette collection. Utilisez Lier à Anki pour la remplacer. La carte n’a pas été modifiée.",
-    "vi": "Không tìm thấy đích trong bộ sưu tập này. Dùng Liên kết với Anki để chọn đích khác. Bản đồ không bị thay đổi.",
-    "zh": "在此集合中未找到目标。请用“关联 Anki”选择其他目标。图未被更改。",
-    "hi": "इस संग्रह में लक्ष्य नहीं मिला। Anki से जोड़ें द्वारा दूसरा चुनें। मानचित्र नहीं बदला है।",
-    "pl": "Nie znaleziono powiązania w tej kolekcji. Użyj „Połącz z Anki”, aby je zastąpić. Mapa nie została zmieniona."
-  },
   "Line": {
     "de": "Linie",
     "es": "Línea",
@@ -1924,17 +1671,6 @@
     "hi": "सहेजें",
     "pl": "Zapisz"
   },
-  "Your first roadmap": {
-    "de": "Deine erste Roadmap",
-    "es": "Tu primera hoja de ruta",
-    "ko": "첫 로드맵",
-    "pt": "Seu primeiro roteiro",
-    "fr": "Votre première feuille de route",
-    "vi": "Lộ trình đầu tiên của bạn",
-    "zh": "你的第一张路线图",
-    "hi": "आपका पहला रोडमैप",
-    "pl": "Twój pierwszy plan"
-  },
   "Roadmap tutorial": {
     "de": "Roadmap-Tutorial",
     "es": "Tutorial de hoja de ruta",
@@ -1946,138 +1682,6 @@
     "hi": "रोडमैप ट्यूटोरियल",
     "pl": "Samouczek planu"
   },
-  "1 · Build your plan": {
-    "de": "1 · Baue deinen Plan",
-    "es": "1 · Crea tu plan",
-    "ko": "1 · 계획 만들기",
-    "pt": "1 · Crie seu plano",
-    "fr": "1 · Créez votre plan",
-    "vi": "1 · Lập kế hoạch",
-    "zh": "1 · 制定计划",
-    "hi": "1 · अपनी योजना बनाएं",
-    "pl": "1 · Stwórz plan"
-  },
-  "Use + to add shapes or free text. Double-click a shape to write.": {
-    "de": "Füge über + Formen oder freien Text ein. Schreibe per Doppelklick in eine Form.",
-    "es": "Usa + para añadir formas o texto libre. Haz doble clic en una forma para escribir.",
-    "ko": "+로 도형이나 자유 텍스트를 추가하세요. 도형을 두 번 클릭하면 글을 쓸 수 있어요.",
-    "pt": "Use + para adicionar formas ou texto livre. Clique duas vezes numa forma para escrever.",
-    "fr": "Utilisez + pour ajouter des formes ou du texte libre. Double-cliquez sur une forme pour écrire.",
-    "vi": "Dùng + để thêm hình hoặc văn bản tự do. Nhấp đúp vào hình để viết.",
-    "zh": "使用 + 添加形状或自由文本。双击形状即可输入文字。",
-    "hi": "आकृतियां या स्वतंत्र टेक्स्ट जोड़ने के लिए + दबाएं। लिखने के लिए आकृति पर डबल-क्लिक करें।",
-    "pl": "Użyj +, aby dodać kształty lub tekst. Kliknij kształt dwukrotnie, by pisać."
-  },
-  "2 · Connect your ideas": {
-    "de": "2 · Verbinde deine Ideen",
-    "es": "2 · Conecta tus ideas",
-    "ko": "2 · 아이디어 연결하기",
-    "pt": "2 · Conecte suas ideias",
-    "fr": "2 · Reliez vos idées",
-    "vi": "2 · Kết nối ý tưởng",
-    "zh": "2 · 连接想法",
-    "hi": "2 · अपने विचार जोड़ें",
-    "pl": "2 · Połącz pomysły"
-  },
-  "Select a shape and drag a connection point to another. Double-click an arrow to label it.": {
-    "de": "Wähle eine Form und ziehe einen Verbindungspunkt zur nächsten. Beschrifte Pfeile per Doppelklick.",
-    "es": "Selecciona una forma y arrastra un punto de conexión a otra. Haz doble clic en una flecha para ponerle una etiqueta.",
-    "ko": "도형을 선택하고 연결점을 다른 도형으로 끌어보세요. 화살표를 두 번 클릭하면 이름을 붙일 수 있어요.",
-    "pt": "Selecione uma forma e arraste um ponto de conexão até outra. Clique duas vezes numa seta para adicionar um rótulo.",
-    "fr": "Sélectionnez une forme et faites glisser un point de connexion vers une autre. Double-cliquez sur une flèche pour la nommer.",
-    "vi": "Chọn một hình rồi kéo điểm kết nối sang hình khác. Nhấp đúp vào mũi tên để thêm nhãn.",
-    "zh": "选择形状，将连接点拖到另一个形状上。双击箭头即可添加标签。",
-    "hi": "एक आकृति चुनें और उसके कनेक्शन बिंदु को दूसरी तक खींचें। तीर पर लेबल लगाने के लिए डबल-क्लिक करें।",
-    "pl": "Wybierz kształt i przeciągnij punkt połączenia do innego. Kliknij strzałkę dwukrotnie, aby ją podpisać."
-  },
-  "3 · Make it yours": {
-    "de": "3 · Gestalte deine Roadmap",
-    "es": "3 · Personaliza tu mapa",
-    "ko": "3 · 나만의 로드맵 꾸미기",
-    "pt": "3 · Personalize seu roteiro",
-    "fr": "3 · Personnalisez votre carte",
-    "vi": "3 · Tùy chỉnh theo ý bạn",
-    "zh": "3 · 自由设计",
-    "hi": "3 · अपनी पसंद से सजाएं",
-    "pl": "3 · Dopasuj do siebie"
-  },
-  "Move, resize or rotate shapes. Try colors, bold text and font sizes. Add images or use Link Card.": {
-    "de": "Verschiebe, vergrößere oder drehe Formen. Probiere Farben und Textformatierung. Füge Bilder oder Anki-Verknüpfungen hinzu.",
-    "es": "Mueve, redimensiona o gira formas. Prueba colores, negrita y tamaños de letra. Añade imágenes o enlaza tarjetas.",
-    "ko": "도형을 이동하거나 크기를 바꾸고 회전해보세요. 색상, 굵은 글씨, 글자 크기를 바꾸거나 이미지와 카드 링크를 추가하세요.",
-    "pt": "Mova, redimensione ou gire formas. Experimente cores, negrito e tamanhos de fonte. Adicione imagens ou vincule cartões.",
-    "fr": "Déplacez, redimensionnez ou faites pivoter les formes. Essayez les couleurs, le gras et les tailles de texte. Ajoutez des images ou liez des cartes.",
-    "vi": "Di chuyển, đổi kích thước hoặc xoay hình. Thử màu sắc, chữ đậm và cỡ chữ. Thêm ảnh hoặc liên kết thẻ.",
-    "zh": "移动、缩放或旋转形状。尝试颜色、粗体和字号，添加图片或关联卡片。",
-    "hi": "आकृतियां खिसकाएं, उनका आकार बदलें या घुमाएं। रंग, बोल्ड और फ़ॉन्ट आकार आज़माएं। चित्र जोड़ें या कार्ड लिंक करें।",
-    "pl": "Przesuwaj, skaluj i obracaj kształty. Wypróbuj kolory, pogrubienie i rozmiary tekstu. Dodawaj obrazy lub użyj „Połącz kartę”."
-  },
-  "4 · Explore & keep": {
-    "de": "4 · Entdecken & sichern",
-    "es": "4 · Explora y guarda",
-    "ko": "4 · 살펴보고 저장하기",
-    "pt": "4 · Explore e guarde",
-    "fr": "4 · Explorez et sauvegardez",
-    "vi": "4 · Khám phá và lưu lại",
-    "zh": "4 · 探索与保存",
-    "hi": "4 · देखें और सहेजें",
-    "pl": "4 · Odkrywaj i zapisuj"
-  },
-  "Pan the canvas, zoom or fit the map. Undo lets you experiment. Export a JSON backup.": {
-    "de": "Verschiebe die Fläche, zoome oder zeige alles an. Mit Rückgängig kannst du experimentieren. Exportiere ein JSON-Backup.",
-    "es": "Desplaza el lienzo, amplía o ajusta el mapa. Deshacer te permite experimentar. Exporta una copia JSON.",
-    "ko": "캔버스를 이동하거나 확대하고 지도를 화면에 맞춰보세요. 실행 취소로 자유롭게 실험하세요. JSON 백업을 내보낼 수 있어요.",
-    "pt": "Mova a tela, amplie ou enquadre o mapa. Use Desfazer para experimentar. Exporte um backup JSON.",
-    "fr": "Déplacez la vue, zoomez ou affichez toute la carte. Annuler permet d’expérimenter. Exportez une sauvegarde JSON.",
-    "vi": "Di chuyển khung vẽ, thu phóng hoặc xem toàn bộ bản đồ. Dùng Hoàn tác để thử nghiệm. Xuất bản sao lưu JSON.",
-    "zh": "平移画布、缩放或显示整张图。使用撤销放心尝试，并导出 JSON 备份。",
-    "hi": "कैनवास खिसकाएं, ज़ूम करें या पूरा नक्शा दिखाएं। बदलाव वापस लेकर प्रयोग करें। JSON बैकअप निर्यात करें।",
-    "pl": "Przesuwaj płótno, zmieniaj zoom lub dopasuj mapę. Cofanie pozwala eksperymentować. Wyeksportuj kopię JSON."
-  },
-  "Try an arrow": {
-    "de": "Probiere einen Pfeil",
-    "es": "Prueba una flecha",
-    "ko": "화살표 사용해보기",
-    "pt": "Experimente uma seta",
-    "fr": "Essayez une flèche",
-    "vi": "Thử một mũi tên",
-    "zh": "试试箭头",
-    "hi": "तीर आज़माएं",
-    "pl": "Wypróbuj strzałkę"
-  },
-  "Choose a route": {
-    "de": "Wähle eine Linienführung",
-    "es": "Elige un trazado",
-    "ko": "선 경로 선택하기",
-    "pt": "Escolha um traçado",
-    "fr": "Choisissez un tracé",
-    "vi": "Chọn đường nối",
-    "zh": "选择连线路径",
-    "hi": "रेखा का मार्ग चुनें",
-    "pl": "Wybierz przebieg"
-  },
-  "Keep going": {
-    "de": "Weiter geht’s",
-    "es": "Sigue adelante",
-    "ko": "계속해보세요",
-    "pt": "Continue",
-    "fr": "Continuez",
-    "vi": "Tiếp tục",
-    "zh": "继续",
-    "hi": "आगे बढ़ें",
-    "pl": "Tak trzymaj"
-  },
-  "Try editing this map or delete it from the map menu. + creates a new map. Changes save automatically.": {
-    "de": "Bearbeite diese Map oder lösche sie im Map-Menü. + erstellt eine neue Map. Änderungen werden automatisch gespeichert.",
-    "es": "Edita este mapa o bórralo desde su menú. + crea uno nuevo. Los cambios se guardan automáticamente.",
-    "ko": "이 지도를 수정하거나 지도 메뉴에서 삭제해보세요. +로 새 지도를 만듭니다. 변경 사항은 자동 저장됩니다.",
-    "pt": "Edite este mapa ou exclua-o pelo menu. + cria um novo mapa. As alterações são salvas automaticamente.",
-    "fr": "Modifiez cette carte ou supprimez-la via son menu. + crée une nouvelle carte. Les modifications sont enregistrées automatiquement.",
-    "vi": "Chỉnh sửa bản đồ này hoặc xóa từ menu bản đồ. + tạo bản đồ mới. Thay đổi được lưu tự động.",
-    "zh": "编辑这张图，或从菜单中删除。+ 可新建地图。更改会自动保存。",
-    "hi": "इस नक्शे को संपादित करें या इसके मेनू से मिटाएं। + नया नक्शा बनाता है। बदलाव अपने आप सहेजे जाते हैं।",
-    "pl": "Edytuj tę mapę lub usuń ją z menu. + tworzy nową mapę. Zmiany zapisują się automatycznie."
-  },
   "Invalid free map file.": {
     "de": "Ungültige Free Map-Datei.",
     "es": "Archivo de hoja de ruta no válido.",
@@ -2088,50 +1692,6 @@
     "zh": "路线图文件无效。",
     "hi": "रोडमैप फ़ाइल अमान्य है।",
     "pl": "Nieprawidłowy plik mapy."
-  },
-  "Invalid free map.": {
-    "de": "Ungültige Free Map.",
-    "es": "Hoja de ruta no válida.",
-    "ko": "잘못된 로드맵입니다.",
-    "pt": "Roteiro inválido.",
-    "fr": "Feuille de route invalide.",
-    "vi": "Lộ trình không hợp lệ.",
-    "zh": "路线图无效。",
-    "hi": "रोडमैप अमान्य है।",
-    "pl": "Nieprawidłowa mapa."
-  },
-  "New free map": {
-    "de": "Neue Free Map",
-    "es": "Nueva hoja de ruta",
-    "ko": "새 로드맵",
-    "pt": "Novo roteiro",
-    "fr": "Nouvelle feuille de route",
-    "vi": "Lộ trình mới",
-    "zh": "新路线图",
-    "hi": "नया रोडमैप",
-    "pl": "Nowa mapa"
-  },
-  "New free map name": {
-    "de": "Name der neuen Free Map",
-    "es": "Nombre de la nueva hoja de ruta",
-    "ko": "새 로드맵 이름",
-    "pt": "Nome do novo roteiro",
-    "fr": "Nom de la nouvelle feuille de route",
-    "vi": "Tên lộ trình mới",
-    "zh": "新路线图名称",
-    "hi": "नए रोडमैप का नाम",
-    "pl": "Nazwa nowej mapy"
-  },
-  "Free Map name": {
-    "de": "Name der Free Map",
-    "es": "Nombre de la hoja de ruta",
-    "ko": "로드맵 이름",
-    "pt": "Nome do roteiro",
-    "fr": "Nom de la feuille de route",
-    "vi": "Tên lộ trình",
-    "zh": "路线图名称",
-    "hi": "रोडमैप का नाम",
-    "pl": "Nazwa FreeMap"
   },
   "Delete this free map?": {
     "de": "Diese Free Map wirklich löschen?",
@@ -2155,28 +1715,6 @@
     "hi": "रोडमैप आयात हो गया।",
     "pl": "Zaimportowano FreeMap."
   },
-  "Select free map": {
-    "de": "Free Map auswählen",
-    "es": "Seleccionar hoja de ruta",
-    "ko": "로드맵 선택",
-    "pt": "Selecionar roteiro",
-    "fr": "Choisir une feuille de route",
-    "vi": "Chọn lộ trình",
-    "zh": "选择路线图",
-    "hi": "रोडमैप चुनें",
-    "pl": "Wybierz mapę"
-  },
-  "Free Map menu": {
-    "de": "Free Map-Menü",
-    "es": "Menú de hoja de ruta",
-    "ko": "로드맵 메뉴",
-    "pt": "Menu do roteiro",
-    "fr": "Menu de la feuille de route",
-    "vi": "Menu lộ trình",
-    "zh": "路线图菜单",
-    "hi": "रोडमैप मेन्यू",
-    "pl": "Menu FreeMap"
-  },
   "Duplicate free map": {
     "de": "Free Map duplizieren",
     "es": "Duplicar hoja de ruta",
@@ -2187,28 +1725,6 @@
     "zh": "复制路线图",
     "hi": "रोडमैप की प्रतिलिपि बनाएँ",
     "pl": "Powiel mapę"
-  },
-  "Delete free map": {
-    "de": "Free Map löschen",
-    "es": "Eliminar hoja de ruta",
-    "ko": "로드맵 삭제",
-    "pt": "Excluir roteiro",
-    "fr": "Supprimer la feuille de route",
-    "vi": "Xóa lộ trình",
-    "zh": "删除路线图",
-    "hi": "रोडमैप हटाएँ",
-    "pl": "Usuń mapę"
-  },
-  "Free free map workspace": {
-    "de": "Freier Free Map-Arbeitsbereich",
-    "es": "Espacio libre de hoja de ruta",
-    "ko": "자유 로드맵 작업 공간",
-    "pt": "Área livre de roteiro",
-    "fr": "Espace libre de feuille de route",
-    "vi": "Không gian lộ trình tự do",
-    "zh": "自由路线图工作区",
-    "hi": "मुक्त रोडमैप कार्यक्षेत्र",
-    "pl": "Przestrzeń swobodnej mapy"
   },
   "Show entire free map": {
     "de": "Gesamte Free Map anzeigen",
@@ -2221,50 +1737,6 @@
     "hi": "पूरा रोडमैप दिखाएँ",
     "pl": "Pokaż całą mapę"
   },
-  "Center free map": {
-    "de": "Free Map zentrieren",
-    "es": "Centrar hoja de ruta",
-    "ko": "로드맵 가운데 정렬",
-    "pt": "Centralizar roteiro",
-    "fr": "Centrer la feuille de route",
-    "vi": "Căn giữa lộ trình",
-    "zh": "路线图居中",
-    "hi": "रोडमैप केंद्र में लाएँ",
-    "pl": "Wyśrodkuj mapę"
-  },
-  "Free Map tab": {
-    "de": "Free Map-Reiter",
-    "es": "Pestaña de hoja de ruta",
-    "ko": "로드맵 탭",
-    "pt": "Aba de roteiro",
-    "fr": "Onglet feuille de route",
-    "vi": "Thẻ lộ trình",
-    "zh": "路线图标签页",
-    "hi": "रोडमैप टैब",
-    "pl": "Karta FreeMap"
-  },
-  "Show Free Map in the shared workspace.": {
-    "de": "Zeigt Free Map im gemeinsamen Arbeitsbereich an.",
-    "es": "Mostrar Hoja de ruta en el espacio compartido.",
-    "ko": "공유 작업 공간에 로드맵을 표시합니다.",
-    "pt": "Mostrar Roteiro na área compartilhada.",
-    "fr": "Afficher Feuille de route dans l’espace partagé.",
-    "vi": "Hiện Lộ trình trong không gian chung.",
-    "zh": "在共享工作区显示路线图。",
-    "hi": "साझा कार्यक्षेत्र में रोडमैप दिखाएँ।",
-    "pl": "Pokaż FreeMap we wspólnym obszarze."
-  },
-  "Your first free map": {
-    "de": "Deine erste Free Map",
-    "es": "Tu primera hoja de ruta",
-    "ko": "첫 로드맵",
-    "pt": "Seu primeiro roteiro",
-    "fr": "Votre première feuille de route",
-    "vi": "Lộ trình đầu tiên của bạn",
-    "zh": "你的第一张路线图",
-    "hi": "आपका पहला रोडमैप",
-    "pl": "Twoja pierwsza mapa"
-  },
   "Free Map tutorial": {
     "de": "Free Map-Tutorial",
     "es": "Tutorial de hoja de ruta",
@@ -2275,17 +1747,6 @@
     "zh": "路线图教程",
     "hi": "रोडमैप ट्यूटोरियल",
     "pl": "Samouczek FreeMap"
-  },
-  "Free Map": {
-    "de": "Free Map",
-    "es": "Free Map",
-    "ko": "Free Map",
-    "pt": "Free Map",
-    "fr": "Free Map",
-    "vi": "Free Map",
-    "zh": "Free Map",
-    "hi": "Free Map",
-    "pl": "FreeMap"
   },
   "Insert": {
     "de": "Einfügen",
@@ -2770,39 +2231,6 @@
     "zh": "路线图居中",
     "hi": "रोडमैप केंद्र में लाएँ",
     "pl": "Wyśrodkuj FreeMap"
-  },
-  "FreeMap tab": {
-    "de": "FreeMap-Reiter",
-    "es": "Pestaña de hoja de ruta",
-    "ko": "로드맵 탭",
-    "pt": "Aba de roteiro",
-    "fr": "Onglet feuille de route",
-    "vi": "Thẻ lộ trình",
-    "zh": "路线图标签页",
-    "hi": "रोडमैप टैब",
-    "pl": "Karta FreeMap"
-  },
-  "Show FreeMap in the shared workspace.": {
-    "de": "Zeigt FreeMap im gemeinsamen Arbeitsbereich an.",
-    "es": "Mostrar Hoja de ruta en el espacio compartido.",
-    "ko": "공유 작업 공간에 로드맵을 표시합니다.",
-    "pt": "Mostrar Roteiro na área compartilhada.",
-    "fr": "Afficher Feuille de route dans l’espace partagé.",
-    "vi": "Hiện Lộ trình trong không gian chung.",
-    "zh": "在共享工作区显示路线图。",
-    "hi": "साझा कार्यक्षेत्र में रोडमैप दिखाएँ।",
-    "pl": "Pokaż FreeMap we wspólnym obszarze."
-  },
-  "Your first FreeMap": {
-    "de": "Deine erste FreeMap",
-    "es": "Tu primera hoja de ruta",
-    "ko": "첫 로드맵",
-    "pt": "Seu primeiro roteiro",
-    "fr": "Votre première feuille de route",
-    "vi": "Lộ trình đầu tiên của bạn",
-    "zh": "你的第一张路线图",
-    "hi": "आपका पहला रोडमैप",
-    "pl": "Twoja pierwsza FreeMap"
   },
   "FreeMap tutorial": {
     "de": "FreeMap-Tutorial",

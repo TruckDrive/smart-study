@@ -210,8 +210,6 @@ def handle(cmd, a):
         return home()
     if cmd == "open":
         return view(a["id"])
-    if cmd == "decks":
-        return ankidata.deck_names(col)
     if cmd == "findDecks":
         return ankidata.find_decks(col, a.get("title", ""), a.get("q", ""), a.get("exclude") or ())
     if cmd == "deckInfo":
@@ -338,9 +336,6 @@ def handle(cmd, a):
             plan["dayMinutes"][a["day"]] = max(0, min(24 * 60, int(a["minutes"])))
         store.save(plan)
         return {"notes": generate_all(a["id"])}
-    if cmd == "simResult":
-        plan = store.load(a["id"])
-        return ankidata.sim_result(col, plan, plan.get("sim") or {})
     if cmd == "candidates":
         plan = a["plan"]
         return {s["id"]: ankidata.candidates(col, planner.src_decks(s)) for s in planner.anki_sources(plan)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 from aqt import mw
-from aqt.qt import *
+from aqt.qt import (QCheckBox, QDialog, QDialogButtonBox, QLabel, QPixmap, Qt,
+                    QVBoxLayout)
 
 try:
     from .locales import _

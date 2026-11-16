@@ -18,15 +18,15 @@ from typing import Callable, Optional
 from . import constants
 
 # --- PyQt Imports ---
-QWidget, QDockWidget, QVBoxLayout, QHBoxLayout, QLabel = object, object, object, object, object
-QUrl, Qt, QPushButton, QIcon, QTimer = object, object, object, object, object
+QWidget, QDockWidget, QVBoxLayout, QLabel = object, object, object, object
+QUrl, Qt, QTimer = object, object, object
 QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings, QWebEngineScript = object, object, object, object, object
 QObject, QWebChannel = object, object
 pyqtSlot = lambda *args: (lambda method: method)
 
 try:
-    from aqt.qt import (QWidget, QDockWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                        QPushButton, QUrl, Qt, QTimer, QIcon, QColor, QCoreApplication)
+    from aqt.qt import (QWidget, QDockWidget, QVBoxLayout, QLabel,
+                        QUrl, Qt, QTimer, QColor, QCoreApplication)
     from PyQt6.QtCore import QObject, pyqtSlot, QEvent
     from PyQt6.QtWebChannel import QWebChannel
     from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -435,9 +435,7 @@ class MindmapPanel(QWidget):
         self._roadmap_saving = False
         self._page_generation = 0
         self._roadmap_saved_revision = -1
-        self._windowed = False
 
-        self.is_initialized = False
         self._page_ready = False
         self._unload_in_progress = False
         self._unload_for_hide = False
@@ -542,7 +540,6 @@ class MindmapPanel(QWidget):
             self.web_view.setHtml(f"<h3>Error: {constants.MINDMAP_HTML_FILENAME} not found.</h3>")
 
         self.web_layout.addWidget(self.web_view)
-        self.is_initialized = True
 
     def _consider_tutorial_invitation(self, existing_maps: bool) -> None:
         if not self.web_view or not mw or not mw.pm:
@@ -765,7 +762,6 @@ class MindmapPanel(QWidget):
         self.web_view = None
         self.profile = None
         self.page = None
-        self.is_initialized = False
         self._page_ready = False
         self._page_generation += 1
 

@@ -7,6 +7,16 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.0.5",
+        "date": "November 17, 2026",
+        "items": [
+            {"tag": "Improved", "text": "Leaving a review is smoother: the streak is worked out from the last month of reviews instead of a whole year, unless your streak really is that long. The result is exactly the same."},
+            {"tag": "Improved", "text": "Less work in the background while you review: the Today panel recounts your study plan every 4 seconds instead of every 1.5, and skips plans that have nothing scheduled for today. The deck list draws its coloured dots faster."},
+            {"tag": "Improved", "text": "A smaller add-on: about 10,000 more lines that nothing used are gone, among them 1,590 translations of removed features and 157 unused files (mostly controller pictures)."},
+            {"tag": "Improved", "text": "The music player no longer downloads the SoundCloud cover of each track. The picture was saved but never shown."},
+        ],
+    },
+    {
         "version": "3.0.4",
         "date": "November 15, 2026",
         "items": [

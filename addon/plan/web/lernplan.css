@@ -148,7 +148,6 @@ html.night-mode input[type=checkbox]:checked { background-image: url("data:image
 .tl > span { color: var(--muted); font-size: 12px; }
 .pill { display: inline-flex; align-items: center; gap: 2px; background: var(--accent-bg); color: var(--fg); border-radius: 12px; padding-block: 0; padding-inline: 9px 4px; font-size: 12.5px; margin-block: 2px; margin-inline: 0 4px; }
 .pill button { border: 0; background: none; padding: 0 4px; color: var(--muted); }
-.sugg { color: var(--accent); }
 .tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
 .panel-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px; }
 .tool { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--bg); }

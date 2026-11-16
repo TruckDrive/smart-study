@@ -39,28 +39,15 @@ except ImportError:
     def translate_for_language(text, lang): return text  # type: ignore
 
 # ── Theme mapping ──────────────────────────────────────────────────────────────
-# Maps the 1-based index of the theme card (img_theme_N.png) to the
-# theme name used by theme.py / addon_settings["active_color_theme"].
-# Adjust this dict if the order of your theme images changes.
+# Maps the 1-based theme number sent by the wizard to the theme name used
+# by theme.py / addon_settings["active_color_theme"].
 THEME_INDEX_TO_NAME = {
-    1: "ocean",     # img_theme_1.png  — Blue
-    2: "horizon",   # img_theme_2.png  — Gray / Slate
-    3: "forest",    # img_theme_3.png  — Green
-    4: "dusty",     # img_theme_4.png  — Teal
-    5: "deluge",    # img_theme_5.png  — Purple
-    6: "orchid",    # img_theme_6.png  — Pink / Magenta
-}
-
-# ── Role → Fact-category mapping ──────────────────────────────────────────────
-# Maps the data-value of the selected role button to the fact_theme key
-# used by daily_widgets.generate_daily_widgets_html().
-ROLE_TO_FACT_THEME = {
-    "medical":    "Medical",
-    "law":        "Law",
-    "language":   "Countries",
-    "highschool": "General",
-    "programmer": "General",
-    "other":      "General",
+    1: "ocean",  # Blue
+    2: "horizon",  # Gray / Slate
+    3: "forest",  # Green
+    4: "dusty",  # Teal
+    5: "deluge",  # Purple
+    6: "orchid",  # Pink / Magenta
 }
 
 # ── Qt 6 imports ───────────────────────────────────────────────────────────────
@@ -162,20 +149,12 @@ if _QT_AVAILABLE:
                 }
                 for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa")
             }
-            theme_sources = ("Ocean", "Horizon", "Forest", "Dusty", "Deluge", "Orchid")
-            themes = {
-                lang: [
-                    translate_for_language(source, lang)
-                    for source in theme_sources
-                ]
-                for lang in ("en", "de", "es", "ko", "pt", "fr", "vi", "zh", "hi", "pl", "fa")
-            }
             try:
                 dark = bool(self.parent() and self.parent().pm and _is_night())
             except Exception:
                 dark = False
             payload = json.dumps(
-                {"errors": errors, "themes": themes, "isDark": dark},
+                {"errors": errors, "isDark": dark},
                 ensure_ascii=False,
             ).replace("</", "<\\/")
             self._page.runJavaScript(

@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.0.5 – 2026-11-17
+
+A second clean-up release with a few speed-ups. Nothing visible changes.
+
+- **Streak without the year-long scan**: `calculate_streak_from_revlog` read 370 days of the review log every time you left the reviewer (about 85 ms on the main thread with 400,000 reviews). It now reads 30, 60, 120 and 160 days, then a year at a time, and stops at the first missing day. A streak under 30 days costs about 6 ms. Old and new code were run against each other on a test collection with gaps at every window border: 46 cases, no difference
+- **Today panel**: every answered card is also an "operation", so the panel's 1.5 s refresh always undercut the 4 s meant for reviewing. It now keeps 4 s while you review. Plans without an item today are no longer evaluated (that spared two card searches per topic)
+- **Deck list dots**: the reviews of sub-decks are summed in one pass instead of asking Anki for the child decks of every deck on each render
+- **No SoundCloud cover download**: the cover of each track was downloaded to a cache file that nothing displayed
+- **Dead code removed** (about 10,000 lines, 196 files touched):
+  - Python: every deck-browser command the removed classic widgets used to send, with what hung on it (plan timer, statistics info and settings dialogs, gamification reset, the HTML generators in `gamification.py`, `deadline_bar.py` and `daily_widgets.py`), the single-card PDF draft nothing called, settings defaults nothing read
+  - Web: the onboarding survey screen that was already skipped, the remote news banner of the settings page that was never loaded, unused functions in the notebook, CSS rules without elements
+  - Translations: 1,590 entries of removed features in `locales.py`, `web_translations.py` and the JSON catalogs (`locales.py` went from 9,480 to about 6,500 lines)
+  - Files: 157 deleted, mostly controller pictures no controller maps to (`Not to add yet/`, Oculus, Vive, Wii Remote), the old toolbar icons, `statistics.html`, unused onboarding pictures
+- Checked with the 15 unit tests and the GUI smoke test (18 checks), before and after
+
 ## 3.0.4 – 2026-11-15
 
 A clean-up release. Nothing visible changes.

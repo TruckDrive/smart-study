@@ -169,7 +169,6 @@ def make_icons():
     write(os.path.join(MEDIA, "settings.svg"), icon_svg(gear(), "currentColor", 1.6))
     write(os.path.join(MEDIA, "sidebar_icon_open.svg"), icon_svg(glyph("panel-left-close"), "#292d32", 1.6))
     write(os.path.join(MEDIA, "sidebar_icon_closed.svg"), icon_svg(glyph("panel-left-open"), "#292d32", 1.6))
-    write(os.path.join(IMAGES, "deadline.svg"), icon_svg(glyph("flag"), "#808080", 1.25))
 
 
 # ── gamification: ranks and achievements ──────────────────────────────────────
@@ -427,17 +426,6 @@ def make_onboarding():
                                     ("compass", ("users", "megaphone", "star"))), 1):
         main = place(g, 280 - 110, 1120 * .33 - 110, 220, "#ffffff", 1.5)
         png(panel_svg(560, 1120, main, chips), os.path.join(ONB, f"img_sidebar_{i}.png"), 560, 1120)
-    for i, (name, color) in enumerate(THEMES.items(), 1):
-        lines = "".join(f'<rect x="150" y="{120 + k * 46}" width="{170 - k * 30}" height="18" rx="9" fill="#ffffff" fill-opacity=".85"/>'
-                        for k in range(4))
-        png(f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
-<defs>{grad("t", mix(color, "#ffffff", .35), color, 1, 1)}</defs>
-<rect width="400" height="400" rx="56" fill="url(#t)"/>
-<rect x="64" y="64" width="64" height="272" rx="20" fill="#ffffff" fill-opacity=".9"/>
-{"".join(f'<circle cx="96" cy="{108 + k * 56}" r="14" fill="{color}" fill-opacity="{1 if k == 0 else .45}"/>' for k in range(4))}
-{lines}
-<rect x="150" y="300" width="120" height="36" rx="18" fill="#ffffff"/>
-</svg>''', os.path.join(ONB, f"img_theme_{i}.png"), 400, 400)
     # Where the settings are: the logo at the top of the launcher bar, highlighted.
     launcher_icons = "".join(place(g, 46, 176 + k * 58, 34, "#888888", 1.6)
                              for k, g in enumerate(("brain-circuit", "globe", "notebook-pen", "network")))

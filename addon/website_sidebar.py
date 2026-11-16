@@ -205,7 +205,6 @@ browser_container = None  # the browser's content widget (for its shortcuts)
 MAX_TABS = 20
 
 # Embedded view (inside the Anki main window) that borrows the dock content.
-website_main_layout: Optional[QVBoxLayout] = None
 website_window = None  # truthy marker while an embedded view is active
 website_embedded_content: Optional[QWidget] = None  # the dock body while embedded
 
@@ -1023,7 +1022,7 @@ def create_website_dock() -> Optional[QDockWidget]:
     global home_button_widget
     global back_button, forward_button, refresh_button, nav_button_layout
     global custom_button_containers
-    global website_main_layout, window_button
+    global window_button
 
     if not _qt_available or QDockWidget is object or QWidget is object or QVBoxLayout is object or QHBoxLayout is object or QWebEngineView is object or QWebEngineProfile is object or QPushButton is object or mw is None:
         print("WS Error: Essential Qt/Anki components missing for dock creation.")
@@ -1113,10 +1112,8 @@ def create_website_dock() -> Optional[QDockWidget]:
         container_widget = QWidget()
         main_layout = QVBoxLayout(container_widget)
         main_layout.setContentsMargins(0, 0, 0, 0); main_layout.setSpacing(0)
-        website_main_layout = main_layout
 
         # Clean grey toolbar bar (matches the Notebook nav bar look).
-        _pal = _toolbar_palette()
         toolbar_widget = QWidget()
         toolbar_widget.setObjectName("smartstudyWebToolbar")
         toolbar_widget.setStyleSheet(browser_chrome.toolbar())
@@ -1351,7 +1348,7 @@ def create_website_dock() -> Optional[QDockWidget]:
         attach(mw, sidebar_dock, "website", lambda: website_window is not None)
         mw.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, sidebar_dock)
         browser_features.start()
-        print(f"WS Info: New dock created and added successfully.")
+        print("WS Info: New dock created and added successfully.")
 
     except Exception as e:
         print(f"WS FATAL: Error during new dock creation: {e}")
@@ -2092,7 +2089,7 @@ def cleanup_website_sidebar():
     global home_button_widget
     global back_button, forward_button, refresh_button
     global custom_button_containers
-    global website_main_layout, website_window, window_button
+    global website_window, window_button
     global tab_bar, tab_stack, search_help, pip_placeholder, browser_container
     global load_bar
     load_bar = None
@@ -2147,7 +2144,7 @@ def cleanup_website_sidebar():
 
     sidebar_dock = None; sidebar_webview = None; website_profile = None; button_container_layout = None; nav_button_layout = None
     add_button_widget = None; home_button_widget = None; back_button = None; forward_button = None; refresh_button = None
-    window_button = None; website_main_layout = None
+    window_button = None
     custom_button_containers.clear()
     print(f"{constants.ADDON_NAME_WEBSITE}: Cleaned up references.")
 

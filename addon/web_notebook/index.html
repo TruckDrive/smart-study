@@ -375,9 +375,6 @@ button, select, input[type=text], input[type=search], input[type=number], input[
             border-radius: 3px; font-size: 14px; font-weight: bold;
         }
         .fmt-btn:hover { background: rgba(128,128,128,0.3); }
-        .color-picker { display: flex; gap: 2px; border-inline-start: 1px solid rgba(128,128,128,0.3); padding-inline-start: 6px; margin-inline-start: 2px; }
-        .color-dot { width: 16px; height: 16px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(128,128,128,0.2); }
-        .color-dot:hover { transform: scale(1.2); }
 
         /* Cover / cloze boxes: a beige box hides the text so you can self-test.
            Click to reveal (box fades to half), click again to hide it. */
@@ -653,7 +650,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
         #notebook-breadcrumbs button:hover { background:var(--hover-bg); border-radius:4px; }
         .nb-tree-row { gap:6px; padding-inline:6px; }
         .nb-tree-row .pin-btn, .nb-tree-row .del-btn { display:none; }
-        .nb-tree-row:hover .pin-btn, .nb-tree-row:hover .del-btn, .nb-tree-row:focus-within .pin-btn, .nb-tree-row:focus-within .del-btn { display:inline; }
         .nb-tree-toggle { border:0; background:transparent; color:var(--text-gray); padding:0; width:18px; min-width:18px; height:24px; cursor:pointer; }
         .nb-section-remove { border:0; background:transparent; color:var(--text-gray); cursor:pointer; margin-inline-start:auto; }
         #page-ctx-menu { max-height:calc(100vh - 16px); overflow-y:auto; max-width:calc(100vw - 16px); }
@@ -817,7 +813,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                 <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Pages" data-notebook-icon="sidebar"></button>
             </div>
             
-            <div class="scroll-wrapper" onclick="clearSearchOnInteraction()">
+            <div class="scroll-wrapper">
                 <div class="content-container">
                     <div class="page-icon-container" onclick="openIconPicker()">
                         <span id="page-icon">📄</span>
@@ -836,7 +832,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                     </div>
 
                     <h1 id="title" class="page-title" contenteditable="true" placeholder="Page Title" data-i18n-placeholder="page_title_placeholder" onfocus="clearSearchHighlights()"></h1>
-                    <div id="editor" onclick="clearSearchOnInteraction()"></div>
+                    <div id="editor"></div>
                 </div>
             </div>
         </div>
@@ -978,52 +974,19 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
         let saveRevision = 0;
         const pendingSaveRevisions = [];
 
-        let currentSearchIndex = -1;
-        let searchResults = [];
 
         // --- Undo / Redo ---
-        let undoStack = [];
-        let redoStack = [];
-        let suppressUndoSnapshot = false;
         let undoDebounceTimer = null;
 
         function pushUndoSnapshot() {
-            if (suppressUndoSnapshot || notebookHistoryReplay) return;
+            if (notebookHistoryReplay) return;
             saveCurrentEditorToState();
             recordNotebookAction(); notebookSeparateAction = true;
-            const page = appState.pages.find(p => p.id === appState.activePageId);
-            if (!page) return;
-            undoStack.push(JSON.stringify({ pageId: page.id, title: page.title, icon: page.icon, blocks: JSON.parse(JSON.stringify(page.blocks)) }));
-            if (undoStack.length > 50) undoStack.shift();
-            redoStack = [];
         }
 
         function scheduleUndoSnapshot() {
             clearTimeout(undoDebounceTimer);
             undoDebounceTimer = setTimeout(pushUndoSnapshot, 1200);
-        }
-
-        function applySnapshot(snapshot) {
-            cancelNotebookBlockDrag();
-            suppressUndoSnapshot = true;
-            const data = JSON.parse(snapshot);
-            const page = appState.pages.find(p => p.id === data.pageId);
-            if (!page || data.pageId !== appState.activePageId) { suppressUndoSnapshot = false; return; }
-            page.title = data.title;
-            page.icon = data.icon;
-            page.blocks = Array.isArray(data.blocks) ? data.blocks : [];
-            titleEl.innerText = page.title;
-            setIconDisplay(page.icon);
-            editor.innerHTML = '';
-            page.blocks.forEach(b => { if (b && typeof b === 'object') editor.appendChild(createStoredBlock(b)); });
-            renderSidebar();
-            resetCoversOnLoad();
-            refreshPageLinks();
-            saveDirty = true;
-            saveRevision += 1;
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(persistNow, 800);
-            suppressUndoSnapshot = false;
         }
 
         // --- Relative time helper ---
@@ -1107,8 +1070,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
             // A page is an undo boundary. Cancel snapshots from the previous
             // editor before changing its identity; never replay them here.
             clearTimeout(undoDebounceTimer);
-            undoStack = [];
-            redoStack = [];
             
             searchInput.value = '';
             clearSearchHighlights();
@@ -1231,15 +1192,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                 parent.replaceChild(document.createTextNode(mark.textContent), mark);
                 parent.normalize(); 
             });
-            searchResults = [];
-            currentSearchIndex = -1;
-        }
-
-        function clearSearchOnInteraction() {
-            if(searchResults.length > 0) {
-                clearSearchHighlights();
-                searchInput.value = '';
-            }
         }
 
         function handleSearchInput(val) {
@@ -1598,13 +1550,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
             const sel = window.getSelection();
             if (sel.anchorNode) sel.anchorNode.parentElement.focus();
             triggerSave(); 
-        }
-        function formatColor(color) {
-            document.execCommand('styleWithCSS', false, true);
-            document.execCommand('foreColor', false, color);
-            const sel = window.getSelection();
-            if (sel.anchorNode) sel.anchorNode.parentElement.focus();
-            triggerSave();
         }
 
         // --- Cover / cloze boxes (hide text under a beige box for self-testing) ---
@@ -2012,7 +1957,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                 };
 
                 title.oninput = (e) => {
-                    if (searchResults.length > 0) clearSearchOnInteraction();
                     triggerSave();
                 };
                 title.onkeydown = (e) => {
@@ -2463,10 +2407,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
             saveRevision += 1;
             const statusEl = document.getElementById('status'); statusEl.style.opacity = 1; statusEl.innerText = (window.__SMARTSTUDY_I18N__?.saving || "Saving...");
             statusEl.style.color = '';
-            if (!suppressUndoSnapshot) {
-                redoStack = [];
-                scheduleUndoSnapshot();
-            }
+            scheduleUndoSnapshot();
             clearTimeout(saveTimeout);
             saveTimeout = immediate ? null : setTimeout(persistNow, 800);
             if (immediate) persistNow();
@@ -2796,13 +2737,6 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
         function addNotebookSubpage(pageId) {
             if (!appState.pages.some(page => page.id === pageId)) return;
             notebookCollapsedPages.delete(pageId); addNewPage(true, pageId);
-        }
-        function addNotebookSection() {
-            const name = prompt(i18nGet('section_name', 'Section name:'), '');
-            if (!name || !name.trim()) return;
-            ensureFolders();
-            appState.folders.push({id:'s-' + Date.now() + '-' + Math.random().toString(36).slice(2), name:name.trim(), open:true, kind:'section'});
-            renderSidebar(); triggerSave();
         }
         function renderHierarchicalSidebar(parents) {
             const byUpdated = notebookSidebarCompare;
@@ -3436,7 +3370,7 @@ body textarea:focus-visible, body a[href]:focus-visible, body [tabindex]:focus-v
                     if (!Array.isArray(page.blocks)) return;
                     page.blocks.push(original); page.updatedAt = Date.now();
                     notebookActionBlock.remove(); if (!editor.children.length) editor.appendChild(createBlock());
-                    clearTimeout(undoDebounceTimer); undoStack = []; redoStack = [];
+                    clearTimeout(undoDebounceTimer);
                     notebookClosePopup(); notebookHideGutter(); triggerSave(); pushUndoSnapshot();
                 }));
             });

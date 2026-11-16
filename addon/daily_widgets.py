@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import html
 import hashlib
 from datetime import date
-import json
 
 # --- Translation Function ---
 # NOTE on fact translations:
@@ -14,18 +12,9 @@ import json
 # _() would freeze the translations at module-import time and break the
 # live-update contract for the fact widget.
 try:
-    from .rtl import dir_attribute
-except ImportError:
-    def dir_attribute():  # type: ignore
-        return ""
-
-try:
     from .locales import _
 except ImportError:
     def _(text): return text  # safety fallback
-
-# --- Debug offset (days) ---
-_debug_day_offset = 0
 
 # --- Medizinische Fakten Liste ---
 MEDICAL_FACTS = [
@@ -153,58 +142,10 @@ def todays_fact(fact_theme: str = "Medical") -> str:
     if not facts:
         return ""
     if fact_theme == "Random":
-        seed = str(date.today().toordinal() + _debug_day_offset).encode("ascii")
+        seed = str(date.today().toordinal()).encode("ascii")
         index = int(hashlib.sha256(seed).hexdigest(), 16) % len(facts)
     else:
-        index = (date.today().timetuple().tm_yday + _debug_day_offset - 1) % len(facts)
+        index = (date.today().timetuple().tm_yday - 1) % len(facts)
     text = facts[index].get("text", "")
     return _(text) if text else ""
 
-
-def generate_todo_widget() -> str:
-    """Read the existing snapshot without creating a second task store."""
-    failed = False
-    try:
-        from .notebook_sidebar import load_todo_preview_snapshot
-        tasks = json.loads(load_todo_preview_snapshot())
-        if not isinstance(tasks, list):
-            raise ValueError("Invalid task list")
-        completed_count = sum(1 for t in tasks if isinstance(t, dict) and t.get("done"))
-        tasks = [t for t in tasks if isinstance(t, dict) and not t.get("done") and t.get("due_on", date.today().isoformat()) <= date.today().isoformat() and isinstance(t.get("text"), str)]
-    except Exception:
-        tasks = []
-        failed = True
-        completed_count = 0
-    esc = lambda value: html.escape(str(value), quote=True)
-    rows = ''.join(
-        f'<li><button type="button" class="sp-task-check" data-task-id="{esc(t.get("id", ""))}" aria-label="{esc(_("Complete task") + ": " + t["text"])}" onclick="event.stopPropagation();pycmd(&quot;pycmd:smartstudy:todo_complete:&quot;+encodeURIComponent(this.dataset.taskId));" {"disabled" if not t.get("id") else ""}></button><span class="sp-task-label" title="{esc(t["text"])}">{esc(t["text"])}</span>{chr(32) + "<span class=sp-task-repeat title=" + chr(34) + esc(_("Recurring task")) + chr(34) + ">↻</span>" if t.get("repeat") in ("daily", "weekly", "weekdays") else ""}</li>'
-        for t in tasks[:8]
-    )
-    if not rows:
-        message = _("Open Tasks to view your list.") if failed else _("All done. No open tasks.")
-        rows = f'<li class="sp-task-empty">{esc(message)}</li>'
-    count = '' if failed else f'<span class="sp-task-count" title="{esc(_("Open tasks"))}" aria-label="{esc(_("Open tasks"))}: {len(tasks)}">{len(tasks)}</span><span class="sp-task-count sp-task-completed" title="{esc(_("Completed tasks"))}" aria-label="{esc(_("Completed tasks"))}: {completed_count}">{completed_count}</span>'
-    return f'''<style>
-    .sp-todo-widget {{box-sizing:border-box;min-width:0;width:100%;max-width:100%;flex:1 1 300px;padding:12px 16px 16px;background:var(--stat-bg,var(--sp-min-surface));color:var(--text-color,var(--sp-min-text));border:1px solid var(--stat-border,var(--sp-min-border));border-radius:12px;text-align:start;}}
-    .sp-task-heading {{display:flex;align-items:center;gap:8px;margin:0 0 12px;flex-wrap:wrap;}}
-    .sp-task-heading h5 {{margin-block:0;margin-inline:0 auto;font-size:1.1em;}}
-    .sp-task-manager {{font:inherit;font-size:10px;line-height:1.2;min-height:0;background:transparent;color:inherit;border:1px solid var(--stat-border,var(--sp-min-border));border-radius:5px;padding:2px 5px;cursor:pointer;}}
-    .sp-task-completed {{color:var(--plan-date-color,var(--sp-min-accent));}}
-    .sp-task-count {{font-size:12px;font-weight:500;border:1px solid currentColor;border-radius:12px;padding:1px 7px;}}
-    .sp-todo-widget ul {{display:flex;flex-wrap:wrap;gap:8px 22px;list-style:none;margin:0;padding:0;}}
-    .sp-todo-widget li {{display:flex;align-items:flex-start;gap:9px;min-width:0;flex:0 1 auto;max-width:100%;padding:5px 0;font-size:14px;line-height:1.4;}}
-    .sp-task-check {{appearance:none;box-sizing:border-box;width:18px;height:18px;flex:0 0 18px;min-width:0;min-height:0;margin:1px 0 0;padding:0;background:transparent;color:inherit;border:1px solid currentColor;border-radius:4px;box-shadow:none;cursor:pointer;}}
-    .sp-task-check:hover {{border-color:var(--plan-date-color,var(--sp-min-accent));}}
-    .sp-todo-widget .sp-task-check,.sp-todo-widget .sp-task-manager,
-    .sp-todo-widget .sp-task-check:hover,.sp-todo-widget .sp-task-manager:hover,
-    .sp-todo-widget .sp-task-check:active,.sp-todo-widget .sp-task-manager:active,
-    .sp-todo-widget .sp-task-check:focus,.sp-todo-widget .sp-task-manager:focus {{box-shadow:none !important;filter:none !important;transform:none !important;}}
-    .sp-todo-widget .sp-task-check {{border-radius:4px !important;width:18px !important;height:18px !important;}}
-    .sp-task-check:focus-visible,.sp-task-manager:focus-visible {{outline:2px solid currentColor;outline-offset:3px;}}
-    .sp-task-repeat {{color:var(--plan-date-color,var(--sp-min-accent));flex-shrink:0;}}
-    .sp-task-label {{min-width:0;white-space:normal;overflow-wrap:anywhere;}}
-    .sp-min-plan-fact-row.sp-min-tasks-row {{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;}}
-    @media(max-width:650px) {{.sp-min-plan-fact-row.sp-min-tasks-row {{grid-template-columns:minmax(0,1fr);}}}}
-    </style><div class="daily-widget sp-todo-widget"{dir_attribute()}>
-    <div class="sp-task-heading"><h5>{esc(_('Tasks'))}</h5><button type="button" class="sp-task-manager" onclick="event.stopPropagation();pycmd('pycmd:smartstudy:todo_viewer')">{esc(_('Open Manager'))}</button>{count}</div>
-    <ul>{rows}</ul></div>''' 

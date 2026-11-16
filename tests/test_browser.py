@@ -1,7 +1,6 @@
 """Search engines and the ad-block list of the Smart Study browser (no Anki needed)."""
 import importlib.util
 import os
-import sys
 
 ADDON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "addon")
 

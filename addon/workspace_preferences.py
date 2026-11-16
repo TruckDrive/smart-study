@@ -92,7 +92,6 @@ def save(group, values):
 
 
 def popup_script(group):
-    from aqt import mw
     from .theme import dialog_palette
     c = dialog_palette(bool(_is_night()))
     payload = dict(group=group, values=enabled(group), labels={k: _(LABELS[k]) for k in GROUPS[group]},

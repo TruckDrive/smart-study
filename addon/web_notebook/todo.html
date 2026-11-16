@@ -575,15 +575,6 @@ function editTodo(id) {
   save();
 }
 
-window.completeDashboardTasks = function(ids) {
-  const wanted = new Set(ids.map(String));
-  let changed = false;
-  todos.forEach(item => {
-    if (wanted.has(String(item.id)) && !item.done) { item.done = true; item.completed_on=TaskSchedule.today(); changed = true; }
-  });
-  if (changed) { render(); save(); }
-};
-
 function toggleDone(id) {
   const item = todos.find(t => t.id === id);
   if (item) {

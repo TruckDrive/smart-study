@@ -12,7 +12,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "3.0.4"
+ADDON_VERSION = "3.0.5"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 
@@ -21,7 +21,6 @@ ADDON_NAME_LAUNCHER = "Launcher_Sidebar"
 ICONS_SUBFOLDER = "media" 
 
 # --- Sizes & Layout (Launcher) ---
-INFO_IMAGE_WIDTH = 200
 INFO_IMAGE_FILENAME = "news-banner.png"
 
 # Sidebar tools that can receive a user-defined keyboard shortcut.  The keys

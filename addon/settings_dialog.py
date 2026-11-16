@@ -16,7 +16,7 @@ try:
 except ImportError:
     print("SettingsDialog CRITICAL: Failed to import constants.")
     class MockConstants:
-        addon_package_name = "SmartStudy1"; icons_folder = "."; INFO_IMAGE_FILENAME = "news-banner.png"; INFO_IMAGE_WIDTH = 200; ADDON_VERSION = "Unknown"
+        addon_package_name = "SmartStudy1"; icons_folder = "."; INFO_IMAGE_FILENAME = "news-banner.png"; ADDON_VERSION = "Unknown"
     constants = MockConstants()
 
 try:
@@ -27,7 +27,7 @@ except Exception:
 # --- Translation Function ---
 try:
     from .locales import _
-    from . import workspace_strings  # Register workspace labels in the native fallback.
+    from . import workspace_strings  # noqa: F401 - registers the workspace labels on import
 except ImportError:
     def _(text): return text  # safety fallback
 
@@ -689,7 +689,6 @@ class SettingsDialog(QDialog):
         master = self.checkboxes['deck_overview_enabled']
         options_frame.setEnabled(master.isChecked())
         master.toggled.connect(options_frame.setEnabled)
-        self._deck_options_frame = options_frame
         from .deck_overview_options import payload
         model = payload(self.current_config, _)
         self._deck_controls = {}
@@ -890,7 +889,6 @@ class SettingsDialog(QDialog):
                 )
                 if not raw:
                     continue
-                feature = _(sidebar_shortcuts.FEATURE_LABELS.get(key, "Sidebar"))
                 portable = sidebar_shortcuts.normalise_sequence(raw)
                 if not sidebar_shortcuts.is_safe_sequence(raw):
                     QMessageBox.warning(

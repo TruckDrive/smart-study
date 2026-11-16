@@ -2,7 +2,6 @@
 # Run: python3 -I tests/test_persian.py
 import ast
 import importlib.util
-import json
 import os
 import re
 import sys

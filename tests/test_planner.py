@@ -184,7 +184,6 @@ def test_prep():
     items = flat(plan)
     prep = [(d, it) for d, it in items if it.get("topic") == "t2" and it["kind"] in ("pages", "video")]
     assert prep and all(d < "2026-10-28" for d, _ in prep), prep
-    cards = [d for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards"]
     assert sum(it["cards"] for d, it in items if it.get("topic") == "t2" and it["kind"] == "cards") == 50
     assert [it for d, it in items if d == "2026-10-28" and it["kind"] == "note" and "Präpsaal" in it["text"]]
     assert not [it for d, it in items if d == "2026-10-27" and it["kind"] == "note"], "no review day before a lab session"
