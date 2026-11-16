@@ -7,8 +7,6 @@ add-on with several optional online tools.
 
 - Smart Study sends no data to the developer or to any other server on its own:
   no analytics, no remote news banner, no update checks.
-- The notebook's PDF.js runtime is bundled and is never downloaded or executed
-  from a CDN.
 - Study plans are stored in the add-on folder (`plan/user_files/`) and in the
   Anki collection, so they travel with your normal AnkiWeb sync.
 
@@ -62,7 +60,7 @@ AnkiWeb, exactly as *Tools → Add-ons → Get Add-ons* does.
 ## Local and synced storage
 
 - General settings, study plans, browser history/custom shortcuts, browser
-  cookies, notebook data, mind maps, and imported music files are
+  cookies and imported music files are
   profile-local under the Anki profile directory.
 - Smart Study stores no AI keys any more. Keys saved by versions before 3.0.1
   (`SmartStudy_Data/ai_secrets.json` and the old entries in the collection

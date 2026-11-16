@@ -1,6 +1,6 @@
 # Smart Study
 
-**One Anki extension for your whole study workflow: study plans up to your exam, plus a full workspace with notebook, PDF viewer, mind maps, focus timer, music, AI assistant and motivation, all inside Anki.**
+**One Anki extension for your whole study workflow: study plans up to your exam, plus a workspace with a browser, AI assistant, focus timer, music and motivation, all inside Anki.**
 
 ![Smart Study: your decks, and on the right today's plan and your numbers](screenshots/home-3.0.png)
 
@@ -64,8 +64,6 @@ You tell Smart Study what you have to learn (book pages, videos, ists of tasks, 
 
 - **Rail on the left, panel on the right**: a slim rail with the logo (opens the settings), a tab for every tool (each with an optional keyboard shortcut), Pomodoro and music. The tools open in a panel on the right and can also be shown as a split view, in the main window or in their own window
 - **Today**, the first tab: countdown to the next exam, today's plan items to tick off without opening the plan, the daily challenge, and three charts with their own period each – cards due on the next days, reviews per day (hover for a day's number) and how much you remembered. It shows on the home screen only and stays away while you review
-- **Notebook** with nested pages, task lists and a built-in **PDF viewer** (PDF.js bundled, nothing loaded from a CDN), plus a PDF card creator for basic, reversed and cloze cards
-- **Mind maps** and FreeMap diagrams with images, icons and links to Anki cards
 - **Pomodoro and session timers** with study-time analytics by deck
 - **Music player** for local audio, optional SoundCloud, plus a Streaming sidebar with YouTube Music (Spotify opens in its app)
 - **AI assistant** (optional): ChatGPT, Claude, Gemini or NotebookLM with your own account, one at a time. What you type goes directly to the provider you choose
@@ -106,9 +104,9 @@ A controller that cannot be recognised reliably (many pads call themselves "Xbox
 |---|---|
 | ![Home in light mode](screenshots/home-light-3.0.png) | ![AI assistant](screenshots/workspace-ai-assistant-3.0.png) |
 
-| Browser: tabs, address field, favourites | Mind maps |
-|---|---|
-| ![Browser](screenshots/workspace-website-3.0.png) | ![Mind map](screenshots/workspace-mindmap-3.0.png) |
+| Browser: tabs, address field, favourites |
+|---|
+| ![Browser](screenshots/workspace-website-3.0.png) |
 
 | Trophies: level, streak, challenge, badges | Settings: tabs on top, search, one switch per part |
 |---|---|

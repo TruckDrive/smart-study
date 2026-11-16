@@ -12,7 +12,7 @@ addon_package_name = "SmartStudy1"
 ADDON_DISPLAY_NAME = "Smart Study"
 print(f"Constants: Addon package name set to '{addon_package_name}'.")
 
-ADDON_VERSION = "3.0.5"
+ADDON_VERSION = "3.1.0"
 MIN_ANKI_VERSION = "25.09.4"
 MIN_ANKI_POINT_VERSION = 250904
 
@@ -27,22 +27,17 @@ INFO_IMAGE_FILENAME = "news-banner.png"
 # deliberately match their existing enable/disable setting so one persisted
 # map can drive both the settings UI and the runtime registrations.
 SIDEBAR_SHORTCUT_KEYS = (
-    "mindmap_enabled",
     "gamification_sidebar_enabled",
     "music_player_enabled",
     "pomodoro_enabled",
     "ai_assistant_enabled",
     "website_viewer_enabled",
-    "notebook_enabled",
 )
 
 # --- Filenames & Object Names (Launcher & Submodules) ---
 
-MINDMAP_DOCK_OBJECT_NAME = "IntegratedMindmapSidebarDock_SmartStudy_v1" 
-NOTEBOOK_DOCK_OBJECT_NAME = "IntegratedNotebookSidebarDock_SmartStudy_v1"
 WEBSITE_DOCK_OBJECT_NAME = "IntegratedWebsiteSidebarDock_SmartStudy_v1"
 AI_ASSISTANT_DOCK_OBJECT_NAME = "AIAssistantSidebarDock_Integrated_v1"
-MINDMAP_HTML_FILENAME = "index.html" 
 
 # --- Pomodoro Constants ---
 ADDON_NAME_POMODORO = "Pomodoro_Integrated"

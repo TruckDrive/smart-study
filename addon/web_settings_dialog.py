@@ -136,14 +136,13 @@ SUPPORTERS_NOTE = ""
 
 # Config keys that are simple on/off toggles.
 _TOGGLE_KEYS = [
-    "workspace_mindmap_tab", "workspace_roadmap_tab",
     "gamification_popups_enabled", "gamification_popup_rank",
     "gamification_popup_level", "gamification_popup_challenge",
     "gamification_widgets_enabled",
     "deadline_bar_enabled",
-    "deck_overview_enabled", "mindmap_enabled",
+    "deck_overview_enabled",
     "gamification_sidebar_enabled", "music_player_enabled", "pomodoro_enabled",
-    "ai_assistant_enabled", "website_viewer_enabled", "notebook_enabled",
+    "ai_assistant_enabled", "website_viewer_enabled",
     "panel_show_plan", "panel_show_challenge", "panel_show_due",
     "stats_show_consistency", "stats_show_retention",
 ]

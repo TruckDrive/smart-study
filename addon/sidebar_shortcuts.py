@@ -39,13 +39,11 @@ except ImportError:
 
 
 FEATURE_LABELS = {
-    "mindmap_enabled": "MindMap",
     "gamification_sidebar_enabled": "Gamification Sidebar",
     "music_player_enabled": "Music Player",
     "pomodoro_enabled": "Timer",
     "ai_assistant_enabled": "AI Assistant",
     "website_viewer_enabled": "Website Viewer",
-    "notebook_enabled": "Notebook",
 }
 
 _registered: Dict[str, Any] = {}
@@ -150,10 +148,7 @@ def _trigger(feature_key: str) -> None:
     if not _settings.get(feature_key, True):
         return
     try:
-        if feature_key == "mindmap_enabled":
-            from .mindmap_sidebar import toggle_mindmap_dock
-            toggle_mindmap_dock()
-        elif feature_key == "gamification_sidebar_enabled":
+        if feature_key == "gamification_sidebar_enabled":
             from .study_plan_trigger import trigger_gamification_sidebar_action
             trigger_gamification_sidebar_action()
         elif feature_key == "music_player_enabled":
@@ -168,9 +163,6 @@ def _trigger(feature_key: str) -> None:
         elif feature_key == "website_viewer_enabled":
             from .website_sidebar import toggle_website_dock
             toggle_website_dock()
-        elif feature_key == "notebook_enabled":
-            from .notebook_sidebar import toggle_notebook_dock
-            toggle_notebook_dock()
     except Exception as exc:
         print(f"SmartStudy shortcut '{feature_key}' failed: {exc}")
         try:

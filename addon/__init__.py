@@ -76,11 +76,6 @@ try:
     from .website_sidebar import cleanup_website_sidebar
     from .background_music import cleanup_music_player
     from .ai_assistant import cleanup_ai_assistant_sidebar
-    from .mindmap_sidebar import cleanup_mindmap_sidebar    
-    from .notebook_sidebar import (
-        cleanup_notebook_sidebar, setup_notebook_sidebar,
-        open_pdf_review_link,
-    )
     from . import deck_overview, sidebar_shortcuts
     from . import custom_background
     from .gamification import GamificationManager
@@ -146,8 +141,8 @@ def get_default_settings() -> Dict[str, Any]:
         "deck_overview_enabled": True,
         **deck_defaults,
         "pomodoro_enabled": True, "ai_assistant_enabled": True,
-        "website_viewer_enabled": True, "notebook_enabled": True,
-        "workspace_mindmap_tab": True, "workspace_roadmap_tab": True, "mindmap_enabled": True, "gamification_sidebar_enabled": True,
+        "website_viewer_enabled": True,
+        "gamification_sidebar_enabled": True,
         "gamification_popups_enabled": True,
         "gamification_popup_rank": True,
         "gamification_popup_level": False,
@@ -485,7 +480,6 @@ def on_state_change(new_state: str, old_state: str):
 ONBOARDING_NEEDS = {
     "plan": ("deadline_bar_enabled", "panel_show_plan"),
     "focus": ("pomodoro_enabled", "music_player_enabled"),
-    "notes": ("notebook_enabled", "mindmap_enabled"),
     "ai": ("ai_assistant_enabled", "website_viewer_enabled"),
     "motivation": ("gamification_widgets_enabled", "panel_show_challenge", "gamification_sidebar_enabled"),
 }
@@ -638,8 +632,6 @@ def run_onboarding_if_needed():
 def _apply_saved_settings(new_settings, message=None):
     """Persist the returned settings and refresh every affected piece of UI.
     Shared by the HTML settings dialog and the native fallback."""
-    if not new_settings.get("workspace_mindmap_tab", True) and not new_settings.get("workspace_roadmap_tab", True):
-        new_settings["workspace_mindmap_tab"] = True
     previous_language = addon_settings.get("language", "auto")
     addon_settings.update(new_settings); save_addon_settings()
 
@@ -677,12 +669,6 @@ def _apply_saved_settings(new_settings, message=None):
         restyle_study_plan()
     except Exception as error:
         print(f"SmartStudy: study plan restyle failed: {error}")
-
-    try:
-        from .mindmap_sidebar import refresh_workspace_settings
-        refresh_workspace_settings()
-    except Exception as error:
-        print(f"SmartStudy: workspace refresh failed: {error}")
 
     # Refresh the launcher sidebar (always-visible icon bar on the side).
     if sidebar_widget_instance:
@@ -953,11 +939,6 @@ def on_theme_changed():
         refresh_website_theme()
     except Exception as error:
         print(f"SmartStudy: browser theme refresh failed: {error}")
-    try:
-        from .mindmap_sidebar import refresh_workspace_theme
-        refresh_workspace_theme()
-    except Exception as error:
-        print(f"SmartStudy: workspace theme refresh failed: {error}")
     try:
         custom_background.setup(addon_settings)
     except Exception:
@@ -1244,10 +1225,11 @@ def _init_ui_delayed(expected_profile_generation=None):
         except Exception as e:
             print(f"SmartStudy: daily gamification maintenance failed: {e}")
 
-    from .notebook_sidebar import setup_task_calendar
-    setup_task_calendar()
-    if addon_settings.get("notebook_enabled", True):
-        setup_notebook_sidebar()
+    try:
+        from . import retired_tools
+        retired_tools.notify_once(addon_settings, save_addon_settings)
+    except Exception as e:
+        print(f"SmartStudy: retired tools notice failed: {e}")
 
     if study_plan_trigger:
         study_plan_trigger.set_gamification_sidebar_trigger_function(toggle_gamification_sidebar)
@@ -1295,7 +1277,6 @@ def on_profile_close():
     
     cleanup_pomodoro(); cleanup_website_sidebar()
     cleanup_music_player(); cleanup_ai_assistant_sidebar()
-    cleanup_mindmap_sidebar(); cleanup_notebook_sidebar()
     try:
         from . import web_sleep
         web_sleep.stop()
@@ -1370,7 +1351,9 @@ def webview_did_receive_js_message(handled: bool, message: str, context: object)
         and isinstance(context, Reviewer)
     ):
         try:
-            open_pdf_review_link(message[len(pdf_link_prefix):])
+            # Cards made from a PDF by the removed notebook still carry this link.
+            from . import retired_tools
+            retired_tools.pdf_link_clicked()
         except Exception as e:
             print(f"SmartStudy PDF review link error: {e}")
         return (True, None)
@@ -1574,7 +1557,7 @@ if modules_loaded and mw and gui_hooks:
     gui_hooks.profile_did_open.append(_add_menus)
     gui_hooks.state_did_change.append(on_state_change)
     gui_hooks.top_toolbar_did_init_links.append(_add_launcher_toggle_to_top_toolbar)
-    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|web_notebook/.+|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css))$") # theme css, notebook, media and study plan files
+    mw.addonManager.setWebExports(__name__, r"(theme/user_files/.+\.css|media/.+|plan/web/.+\.(js|css)|web_panel/.+\.(js|css))$") # theme css, media and study plan files
     gui_hooks.webview_will_set_content.append(inject_theme_assets)
     try:
         from . import smooth_ui

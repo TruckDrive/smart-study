@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.0 – 2026-11-17
+
+Notebook and mind map are removed.
+
+- **Removed: notebook** with its three tools: notes, to-do list with the task calendar, and the PDF viewer with the card creator (`notebook_sidebar.py`, `web_notebook/` with the bundled PDF.js, `pdf_card_types.py`, `task_schedule.py`)
+- **Removed: mind map and free maps** (`mindmap_sidebar.py`, `roadmap_store.py`, the `workspace_*` modules, `web_roadmap/`, `index.html`)
+- With them go their tabs in the rail, their switches and keyboard shortcuts in the settings, the "Notes and mind maps" choice in the setup wizard, their translations and the PDF.js notice. The Lucide license text moved to `LICENSE-Lucide.txt` (the artwork is still drawn from Lucide icons); the icon catalog `tools/make_assets.py` needs is now in `tools/lucide/`
+- **No data is deleted**: `notebook.sqlite`, `mindmap_recovery.json`, `mindmap_web_data/` and `SmartStudy_Data/roadmaps.sqlite3` stay in the Anki profile folder. Whoever has one of these files sees a window once per profile that lists them and points to 3.0.5 (`retired_tools.py`)
+- A card made from a PDF still carries its link to the PDF page. A click on it now shows a short note instead of opening the viewer
+- The study plan is not affected: its PDFs open in a tab of the Smart Study browser, as before
+- Saved settings of the removed tools (`notebook_enabled`, `mindmap_enabled`, `workspace_*_tab`, their shortcuts) are left in place and ignored
+
 ## 3.0.5 – 2026-11-17
 
 A second clean-up release with a few speed-ups. Nothing visible changes.

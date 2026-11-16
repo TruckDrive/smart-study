@@ -514,7 +514,6 @@ html.dark .need.selected { background: var(--acc-soft); border-color: var(--acc-
       <div class="needs">
         <button class="need selected" data-need="plan" onclick="toggleNeed(this)"><b data-i18n="needPlan">Study plan for an exam</b><span data-i18n="needPlanHint">Countdown and today's plan on the home screen</span></button>
         <button class="need selected" data-need="focus" onclick="toggleNeed(this)"><b data-i18n="needFocus">Focus</b><span data-i18n="needFocusHint">Pomodoro timer and music</span></button>
-        <button class="need" data-need="notes" onclick="toggleNeed(this)"><b data-i18n="needNotes">Notes and mind maps</b><span data-i18n="needNotesHint">Notebook, PDFs, to-dos and mind maps</span></button>
         <button class="need" data-need="ai" onclick="toggleNeed(this)"><b data-i18n="needAi">AI and browser</b><span data-i18n="needAiHint">ChatGPT, Claude or Gemini and websites next to your cards</span></button>
         <button class="need selected" data-need="motivation" onclick="toggleNeed(this)"><b data-i18n="needMotivation">Motivation</b><span data-i18n="needMotivationHint">Level, streak, daily challenge and trophies</span></button>
       </div>
@@ -616,7 +615,7 @@ html.dark .need.selected { background: var(--acc-soft); border-color: var(--acc-
 <script>
 const T = {
   fa: {
-    needsTitle: "Smart Study را برای چه می‌خواهید؟", needsSub: "آنچه لازم دارید را انتخاب کنید – بقیه خاموش می‌ماند تا در تنظیمات روشنش کنید.", needPlan: "برنامهٔ مطالعه برای امتحان", needPlanHint: "شمارش معکوس و برنامهٔ امروز در صفحهٔ اصلی", needFocus: "تمرکز", needFocusHint: "تایمر پومودورو و موسیقی", needNotes: "یادداشت و نقشهٔ ذهنی", needNotesHint: "دفترچه، PDF، کارها و نقشهٔ ذهنی", needAi: "هوش مصنوعی و مرورگر", needAiHint: "ChatGPT، Claude یا Gemini و وب‌سایت‌ها کنار کارت‌ها", needMotivation: "انگیزه", needMotivationHint: "سطح، روزهای پیاپی، چالش روزانه و جام‌ها",
+    needsTitle: "Smart Study را برای چه می‌خواهید؟", needsSub: "آنچه لازم دارید را انتخاب کنید – بقیه خاموش می‌ماند تا در تنظیمات روشنش کنید.", needPlan: "برنامهٔ مطالعه برای امتحان", needPlanHint: "شمارش معکوس و برنامهٔ امروز در صفحهٔ اصلی", needFocus: "تمرکز", needFocusHint: "تایمر پومودورو و موسیقی", needAi: "هوش مصنوعی و مرورگر", needAiHint: "ChatGPT، Claude یا Gemini و وب‌سایت‌ها کنار کارت‌ها", needMotivation: "انگیزه", needMotivationHint: "سطح، روزهای پیاپی، چالش روزانه و جام‌ها",
     welcomeTo: "خوش آمدید به", welcomeSub: "آماده‌اید تجربهٔ Anki خود را بهتر کنید؟",
     getStarted: "شروع کنیم", continue: "ادامه", start: "شروع",
     chooseLanguage: "زبان خود را انتخاب کنید",
@@ -632,7 +631,7 @@ const T = {
     loadingDone: "✓ Smart Study آماده است!", close: "بستن",
   },
   pl: {
-    needsTitle: "Do czego chcesz używać Smart Study?", needsSub: "Wybierz, czego potrzebujesz – reszta pozostanie wyłączona, dopóki jej nie włączysz w ustawieniach.", needPlan: "Plan nauki do egzaminu", needPlanHint: "Odliczanie i plan dnia na ekranie głównym", needFocus: "Skupienie", needFocusHint: "Timer Pomodoro i muzyka", needNotes: "Notatki i mapy myśli", needNotesHint: "Notatnik, PDF-y, zadania i mapy myśli", needAi: "AI i przeglądarka", needAiHint: "ChatGPT, Claude lub Gemini i strony obok twoich kart", needMotivation: "Motywacja", needMotivationHint: "Poziom, seria, wyzwanie dnia i trofea",
+    needsTitle: "Do czego chcesz używać Smart Study?", needsSub: "Wybierz, czego potrzebujesz – reszta pozostanie wyłączona, dopóki jej nie włączysz w ustawieniach.", needPlan: "Plan nauki do egzaminu", needPlanHint: "Odliczanie i plan dnia na ekranie głównym", needFocus: "Skupienie", needFocusHint: "Timer Pomodoro i muzyka", needAi: "AI i przeglądarka", needAiHint: "ChatGPT, Claude lub Gemini i strony obok twoich kart", needMotivation: "Motywacja", needMotivationHint: "Poziom, seria, wyzwanie dnia i trofea",
     welcomeTo: "Witaj w", welcomeSub: "Chcesz lepiej korzystać z Anki?",
     getStarted: "Zaczynamy", continue: "Dalej", start: "Start",
     chooseLanguage: "Wybierz język",
@@ -649,7 +648,7 @@ const T = {
   },
 
   en: {
-    needsTitle: "What do you want Smart Study for?", needsSub: "Pick what you need – the rest stays off until you switch it on in the settings.", needPlan: "Study plan for an exam", needPlanHint: "Countdown and today's plan on the home screen", needFocus: "Focus", needFocusHint: "Pomodoro timer and music", needNotes: "Notes and mind maps", needNotesHint: "Notebook, PDFs, to-dos and mind maps", needAi: "AI and browser", needAiHint: "ChatGPT, Claude or Gemini and websites next to your cards", needMotivation: "Motivation", needMotivationHint: "Level, streak, daily challenge and trophies",
+    needsTitle: "What do you want Smart Study for?", needsSub: "Pick what you need – the rest stays off until you switch it on in the settings.", needPlan: "Study plan for an exam", needPlanHint: "Countdown and today's plan on the home screen", needFocus: "Focus", needFocusHint: "Pomodoro timer and music", needAi: "AI and browser", needAiHint: "ChatGPT, Claude or Gemini and websites next to your cards", needMotivation: "Motivation", needMotivationHint: "Level, streak, daily challenge and trophies",
     welcomeTo: "Welcome to", welcomeSub: "Ready to boost your Anki Experience?",
     getStarted: "Get Started", continue: "Continue", start: "Start",
     chooseLanguage: "Choose Your Language",
@@ -665,7 +664,7 @@ const T = {
     loadingDone: "✓ Smart Study is ready!", close: "Close",
   },
   de: {
-    needsTitle: "Wofür willst du Smart Study?", needsSub: "Wähl, was du brauchst – der Rest bleibt aus, bis du ihn in den Einstellungen einschaltest.", needPlan: "Lernplan für eine Prüfung", needPlanHint: "Countdown und Tagesplan auf der Startseite", needFocus: "Fokus", needFocusHint: "Pomodoro-Timer und Musik", needNotes: "Notizen und Mindmaps", needNotesHint: "Notizbuch, PDFs, To-dos und Mindmaps", needAi: "KI und Browser", needAiHint: "ChatGPT, Claude oder Gemini und Webseiten neben deinen Karten", needMotivation: "Motivation", needMotivationHint: "Level, Serie, Tagesaufgabe und Trophäen",
+    needsTitle: "Wofür willst du Smart Study?", needsSub: "Wähl, was du brauchst – der Rest bleibt aus, bis du ihn in den Einstellungen einschaltest.", needPlan: "Lernplan für eine Prüfung", needPlanHint: "Countdown und Tagesplan auf der Startseite", needFocus: "Fokus", needFocusHint: "Pomodoro-Timer und Musik", needAi: "KI und Browser", needAiHint: "ChatGPT, Claude oder Gemini und Webseiten neben deinen Karten", needMotivation: "Motivation", needMotivationHint: "Level, Serie, Tagesaufgabe und Trophäen",
     welcomeTo: "Willkommen bei", welcomeSub: "Bereit, deine Anki-Erfahrung zu verbessern?",
     getStarted: "Los geht's", continue: "Weiter", start: "Starten",
     chooseLanguage: "Sprache auswählen",
@@ -681,7 +680,7 @@ const T = {
     loadingDone: "✓ Smart Study ist bereit!", close: "Schließen",
   },
   es: {
-    needsTitle: "¿Para qué quieres Smart Study?", needsSub: "Elige lo que necesitas; lo demás queda desactivado hasta que lo actives en los ajustes.", needPlan: "Plan de estudio para un examen", needPlanHint: "Cuenta atrás y plan del día en la pantalla de inicio", needFocus: "Concentración", needFocusHint: "Temporizador Pomodoro y música", needNotes: "Notas y mapas mentales", needNotesHint: "Cuaderno, PDF, tareas y mapas mentales", needAi: "IA y navegador", needAiHint: "ChatGPT, Claude o Gemini y páginas web junto a tus tarjetas", needMotivation: "Motivación", needMotivationHint: "Nivel, racha, reto diario y trofeos",
+    needsTitle: "¿Para qué quieres Smart Study?", needsSub: "Elige lo que necesitas; lo demás queda desactivado hasta que lo actives en los ajustes.", needPlan: "Plan de estudio para un examen", needPlanHint: "Cuenta atrás y plan del día en la pantalla de inicio", needFocus: "Concentración", needFocusHint: "Temporizador Pomodoro y música", needAi: "IA y navegador", needAiHint: "ChatGPT, Claude o Gemini y páginas web junto a tus tarjetas", needMotivation: "Motivación", needMotivationHint: "Nivel, racha, reto diario y trofeos",
     welcomeTo: "Bienvenido a", welcomeSub: "¿Listo para mejorar tu experiencia en Anki?",
     getStarted: "Comenzar", continue: "Continuar", start: "Empezar",
     chooseLanguage: "Elige tu idioma",
@@ -697,7 +696,7 @@ const T = {
     loadingDone: "✓ ¡Smart Study está listo!", close: "Cerrar",
   },
   pt: {
-    needsTitle: "Para que você quer o Smart Study?", needsSub: "Escolha o que precisa – o resto fica desligado até você ativar nas configurações.", needPlan: "Plano de estudo para uma prova", needPlanHint: "Contagem regressiva e plano do dia na tela inicial", needFocus: "Foco", needFocusHint: "Timer Pomodoro e música", needNotes: "Notas e mapas mentais", needNotesHint: "Caderno, PDFs, tarefas e mapas mentais", needAi: "IA e navegador", needAiHint: "ChatGPT, Claude ou Gemini e sites ao lado dos seus cartões", needMotivation: "Motivação", needMotivationHint: "Nível, sequência, desafio diário e troféus",
+    needsTitle: "Para que você quer o Smart Study?", needsSub: "Escolha o que precisa – o resto fica desligado até você ativar nas configurações.", needPlan: "Plano de estudo para uma prova", needPlanHint: "Contagem regressiva e plano do dia na tela inicial", needFocus: "Foco", needFocusHint: "Timer Pomodoro e música", needAi: "IA e navegador", needAiHint: "ChatGPT, Claude ou Gemini e sites ao lado dos seus cartões", needMotivation: "Motivação", needMotivationHint: "Nível, sequência, desafio diário e troféus",
     welcomeTo: "Bem-vindo ao", welcomeSub: "Pronto para melhorar sua experiência no Anki?",
     getStarted: "Começar", continue: "Continuar", start: "Iniciar",
     chooseLanguage: "Escolha seu idioma",
@@ -713,7 +712,7 @@ const T = {
     loadingDone: "✓ Smart Study está pronto!", close: "Fechar",
   },
   vi: {
-    needsTitle: "Bạn muốn dùng Smart Study để làm gì?", needsSub: "Chọn những gì bạn cần – phần còn lại sẽ tắt cho đến khi bạn bật trong cài đặt.", needPlan: "Kế hoạch ôn thi", needPlanHint: "Đếm ngược và kế hoạch hôm nay trên màn hình chính", needFocus: "Tập trung", needFocusHint: "Hẹn giờ Pomodoro và nhạc", needNotes: "Ghi chú và sơ đồ tư duy", needNotesHint: "Sổ ghi chú, PDF, việc cần làm và sơ đồ tư duy", needAi: "AI và trình duyệt", needAiHint: "ChatGPT, Claude hoặc Gemini và trang web cạnh thẻ của bạn", needMotivation: "Động lực", needMotivationHint: "Cấp độ, chuỗi ngày, thử thách hằng ngày và cúp",
+    needsTitle: "Bạn muốn dùng Smart Study để làm gì?", needsSub: "Chọn những gì bạn cần – phần còn lại sẽ tắt cho đến khi bạn bật trong cài đặt.", needPlan: "Kế hoạch ôn thi", needPlanHint: "Đếm ngược và kế hoạch hôm nay trên màn hình chính", needFocus: "Tập trung", needFocusHint: "Hẹn giờ Pomodoro và nhạc", needAi: "AI và trình duyệt", needAiHint: "ChatGPT, Claude hoặc Gemini và trang web cạnh thẻ của bạn", needMotivation: "Động lực", needMotivationHint: "Cấp độ, chuỗi ngày, thử thách hằng ngày và cúp",
     welcomeTo: "Chào mừng đến với", welcomeSub: "Sẵn sàng nâng cao trải nghiệm Anki của bạn?",
     getStarted: "Bắt đầu", continue: "Tiếp tục", start: "Bắt đầu",
     chooseLanguage: "Chọn ngôn ngữ của bạn",
@@ -729,7 +728,7 @@ const T = {
     loadingDone: "✓ Smart Study đã sẵn sàng!", close: "Đóng",
   },
   fr: {
-    needsTitle: "Pourquoi veux-tu utiliser Smart Study ?", needsSub: "Choisis ce dont tu as besoin – le reste reste désactivé jusqu'à ce que tu l'actives dans les réglages.", needPlan: "Plan de révision pour un examen", needPlanHint: "Compte à rebours et plan du jour sur l'accueil", needFocus: "Concentration", needFocusHint: "Minuteur Pomodoro et musique", needNotes: "Notes et cartes mentales", needNotesHint: "Carnet, PDF, tâches et cartes mentales", needAi: "IA et navigateur", needAiHint: "ChatGPT, Claude ou Gemini et des sites web à côté de tes cartes", needMotivation: "Motivation", needMotivationHint: "Niveau, série, défi du jour et trophées",
+    needsTitle: "Pourquoi veux-tu utiliser Smart Study ?", needsSub: "Choisis ce dont tu as besoin – le reste reste désactivé jusqu'à ce que tu l'actives dans les réglages.", needPlan: "Plan de révision pour un examen", needPlanHint: "Compte à rebours et plan du jour sur l'accueil", needFocus: "Concentration", needFocusHint: "Minuteur Pomodoro et musique", needAi: "IA et navigateur", needAiHint: "ChatGPT, Claude ou Gemini et des sites web à côté de tes cartes", needMotivation: "Motivation", needMotivationHint: "Niveau, série, défi du jour et trophées",
     welcomeTo: "Bienvenue sur", welcomeSub: "Prêt à améliorer votre expérience Anki ?",
     getStarted: "Commencer", continue: "Continuer", start: "Démarrer",
     chooseLanguage: "Choisissez votre langue",
@@ -745,7 +744,7 @@ const T = {
     loadingDone: "✓ Smart Study est prêt !", close: "Fermer",
   },
   hi: {
-    needsTitle: "आप Smart Study किसलिए चाहते हैं?", needsSub: "जो चाहिए वह चुनें – बाकी बंद रहेगा, जब तक आप सेटिंग्स में चालू न करें।", needPlan: "परीक्षा के लिए अध्ययन योजना", needPlanHint: "होम स्क्रीन पर उलटी गिनती और आज की योजना", needFocus: "फ़ोकस", needFocusHint: "पोमोडोरो टाइमर और संगीत", needNotes: "नोट्स और माइंड मैप", needNotesHint: "नोटबुक, PDF, कार्य-सूची और माइंड मैप", needAi: "AI और ब्राउज़र", needAiHint: "आपके कार्ड के पास ChatGPT, Claude या Gemini और वेबसाइटें", needMotivation: "प्रेरणा", needMotivationHint: "लेवल, स्ट्रीक, दैनिक चुनौती और ट्रॉफ़ी",
+    needsTitle: "आप Smart Study किसलिए चाहते हैं?", needsSub: "जो चाहिए वह चुनें – बाकी बंद रहेगा, जब तक आप सेटिंग्स में चालू न करें।", needPlan: "परीक्षा के लिए अध्ययन योजना", needPlanHint: "होम स्क्रीन पर उलटी गिनती और आज की योजना", needFocus: "फ़ोकस", needFocusHint: "पोमोडोरो टाइमर और संगीत", needAi: "AI और ब्राउज़र", needAiHint: "आपके कार्ड के पास ChatGPT, Claude या Gemini और वेबसाइटें", needMotivation: "प्रेरणा", needMotivationHint: "लेवल, स्ट्रीक, दैनिक चुनौती और ट्रॉफ़ी",
     welcomeTo: "स्वागत है", welcomeSub: "अपने Anki अनुभव को बेहतर बनाने के लिए तैयार हैं?",
     getStarted: "शुरू करें", continue: "जारी रखें", start: "प्रारंभ",
     chooseLanguage: "अपनी भाषा चुनें",
@@ -761,7 +760,7 @@ const T = {
     loadingDone: "✓ Smart Study तैयार है!", close: "बंद करें",
   },
   ko: {
-    needsTitle: "Smart Study를 어디에 쓰고 싶나요?", needsSub: "필요한 것을 고르세요 – 나머지는 설정에서 켤 때까지 꺼져 있습니다.", needPlan: "시험 학습 계획", needPlanHint: "홈 화면의 카운트다운과 오늘의 계획", needFocus: "집중", needFocusHint: "뽀모도로 타이머와 음악", needNotes: "노트와 마인드맵", needNotesHint: "노트북, PDF, 할 일, 마인드맵", needAi: "AI와 브라우저", needAiHint: "카드 옆의 ChatGPT, Claude, Gemini와 웹사이트", needMotivation: "동기 부여", needMotivationHint: "레벨, 연속 학습, 일일 도전, 트로피",
+    needsTitle: "Smart Study를 어디에 쓰고 싶나요?", needsSub: "필요한 것을 고르세요 – 나머지는 설정에서 켤 때까지 꺼져 있습니다.", needPlan: "시험 학습 계획", needPlanHint: "홈 화면의 카운트다운과 오늘의 계획", needFocus: "집중", needFocusHint: "뽀모도로 타이머와 음악", needAi: "AI와 브라우저", needAiHint: "카드 옆의 ChatGPT, Claude, Gemini와 웹사이트", needMotivation: "동기 부여", needMotivationHint: "레벨, 연속 학습, 일일 도전, 트로피",
     welcomeTo: "환영합니다", welcomeSub: "Anki 경험을 향상시킬 준비가 되셨나요?",
     getStarted: "시작하기", continue: "계속", start: "시작",
     chooseLanguage: "언어를 선택하세요",
@@ -777,7 +776,7 @@ const T = {
     loadingDone: "✓ Smart Study 준비 완료!", close: "닫기",
   },
   zh: {
-    needsTitle: "你想用 Smart Study 做什么？", needsSub: "选择你需要的功能——其余的会保持关闭，直到你在设置中开启。", needPlan: "考试学习计划", needPlanHint: "主页上的倒计时和今日计划", needFocus: "专注", needFocusHint: "番茄钟和音乐", needNotes: "笔记和思维导图", needNotesHint: "笔记本、PDF、待办和思维导图", needAi: "AI 和浏览器", needAiHint: "在卡片旁使用 ChatGPT、Claude 或 Gemini 及网页", needMotivation: "激励", needMotivationHint: "等级、连续天数、每日挑战和奖杯",
+    needsTitle: "你想用 Smart Study 做什么？", needsSub: "选择你需要的功能——其余的会保持关闭，直到你在设置中开启。", needPlan: "考试学习计划", needPlanHint: "主页上的倒计时和今日计划", needFocus: "专注", needFocusHint: "番茄钟和音乐", needAi: "AI 和浏览器", needAiHint: "在卡片旁使用 ChatGPT、Claude 或 Gemini 及网页", needMotivation: "激励", needMotivationHint: "等级、连续天数、每日挑战和奖杯",
     welcomeTo: "欢迎使用", welcomeSub: "准备好提升您的 Anki 体验了吗？",
     getStarted: "开始使用", continue: "继续", start: "开始",
     chooseLanguage: "选择您的语言",

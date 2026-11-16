@@ -7,6 +7,15 @@ window, so the user can keep or undo the change right away.
 
 CHANGELOG = [
     {
+        "version": "3.1.0",
+        "date": "November 17, 2026",
+        "items": [
+            {"tag": "Changed", "text": "The notebook (notes, to-dos, PDF viewer, cards from a PDF) and the mind map with its free maps are no longer part of Smart Study. The add-on concentrates on the study plan, the Today panel, browser, assistant, timer, music and trophies."},
+            {"tag": "Changed", "text": "Nothing you saved is deleted. If you used the notebook or the mind map, a window tells you once where your data is in the Anki profile folder. To keep using these tools, install Smart Study 3.0.5 again from GitHub."},
+            {"tag": "Improved", "text": "The add-on is much smaller: about 2 MB and 16,000 lines less, without the bundled PDF library."},
+        ],
+    },
+    {
         "version": "3.0.5",
         "date": "November 17, 2026",
         "items": [

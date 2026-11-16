@@ -197,424 +197,6 @@
     "de": "Aufgaben",
     "pl": "Zadania"
   },
-  "Task settings": {
-    "es": "Ajustes de tareas",
-    "ko": "할 일 설정",
-    "pt": "Configurações de tarefas",
-    "fr": "Paramètres des tâches",
-    "vi": "Cài đặt công việc",
-    "zh": "任务设置",
-    "hi": "कार्य सेटिंग्स",
-    "de": "Aufgabeneinstellungen",
-    "pl": "Ustawienia zadań"
-  },
-  "Remove completed one-time tasks on the next day": {
-    "es": "Eliminar las tareas únicas completadas al día siguiente",
-    "ko": "완료된 일회성 할 일을 다음 날 삭제",
-    "pt": "Remover tarefas únicas concluídas no dia seguinte",
-    "fr": "Supprimer le lendemain les tâches ponctuelles terminées",
-    "vi": "Xóa công việc một lần đã hoàn thành vào ngày hôm sau",
-    "zh": "次日删除已完成的一次性任务",
-    "hi": "पूरे हुए एकबारगी कार्य अगले दिन हटाएँ",
-    "de": "Erledigte einmalige Aufgaben am nächsten Tag löschen",
-    "pl": "Usuwaj ukończone jednorazowe zadania następnego dnia"
-  },
-  "Off by default. Recurring tasks and old tasks without a completion date are kept.": {
-    "es": "Desactivado por defecto. Se conservan las tareas recurrentes y las antiguas sin fecha de finalización.",
-    "ko": "기본적으로 꺼져 있습니다. 반복 할 일과 완료 날짜가 없는 이전 할 일은 유지됩니다.",
-    "pt": "Desativado por padrão. Tarefas recorrentes e antigas sem data de conclusão são mantidas.",
-    "fr": "Désactivé par défaut. Les tâches récurrentes et les anciennes tâches sans date de fin sont conservées.",
-    "vi": "Mặc định tắt. Công việc lặp lại và công việc cũ không có ngày hoàn thành vẫn được giữ.",
-    "zh": "默认关闭。重复任务和没有完成日期的旧任务会保留。",
-    "hi": "डिफ़ॉल्ट रूप से बंद। दोहराए जाने वाले और बिना पूर्णता-तिथि वाले पुराने कार्य बने रहते हैं।",
-    "de": "Standardmäßig aus. Wiederkehrende Aufgaben und alte Aufgaben ohne Erledigungsdatum bleiben erhalten.",
-    "pl": "Domyślnie wyłączone. Zadania cykliczne i stare zadania bez daty ukończenia pozostają."
-  },
-  "Repeat task": {
-    "es": "Repetir tarea",
-    "ko": "할 일 반복",
-    "pt": "Repetir tarefa",
-    "fr": "Répéter la tâche",
-    "vi": "Lặp lại công việc",
-    "zh": "重复任务",
-    "hi": "कार्य दोहराएँ",
-    "de": "Aufgabe wiederholen",
-    "pl": "Powtarzaj zadanie"
-  },
-  "No repeat": {
-    "es": "Sin repetición",
-    "ko": "반복 안 함",
-    "pt": "Não repetir",
-    "fr": "Sans répétition",
-    "vi": "Không lặp lại",
-    "zh": "不重复",
-    "hi": "दोहराना बंद",
-    "de": "Keine Wiederholung",
-    "pl": "Bez powtarzania"
-  },
-  "Daily": {
-    "es": "A diario",
-    "ko": "매일",
-    "pt": "Diariamente",
-    "fr": "Chaque jour",
-    "vi": "Hằng ngày",
-    "zh": "每天",
-    "hi": "प्रतिदिन",
-    "de": "Täglich",
-    "pl": "Codziennie"
-  },
-  "Weekly": {
-    "es": "Semanalmente",
-    "ko": "매주",
-    "pt": "Semanalmente",
-    "fr": "Chaque semaine",
-    "vi": "Hằng tuần",
-    "zh": "每周",
-    "hi": "साप्ताहिक",
-    "de": "Wöchentlich",
-    "pl": "Co tydzień"
-  },
-  "Selected weekdays": {
-    "es": "Días de la semana seleccionados",
-    "ko": "선택한 요일",
-    "pt": "Dias da semana selecionados",
-    "fr": "Jours de la semaine sélectionnés",
-    "vi": "Các ngày đã chọn trong tuần",
-    "zh": "选定的星期几",
-    "hi": "चुने हुए वार",
-    "de": "Ausgewählte Wochentage",
-    "pl": "Wybrane dni tygodnia"
-  },
-  "Weekly tasks repeat on the weekday you configure them. Missed tasks remain open without extra copies.": {
-    "es": "Las tareas semanales se repiten el día de la semana en que las configuras. Las tareas pendientes permanecen abiertas sin crear copias adicionales.",
-    "ko": "주간 할 일은 설정한 요일에 반복됩니다. 놓친 할 일은 복제되지 않고 미완료 상태로 유지됩니다.",
-    "pt": "As tarefas semanais se repetem no dia da semana em que são configuradas. Tarefas não concluídas permanecem abertas, sem cópias extras.",
-    "fr": "Les tâches hebdomadaires se répètent le jour de leur configuration. Les tâches manquées restent ouvertes sans créer de copies supplémentaires.",
-    "vi": "Công việc hằng tuần lặp vào thứ bạn thiết lập. Công việc bị bỏ lỡ vẫn mở, không tạo bản sao thêm.",
-    "zh": "每周任务会在设置当天对应的星期几重复。未完成的任务将保持待办，不会产生额外副本。",
-    "hi": "साप्ताहिक कार्य उसी वार दोहराते हैं जिस दिन उन्हें सेट किया गया। छूटे हुए कार्य खुले रहते हैं, अतिरिक्त प्रतियाँ नहीं बनतीं।",
-    "de": "Wöchentliche Aufgaben wiederholen sich an dem Wochentag, an dem du sie einstellst. Verpasste Aufgaben bleiben ohne zusätzliche Kopien offen.",
-    "pl": "Zadania tygodniowe wracają w wybranym dniu tygodnia. Pominięte pozostają otwarte, bez dodatkowych kopii."
-  },
-  "Choose at least one weekday.": {
-    "es": "Selecciona al menos un día de la semana.",
-    "ko": "요일을 하나 이상 선택하세요.",
-    "pt": "Escolha pelo menos um dia da semana.",
-    "fr": "Choisissez au moins un jour de la semaine.",
-    "vi": "Chọn ít nhất một ngày trong tuần.",
-    "zh": "请至少选择一个星期几。",
-    "hi": "कम से कम एक वार चुनें।",
-    "de": "Wähle mindestens einen Wochentag.",
-    "pl": "Wybierz co najmniej jeden dzień tygodnia."
-  },
-  "Recurring task": {
-    "es": "Tarea recurrente",
-    "ko": "반복 할 일",
-    "pt": "Tarefa recorrente",
-    "fr": "Tâche récurrente",
-    "vi": "Công việc lặp lại",
-    "zh": "重复任务",
-    "hi": "दोहराया जाने वाला कार्य",
-    "de": "Wiederkehrende Aufgabe",
-    "pl": "Zadanie cykliczne"
-  },
-  "Tutorial": {
-    "es": "Tutorial",
-    "ko": "튜토리얼",
-    "pt": "Tutorial",
-    "fr": "Tutoriel",
-    "vi": "Hướng dẫn",
-    "zh": "教程",
-    "hi": "ट्यूटोरियल",
-    "de": "Tutorial",
-    "pl": "Samouczek"
-  },
-  "Show entire map": {
-    "es": "Mostrar todo el mapa",
-    "ko": "전체 맵 보기",
-    "pt": "Mostrar mapa inteiro",
-    "fr": "Afficher toute la carte",
-    "vi": "Hiện toàn bộ sơ đồ",
-    "zh": "显示整个导图",
-    "hi": "पूरा मानचित्र दिखाएँ",
-    "de": "Gesamte Map anzeigen",
-    "pl": "Pokaż całą mapę"
-  },
-  "Step {current} of {total}": {
-    "es": "Paso {current} de {total}",
-    "ko": "{total}단계 중 {current}단계",
-    "pt": "Etapa {current} de {total}",
-    "fr": "Étape {current} sur {total}",
-    "vi": "Bước {current}/{total}",
-    "zh": "第 {current} 步，共 {total} 步",
-    "hi": "चरण {current}/{total}",
-    "de": "Schritt {current} von {total}",
-    "pl": "Krok {current} z {total}"
-  },
-  "Right click a node and choose a different color or size.": {
-    "es": "Haz clic derecho en un nodo y elige otro color o tamaño.",
-    "ko": "노드를 오른쪽 클릭하여 색상이나 크기를 바꾸세요.",
-    "pt": "Clique com o botão direito em um nó e escolha outra cor ou tamanho.",
-    "fr": "Faites un clic droit sur un nœud pour changer sa couleur ou sa taille.",
-    "vi": "Nhấp chuột phải vào nút để đổi màu hoặc kích thước.",
-    "zh": "右键点击节点，更改颜色或大小。",
-    "hi": "नोड पर दायाँ क्लिक करके रंग या आकार बदलें।",
-    "de": "Klicke mit der rechten Maustaste auf einen Knoten und wähle eine andere Farbe oder Größe.",
-    "pl": "Kliknij węzeł prawym przyciskiem i wybierz inny kolor lub rozmiar."
-  },
-  "Click the main topic and change its text.": {
-    "es": "Haz clic en el tema principal y cambia su texto.",
-    "ko": "중심 주제를 클릭하고 텍스트를 바꾸세요.",
-    "pt": "Clique no tema principal e altere o texto.",
-    "fr": "Cliquez sur le sujet principal et modifiez son texte.",
-    "vi": "Nhấp vào chủ đề chính và sửa văn bản.",
-    "zh": "点击中心主题并修改文字。",
-    "hi": "मुख्य विषय पर क्लिक करके उसका पाठ बदलें।",
-    "de": "Klicke auf den Hauptbegriff und ändere seinen Text.",
-    "pl": "Kliknij główny temat i zmień jego tekst."
-  },
-  "Drag the small blue dot on the main topic into an empty area to create a child node.": {
-    "es": "Arrastra el punto azul del tema principal a una zona vacía para crear un nodo hijo.",
-    "ko": "중심 주제의 작은 파란 점을 빈 공간으로 끌어 하위 노드를 만드세요.",
-    "pt": "Arraste o pequeno ponto azul do tema principal para uma área vazia para criar um nó filho.",
-    "fr": "Faites glisser le petit point bleu du sujet principal vers une zone vide pour créer un nœud enfant.",
-    "vi": "Kéo chấm xanh nhỏ của chủ đề chính ra vùng trống để tạo nút con.",
-    "zh": "将中心主题的小蓝点拖到空白处，创建子节点。",
-    "hi": "मुख्य विषय का छोटा नीला बिंदु खाली जगह पर खींचकर उपनोड बनाएँ।",
-    "de": "Ziehe den kleinen blauen Punkt am Hauptbegriff auf eine freie Stelle, um einen Unterknoten zu erstellen.",
-    "pl": "Przeciągnij mały niebieski punkt głównego tematu w puste miejsce, aby utworzyć węzeł podrzędny."
-  },
-  "Drag the empty canvas to move the view. Use the mouse wheel or the zoom buttons to zoom.": {
-    "es": "Arrastra el lienzo vacío para mover la vista. Usa la rueda o los botones de zoom para acercar o alejar.",
-    "ko": "빈 캔버스를 끌어 화면을 이동하세요. 마우스 휠이나 확대/축소 버튼으로 배율을 조절하세요.",
-    "pt": "Arraste a área vazia para mover a visualização. Use a roda do mouse ou os botões de zoom para ampliar ou reduzir.",
-    "fr": "Faites glisser le canevas vide pour déplacer la vue. Utilisez la molette ou les boutons de zoom pour agrandir ou réduire.",
-    "vi": "Kéo vùng trống để di chuyển góc nhìn. Dùng con lăn hoặc nút thu phóng để đổi độ phóng đại.",
-    "zh": "拖动空白画布移动视图，用鼠标滚轮或缩放按钮调整缩放。",
-    "hi": "दृश्य खिसकाने के लिए खाली कैनवास खींचें। ज़ूम के लिए माउस व्हील या ज़ूम बटन इस्तेमाल करें।",
-    "de": "Ziehe die freie Fläche, um die Ansicht zu verschieben. Mit dem Mausrad oder den Zoomtasten kannst du zoomen.",
-    "pl": "Przeciągaj puste płótno, aby przesuwać widok. Używaj kółka myszy lub przycisków zoomu, aby zmieniać skalę."
-  },
-  "Click Show entire map to bring every node into view. Node positions stay unchanged.": {
-    "es": "Pulsa Mostrar todo el mapa para ver todos los nodos. Sus posiciones no cambian.",
-    "ko": "전체 맵 보기를 클릭하면 모든 노드가 표시됩니다. 노드 위치는 바뀌지 않습니다.",
-    "pt": "Clique em Mostrar mapa inteiro para ver todos os nós. As posições dos nós não mudam.",
-    "fr": "Cliquez sur Afficher toute la carte pour voir tous les nœuds. Leurs positions ne changent pas.",
-    "vi": "Nhấn Hiện toàn bộ sơ đồ để thấy mọi nút. Vị trí các nút không đổi.",
-    "zh": "点击“显示整个导图”即可看到所有节点，节点位置不会改变。",
-    "hi": "सभी नोड देखने के लिए पूरा मानचित्र दिखाएँ पर क्लिक करें। नोड की जगह नहीं बदलेगी।",
-    "de": "Klicke auf „Gesamte Map anzeigen“, um alle Knoten zu sehen. Ihre Positionen bleiben unverändert.",
-    "pl": "Kliknij „Pokaż całą mapę”, aby zobaczyć wszystkie węzły. Ich położenie się nie zmieni."
-  },
-  "Open the highlighted menu and choose Start Learning. Try revealing a hidden answer.": {
-    "es": "Abre el menú resaltado y elige Iniciar estudio. Prueba a revelar una respuesta oculta.",
-    "ko": "강조된 메뉴에서 학습 시작을 선택하세요. 숨겨진 답을 표시해 보세요.",
-    "pt": "Abra o menu destacado e escolha Iniciar estudo. Tente revelar uma resposta oculta.",
-    "fr": "Ouvrez le menu en surbrillance et choisissez Commencer à apprendre. Essayez de révéler une réponse masquée.",
-    "vi": "Mở menu được đánh dấu và chọn Bắt đầu học. Thử hiện một câu trả lời bị ẩn.",
-    "zh": "打开高亮菜单并选择“开始学习”，尝试显示隐藏的答案。",
-    "hi": "चिह्नित मेनू खोलकर अध्ययन शुरू करें चुनें। छिपा हुआ उत्तर दिखाकर देखें।",
-    "de": "Öffne das markierte Menü und wähle „Lernen starten“. Probiere aus, eine verdeckte Antwort aufzudecken.",
-    "pl": "Otwórz wyróżnione menu i wybierz „Rozpocznij naukę”. Spróbuj odkryć ukrytą odpowiedź."
-  },
-  "Done. Continue when you are ready.": {
-    "es": "Hecho. Continúa cuando quieras.",
-    "ko": "완료했습니다. 준비되면 계속하세요.",
-    "pt": "Pronto. Continue quando quiser.",
-    "fr": "Terminé. Continuez quand vous le souhaitez.",
-    "vi": "Xong. Tiếp tục khi bạn sẵn sàng.",
-    "zh": "完成。准备好后继续。",
-    "hi": "हो गया। तैयार होने पर आगे बढ़ें।",
-    "de": "Geschafft. Gehe weiter, sobald du bereit bist.",
-    "pl": "Gotowe. Kontynuuj, gdy chcesz."
-  },
-  "Finish tutorial": {
-    "es": "Finalizar tutorial",
-    "ko": "튜토리얼 마치기",
-    "pt": "Concluir tutorial",
-    "fr": "Terminer le tutoriel",
-    "vi": "Hoàn tất hướng dẫn",
-    "zh": "完成教程",
-    "hi": "ट्यूटोरियल पूरा करें",
-    "de": "Tutorial abschließen",
-    "pl": "Zakończ samouczek"
-  },
-  "Skip step": {
-    "es": "Saltar paso",
-    "ko": "단계 건너뛰기",
-    "pt": "Pular etapa",
-    "fr": "Passer l’étape",
-    "vi": "Bỏ qua bước",
-    "zh": "跳过此步",
-    "hi": "चरण छोड़ें",
-    "de": "Schritt überspringen",
-    "pl": "Pomiń krok"
-  },
-  "Practice · changes are not saved": {
-    "es": "Práctica · los cambios no se guardan",
-    "ko": "연습 · 변경 사항은 저장되지 않음",
-    "pt": "Prática · alterações não são salvas",
-    "fr": "Entraînement · modifications non enregistrées",
-    "vi": "Thực hành · thay đổi không được lưu",
-    "zh": "练习 · 更改不会保存",
-    "hi": "अभ्यास · बदलाव नहीं सहेजे जाते",
-    "de": "Übung · Änderungen werden nicht gespeichert",
-    "pl": "Ćwiczenie · zmiany nie są zapisywane"
-  },
-  "My learning topic": {
-    "es": "Mi tema de estudio",
-    "ko": "내 학습 주제",
-    "pt": "Meu tema de estudo",
-    "fr": "Mon sujet d’étude",
-    "vi": "Chủ đề học của tôi",
-    "zh": "我的学习主题",
-    "hi": "मेरा अध्ययन विषय",
-    "de": "Mein Lernthema",
-    "pl": "Mój temat nauki"
-  },
-  "An example": {
-    "es": "Un ejemplo",
-    "ko": "예시",
-    "pt": "Um exemplo",
-    "fr": "Un exemple",
-    "vi": "Một ví dụ",
-    "zh": "示例",
-    "hi": "एक उदाहरण",
-    "de": "Ein Beispiel",
-    "pl": "Przykład"
-  },
-  "Exit tutorial": {
-    "es": "Salir del tutorial",
-    "ko": "튜토리얼 나가기",
-    "pt": "Sair do tutorial",
-    "fr": "Quitter le tutoriel",
-    "vi": "Thoát hướng dẫn",
-    "zh": "退出教程",
-    "hi": "ट्यूटोरियल से बाहर निकलें",
-    "de": "Tutorial beenden",
-    "pl": "Zakończ samouczek"
-  },
-  "Finish the current editing or learning mode before opening the tutorial.": {
-    "es": "Finaliza la edición o el modo de estudio actual antes de abrir el tutorial.",
-    "ko": "튜토리얼을 열기 전에 현재 편집 또는 학습 모드를 종료하세요.",
-    "pt": "Finalize a edição ou o modo de estudo atual antes de abrir o tutorial.",
-    "fr": "Terminez le mode d’édition ou d’apprentissage en cours avant d’ouvrir le tutoriel.",
-    "vi": "Kết thúc chế độ chỉnh sửa hoặc học hiện tại trước khi mở hướng dẫn.",
-    "zh": "请先结束当前编辑或学习模式，再打开教程。",
-    "hi": "ट्यूटोरियल खोलने से पहले मौजूदा संपादन या अध्ययन मोड समाप्त करें।",
-    "de": "Beende zuerst die aktuelle Bearbeitung oder den Lernmodus, bevor du das Tutorial öffnest.",
-    "pl": "Zakończ edycję lub tryb nauki przed otwarciem samouczka."
-  },
-  "Discover Mindmaps": {
-    "es": "Descubre MindMap",
-    "ko": "MindMap 알아보기",
-    "pt": "Descubra o MindMap",
-    "fr": "Découvrez MindMap",
-    "vi": "Khám phá MindMap",
-    "zh": "探索 MindMap",
-    "hi": "MindMap जानें",
-    "de": "Mindmaps kennenlernen",
-    "pl": "Odkrywaj mapy myśli"
-  },
-  "Connect ideas visually and test your knowledge with hidden answers.": {
-    "es": "Conecta ideas visualmente y comprueba tus conocimientos con respuestas ocultas.",
-    "ko": "아이디어를 시각적으로 연결하고 숨겨진 답으로 지식을 확인하세요.",
-    "pt": "Conecte ideias visualmente e teste seus conhecimentos com respostas ocultas.",
-    "fr": "Reliez vos idées visuellement et testez vos connaissances avec des réponses masquées.",
-    "vi": "Kết nối ý tưởng trực quan và kiểm tra kiến thức bằng câu trả lời ẩn.",
-    "zh": "直观连接想法，通过隐藏答案检验知识。",
-    "hi": "विचारों को दृश्य रूप से जोड़ें और छिपे उत्तरों से अपना ज्ञान जाँचें।",
-    "de": "Verbinde Begriffe zu einer übersichtlichen Map und prüfe dein Wissen mit verdeckten Antworten.",
-    "pl": "Łącz pomysły wizualnie i sprawdzaj wiedzę, ukrywając odpowiedzi."
-  },
-  "Six short steps": {
-    "es": "Seis pasos breves",
-    "ko": "간단한 6단계",
-    "pt": "Seis etapas curtas",
-    "fr": "Six étapes courtes",
-    "vi": "Sáu bước ngắn",
-    "zh": "六个简短步骤",
-    "hi": "छह छोटे चरण",
-    "de": "Sechs kurze Schritte",
-    "pl": "Sześć krótkich kroków"
-  },
-  "Create and connect nodes": {
-    "es": "Crear y conectar nodos",
-    "ko": "노드 만들기 및 연결",
-    "pt": "Criar e conectar nós",
-    "fr": "Créer et relier des nœuds",
-    "vi": "Tạo và kết nối nút",
-    "zh": "创建并连接节点",
-    "hi": "नोड बनाएँ और जोड़ें",
-    "de": "Knoten erstellen und verbinden",
-    "pl": "Twórz i łącz węzły"
-  },
-  "Adjust colors and sizes": {
-    "es": "Ajustar colores y tamaños",
-    "ko": "색상 및 크기 조절",
-    "pt": "Ajustar cores e tamanhos",
-    "fr": "Ajuster les couleurs et les tailles",
-    "vi": "Điều chỉnh màu và kích thước",
-    "zh": "调整颜色和大小",
-    "hi": "रंग और आकार बदलें",
-    "de": "Farben und Größen anpassen",
-    "pl": "Dostosuj kolory i rozmiary"
-  },
-  "Navigate your map and try learning mode": {
-    "es": "Navegar por el mapa y probar el modo de estudio",
-    "ko": "맵 탐색 및 학습 모드 체험",
-    "pt": "Navegar pelo mapa e testar o modo de estudo",
-    "fr": "Parcourir la carte et essayer le mode d’apprentissage",
-    "vi": "Di chuyển trong sơ đồ và thử chế độ học",
-    "zh": "浏览导图并体验学习模式",
-    "hi": "मानचित्र देखें और अध्ययन मोड आज़माएँ",
-    "de": "Durch die Map navigieren und den Lernmodus ausprobieren",
-    "pl": "Poruszaj się po mapie i wypróbuj tryb nauki"
-  },
-  "Practice with sample data": {
-    "es": "Practicar con datos de ejemplo",
-    "ko": "예제 데이터로 연습",
-    "pt": "Praticar com dados de exemplo",
-    "fr": "S’entraîner avec des exemples",
-    "vi": "Thực hành với dữ liệu mẫu",
-    "zh": "使用示例数据练习",
-    "hi": "उदाहरण डेटा के साथ अभ्यास करें",
-    "de": "Mit Beispieldaten üben",
-    "pl": "Ćwicz na przykładowych danych"
-  },
-  "Your own maps stay untouched. Practice changes are not saved.": {
-    "es": "Tus mapas no se modifican. Los cambios de práctica no se guardan.",
-    "ko": "기존 맵은 변경되지 않습니다. 연습 중 변경 사항은 저장되지 않습니다.",
-    "pt": "Seus mapas não são alterados. As mudanças da prática não são salvas.",
-    "fr": "Vos cartes restent intactes. Les modifications d’entraînement ne sont pas enregistrées.",
-    "vi": "Sơ đồ của bạn không bị thay đổi. Các thay đổi khi thực hành không được lưu.",
-    "zh": "你的导图不会改变，练习中的更改不会保存。",
-    "hi": "आपके मानचित्र नहीं बदलेंगे। अभ्यास के बदलाव नहीं सहेजे जाएँगे।",
-    "de": "Deine eigenen Maps bleiben unverändert. Die Übungen werden nicht gespeichert.",
-    "pl": "Twoje mapy pozostają bez zmian. Ćwiczenia nie są zapisywane."
-  },
-  "You can exit at any time and restart from the menu.": {
-    "es": "Puedes salir cuando quieras y reiniciar desde el menú.",
-    "ko": "언제든지 종료하고 메뉴에서 다시 시작할 수 있습니다.",
-    "pt": "Você pode sair a qualquer momento e recomeçar pelo menu.",
-    "fr": "Vous pouvez quitter à tout moment et recommencer depuis le menu.",
-    "vi": "Bạn có thể thoát bất cứ lúc nào và bắt đầu lại từ menu.",
-    "zh": "可随时退出，并从菜单重新开始。",
-    "hi": "कभी भी बाहर निकलें और मेनू से दोबारा शुरू करें।",
-    "de": "Du kannst jederzeit aufhören und das Tutorial über das Menü neu starten.",
-    "pl": "Możesz wyjść w każdej chwili i zacząć ponownie z menu."
-  },
-  "Start tutorial": {
-    "es": "Iniciar tutorial",
-    "ko": "튜토리얼 시작",
-    "pt": "Iniciar tutorial",
-    "fr": "Démarrer le tutoriel",
-    "vi": "Bắt đầu hướng dẫn",
-    "zh": "开始教程",
-    "hi": "ट्यूटोरियल शुरू करें",
-    "de": "Tutorial starten",
-    "pl": "Uruchom samouczek"
-  },
   "Not now": {
     "es": "Ahora no",
     "ko": "나중에",
@@ -625,83 +207,6 @@
     "hi": "अभी नहीं",
     "de": "Jetzt nicht",
     "pl": "Nie teraz"
-  },
-  "MindMap error": {
-    "es": "Error de MindMap",
-    "ko": "MindMap 오류",
-    "pt": "Erro do MindMap",
-    "fr": "Erreur MindMap",
-    "vi": "Lỗi MindMap",
-    "zh": "MindMap 错误",
-    "hi": "MindMap त्रुटि",
-    "de": "MindMap-Fehler",
-    "pl": "Błąd MindMap"
-  },
-  "MindMap Information": {
-    "es": "Información de MindMap",
-    "ko": "MindMap 정보",
-    "pt": "Informações do MindMap",
-    "fr": "Informations MindMap",
-    "vi": "Thông tin MindMap",
-    "zh": "MindMap 信息",
-    "hi": "MindMap जानकारी",
-    "de": "MindMap-Informationen",
-    "pl": "Informacje o MindMap"
-  },
-  "Import MindMap": {
-    "es": "Importar MindMap",
-    "ko": "MindMap 가져오기",
-    "pt": "Importar MindMap",
-    "fr": "Importer une MindMap",
-    "vi": "Nhập MindMap",
-    "zh": "导入 MindMap",
-    "hi": "MindMap आयात करें",
-    "de": "MindMap importieren",
-    "pl": "Importuj MindMap"
-  },
-  "Create New MindMap": {
-    "es": "Crear nueva MindMap",
-    "ko": "새 MindMap 만들기",
-    "pt": "Criar nova MindMap",
-    "fr": "Créer une MindMap",
-    "vi": "Tạo MindMap mới",
-    "zh": "新建 MindMap",
-    "hi": "नई MindMap बनाएँ",
-    "de": "Neue MindMap erstellen",
-    "pl": "Utwórz MindMap"
-  },
-  "Name of the MindMap": {
-    "es": "Nombre de la MindMap",
-    "ko": "MindMap 이름",
-    "pt": "Nome da MindMap",
-    "fr": "Nom de la MindMap",
-    "vi": "Tên MindMap",
-    "zh": "MindMap 名称",
-    "hi": "MindMap का नाम",
-    "de": "Name der MindMap",
-    "pl": "Nazwa MindMap"
-  },
-  "MindMap Tutorial": {
-    "es": "Tutorial de MindMap",
-    "ko": "MindMap 튜토리얼",
-    "pt": "Tutorial do MindMap",
-    "fr": "Tutoriel MindMap",
-    "vi": "Hướng dẫn MindMap",
-    "zh": "MindMap 教程",
-    "hi": "MindMap ट्यूटोरियल",
-    "de": "MindMap-Tutorial",
-    "pl": "Samouczek MindMap"
-  },
-  "Welcome to the MindMap Tool!": {
-    "es": "¡Bienvenido a MindMap!",
-    "ko": "MindMap에 오신 것을 환영합니다!",
-    "pt": "Bem-vindo ao MindMap!",
-    "fr": "Bienvenue dans MindMap !",
-    "vi": "Chào mừng đến với MindMap!",
-    "zh": "欢迎使用 MindMap！",
-    "hi": "MindMap में आपका स्वागत है!",
-    "de": "Willkommen bei MindMap!",
-    "pl": "Witaj w narzędziu MindMap!"
   },
   "Open in browser": {
     "es": "Abrir en el navegador",
@@ -988,17 +493,6 @@
     "hi": "डेवलपर कंसोल नहीं खोला जा सका: {}",
     "de": "Die Entwicklerkonsole konnte nicht geöffnet werden: {}",
     "pl": "Nie udało się otworzyć konsoli deweloperskiej: {}"
-  },
-  "Connect ideas visually and test your knowledge with hidden answers. In six short steps, you will create and style nodes, navigate your map and try learning mode. You will use sample data. Your own maps stay untouched and practice changes are not saved. You can exit at any time and restart from the menu.": {
-    "es": "Conecta ideas visualmente y comprueba tus conocimientos con respuestas ocultas. Seis pasos breves Crear y conectar nodos Ajustar colores y tamaños Navegar por el mapa y probar el modo de estudio Practicar con datos de ejemplo Tus mapas no se modifican. Los cambios de práctica no se guardan. Puedes salir cuando quieras y reiniciar desde el menú.",
-    "ko": "아이디어를 시각적으로 연결하고 숨겨진 답으로 지식을 확인하세요. 간단한 6단계 노드 만들기 및 연결 색상 및 크기 조절 맵 탐색 및 학습 모드 체험 예제 데이터로 연습 기존 맵은 변경되지 않습니다. 연습 중 변경 사항은 저장되지 않습니다. 언제든지 종료하고 메뉴에서 다시 시작할 수 있습니다.",
-    "pt": "Conecte ideias visualmente e teste seus conhecimentos com respostas ocultas. Seis etapas curtas Criar e conectar nós Ajustar cores e tamanhos Navegar pelo mapa e testar o modo de estudo Praticar com dados de exemplo Seus mapas não são alterados. As mudanças da prática não são salvas. Você pode sair a qualquer momento e recomeçar pelo menu.",
-    "fr": "Reliez vos idées visuellement et testez vos connaissances avec des réponses masquées. Six étapes courtes Créer et relier des nœuds Ajuster les couleurs et les tailles Parcourir la carte et essayer le mode d’apprentissage S’entraîner avec des exemples Vos cartes restent intactes. Les modifications d’entraînement ne sont pas enregistrées. Vous pouvez quitter à tout moment et recommencer depuis le menu.",
-    "vi": "Kết nối ý tưởng trực quan và kiểm tra kiến thức bằng câu trả lời ẩn. Sáu bước ngắn Tạo và kết nối nút Điều chỉnh màu và kích thước Di chuyển trong sơ đồ và thử chế độ học Thực hành với dữ liệu mẫu Sơ đồ của bạn không bị thay đổi. Các thay đổi khi thực hành không được lưu. Bạn có thể thoát bất cứ lúc nào và bắt đầu lại từ menu.",
-    "zh": "直观连接想法，通过隐藏答案检验知识。 六个简短步骤 创建并连接节点 调整颜色和大小 浏览导图并体验学习模式 使用示例数据练习 你的导图不会改变，练习中的更改不会保存。 可随时退出，并从菜单重新开始。",
-    "hi": "विचारों को दृश्य रूप से जोड़ें और छिपे उत्तरों से अपना ज्ञान जाँचें। छह छोटे चरण नोड बनाएँ और जोड़ें रंग और आकार बदलें मानचित्र देखें और अध्ययन मोड आज़माएँ उदाहरण डेटा के साथ अभ्यास करें आपके मानचित्र नहीं बदलेंगे। अभ्यास के बदलाव नहीं सहेजे जाएँगे। कभी भी बाहर निकलें और मेनू से दोबारा शुरू करें।",
-    "de": "Verbinde Begriffe zu einer übersichtlichen Map und prüfe dein Wissen mit verdeckten Antworten. In sechs kurzen Schritten erstellst und gestaltest du Knoten, navigierst durch deine Map und probierst den Lernmodus aus. Du übst mit Beispieldaten. Deine eigenen Maps bleiben unverändert und die Übungen werden nicht gespeichert. Du kannst jederzeit aufhören und das Tutorial über das Menü neu starten.",
-    "pl": "Łącz pomysły wizualnie i sprawdzaj wiedzę, ukrywając odpowiedzi. W sześciu krokach utworzysz i wystylizujesz węzły, poznasz nawigację i tryb nauki. Użyjesz danych przykładowych. Twoje mapy pozostaną bez zmian, a ćwiczenia nie zostaną zapisane. Możesz wyjść w dowolnej chwili i zacząć ponownie z menu."
   },
   "Mature cards have an interval of at least 21 days. They still need reviews.": {
     "es": "Las tarjetas maduras tienen un intervalo de al menos 21 días. Siguen necesitando repasos.",
@@ -2155,50 +1649,6 @@
     "hi": "चैलेंज प्रगति (%)",
     "pl": "Postęp wyzwania (%)"
   },
-  "Could not save the current map. Please try again.": {
-    "de": "Die aktuelle Map konnte nicht gespeichert werden. Bitte versuche es erneut.",
-    "es": "No se pudo guardar el mapa actual. Inténtalo de nuevo.",
-    "ko": "현재 맵을 저장하지 못했습니다. 다시 시도하세요.",
-    "pt": "Não foi possível salvar o mapa atual. Tente novamente.",
-    "fr": "Impossible d’enregistrer la carte actuelle. Réessayez.",
-    "vi": "Không thể lưu sơ đồ hiện tại. Vui lòng thử lại.",
-    "zh": "无法保存当前导图，请重试。",
-    "hi": "वर्तमान मानचित्र सहेजा नहीं जा सका। फिर प्रयास करें।",
-    "pl": "Nie udało się zapisać mapy. Spróbuj ponownie."
-  },
-  "Could not save the current page. Please try again.": {
-    "de": "Die aktuelle Seite konnte nicht gespeichert werden. Bitte versuche es erneut.",
-    "es": "No se pudo guardar la página actual. Inténtalo de nuevo.",
-    "ko": "현재 페이지를 저장하지 못했습니다. 다시 시도하세요.",
-    "pt": "Não foi possível salvar a página atual. Tente novamente.",
-    "fr": "Impossible d’enregistrer la page actuelle. Réessayez.",
-    "vi": "Không thể lưu trang hiện tại. Vui lòng thử lại.",
-    "zh": "无法保存当前页面，请重试。",
-    "hi": "वर्तमान पृष्ठ सहेजा नहीं जा सका। फिर प्रयास करें।",
-    "pl": "Nie udało się zapisać strony. Spróbuj ponownie."
-  },
-  "Keep at least one tab visible.": {
-    "de": "Lass mindestens einen Tab sichtbar.",
-    "es": "Mantén al menos una pestaña visible.",
-    "ko": "탭을 하나 이상 표시해야 합니다.",
-    "pt": "Mantenha pelo menos uma aba visível.",
-    "fr": "Gardez au moins un onglet visible.",
-    "vi": "Giữ ít nhất một tab hiển thị.",
-    "zh": "请至少保留一个可见标签页。",
-    "hi": "कम से कम एक टैब दिखाई दे।",
-    "pl": "Pozostaw co najmniej jedną widoczną kartę."
-  },
-  "Invalid workspace preferences": {
-    "de": "Ungültige Arbeitsbereich-Einstellungen",
-    "es": "Preferencias del espacio no válidas",
-    "ko": "잘못된 작업 공간 설정",
-    "pt": "Preferências de espaço inválidas",
-    "fr": "Préférences d’espace de travail invalides",
-    "vi": "Tùy chọn không gian làm việc không hợp lệ",
-    "zh": "工作区设置无效",
-    "hi": "अमान्य कार्यक्षेत्र प्राथमिकताएँ",
-    "pl": "Nieprawidłowe ustawienia obszaru"
-  },
   "Local diagnostics: start recording, close the console and use Anki normally. Samples are taken every 5 seconds for up to 8 hours. Up to 5 recordings with about 6 MiB of events each are kept. No URLs, search text, card contents or automatic uploads. Saved recordings remain available after restarting.": {
     "de": "Lokale Diagnose: Aufnahme starten, Konsole schließen und Anki normal verwenden. Messung alle 5 Sekunden, maximal 8 Stunden. Bis zu 5 Aufnahmen mit je etwa 6 MiB Ereignissen. Keine URLs, Suchtexte, Karteninhalte oder automatischen Uploads. Gespeicherte Aufnahmen bleiben nach einem Neustart verfügbar.",
     "es": "Diagnóstico local: inicia la grabación, cierra la consola y usa Anki normalmente. Muestras cada 5 segundos hasta 8 horas. Se conservan hasta 5 grabaciones de unos 6 MiB de eventos cada una. Sin URLs, búsquedas, contenido de tarjetas ni subidas automáticas. Las grabaciones permanecen tras reiniciar.",
@@ -2528,32 +1978,14 @@
   "+ Add": {
     "pl": "+ Dodaj"
   },
-  "+ Col": {
-    "pl": "+ Kol."
-  },
-  "+ Row": {
-    "pl": "+ Wiersz"
-  },
   "+{} XP earned": {
     "pl": "Zdobyto +{} XP"
-  },
-  "1. Select Create with AI in the menu.": {
-    "pl": "1. Wybierz „Utwórz z AI” w menu."
-  },
-  "2. Copy the prompt and paste it into an AI service.": {
-    "pl": "2. Skopiuj prompt i wklej go do usługi AI."
-  },
-  "3. Copy the AI's JSON response and paste it back into the tool.": {
-    "pl": "3. Skopiuj odpowiedź AI w formacie JSON i wklej ją z powrotem do narzędzia."
   },
   "<b>Theme Change Detected</b><br><br>You have switched between Light and Dark mode.<br>To ensure all Smart Study UI elements and styles are applied correctly, please restart Anki.": {
     "pl": "<b>Zmiana motywu</b><br><br>Przełączono tryb jasny/ciemny.<br>Uruchom Anki ponownie, aby poprawnie zastosować wszystkie elementy i style Smart Study."
   },
   "<p>Earn XP, level up, and climb the ranks while studying!</p><p><b>How to Earn XP</b></p><ul><li><b>Study Time:</b> 10 XP per minute.</li><li><b>Daily Challenge:</b> Bonus XP based on level.</li><li><b>Streak:</b> 20 XP × current streak day.</li></ul><p><b>Leveling &amp; Ranks</b></p><ul><li>Max Level: 100.</li><li>New Rank every 5 levels.</li></ul><p class=\"tip\">Tip: Consistency is key!</p>": {
     "pl": "<p>Zdobywaj XP, poziomy i rangi podczas nauki!</p><p><b>Jak zdobywać XP</b></p><ul><li><b>Czas nauki:</b> 10 XP na minutę.</li><li><b>Wyzwanie dnia:</b> premia zależna od poziomu.</li><li><b>Seria:</b> 20 XP × bieżący dzień serii.</li></ul><p><b>Poziomy i rangi</b></p><ul><li>Maks. poziom: 100.</li><li>Nowa ranga co 5 poziomów.</li></ul><p class=\"tip\">Wskazówka: liczy się regularność!</p>"
-  },
-  "A PDF Card Creator session can contain at most {count} cards.": {
-    "pl": "Sesja kreatora kart PDF może zawierać maks. {count} kart."
   },
   "A background for studying": {
     "pl": "Tło do nauki"
@@ -2606,9 +2038,6 @@
   "A new fact on your Anki home screen each day.": {
     "pl": "Nowa ciekawostka codziennie na ekranie głównym Anki."
   },
-  "A newer mind map recovery copy was restored.": {
-    "pl": "Przywrócono nowszą kopię odzyskiwania mapy myśli."
-  },
   "A rare condition known as Superior Canal Dehiscence Syndrome allows some individuals to actually hear internal body sounds, such as their own eyeballs moving within their sockets.": {
     "pl": "Rzadki zespół rozejścia kanału półkolistego górnego pozwala niektórym osobom słyszeć dźwięki własnego ciała, np. ruch gałek ocznych w oczodołach."
   },
@@ -2629,9 +2058,6 @@
   },
   "A touch of antiquity: Because Latin is the official language of the Catholic Church, Vatican City is the only country in the world offering ATMs with a Latin language interface.": {
     "pl": "Odrobina antyku: łacina jest językiem urzędowym Kościoła katolickiego, dlatego Watykan jako jedyny kraj oferuje bankomaty z interfejsem po łacinie."
-  },
-  "A visual mind-mapping panel.": {
-    "pl": "Wizualny panel map myśli."
   },
   "AI Assistant": {
     "pl": "Asystent AI"
@@ -2663,44 +2089,14 @@
   "Add": {
     "pl": "Dodaj"
   },
-  "Add Icon": {
-    "pl": "Dodaj ikonę"
-  },
-  "Add PDF": {
-    "pl": "Dodaj PDF"
-  },
-  "Add PDF source to the back": {
-    "pl": "Dodaj źródło PDF na odwrocie"
-  },
   "Add Shortcut": {
     "pl": "Dodaj skrót"
   },
   "Add Website": {
     "pl": "Dodaj stronę"
   },
-  "Add a task…": {
-    "pl": "Dodaj zadanie…"
-  },
-  "Add at least one card first.": {
-    "pl": "Najpierw dodaj co najmniej jedną kartę."
-  },
-  "Add at least one cloze deletion, for example {{c1::answer}}.": {
-    "pl": "Dodaj co najmniej jedną lukę, np. {{c1::answer}}."
-  },
-  "Add card": {
-    "pl": "Dodaj kartę"
-  },
-  "Add content here...": {
-    "pl": "Dodaj treść tutaj..."
-  },
   "Add new website": {
     "pl": "Dodaj nową stronę"
-  },
-  "Add one above!": {
-    "pl": "Dodaj powyżej!"
-  },
-  "Add one to get started.": {
-    "pl": "Dodaj element, aby zacząć."
   },
   "Add your own track": {
     "pl": "Dodaj własny utwór"
@@ -2708,23 +2104,14 @@
   "Added the AI Assistant sidebar.": {
     "pl": "Dodano panel asystenta AI."
   },
-  "Adds the file name and selected page numbers in small text.": {
-    "pl": "Dodaje małym tekstem nazwę pliku i numery wybranych stron."
-  },
   "Advanced Statistics": {
     "pl": "Zaawansowane statystyki"
-  },
-  "All": {
-    "pl": "Wszystkie"
   },
   "All Ranks": {
     "pl": "Wszystkie rangi"
   },
   "Alpha Waves": {
     "pl": "Fale alfa"
-  },
-  "Already in list": {
-    "pl": "Już na liście"
   },
   "Always Show": {
     "pl": "Zawsze pokazuj"
@@ -2762,9 +2149,6 @@
   "Announcements, tips and updates from Smart Study.": {
     "pl": "Ogłoszenia, wskazówki i aktualizacje Smart Study."
   },
-  "Answer or explanation": {
-    "pl": "Odpowiedź lub wyjaśnienie"
-  },
   "Appearance": {
     "pl": "Wygląd"
   },
@@ -2782,12 +2166,6 @@
   },
   "Back": {
     "pl": "Wstecz"
-  },
-  "Back saved": {
-    "pl": "Zapisano tył"
-  },
-  "Back side": {
-    "pl": "Tył karty"
   },
   "Back to Anki": {
     "pl": "Wróć do Anki"
@@ -2814,15 +2192,6 @@
   "Basic": {
     "pl": "Podstawowe"
   },
-  "Basic (Front / Back)": {
-    "pl": "Podstawowa (przód / tył)"
-  },
-  "Basic + Reversed": {
-    "pl": "Podstawowa + odwrócona"
-  },
-  "Basic Controls": {
-    "pl": "Podstawy obsługi"
-  },
   "Believe it or not, humans actually emit a faint glow through natural bioluminescence! However, this light is approximately 1,000 times weaker than what the unaided human eye is capable of detecting.": {
     "pl": "Ludzie emitują delikatne światło w wyniku naturalnej bioluminescencji! Jest ono jednak około 1000 razy słabsze niż próg widzenia nieuzbrojonego oka."
   },
@@ -2831,10 +2200,6 @@
   },
   "Beta Waves": {
     "pl": "Fale beta"
-  },
-  "Blue": {
-    "pl": "Niebieski",
-    "de": "Blau"
   },
   "Blur": {
     "pl": "Rozmycie"
@@ -2851,26 +2216,11 @@
   "Browse…": {
     "pl": "Przeglądaj…"
   },
-  "Build multiple cards while reading": {
-    "pl": "Twórz wiele kart podczas czytania"
-  },
   "Built-in": {
     "pl": "Wbudowane"
   },
-  "Callout": {
-    "pl": "Wyróżnienie"
-  },
   "Cannot trigger Gamification Sidebar: Function not initialized by main addon.": {
     "pl": "Nie można otworzyć panelu grywalizacji: funkcja nie została zainicjowana przez dodatek."
-  },
-  "Card Creator": {
-    "pl": "Kreator kart"
-  },
-  "Card back": {
-    "pl": "Tył karty"
-  },
-  "Card front": {
-    "pl": "Przód karty"
   },
   "Card preview": {
     "pl": "Podgląd karty"
@@ -2878,29 +2228,14 @@
   "Card templates with their own backgrounds may cover the image or look different. You can turn this off at any time.": {
     "pl": "Szablony kart z własnym tłem mogą zasłonić obraz lub wyglądać inaczej. Możesz to wyłączyć w każdej chwili."
   },
-  "Card type": {
-    "pl": "Typ karty"
-  },
   "Cards": {
     "pl": "Karty"
-  },
-  "Cards created": {
-    "pl": "Utworzone karty"
   },
   "Celebration popups": {
     "pl": "Powiadomienia o sukcesach"
   },
   "Center": {
     "pl": "Środek"
-  },
-  "Center View": {
-    "pl": "Wyśrodkuj widok"
-  },
-  "Center View: Use the Center View button to focus on the root node.": {
-    "pl": "Wyśrodkowanie: przycisk „Wyśrodkuj widok” ustawia widok na węźle głównym."
-  },
-  "Central Topic": {
-    "pl": "Główny temat"
   },
   "Challenge already completed today!": {
     "pl": "Dzisiejsze wyzwanie już ukończone!"
@@ -2911,20 +2246,11 @@
   "Challenge not completed yet ({}/{}).": {
     "pl": "Wyzwanie jeszcze nieukończone ({}/{})."
   },
-  "Change Color: Right-click a node and choose a color.": {
-    "pl": "Zmiana koloru: kliknij węzeł prawym przyciskiem i wybierz kolor."
-  },
-  "Change Size: Right-click and choose Small, Medium, or Large.": {
-    "pl": "Zmiana rozmiaru: kliknij prawym przyciskiem i wybierz mały, średni lub duży."
-  },
   "Changelog": {
     "pl": "Historia zmian"
   },
   "Check your internet connection.": {
     "pl": "Sprawdź połączenie internetowe."
-  },
-  "Child nodes are hidden so you can recall them.": {
-    "pl": "Węzły podrzędne są ukryte, by ćwiczyć przypominanie."
   },
   "Choose Background Image": {
     "pl": "Wybierz obraz tła"
@@ -2938,15 +2264,6 @@
   "Choose a light or dark colour for the studied-today summary.": {
     "pl": "Wybierz jasny lub ciemny kolor podsumowania dzisiejszej nauki."
   },
-  "Choose an existing deck or enter a new name": {
-    "pl": "Wybierz istniejącą talię lub wpisz nową nazwę"
-  },
-  "Choose or enter a deck name.": {
-    "pl": "Wybierz lub wpisz nazwę talii."
-  },
-  "Choose or enter a valid deck name.": {
-    "pl": "Wybierz lub wpisz poprawną nazwę talii."
-  },
   "Choose the accent colour used across Smart Study and the background style.": {
     "pl": "Wybierz kolor akcentu Smart Study i styl tła."
   },
@@ -2959,17 +2276,11 @@
   "Claim your +{} XP in the sidebar.": {
     "pl": "Odbierz +{} XP w panelu bocznym."
   },
-  "Clear": {
-    "pl": "Wyczyść"
-  },
   "Clear Shortcut": {
     "pl": "Usuń skrót"
   },
   "Cleopatra lived closer in time to the invention of the iPhone than to the construction of the Great Pyramid.": {
     "pl": "Kleopatra żyła bliżej czasów wynalezienia iPhone’a niż budowy Wielkiej Piramidy."
-  },
-  "Click PDF pages to select them.": {
-    "pl": "Kliknij strony PDF, aby je zaznaczyć."
   },
   "Click and press a keyboard shortcut.": {
     "pl": "Kliknij i naciśnij skrót klawiaturowy."
@@ -2979,12 +2290,6 @@
   },
   "Click to choose a color": {
     "pl": "Kliknij, aby wybrać kolor"
-  },
-  "Close Window": {
-    "pl": "Zamknij okno"
-  },
-  "Cloze": {
-    "pl": "Luki"
   },
   "Code": {
     "pl": "Kod"
@@ -3004,44 +2309,17 @@
   "Configure Deadlines": {
     "pl": "Ustaw terminy"
   },
-  "Confirm": {
-    "pl": "Potwierdź"
-  },
   "Congratulations!": {
     "pl": "Gratulacje!"
   },
   "Contrary to popular belief, human blood is never actually blue. It only appears bluish through the skin because of how different wavelengths of light penetrate and reflect off tissues.": {
     "pl": "Wbrew obiegowej opinii ludzka krew nigdy nie jest niebieska. Tak wygląda przez skórę ze względu na sposób przenikania i odbijania różnych długości fal światła w tkankach."
   },
-  "Convert": {
-    "pl": "Przekształć"
-  },
   "Copied!": {
     "pl": "Skopiowano!"
   },
-  "Copy Prompt": {
-    "pl": "Kopiuj prompt"
-  },
   "Copy error": {
     "pl": "Kopiuj błąd"
-  },
-  "Copy the JSON data below.": {
-    "pl": "Skopiuj poniższe dane JSON."
-  },
-  "Copy to Clipboard": {
-    "pl": "Kopiuj do schowka"
-  },
-  "Could not copy text": {
-    "pl": "Nie udało się skopiować tekstu"
-  },
-  "Could not copy the selected text.": {
-    "pl": "Nie udało się skopiować zaznaczonego tekstu."
-  },
-  "Could not create cards": {
-    "pl": "Nie udało się utworzyć kart"
-  },
-  "Could not create the PDF cards.": {
-    "pl": "Nie udało się utworzyć kart z PDF."
   },
   "Could not delete site: Invalid index.": {
     "pl": "Nie udało się usunąć strony: nieprawidłowy indeks."
@@ -3049,35 +2327,11 @@
   "Could not load the SoundCloud player.": {
     "pl": "Nie udało się wczytać odtwarzacza SoundCloud."
   },
-  "Could not open file: {}": {
-    "pl": "Nie udało się otworzyć pliku: {}"
-  },
-  "Could not open the linked PDF.": {
-    "pl": "Nie udało się otworzyć powiązanego PDF."
-  },
   "Could not open this sidebar tool.": {
     "pl": "Nie udało się otworzyć tego narzędzia panelu."
   },
-  "Could not read PDF: {}": {
-    "pl": "Nie udało się odczytać PDF: {}"
-  },
-  "Could not render PDF.": {
-    "pl": "Nie udało się wyświetlić PDF."
-  },
-  "Could not save mind maps: {error}": {
-    "pl": "Nie udało się zapisać map myśli: {error}"
-  },
-  "Could not save: browser storage is full. Export your maps as backup and delete unused maps.": {
-    "pl": "Brak miejsca w pamięci przeglądarki. Wyeksportuj mapy jako kopię zapasową i usuń nieużywane."
-  },
   "Countries": {
     "pl": "Kraje"
-  },
-  "Cover all revealed terms again": {
-    "pl": "Ponownie ukryj odkryte pojęcia"
-  },
-  "Cover for learning": {
-    "pl": "Ukryj do nauki"
   },
   "Cows have best friends and get stressed when they're separated.": {
     "pl": "Krowy mają najlepszych przyjaciół i stresują się po rozdzieleniu."
@@ -3088,41 +2342,11 @@
   "Create": {
     "pl": "Utwórz"
   },
-  "Create Child Node: Click and drag the blue dot on a node.": {
-    "pl": "Tworzenie węzła podrzędnego: przeciągnij niebieski punkt węzła."
-  },
-  "Create New Mind Map": {
-    "pl": "Utwórz mapę myśli"
-  },
-  "Create PDF cards": {
-    "pl": "Utwórz karty z PDF"
-  },
-  "Create cards": {
-    "pl": "Utwórz karty"
-  },
-  "Create new page": {
-    "pl": "Utwórz stronę"
-  },
-  "Create with AI": {
-    "pl": "Utwórz z AI"
-  },
-  "Create with AI: Generate a mind map from a topic using AI.": {
-    "pl": "Utwórz z AI: wygeneruj mapę myśli na wybrany temat."
-  },
-  "Created {count} cards in “{deck}”.": {
-    "pl": "Utworzone karty: {count} · „{deck}”."
-  },
-  "Creating cards…": {
-    "pl": "Tworzenie kart…"
-  },
   "Culture encoded in law: The Kingdom of Bhutan measures national success by 'Gross National Happiness' rather than GDP. This Buddhist-inspired concept is officially enshrined directly in the country's constitution.": {
     "pl": "Kultura zapisana w prawie: Bhutan mierzy sukces „szczęściem narodowym brutto” zamiast PKB. Ta inspirowana buddyzmem idea jest zapisana w konstytucji kraju."
   },
   "Current Streak": {
     "pl": "Bieżąca seria"
-  },
-  "Current deck": {
-    "pl": "Bieżąca talia"
   },
   "Custom Background": {
     "pl": "Własne tło"
@@ -3144,9 +2368,6 @@
   },
   "Custom deck name color": {
     "pl": "Własny kolor nazwy talii"
-  },
-  "Customize Nodes (right-click)": {
-    "pl": "Dostosuj węzły (prawy przycisk)"
   },
   "Customize the New, Learn and Due numbers in the main Deck Browser.": {
     "pl": "Dostosuj liczniki nowych, uczonych i zaległych kart na liście talii."
@@ -3187,9 +2408,6 @@
   "Dashboard": {
     "pl": "Pulpit"
   },
-  "Data & Maps": {
-    "pl": "Dane i mapy"
-  },
   "Deadline": {
     "pl": "Termin"
   },
@@ -3211,38 +2429,11 @@
   "Deck Overview": {
     "pl": "Widok talii"
   },
-  "Deck name": {
-    "pl": "Nazwa talii"
-  },
   "Deck name color": {
     "pl": "Kolor nazwy talii"
   },
   "Decks": {
     "pl": "Talie"
-  },
-  "Delete Map": {
-    "pl": "Usuń mapę"
-  },
-  "Delete Node: Hover over a node and use the minus button.": {
-    "pl": "Usuwanie węzła: najedź na węzeł i kliknij minus."
-  },
-  "Delete folder \"{name}\"? {count} PDF file(s) will become unfiled.": {
-    "pl": "Usunąć folder „{name}”? Pliki PDF ({count}) pozostaną bez folderu."
-  },
-  "Delete folder? Pages inside will be kept.": {
-    "pl": "Usunąć folder? Strony w nim zostaną zachowane."
-  },
-  "Delete node?": {
-    "pl": "Usunąć węzeł?"
-  },
-  "Delete table?": {
-    "pl": "Usunąć tabelę?"
-  },
-  "Delete this map?": {
-    "pl": "Usunąć tę mapę?"
-  },
-  "Delete this page?": {
-    "pl": "Usunąć tę stronę?"
   },
   "Deluge": {
     "pl": "Ulewa"
@@ -3256,35 +2447,14 @@
   "Did you know? Your brain consumes a significant amount of energy, about 20% of your body's total supply, despite only accounting for roughly 2% of your total body weight.": {
     "pl": "Czy wiesz? Mózg zużywa około 20% energii organizmu, choć stanowi zaledwie około 2% masy ciała."
   },
-  "Did you recall it correctly?": {
-    "pl": "Czy udało Ci się przypomnieć poprawnie?"
-  },
-  "Didn't know": {
-    "pl": "Nie wiem"
-  },
-  "Discard session": {
-    "pl": "Odrzuć sesję"
-  },
-  "Discard the unfinished card draft?": {
-    "pl": "Odrzucić niedokończony szkic karty?"
-  },
-  "Discard this unfinished Card Creator session?": {
-    "pl": "Odrzucić niedokończoną sesję kreatora kart?"
-  },
   "Dismiss": {
     "pl": "Zamknij"
   },
   "Displays the most frequent bold, underlined, or cloze terms in this deck.": {
     "pl": "Pokazuje najczęstsze pogrubione, podkreślone lub ukryte w lukach pojęcia z talii."
   },
-  "Divider": {
-    "pl": "Separator"
-  },
   "Don't show this message again": {
     "pl": "Nie pokazuj tej wiadomości ponownie"
-  },
-  "Done! Great work!": {
-    "pl": "Gotowe! Świetna praca!"
   },
   "Due": {
     "pl": "Do powtórki"
@@ -3300,12 +2470,6 @@
   },
   "Edit Dashboard Surfaces": {
     "pl": "Edytuj powierzchnie pulpitu"
-  },
-  "Edit Hints": {
-    "pl": "Edytuj wskazówki"
-  },
-  "Edit Text: Double-click the text inside a node.": {
-    "pl": "Edycja tekstu: kliknij dwukrotnie tekst w węźle."
   },
   "Edit Theme": {
     "pl": "Edytuj motyw"
@@ -3340,18 +2504,6 @@
   "Enjoying the add-on? Please leave a <b>Thumbs Up</b> on AnkiWeb – it supports me the most!": {
     "pl": "Podoba Ci się dodatek? Zostaw <b>kciuk w górę</b> na AnkiWeb — to największe wsparcie!"
   },
-  "Enter a front side first.": {
-    "pl": "Najpierw wpisz przód karty."
-  },
-  "Enter here...": {
-    "pl": "Wpisz tutaj..."
-  },
-  "Enter text manually or select text in the PDF.": {
-    "pl": "Wpisz tekst lub zaznacz go w PDF."
-  },
-  "Entire Map": {
-    "pl": "Cała mapa"
-  },
   "Error": {
     "pl": "Błąd"
   },
@@ -3376,47 +2528,14 @@
   "Error: {}": {
     "pl": "Błąd: {}"
   },
-  "Every card needs a front side.": {
-    "pl": "Każda karta wymaga przodu."
-  },
   "Example Wallpapers": {
     "pl": "Przykładowe tapety"
-  },
-  "Export Notebook": {
-    "pl": "Eksportuj notatnik"
-  },
-  "Export failed: {}": {
-    "pl": "Eksport nie powiódł się: {}"
-  },
-  "Export saves your map as JSON for backup.": {
-    "pl": "Eksport zapisuje mapę jako JSON — kopię zapasową."
-  },
-  "Export to JSON": {
-    "pl": "Eksportuj do JSON"
-  },
-  "Extra": {
-    "pl": "Dodatkowe"
-  },
-  "Features": {
-    "pl": "Funkcje"
   },
   "Fibrodysplasia Ossificans Progressiva, sometimes called 'Stone Man Syndrome,' is an extremely rare genetic condition where injured muscle and connective tissue gradually ossify, turning into solid bone over time.": {
     "pl": "Postępujące kostniejące zapalenie mięśni, zwane „syndromem kamiennego człowieka”, to niezwykle rzadka choroba genetyczna. Uszkodzone mięśnie i tkanka łączna stopniowo zamieniają się w kość."
   },
-  "File missing": {
-    "pl": "Brak pliku"
-  },
-  "File not found – it may have been moved or deleted:\n{}": {
-    "pl": "Nie znaleziono pliku — mógł zostać przeniesiony lub usunięty:\n{}"
-  },
-  "File relinked": {
-    "pl": "Ponownie połączono plik"
-  },
   "File:": {
     "pl": "Plik:"
-  },
-  "Finish · Create {count} cards": {
-    "pl": "Zakończ · Utwórz karty: {count}"
   },
   "Finished Cards": {
     "pl": "Utrwalone karty"
@@ -3427,9 +2546,6 @@
   "Focus Time": {
     "pl": "Czas skupienia"
   },
-  "Folder name:": {
-    "pl": "Nazwa folderu:"
-  },
   "Forest": {
     "pl": "Las"
   },
@@ -3438,9 +2554,6 @@
   },
   "Front": {
     "pl": "Przód"
-  },
-  "Front saved": {
-    "pl": "Zapisano przód"
   },
   "Gamification Sidebar": {
     "pl": "Panel grywalizacji"
@@ -3454,9 +2567,6 @@
   "General Settings": {
     "pl": "Ustawienia ogólne"
   },
-  "Generate the mind map JSON now.": {
-    "pl": "Wygeneruj teraz mapę myśli w JSON."
-  },
   "Generating Brainstorm Cloud...": {
     "pl": "Tworzenie chmury pojęć..."
   },
@@ -3466,21 +2576,11 @@
   "Go Forward": {
     "pl": "Dalej"
   },
-  "Green": {
-    "pl": "Zielony",
-    "de": "Grün"
-  },
   "Hard Cards": {
     "pl": "Trudne karty"
   },
   "Hard cards are cards you have forgotten 8 or more times.": {
     "pl": "Trudne karty to te zapomniane co najmniej 8 razy."
-  },
-  "Heading 1": {
-    "pl": "Nagłówek 1"
-  },
-  "Heading 2": {
-    "pl": "Nagłówek 2"
   },
   "Help": {
     "pl": "Pomoc"
@@ -3496,9 +2596,6 @@
   },
   "Hide while Reviewing": {
     "pl": "Ukryj podczas powtórek"
-  },
-  "Hint…": {
-    "pl": "Wskazówka…"
   },
   "Historical irony: Despite being linguistic rivals today, French was actually the official language of the English royal court and nobility for nearly 300 years following the Norman Conquest in 1066.": {
     "pl": "Ironia historii: choć dziś francuski i angielski rywalizują, po podboju normańskim w 1066 r. francuski był przez niemal 300 lat oficjalnym językiem angielskiego dworu i szlachty."
@@ -3521,9 +2618,6 @@
   "How it works": {
     "pl": "Jak to działa"
   },
-  "I knew it!": {
-    "pl": "Wiem!"
-  },
   "If no deadline is set as default, the nearest upcoming one is shown automatically.": {
     "pl": "Jeśli nie ustawiono domyślnego terminu, automatycznie wyświetla się najbliższy nadchodzący."
   },
@@ -3536,23 +2630,8 @@
   "Images (*.jpg *.jpeg *.png *.webp)": {
     "pl": "Obrazy (*.jpg *.jpeg *.png *.webp)"
   },
-  "Import / Export (backup)": {
-    "pl": "Import / eksport (kopia zapasowa)"
-  },
-  "Import Mind Map": {
-    "pl": "Importuj mapę myśli"
-  },
   "Import Track": {
     "pl": "Importuj utwór"
-  },
-  "Import failed while loading the map: {error}": {
-    "pl": "Błąd importu mapy: {error}"
-  },
-  "Import from JSON": {
-    "pl": "Importuj z JSON"
-  },
-  "Import loads a map from a JSON file.": {
-    "pl": "Import wczytuje mapę z pliku JSON."
   },
   "In Antarctica, there's a waterfall that runs red as blood — it's actually caused by oxidized iron in saltwater.": {
     "pl": "Na Antarktydzie jest wodospad czerwony jak krew — barwę nadaje mu utlenione żelazo w słonej wodzie."
@@ -3581,12 +2660,6 @@
   "Individual dashboard widgets are unavailable while Minimalist Dashboard is enabled.": {
     "pl": "Osobne widżety są niedostępne przy włączonym minimalistycznym pulpicie."
   },
-  "Information": {
-    "pl": "Informacje"
-  },
-  "Initialization": {
-    "pl": "Inicjalizacja"
-  },
   "Interface language. \"Auto\" follows your Anki language.": {
     "pl": "Język interfejsu. „Auto” używa języka Anki."
   },
@@ -3599,20 +2672,11 @@
   "Intervals per Cycle:": {
     "pl": "Sesje w cyklu:"
   },
-  "Invalid JSON: {error}. Make sure you copied the complete JSON object.": {
-    "pl": "Nieprawidłowy JSON: {error}. Skopiuj cały obiekt JSON."
-  },
   "It's astounding: If you lined up all ~25 trillion erythrocytes (red blood cells) in your body end-to-end, they would form a chain long enough to circle the entire Earth four times at the equator!": {
     "pl": "To niezwykłe: około 25 bilionów erytrocytów z Twojego ciała ułożonych jeden za drugim utworzyłoby łańcuch okrążający Ziemię wzdłuż równika cztery razy!"
   },
   "It's astounding: Mandarin Chinese doesn't use a standard alphabet, but rather thousands of individual characters. To fluently read a daily newspaper, you must memorize approximately 3,000 of these logograms.": {
     "pl": "To niezwykłe: chiński mandaryński nie używa zwykłego alfabetu, lecz tysięcy znaków. Do płynnego czytania gazety trzeba zapamiętać około 3000 z nich."
-  },
-  "JSON (*.json)": {
-    "pl": "JSON (*.json)"
-  },
-  "Japanese": {
-    "pl": "Japoński"
   },
   "Jazz": {
     "pl": "Jazz"
@@ -3623,23 +2687,14 @@
   "July 2026": {
     "pl": "Lipiec 2026"
   },
-  "Key": {
-    "pl": "Klucz"
-  },
   "Keyboard Shortcut": {
     "pl": "Skrót klawiaturowy"
   },
   "Known Add-on Conflict": {
     "pl": "Znany konflikt dodatków"
   },
-  "Korean": {
-    "pl": "Koreański"
-  },
   "Language": {
     "pl": "Język"
-  },
-  "Large": {
-    "pl": "Duży"
   },
   "Last 24 Hours": {
     "pl": "Ostatnie 24 godziny"
@@ -3680,9 +2735,6 @@
   "Learn {} new cards today.": {
     "pl": "Naucz się dziś {} nowych kart."
   },
-  "Learning Setup": {
-    "pl": "Ustawienia nauki"
-  },
   "Leaving a thumbs up on AnkiWeb supports development the most. Thank you so much!": {
     "pl": "Kciuk w górę na AnkiWeb to największe wsparcie rozwoju. Dziękuję!"
   },
@@ -3719,12 +2771,6 @@
   "Linguistic distance: Despite being in Central Europe, Hungarian belongs to the Uralic language family. Distantly related to Finnish, it is completely incomprehensible to all of Hungary's direct geographical neighbors.": {
     "pl": "Językowy dystans: choć Węgry leżą w Europie Środkowej, węgierski należy do rodziny uralskiej. Jest daleko spokrewniony z fińskim i niezrozumiały dla bezpośrednich sąsiadów Węgier."
   },
-  "Link (Ctrl+K)": {
-    "pl": "Link (Ctrl+K)"
-  },
-  "Link to page": {
-    "pl": "Link do strony"
-  },
   "List": {
     "pl": "Lista"
   },
@@ -3734,20 +2780,11 @@
   "Lo-Fi Focus": {
     "pl": "Lo-fi do nauki"
   },
-  "Loading PDF…": {
-    "pl": "Ładowanie PDF…"
-  },
-  "Loading mind map": {
-    "pl": "Ładowanie mapy myśli"
-  },
   "Loading study time…": {
     "pl": "Ładowanie czasu nauki…"
   },
   "Loading...": {
     "pl": "Ładowanie..."
-  },
-  "Loading…": {
-    "pl": "Ładowanie…"
   },
   "Local": {
     "pl": "Lokalne"
@@ -3760,12 +2797,6 @@
   },
   "Lvl {}+: {}": {
     "pl": "Poz. {}+: {}"
-  },
-  "Main Branch": {
-    "pl": "Główna gałąź"
-  },
-  "Managing Nodes": {
-    "pl": "Zarządzanie węzłami"
   },
   "Many famous revolutions, from the American to the French, began not with weapons but with legal arguments about rights and legitimacy.": {
     "pl": "Wiele słynnych rewolucji, od amerykańskiej po francuską, zaczęło się nie od broni, lecz od argumentów prawnych o prawach i legitymizacji władzy."
@@ -3785,35 +2816,14 @@
   "Medical": {
     "pl": "Medycyna"
   },
-  "Medium": {
-    "pl": "Średni"
-  },
   "Menu": {
     "pl": "Menu"
   },
   "Mind Map": {
     "pl": "MindMap"
   },
-  "Mind Map - Fullscreen": {
-    "pl": "MindMap — pełny ekran"
-  },
-  "Mind Map Information": {
-    "pl": "Informacje o MindMap"
-  },
-  "Mind Map Tutorial": {
-    "pl": "Samouczek MindMap"
-  },
-  "Mind Map error": {
-    "pl": "Błąd MindMap"
-  },
-  "Mind map imported. Some data was repaired automatically: {details}": {
-    "pl": "Zaimportowano mapę myśli. Część danych naprawiono automatycznie: {details}"
-  },
   "Mind your punctuation: When writing a question in Greek, don't use a standard question mark. The official Greek question mark actually looks exactly like an English semicolon (;).": {
     "pl": "Uwaga na interpunkcję: pisząc pytanie po grecku, nie używaj zwykłego pytajnika. Grecki znak zapytania wygląda dokładnie jak średnik (;)."
-  },
-  "MindMap - Fullscreen": {
-    "pl": "MindMap — pełny ekran"
   },
   "Minimalist Dashboard": {
     "pl": "Minimalistyczny pulpit"
@@ -3823,15 +2833,6 @@
   },
   "Most legal disputes never reach a courtroom; the vast majority are settled privately through negotiation or mediation.": {
     "pl": "Większość sporów prawnych nie trafia do sądu. Zdecydowana większość kończy się prywatną ugodą w drodze negocjacji lub mediacji."
-  },
-  "Move Node: Click and drag any node.": {
-    "pl": "Przesuwanie węzła: kliknij i przeciągnij dowolny węzeł."
-  },
-  "Move to folder": {
-    "pl": "Przenieś do folderu"
-  },
-  "Moved to folder": {
-    "pl": "Przeniesiono do folderu"
   },
   "Multimedia libs missing.": {
     "pl": "Brak bibliotek multimedialnych."
@@ -3851,41 +2852,11 @@
   "Name for the new button:": {
     "pl": "Nazwa nowego przycisku:"
   },
-  "Name of the Mind Map": {
-    "pl": "Nazwa mapy myśli"
-  },
   "Needed for next level: {}": {
     "pl": "Do kolejnego poziomu: {}"
   },
-  "New Folder": {
-    "pl": "Nowy folder"
-  },
-  "New Map / Delete Map: Manage your mind maps.": {
-    "pl": "Nowa mapa / Usuń mapę: zarządzaj mapami myśli."
-  },
-  "New Map and Delete Map manage your collection.": {
-    "pl": "„Nowa mapa” i „Usuń mapę” zarządzają kolekcją."
-  },
-  "New Node": {
-    "pl": "Nowy węzeł"
-  },
-  "New Page": {
-    "pl": "Nowa strona"
-  },
   "New Rank!": {
     "pl": "Nowa ranga!"
-  },
-  "New Window": {
-    "pl": "Nowe okno"
-  },
-  "New card": {
-    "pl": "Nowa karta"
-  },
-  "New cloze": {
-    "pl": "Nowa luka"
-  },
-  "New page: \"{title}\"": {
-    "pl": "Nowa strona: „{title}”"
   },
   "New: redesigned Settings with a cleaner, category-based layout.": {
     "pl": "Nowość: czytelniejsze ustawienia podzielone na kategorie."
@@ -3893,26 +2864,14 @@
   "News": {
     "pl": "Aktualności"
   },
-  "Next": {
-    "pl": "Dalej"
-  },
   "Next Goal": {
     "pl": "Kolejny cel"
   },
   "Next track": {
     "pl": "Następny utwór"
   },
-  "No PDFs in \"{folder}\" yet.": {
-    "pl": "Brak PDF w folderze „{folder}”."
-  },
-  "No PDFs yet.": {
-    "pl": "Brak plików PDF."
-  },
   "No background image selected.": {
     "pl": "Nie wybrano obrazu tła."
-  },
-  "No cards collected yet.": {
-    "pl": "Nie zebrano jeszcze kart."
   },
   "No challenge available.": {
     "pl": "Brak dostępnego wyzwania."
@@ -3929,41 +2888,14 @@
   "No file selected": {
     "pl": "Nie wybrano pliku"
   },
-  "No folder": {
-    "pl": "Bez folderu"
-  },
-  "No folders yet.": {
-    "pl": "Brak folderów."
-  },
   "No marked words found.": {
     "pl": "Nie znaleziono wyróżnionych słów."
-  },
-  "No matching decks. Enter a name to create one.": {
-    "pl": "Brak pasujących talii. Wpisz nazwę, aby utworzyć nową."
   },
   "No recorded study time in the last 30 days.": {
     "pl": "Brak zapisanego czasu nauki z ostatnich 30 dni."
   },
-  "No results for": {
-    "pl": "Brak wyników dla"
-  },
-  "No tasks yet.": {
-    "pl": "Brak zadań."
-  },
-  "Notebook": {
-    "pl": "Notatnik"
-  },
-  "Notebook exported successfully!": {
-    "pl": "Notatnik wyeksportowany!"
-  },
   "Notebook: insert a line between any two lines, cover/hide terms for self-testing, link to other pages, and many more icons.": {
     "pl": "Notatnik: wstawianie linii między wierszami, ukrywanie pojęć do samodzielnych testów, linki do innych stron i więcej ikon."
-  },
-  "Notes, to-dos and PDFs alongside your cards.": {
-    "pl": "Notatki, zadania i PDF obok Twoich kart."
-  },
-  "Nothing to export: the current mind map was not found in storage.": {
-    "pl": "Brak danych do eksportu: bieżąca mapa nie została znaleziona w pamięci."
   },
   "OK": {
     "pl": "OK"
@@ -3980,9 +2912,6 @@
   "On": {
     "pl": "Wł."
   },
-  "One of the PDF cards is too long.": {
-    "pl": "Jedna z kart PDF jest zbyt długa."
-  },
   "Only affects the card counters in the main Deck Browser.": {
     "pl": "Dotyczy tylko liczników na głównej liście talii."
   },
@@ -3992,17 +2921,8 @@
   "Open Add-on Settings": {
     "pl": "Otwórz ustawienia dodatku"
   },
-  "Open PDF": {
-    "pl": "Otwórz PDF"
-  },
-  "Open externally": {
-    "pl": "Otwórz zewnętrznie"
-  },
   "Open in main window": {
     "pl": "Otwórz w oknie głównym"
-  },
-  "Open in system viewer": {
-    "pl": "Otwórz w przeglądarce systemowej"
   },
   "Open websites in a panel without leaving Anki.": {
     "pl": "Otwieraj strony w panelu bez opuszczania Anki."
@@ -4010,17 +2930,11 @@
   "Orchid": {
     "pl": "Orchidea"
   },
-  "Order": {
-    "pl": "Kolejność"
-  },
   "Over an average lifetime, you'll shed approximately 40 pounds (around 18kg) of dead skin cells. Much of the common household dust is actually composed of this sloughed-off skin.": {
     "pl": "Przez całe życie tracisz około 18 kg martwych komórek skóry. Znaczna część domowego kurzu składa się właśnie ze złuszczonego naskórka."
   },
   "Overall background of the add-on screens.": {
     "pl": "Główne tło ekranów dodatku."
-  },
-  "Own icon or text…": {
-    "pl": "Własna ikona lub tekst…"
   },
   "PDF": {
     "pl": "PDF"
@@ -4028,26 +2942,8 @@
   "PDF Files (*.pdf)": {
     "pl": "Pliki PDF (*.pdf)"
   },
-  "PDF added": {
-    "pl": "Dodano PDF"
-  },
-  "PDF study viewer": {
-    "pl": "PDF do nauki"
-  },
   "PNG, JPEG or WebP · maximum 20 MB and 40 megapixels. Large valid images are optimized automatically.": {
     "pl": "PNG, JPEG lub WebP · maks. 20 MB i 40 megapikseli. Duże poprawne obrazy są optymalizowane automatycznie."
-  },
-  "Page": {
-    "pl": "Strona"
-  },
-  "Page Title": {
-    "pl": "Tytuł strony"
-  },
-  "Page not found": {
-    "pl": "Nie znaleziono strony"
-  },
-  "Page {page}: {error}": {
-    "pl": "Strona {page}: {error}"
   },
   "Pages": {
     "pl": "Strony",
@@ -4060,30 +2956,11 @@
     "vi": "Trang",
     "hi": "पृष्ठ"
   },
-  "Pan View: Click and drag on the empty background.": {
-    "pl": "Przesuwanie widoku: kliknij i przeciągnij puste tło."
-  },
-  "Paste JSON here...": {
-    "pl": "Wklej JSON tutaj..."
-  },
-  "Paste your mind map JSON data below.": {
-    "pl": "Wklej poniżej dane mapy myśli w JSON."
-  },
   "Pause": {
     "pl": "Pauza"
   },
   "Performance and stability improvements across the add-on.": {
     "pl": "Poprawki wydajności i stabilności całego dodatku."
-  },
-  "Pin": {
-    "pl": "Przypnij"
-  },
-  "Pink": {
-    "pl": "Różowy",
-    "de": "Rosa"
-  },
-  "Pinned": {
-    "pl": "Przypięte"
   },
   "Play / Pause": {
     "pl": "Odtwórz / pauza"
@@ -4102,9 +2979,6 @@
   },
   "Please paste a valid SoundCloud URL.": {
     "pl": "Wklej poprawny adres SoundCloud."
-  },
-  "Please paste your mind map JSON first.": {
-    "pl": "Najpierw wklej mapę myśli w JSON."
   },
   "Pomodoro": {
     "pl": "Pomodoro"
@@ -4145,17 +3019,11 @@
   "QtWebEngine is required for the music player.": {
     "pl": "Odtwarzacz muzyki wymaga QtWebEngine."
   },
-  "Question or prompt": {
-    "pl": "Pytanie lub prompt"
-  },
   "Quick Action Buttons": {
     "pl": "Przyciski szybkich działań"
   },
   "Quick Presets": {
     "pl": "Gotowe ustawienia"
-  },
-  "Quote": {
-    "pl": "Cytat"
   },
   "Rain": {
     "pl": "Deszcz"
@@ -4166,35 +3034,14 @@
   "Rate on AnkiWeb": {
     "pl": "Oceń na AnkiWeb"
   },
-  "Rate your answer to reinforce your memory.": {
-    "pl": "Oceń odpowiedź, aby utrwalić wiedzę."
-  },
-  "Recall the highlighted node · {remaining} remaining": {
-    "pl": "Przypomnij sobie wyróżniony węzeł · pozostało: {remaining}"
-  },
-  "Recent decks": {
-    "pl": "Ostatnie talie"
-  },
   "Recorded answer time, capped by your Anki deck settings. Includes learning and review cards, not breaks or card editing. Parent decks include their subdecks; totals count each answer once. Cards are grouped by their current deck; deleted cards are excluded.": {
     "pl": "Zapisany czas odpowiedzi z limitem z ustawień talii Anki. Obejmuje naukę i powtórki, bez przerw i edycji kart. Talie nadrzędne obejmują podtalie; każda odpowiedź liczy się raz. Karty grupuje się według obecnej talii; usunięte są pomijane."
-  },
-  "Recovery data is invalid": {
-    "pl": "Nieprawidłowe dane odzyskiwania"
   },
   "Reddit": {
     "pl": "Reddit"
   },
-  "Redo (Ctrl+Y)": {
-    "pl": "Ponów (Ctrl+Y)"
-  },
   "Release hardening: profile-isolated browser data, local API-key storage, safer HTML/PDF handling, and consistent Anki-day calculations.": {
     "pl": "Wzmocnienie stabilności: dane przeglądarki oddzielone według profili, lokalne klucze API, bezpieczniejsza obsługa HTML/PDF i spójne obliczenia dnia Anki."
-  },
-  "Relink PDF": {
-    "pl": "Połącz PDF ponownie"
-  },
-  "Relink file": {
-    "pl": "Połącz plik ponownie"
   },
   "Reload Page": {
     "pl": "Odśwież stronę"
@@ -4205,32 +3052,11 @@
   "Remove '{}'": {
     "pl": "Usuń „{}”"
   },
-  "Remove Icon": {
-    "pl": "Usuń ikonę"
-  },
   "Remove Selected": {
     "pl": "Usuń wybrane"
   },
-  "Remove card": {
-    "pl": "Usuń kartę"
-  },
-  "Remove cover": {
-    "pl": "Usuń zasłonę"
-  },
   "Remove this track": {
     "pl": "Usuń ten utwór"
-  },
-  "Removed": {
-    "pl": "Usunięto"
-  },
-  "Removed from folder": {
-    "pl": "Usunięto z folderu"
-  },
-  "Rename folder:": {
-    "pl": "Zmień nazwę folderu:"
-  },
-  "Rendering page {page}…": {
-    "pl": "Renderowanie strony {page}…"
   },
   "Replaces the standard overview with a modern dashboard showing retention, hard cards and more.": {
     "pl": "Zastępuje standardowy widok nowoczesnym pulpitem z zapamiętywaniem, trudnymi kartami i innymi danymi."
@@ -4250,9 +3076,6 @@
   "Reset Timer": {
     "pl": "Resetuj minutnik"
   },
-  "Resize": {
-    "pl": "Zmień rozmiar"
-  },
   "Restart Required": {
     "pl": "Wymagany restart"
   },
@@ -4271,15 +3094,6 @@
   "Retry": {
     "pl": "Ponów"
   },
-  "Retry Soon": {
-    "pl": "Powtórz wkrótce"
-  },
-  "Reveal": {
-    "pl": "Odkryj"
-  },
-  "Reversed cards need text on both sides.": {
-    "pl": "Karty odwrócone wymagają tekstu po obu stronach."
-  },
   "Review": {
     "pl": "Powtórki"
   },
@@ -4289,68 +3103,14 @@
   "Review {} cards today.": {
     "pl": "Powtórz dziś {} kart."
   },
-  "Reviewing missed cards…": {
-    "pl": "Powtarzanie pominiętych kart…"
-  },
-  "Revisit Later": {
-    "pl": "Wróć później"
-  },
-  "Right-click on a node for options. Drag the blue dot to create new nodes.": {
-    "pl": "Kliknij węzeł prawym przyciskiem, by zobaczyć opcje. Przeciągnij niebieski punkt, by tworzyć węzły."
-  },
-  "Same card": {
-    "pl": "Ta sama karta"
-  },
   "Sat": {
     "pl": "So"
   },
   "Save Settings": {
     "pl": "Zapisz ustawienia"
   },
-  "Save failed — your changes are still open.": {
-    "pl": "Zapis nieudany — zmiany nadal są otwarte."
-  },
-  "Scope": {
-    "pl": "Zakres"
-  },
   "Search '{}' in Sidebar": {
     "pl": "Szukaj „{}” w panelu"
-  },
-  "Search PDFs…": {
-    "pl": "Szukaj PDF…"
-  },
-  "Search in this page...": {
-    "pl": "Szukaj na tej stronie..."
-  },
-  "Search or create a page…": {
-    "pl": "Szukaj lub utwórz stronę…"
-  },
-  "Select Nodes": {
-    "pl": "Wybierz węzły"
-  },
-  "Select PDF": {
-    "pl": "Wybierz PDF"
-  },
-  "Select plain text outside an existing cloze.": {
-    "pl": "Zaznacz zwykły tekst poza istniejącą luką."
-  },
-  "Select some PDF text first.": {
-    "pl": "Najpierw zaznacz tekst w PDF."
-  },
-  "Select text below, then add a cloze. Different numbers create separate cards; matching numbers hide together.": {
-    "pl": "Zaznacz tekst poniżej i dodaj lukę. Różne numery tworzą osobne karty; te same numery ukrywają się razem."
-  },
-  "Select text in text-based PDFs to copy it or prepare an Anki card. Scanned PDFs require OCR.": {
-    "pl": "Zaznacz tekst w tekstowym PDF, by go skopiować lub przygotować kartę Anki. Skany wymagają OCR."
-  },
-  "Select the text you want to hide first.": {
-    "pl": "Najpierw zaznacz tekst do ukrycia."
-  },
-  "Selected pages": {
-    "pl": "Wybrane strony"
-  },
-  "Selected text copied": {
-    "pl": "Skopiowano zaznaczony tekst"
   },
   "Session Summary": {
     "pl": "Podsumowanie sesji"
@@ -4409,17 +3169,11 @@
   "Site '{}' removed.": {
     "pl": "Usunięto stronę „{}”."
   },
-  "Skip": {
-    "pl": "Pomiń"
-  },
   "Skip current phase": {
     "pl": "Pomiń bieżący etap"
   },
   "Sloths can hold their breath longer than dolphins — up to 40 minutes — by slowing their heart rate.": {
     "pl": "Leniwce potrafią wstrzymywać oddech dłużej niż delfiny — do 40 minut — spowalniając tętno."
-  },
-  "Small": {
-    "pl": "Mały"
   },
   "Softens only the background. Card content stays sharp.": {
     "pl": "Rozmywa tylko tło. Treść karty pozostaje ostra."
@@ -4454,20 +3208,8 @@
   "Space smells like seared steak — astronauts report the odor comes from dying stars and cosmic dust.": {
     "pl": "Kosmos pachnie smażonym stekiem — astronauci opisują zapach pochodzący z umierających gwiazd i pyłu kosmicznego."
   },
-  "Special Features": {
-    "pl": "Funkcje specjalne"
-  },
-  "Standard": {
-    "pl": "Standardowy"
-  },
   "Start": {
     "pl": "Start"
-  },
-  "Start Learning": {
-    "pl": "Rozpocznij naukę"
-  },
-  "Start Learning: Review mode with active recall.": {
-    "pl": "Rozpocznij naukę: powtórki z aktywnym przypominaniem."
   },
   "Start Study": {
     "pl": "Rozpocznij naukę"
@@ -4481,9 +3223,6 @@
   "Start:": {
     "pl": "Początek:"
   },
-  "Startup check": {
-    "pl": "Kontrola przy starcie"
-  },
   "Statistics": {
     "pl": "Statystyki"
   },
@@ -4495,21 +3234,6 @@
   },
   "Statistics reset.": {
     "pl": "Statystyki wyzerowane."
-  },
-  "Step 1: Customize and Copy the Prompt": {
-    "pl": "Krok 1: dostosuj i skopiuj prompt"
-  },
-  "Step 2: Paste the AI-Generated JSON": {
-    "pl": "Krok 2: wklej JSON wygenerowany przez AI"
-  },
-  "Stop": {
-    "pl": "Stop"
-  },
-  "Storage read failed": {
-    "pl": "Błąd odczytu pamięci"
-  },
-  "Stored mind map data was corrupted and has been backed up. Starting fresh.": {
-    "pl": "Dane map myśli były uszkodzone. Utworzono kopię zapasową i rozpoczęto od nowa."
   },
   "Streak": {
     "pl": "Seria"
@@ -4550,9 +3274,6 @@
   "Study time · Last 30 days": {
     "pl": "Czas nauki · ostatnie 30 dni"
   },
-  "Sub-point": {
-    "pl": "Podpunkt"
-  },
   "Subject the daily fact on the home screen is drawn from.": {
     "pl": "Tematyka ciekawostek na ekranie głównym."
   },
@@ -4580,18 +3301,6 @@
   "Smart Study is ready!": {
     "pl": "Smart Study jest gotowy!"
   },
-  "Smart Study – Notebook": {
-    "pl": "Smart Study — notatnik"
-  },
-  "Table": {
-    "pl": "Tabela"
-  },
-  "Tag (optional)": {
-    "pl": "Tag (opcjonalnie)"
-  },
-  "Tap nodes to select:": {
-    "pl": "Kliknij węzły, aby wybrać:"
-  },
   "Technically, you perceive sound with your brain, not directly with your ears. Your ears simply act as sophisticated collectors, converting sound waves into signals the brain interprets.": {
     "pl": "Dźwięki odbierasz mózgiem, nie bezpośrednio uszami. Uszy są zaawansowanymi odbiornikami, które zmieniają fale dźwiękowe w sygnały interpretowane przez mózg."
   },
@@ -4615,9 +3324,6 @@
   },
   "The correct answer to almost any complex legal question is: 'It depends.'": {
     "pl": "Poprawna odpowiedź na niemal każde złożone pytanie prawne brzmi: „To zależy”."
-  },
-  "The current mind map could not be saved. Import was cancelled to protect your changes.": {
-    "pl": "Nie udało się zapisać bieżącej mapy. Import anulowano, aby chronić zmiany."
   },
   "The fingerprints of koalas are so similar to humans' that they've confused crime scene investigators.": {
     "pl": "Odciski palców koali są tak podobne do ludzkich, że myliły śledczych badających miejsca przestępstw."
@@ -4646,14 +3352,8 @@
   "The liver possesses an incredible regenerative capacity. It's capable of regrowing back to its full, original size even if only 25% of the healthy tissue remains after damage or surgery.": {
     "pl": "Wątroba ma niezwykłą zdolność regeneracji. Może odzyskać pełny rozmiar, nawet gdy po urazie lub operacji pozostanie tylko 25% zdrowej tkanki."
   },
-  "The mind map is valid but could not be saved (storage full?).": {
-    "pl": "Mapa myśli jest poprawna, ale nie udało się jej zapisać (pełna pamięć?)."
-  },
   "The optimized background could not be saved.": {
     "pl": "Nie udało się zapisać zoptymalizowanego tła."
-  },
-  "The output must be one valid JSON object and nothing else. Do not add explanations.": {
-    "pl": "Wynik musi być jednym poprawnym obiektem JSON i niczym więcej. Bez objaśnień."
   },
   "The people who help keep Smart Study going.": {
     "pl": "Osoby, dzięki którym Smart Study się rozwija."
@@ -4672,9 +3372,6 @@
   },
   "The screen shown after you click a deck, before studying.": {
     "pl": "Ekran po kliknięciu talii, przed rozpoczęciem nauki."
-  },
-  "The selected text is too long to copy at once.": {
-    "pl": "Zaznaczony tekst jest za długi do jednorazowego skopiowania."
   },
   "The sheer complexity of the human brain is staggering: It contains more connections (synapses) between neurons than there are estimated stars in the entire Milky Way galaxy.": {
     "pl": "Ludzki mózg jest zdumiewająco złożony: ma więcej połączeń między neuronami (synaps) niż szacowana liczba gwiazd w całej Drodze Mlecznej."
@@ -4709,38 +3406,11 @@
   "There's enough DNA in your body to stretch from the Sun to Pluto and back — 17 times.": {
     "pl": "DNA w Twoim ciele wystarczyłoby, by sięgnąć od Słońca do Plutona i z powrotem — 17 razy."
   },
-  "This Card Creator session contains too much text.": {
-    "pl": "Ta sesja kreatora kart zawiera zbyt dużo tekstu."
-  },
-  "This JSON is not a valid mind map: {error}": {
-    "pl": "Ten JSON nie jest poprawną mapą myśli: {error}"
-  },
-  "This PDF is {size:.1f} MB and is too large for the inline viewer. Open it in the system PDF viewer instead.": {
-    "pl": "Ten PDF ma {size:.1f} MB i jest za duży dla wbudowanej przeglądarki. Otwórz go w systemowej przeglądarce PDF."
-  },
-  "This PDF is {size:.1f} MB. Loading it into the sidebar may be slow or use a lot of memory.\n\nContinue anyway?": {
-    "pl": "Ten PDF ma {size:.1f} MB. Wczytanie go w panelu może być wolne lub zużyć dużo pamięci.\n\nKontynuować mimo to?"
-  },
-  "This card contains too much text.": {
-    "pl": "Ta karta zawiera zbyt dużo tekstu."
-  },
-  "This card is already in the session.": {
-    "pl": "Ta karta jest już w sesji."
-  },
   "This image must be enlarged considerably to fill the current window and may appear soft.": {
     "pl": "Obraz wymaga dużego powiększenia, by wypełnić okno, i może być nieostry."
   },
-  "This linked PDF is not available on this device. Open the PDF library to relink it.": {
-    "pl": "Powiązany PDF jest niedostępny na tym urządzeniu. Otwórz bibliotekę PDF, aby połączyć go ponownie."
-  },
   "This may include unusual colours, layout problems or other visual glitches. If you experience these issues, please try temporarily disabling this add-on. If you need help or notice conflicts with other add-ons, contact me at github.com/TruckDrive/smart-study/issues.": {
     "pl": "Mogą wystąpić nietypowe kolory, problemy z układem lub inne błędy wizualne. Spróbuj tymczasowo wyłączyć ten dodatek. Jeśli potrzebujesz pomocy lub zauważysz konflikty, napisz na github.com/TruckDrive/smart-study/issues."
-  },
-  "This mind map was corrupted and has been removed. A backup was kept in storage.": {
-    "pl": "Ta mapa była uszkodzona i została usunięta. Zachowano kopię zapasową w pamięci."
-  },
-  "This session already contains 500 cards.": {
-    "pl": "Ta sesja zawiera już 500 kart."
   },
   "This shortcut is already assigned to {feature}.": {
     "pl": "Ten skrót jest już przypisany do {feature}."
@@ -4766,41 +3436,20 @@
   "Timer Settings": {
     "pl": "Ustawienia minutnika"
   },
-  "Tip: Card Creator works best in fullscreen.": {
-    "pl": "Wskazówka: kreator kart najlepiej działa na pełnym ekranie."
-  },
-  "Tip: Paste images (Ctrl+V) supported": {
-    "pl": "Wskazówka: można wklejać obrazy (Ctrl+V)"
-  },
   "Title:": {
     "pl": "Tytuł:"
-  },
-  "To-Do": {
-    "pl": "Zadania"
   },
   "Today": {
     "pl": "Dzisiaj"
   },
-  "Todo": {
-    "pl": "Zadania"
-  },
-  "Toggle": {
-    "pl": "Przełącz"
-  },
   "Toggle Gamification Sidebar": {
     "pl": "Przełącz panel grywalizacji"
-  },
-  "Toggle title": {
-    "pl": "Rozwijany nagłówek"
   },
   "Tools available in the launcher bar on the side of Anki.": {
     "pl": "Narzędzia dostępne na bocznym pasku Anki."
   },
   "Top": {
     "pl": "Góra"
-  },
-  "Top-Down": {
-    "pl": "Z góry na dół"
   },
   "Total Pomodoros": {
     "pl": "Łącznie Pomodoro"
@@ -4814,15 +3463,6 @@
   "Tue": {
     "pl": "Wt"
   },
-  "Turns your map into an active-recall session.": {
-    "pl": "Zmienia mapę w sesję aktywnego przypominania."
-  },
-  "Type '/' for commands": {
-    "pl": "Wpisz „/”, aby wybrać polecenie"
-  },
-  "Type something...": {
-    "pl": "Wpisz coś..."
-  },
   "URL '{}' seems invalid.": {
     "pl": "Adres „{}” wygląda na nieprawidłowy."
   },
@@ -4832,20 +3472,11 @@
   "URL for '{}':": {
     "pl": "Adres dla „{}”:"
   },
-  "Undo (Ctrl+Z)": {
-    "pl": "Cofnij (Ctrl+Z)"
-  },
-  "Undo/Redo: Use the arrows at the top right or Ctrl+Z / Ctrl+Y.": {
-    "pl": "Cofnij/ponów: strzałki w prawym górnym rogu lub Ctrl+Z / Ctrl+Y."
-  },
   "Unexpected error": {
     "pl": "Nieoczekiwany błąd"
   },
   "Unexpected error (async)": {
     "pl": "Nieoczekiwany błąd (asynchroniczny)"
-  },
-  "Unfiled": {
-    "pl": "Bez folderu"
   },
   "Unique in typography: The letter 'ß' (Eszett) exists exclusively in written German. Interestingly, it isn't even used in German-speaking Switzerland, where writers consistently use a double 'ss' instead.": {
     "pl": "Typograficzny wyjątek: litera „ß” (eszett) występuje tylko w pisanym niemieckim. Nie używa się jej jednak w niemieckojęzycznej Szwajcarii, gdzie zastępuje ją „ss”."
@@ -4856,18 +3487,6 @@
   "Unknown Rank": {
     "pl": "Nieznana ranga"
   },
-  "Unnamed Map": {
-    "pl": "Mapa bez nazwy"
-  },
-  "Unpin": {
-    "pl": "Odepnij"
-  },
-  "Untitled": {
-    "pl": "Bez tytułu"
-  },
-  "Update card": {
-    "pl": "Aktualizuj kartę"
-  },
   "Use Ctrl, Alt, Command or a function key.": {
     "pl": "Użyj Ctrl, Alt, Command lub klawisza funkcyjnego."
   },
@@ -4877,20 +3496,11 @@
   "Use primary color": {
     "pl": "Użyj koloru głównego"
   },
-  "Use the list at the top left to switch between maps.": {
-    "pl": "Przełączaj mapy listą w lewym górnym rogu."
-  },
   "Use the same image behind your learning cards.": {
     "pl": "Użyj tego samego obrazu za kartami do nauki."
   },
-  "Use this JSON structure:": {
-    "pl": "Użyj tej struktury JSON:"
-  },
   "Version": {
     "pl": "Wersja"
-  },
-  "View inline": {
-    "pl": "Pokaż w panelu"
   },
   "Volume": {
     "pl": "Głośność"
@@ -4912,9 +3522,6 @@
   },
   "Wed": {
     "pl": "Śr"
-  },
-  "Welcome to the Mind Map Tool!": {
-    "pl": "Witaj w narzędziu MindMap!"
   },
   "What changed in recent versions of Smart Study.": {
     "pl": "Zmiany w ostatnich wersjach Smart Study."
@@ -4939,12 +3546,6 @@
   },
   "Work session finished! ({}/{})": {
     "pl": "Koniec sesji pracy! ({}/{})"
-  },
-  "Wrong Answer Penalty": {
-    "pl": "Kara za błędną odpowiedź"
-  },
-  "You are an expert assistant that creates mind maps in a specific JSON format.": {
-    "pl": "Jesteś ekspertem tworzącym mapy myśli w określonym formacie JSON."
   },
   "You can save up to {count} custom SoundCloud URLs.": {
     "pl": "Możesz zapisać do {count} własnych adresów SoundCloud."
@@ -4973,53 +3574,14 @@
   "Your level, XP and daily streak.": {
     "pl": "Twój poziom, XP i seria dni."
   },
-  "Your recovery copy is open in memory. Free browser storage or export it before closing.": {
-    "pl": "Kopia odzyskiwania jest otwarta w pamięci. Zwolnij pamięć przeglądarki lub wyeksportuj ją przed zamknięciem."
-  },
   "Your skeleton isn't static! Bones are constantly undergoing a process of breakdown and rebuilding, leading to a complete skeletal renewal approximately every 10 years.": {
     "pl": "Twój szkielet ciągle się zmienia! Kości nieustannie rozpadają się i odbudowują, co prowadzi do pełnej odnowy szkieletu mniej więcej co 10 lat."
-  },
-  "Zoom View: Use the mouse wheel or the +/- buttons.": {
-    "pl": "Zoom: używaj kółka myszy lub przycisków +/−."
-  },
-  "Zoom in": {
-    "pl": "Przybliż"
-  },
-  "Zoom out": {
-    "pl": "Oddal"
-  },
-  "d ago": {
-    "pl": "d temu"
-  },
-  "h ago": {
-    "pl": "godz. temu"
   },
   "in {}": {
     "pl": "za {}"
   },
-  "just now": {
-    "pl": "przed chwilą"
-  },
-  "m ago": {
-    "pl": "min temu"
-  },
   "sessions": {
     "pl": "sesje"
-  },
-  "{count} cards ready": {
-    "pl": "Gotowe karty: {count}"
-  },
-  "{count} corrupted mind map(s) were removed so the tool works again. A backup was kept in storage.": {
-    "pl": "Usunięto uszkodzone mapy ({count}), aby narzędzie znów działało. Zachowano kopię w pamięci."
-  },
-  "{count} mind map(s) had invalid data and were repaired automatically.": {
-    "pl": "Mapy z nieprawidłowymi danymi naprawiono automatycznie: {count}."
-  },
-  "{count} selected": {
-    "pl": "Wybrano: {count}"
-  },
-  "{done} / {total} done": {
-    "pl": "Gotowe: {done} / {total}"
   },
   "{} Cards": {
     "pl": "Karty: {}"
@@ -5048,39 +3610,6 @@
   "{}:\nCould not create or find the website sidebar.": {
     "pl": "{}:\nNie udało się utworzyć lub znaleźć panelu WWW."
   },
-  "Try again": {
-    "de": "Erneut versuchen",
-    "es": "Reintentar",
-    "ko": "다시 시도",
-    "pt": "Tentar novamente",
-    "fr": "Réessayer",
-    "vi": "Thử lại",
-    "zh": "重试",
-    "hi": "फिर कोशिश करें",
-    "pl": "Spróbuj ponownie"
-  },
-  "Could not load your data. Nothing has been overwritten. Please try again.": {
-    "de": "Deine Daten konnten nicht geladen werden. Es wurde nichts überschrieben. Bitte versuche es erneut.",
-    "es": "No se pudieron cargar tus datos. No se ha sobrescrito nada. Inténtalo de nuevo.",
-    "ko": "데이터를 불러오지 못했습니다. 덮어쓴 내용은 없습니다. 다시 시도하세요.",
-    "pt": "Não foi possível carregar seus dados. Nada foi sobrescrito. Tente novamente.",
-    "fr": "Impossible de charger vos données. Rien n’a été écrasé. Veuillez réessayer.",
-    "vi": "Không thể tải dữ liệu. Chưa có dữ liệu nào bị ghi đè. Vui lòng thử lại.",
-    "zh": "无法加载数据。未覆盖任何内容。请重试。",
-    "hi": "डेटा लोड नहीं हो सका। कुछ भी ओवरराइट नहीं हुआ है। कृपया फिर कोशिश करें।",
-    "pl": "Nie udało się wczytać danych. Nic nie zostało nadpisane. Spróbuj ponownie."
-  },
-  "Export failed. Please try again.": {
-    "de": "Export fehlgeschlagen. Bitte erneut versuchen.",
-    "es": "Error al exportar. Inténtalo de nuevo.",
-    "ko": "내보내지 못했습니다. 다시 시도하세요.",
-    "pt": "Falha ao exportar. Tente novamente.",
-    "fr": "Échec de l’exportation. Veuillez réessayer.",
-    "vi": "Xuất không thành công. Vui lòng thử lại.",
-    "zh": "导出失败。请重试。",
-    "hi": "निर्यात विफल हुआ। कृपया फिर कोशिश करें।",
-    "pl": "Eksport nie powiódł się. Spróbuj ponownie."
-  },
   "If the change does not appear, restart Anki.": {
     "de": "Falls die Änderung nicht erscheint, starte Anki neu.",
     "es": "Si el cambio no aparece, reinicia Anki.",
@@ -5092,127 +3621,8 @@
     "hi": "यदि बदलाव न दिखे, तो Anki को दोबारा शुरू करें।",
     "pl": "Jeśli zmiana się nie pojawi, uruchom Anki ponownie."
   },
-  "Heading 3": {
-    "de": "Überschrift 3",
-    "es": "Encabezado 3",
-    "ko": "제목 3",
-    "pt": "Título 3",
-    "fr": "Titre 3",
-    "vi": "Tiêu đề 3",
-    "zh": "标题 3",
-    "hi": "शीर्षक 3",
-    "pl": "Nagłówek 3"
-  },
-  "Insert block": {
-    "de": "Block einfügen",
-    "es": "Insertar bloque",
-    "ko": "블록 삽입",
-    "pt": "Inserir bloco",
-    "fr": "Insérer un bloc",
-    "vi": "Chèn khối",
-    "zh": "插入块",
-    "hi": "ब्लॉक जोड़ें",
-    "pl": "Wstaw blok"
-  },
-  "Block actions": {
-    "de": "Blockaktionen",
-    "es": "Acciones del bloque",
-    "ko": "블록 작업",
-    "pt": "Ações do bloco",
-    "fr": "Actions du bloc",
-    "vi": "Thao tác khối",
-    "zh": "块操作",
-    "hi": "ब्लॉक कार्रवाइयाँ",
-    "pl": "Działania bloku"
-  },
-  "Search actions…": {
-    "de": "Aktionen suchen…",
-    "es": "Buscar acciones…",
-    "ko": "작업 검색…",
-    "pt": "Buscar ações…",
-    "fr": "Rechercher une action…",
-    "vi": "Tìm thao tác…",
-    "zh": "搜索操作…",
-    "hi": "कार्रवाइयाँ खोजें…",
-    "pl": "Szukaj działań…"
-  },
-  "Color": {
-    "de": "Farbe"
-  },
-  "Text color": {
-    "de": "Textfarbe"
-  },
-  "Strikethrough": {
-    "de": "Durchstreichen"
-  },
-  "Inline code": {
-    "de": "Inline-Code",
-    "es": "Código en línea",
-    "ko": "인라인 코드",
-    "pt": "Código em linha",
-    "fr": "Code en ligne",
-    "vi": "Mã nội dòng",
-    "zh": "行内代码",
-    "hi": "इनलाइन कोड",
-    "pl": "Kod w tekście"
-  },
-  "Move to page": {
-    "de": "Auf Seite verschieben",
-    "es": "Mover a una página",
-    "ko": "페이지로 이동",
-    "pt": "Mover para página",
-    "fr": "Déplacer vers une page",
-    "vi": "Chuyển sang trang",
-    "zh": "移动到页面",
-    "hi": "पृष्ठ पर ले जाएँ",
-    "pl": "Przenieś na stronę"
-  },
-  "Move this block to another page?": {
-    "de": "Diesen Block auf eine andere Seite verschieben?",
-    "es": "¿Mover este bloque a otra página?",
-    "ko": "이 블록을 다른 페이지로 이동할까요?",
-    "pt": "Mover este bloco para outra página?",
-    "fr": "Déplacer ce bloc vers une autre page ?",
-    "vi": "Chuyển khối này sang trang khác?",
-    "zh": "将此块移动到其他页面？",
-    "hi": "इस ब्लॉक को दूसरे पृष्ठ पर ले जाएँ?",
-    "pl": "Przenieść ten blok na inną stronę?"
-  },
-  "Create another page first.": {
-    "de": "Erstelle zuerst eine weitere Seite.",
-    "es": "Primero crea otra página.",
-    "ko": "먼저 다른 페이지를 만드세요.",
-    "pt": "Crie outra página primeiro.",
-    "fr": "Créez d’abord une autre page.",
-    "vi": "Hãy tạo một trang khác trước.",
-    "zh": "请先创建另一个页面。",
-    "hi": "पहले एक और पृष्ठ बनाएँ।",
-    "pl": "Najpierw utwórz inną stronę."
-  },
   "Default": {
     "de": "Standard"
-  },
-  "Gray": {
-    "de": "Grau",
-    "es": "Gris",
-    "ko": "회색",
-    "pt": "Cinza",
-    "fr": "Gris",
-    "vi": "Xám",
-    "zh": "灰色",
-    "hi": "धूसर",
-    "pl": "Szary"
-  },
-  "Brown": {
-    "de": "Braun",
-    "es": "Marrón",
-    "ko": "갈색",
-    "pt": "Marrom",
-    "fr": "Marron",
-    "vi": "Nâu",
-    "zh": "棕色",
-    "hi": "भूरा",
-    "pl": "Brązowy"
   },
   "Orange": {
     "de": "Orange",
@@ -5225,303 +3635,6 @@
     "hi": "नारंगी",
     "pl": "Pomarańczowy"
   },
-  "Yellow": {
-    "de": "Gelb",
-    "es": "Amarillo",
-    "ko": "노란색",
-    "pt": "Amarelo",
-    "fr": "Jaune",
-    "vi": "Vàng",
-    "zh": "黄色",
-    "hi": "पीला",
-    "pl": "Żółty"
-  },
-  "Purple": {
-    "de": "Violett",
-    "es": "Morado",
-    "ko": "보라색",
-    "pt": "Roxo",
-    "fr": "Violet",
-    "vi": "Tím",
-    "zh": "紫色",
-    "hi": "बैंगनी",
-    "pl": "Fioletowy"
-  },
-  "Red": {
-    "de": "Rot",
-    "es": "Rojo",
-    "ko": "빨간색",
-    "pt": "Vermelho",
-    "fr": "Rouge",
-    "vi": "Đỏ",
-    "zh": "红色",
-    "hi": "लाल",
-    "pl": "Czerwony"
-  },
-  "Original content preserved. This block contains content that cannot be safely edited here.": {
-    "de": "Originalinhalt erhalten. Dieser Block enthält Inhalte, die hier nicht sicher bearbeitet werden können.",
-    "es": "Contenido original conservado. Este bloque contiene contenido que no se puede editar aquí de forma segura.",
-    "ko": "원본 내용이 보존되었습니다. 이 블록에는 여기서 안전하게 편집할 수 없는 내용이 있습니다.",
-    "pt": "Conteúdo original preservado. Este bloco contém conteúdo que não pode ser editado aqui com segurança.",
-    "fr": "Contenu original conservé. Ce bloc contient du contenu qui ne peut pas être modifié ici en toute sécurité.",
-    "vi": "Nội dung gốc được giữ nguyên. Khối này có nội dung không thể chỉnh sửa an toàn tại đây.",
-    "zh": "原始内容已保留。此块包含无法在此处安全编辑的内容。",
-    "hi": "मूल सामग्री सुरक्षित रखी गई है। इस ब्लॉक में ऐसी सामग्री है जिसे यहाँ सुरक्षित रूप से संपादित नहीं किया जा सकता।",
-    "pl": "Oryginalna treść została zachowana. Ten blok zawiera treść, której nie można tutaj bezpiecznie edytować."
-  },
-  "Page navigation": {
-    "de": "Seitennavigation",
-    "es": "Navegación de páginas",
-    "ko": "페이지 탐색",
-    "pt": "Navegação de páginas",
-    "fr": "Navigation des pages",
-    "vi": "Điều hướng trang",
-    "zh": "页面导航",
-    "hi": "पृष्ठ नेविगेशन",
-    "pl": "Nawigacja stron"
-  },
-  "New subpage": {
-    "de": "Neue Unterseite",
-    "es": "Nueva subpágina",
-    "ko": "새 하위 페이지",
-    "pt": "Nova subpágina",
-    "fr": "Nouvelle sous-page",
-    "vi": "Trang con mới",
-    "zh": "新建子页面",
-    "hi": "नया उपपृष्ठ",
-    "pl": "Nowa podstrona"
-  },
-  "Subpages": {
-    "de": "Unterseiten",
-    "es": "Subpáginas",
-    "ko": "하위 페이지",
-    "pt": "Subpáginas",
-    "fr": "Sous-pages",
-    "vi": "Trang con",
-    "zh": "子页面",
-    "hi": "उपपृष्ठ",
-    "pl": "Podstrony"
-  },
-  "Move under page": {
-    "de": "Als Unterseite verschieben",
-    "es": "Mover como subpágina",
-    "ko": "하위 페이지로 이동",
-    "pt": "Mover como subpágina",
-    "fr": "Déplacer comme sous-page",
-    "vi": "Chuyển thành trang con",
-    "zh": "移动为子页面",
-    "hi": "उपपृष्ठ के रूप में ले जाएँ",
-    "pl": "Przenieś jako podstronę"
-  },
-  "Top level": {
-    "de": "Oberste Ebene",
-    "es": "Nivel superior",
-    "ko": "최상위 수준",
-    "pt": "Nível superior",
-    "fr": "Niveau supérieur",
-    "vi": "Cấp cao nhất",
-    "zh": "顶层",
-    "hi": "शीर्ष स्तर",
-    "pl": "Najwyższy poziom"
-  },
-  "New section": {
-    "de": "Neuer Abschnitt",
-    "es": "Nueva sección",
-    "ko": "새 섹션",
-    "pt": "Nova seção",
-    "fr": "Nouvelle section",
-    "vi": "Phần mới",
-    "zh": "新建分区",
-    "hi": "नया अनुभाग",
-    "pl": "Nowa sekcja"
-  },
-  "Section name:": {
-    "de": "Abschnittsname:",
-    "es": "Nombre de la sección:",
-    "ko": "섹션 이름:",
-    "pt": "Nome da seção:",
-    "fr": "Nom de la section :",
-    "vi": "Tên phần:",
-    "zh": "分区名称：",
-    "hi": "अनुभाग का नाम:",
-    "pl": "Nazwa sekcji:"
-  },
-  "Search pages…": {
-    "de": "Seiten suchen…",
-    "es": "Buscar páginas…",
-    "ko": "페이지 검색…",
-    "pt": "Buscar páginas…",
-    "fr": "Rechercher des pages…",
-    "vi": "Tìm trang…",
-    "zh": "搜索页面…",
-    "hi": "पृष्ठ खोजें…",
-    "pl": "Szukaj stron…"
-  },
-  "Breadcrumb": {
-    "de": "Seitenpfad",
-    "es": "Ruta de navegación",
-    "ko": "페이지 경로",
-    "pt": "Caminho de navegação",
-    "fr": "Fil d’Ariane",
-    "vi": "Đường dẫn trang",
-    "zh": "页面路径",
-    "hi": "पृष्ठ पथ",
-    "pl": "Ścieżka strony"
-  },
-  "Move up": {
-    "de": "Nach oben verschieben",
-    "es": "Mover arriba",
-    "ko": "위로 이동",
-    "pt": "Mover para cima",
-    "fr": "Déplacer vers le haut",
-    "vi": "Di chuyển lên",
-    "zh": "上移",
-    "hi": "ऊपर ले जाएँ",
-    "pl": "Przenieś w górę"
-  },
-  "Move down": {
-    "de": "Nach unten verschieben",
-    "es": "Mover abajo",
-    "ko": "아래로 이동",
-    "pt": "Mover para baixo",
-    "fr": "Déplacer vers le bas",
-    "vi": "Di chuyển xuống",
-    "zh": "下移",
-    "hi": "नीचे ले जाएँ",
-    "pl": "Przenieś w dół"
-  },
-  "Contents": {
-    "de": "Inhaltsverzeichnis",
-    "es": "Contenido",
-    "fr": "Sommaire",
-    "pt": "Sumário",
-    "zh": "目录",
-    "ko": "목차",
-    "vi": "Mục lục",
-    "hi": "विषय-सूची",
-    "pl": "Spis treści"
-  },
-  "No headings yet": {
-    "de": "Noch keine Überschriften",
-    "es": "Aún no hay encabezados",
-    "fr": "Aucun titre pour le moment",
-    "pt": "Ainda sem títulos",
-    "zh": "暂无标题",
-    "ko": "아직 제목이 없습니다",
-    "vi": "Chưa có tiêu đề",
-    "hi": "अभी कोई शीर्षक नहीं",
-    "pl": "Brak nagłówków"
-  },
-  "Notebook actions": {
-    "de": "Notizbuch-Aktionen",
-    "es": "Acciones del cuaderno",
-    "fr": "Actions du carnet",
-    "pt": "Ações do caderno",
-    "zh": "笔记本操作",
-    "ko": "노트북 작업",
-    "vi": "Thao tác sổ ghi chép",
-    "hi": "नोटबुक कार्रवाइयाँ",
-    "pl": "Działania notatnika"
-  },
-  "Templates": {
-    "de": "Vorlagen",
-    "es": "Plantillas",
-    "fr": "Modèles",
-    "pt": "Modelos",
-    "zh": "模板",
-    "ko": "템플릿",
-    "vi": "Mẫu",
-    "hi": "टेम्पलेट",
-    "pl": "Szablony"
-  },
-  "Save as template": {
-    "de": "Als Vorlage speichern",
-    "es": "Guardar como plantilla",
-    "fr": "Enregistrer comme modèle",
-    "pt": "Salvar como modelo",
-    "zh": "保存为模板",
-    "ko": "템플릿으로 저장",
-    "vi": "Lưu làm mẫu",
-    "hi": "टेम्पलेट के रूप में सहेजें",
-    "pl": "Zapisz jako szablon"
-  },
-  "Template name:": {
-    "de": "Name der Vorlage:",
-    "es": "Nombre de la plantilla:",
-    "fr": "Nom du modèle :",
-    "pt": "Nome do modelo:",
-    "zh": "模板名称：",
-    "ko": "템플릿 이름:",
-    "vi": "Tên mẫu:",
-    "hi": "टेम्पलेट का नाम:",
-    "pl": "Nazwa szablonu:"
-  },
-  "Use template": {
-    "de": "Vorlage verwenden",
-    "es": "Usar plantilla",
-    "fr": "Utiliser ce modèle",
-    "pt": "Usar modelo",
-    "zh": "使用模板",
-    "ko": "템플릿 사용",
-    "vi": "Dùng mẫu",
-    "hi": "टेम्पलेट का उपयोग करें",
-    "pl": "Użyj szablonu"
-  },
-  "Versions": {
-    "de": "Versionen",
-    "es": "Versiones",
-    "fr": "Versions",
-    "pt": "Versões",
-    "zh": "版本",
-    "ko": "버전",
-    "vi": "Phiên bản",
-    "hi": "संस्करण",
-    "pl": "Wersje"
-  },
-  "Restore as copy": {
-    "de": "Als Kopie wiederherstellen",
-    "es": "Restaurar como copia",
-    "fr": "Restaurer en tant que copie",
-    "pt": "Restaurar como cópia",
-    "zh": "恢复为副本",
-    "ko": "사본으로 복원",
-    "vi": "Khôi phục thành bản sao",
-    "hi": "प्रतिलिपि के रूप में पुनर्स्थापित करें",
-    "pl": "Przywróć jako kopię"
-  },
-  "No versions available": {
-    "de": "Keine Versionen verfügbar",
-    "es": "No hay versiones disponibles",
-    "fr": "Aucune version disponible",
-    "pt": "Nenhuma versão disponível",
-    "zh": "没有可用版本",
-    "ko": "사용 가능한 버전이 없습니다",
-    "vi": "Không có phiên bản nào",
-    "hi": "कोई संस्करण उपलब्ध नहीं",
-    "pl": "Brak dostępnych wersji"
-  },
-  "Loading versions…": {
-    "de": "Versionen werden geladen…",
-    "es": "Cargando versiones…",
-    "fr": "Chargement des versions…",
-    "pt": "Carregando versões…",
-    "zh": "正在加载版本…",
-    "ko": "버전 불러오는 중…",
-    "vi": "Đang tải phiên bản…",
-    "hi": "संस्करण लोड हो रहे हैं…",
-    "pl": "Ładowanie wersji…"
-  },
-  "Could not load versions. Try again.": {
-    "de": "Versionen konnten nicht geladen werden. Bitte erneut versuchen.",
-    "es": "No se pudieron cargar las versiones. Inténtalo de nuevo.",
-    "fr": "Impossible de charger les versions. Réessayez.",
-    "pt": "Não foi possível carregar as versões. Tente novamente.",
-    "zh": "无法加载版本，请重试。",
-    "ko": "버전을 불러올 수 없습니다. 다시 시도하세요.",
-    "vi": "Không thể tải phiên bản. Hãy thử lại.",
-    "hi": "संस्करण लोड नहीं हो सके। फिर से प्रयास करें।",
-    "pl": "Nie udało się wczytać wersji. Spróbuj ponownie."
-  },
   "Copy": {
     "de": "Kopie",
     "es": "Copia",
@@ -5532,270 +3645,6 @@
     "vi": "Bản sao",
     "hi": "प्रतिलिपि",
     "pl": "Kopia"
-  },
-  "Pre-update backup": {
-    "de": "Sicherung vor dem Update",
-    "es": "Copia anterior a la actualización",
-    "fr": "Sauvegarde avant mise à jour",
-    "pt": "Backup anterior à atualização",
-    "zh": "更新前备份",
-    "ko": "업데이트 전 백업",
-    "vi": "Bản sao lưu trước cập nhật",
-    "hi": "अपडेट से पहले का बैकअप",
-    "pl": "Kopia sprzed aktualizacji"
-  },
-  "Recovery": {
-    "de": "Wiederherstellung",
-    "es": "Recuperación",
-    "fr": "Récupération",
-    "pt": "Recuperação",
-    "zh": "恢复",
-    "ko": "복구",
-    "vi": "Khôi phục",
-    "hi": "पुनर्प्राप्ति",
-    "pl": "Odzyskiwanie"
-  },
-  "Disease profile": {
-    "de": "Krankheitsbild",
-    "es": "Perfil de enfermedad",
-    "fr": "Fiche de maladie",
-    "pt": "Perfil de doença",
-    "zh": "疾病概述",
-    "ko": "질환 개요",
-    "vi": "Hồ sơ bệnh",
-    "hi": "रोग विवरण",
-    "pl": "Opis choroby"
-  },
-  "Definition": {
-    "de": "Definition",
-    "es": "Definición",
-    "fr": "Définition",
-    "pt": "Definição",
-    "zh": "定义",
-    "ko": "정의",
-    "vi": "Định nghĩa",
-    "hi": "परिभाषा",
-    "pl": "Definicja"
-  },
-  "Mechanism": {
-    "de": "Mechanismus",
-    "es": "Mecanismo",
-    "fr": "Mécanisme",
-    "pt": "Mecanismo",
-    "zh": "机制",
-    "ko": "기전",
-    "vi": "Cơ chế",
-    "hi": "तंत्र",
-    "pl": "Mechanizm"
-  },
-  "Symptoms": {
-    "de": "Symptome",
-    "es": "Síntomas",
-    "fr": "Symptômes",
-    "pt": "Sintomas",
-    "zh": "症状",
-    "ko": "증상",
-    "vi": "Triệu chứng",
-    "hi": "लक्षण",
-    "pl": "Objawy"
-  },
-  "Diagnosis": {
-    "de": "Diagnostik",
-    "es": "Diagnóstico",
-    "fr": "Diagnostic",
-    "pt": "Diagnóstico",
-    "zh": "诊断",
-    "ko": "진단",
-    "vi": "Chẩn đoán",
-    "hi": "निदान",
-    "pl": "Diagnostyka"
-  },
-  "Treatment": {
-    "de": "Therapie",
-    "es": "Tratamiento",
-    "fr": "Traitement",
-    "pt": "Tratamento",
-    "zh": "治疗",
-    "ko": "치료",
-    "vi": "Điều trị",
-    "hi": "उपचार",
-    "pl": "Leczenie"
-  },
-  "Resize column": {
-    "de": "Spaltenbreite ändern",
-    "es": "Cambiar ancho de columna",
-    "fr": "Redimensionner la colonne",
-    "pt": "Redimensionar coluna",
-    "zh": "调整列宽",
-    "ko": "열 너비 조절",
-    "vi": "Đổi chiều rộng cột",
-    "hi": "स्तंभ की चौड़ाई बदलें",
-    "pl": "Zmień szerokość kolumny"
-  },
-  "Header row": {
-    "de": "Kopfzeile",
-    "es": "Fila de encabezado",
-    "fr": "Ligne d’en-tête",
-    "pt": "Linha de cabeçalho",
-    "zh": "标题行",
-    "ko": "머리글 행",
-    "vi": "Hàng tiêu đề",
-    "hi": "शीर्षक पंक्ति",
-    "pl": "Wiersz nagłówka"
-  },
-  "Move row up": {
-    "de": "Zeile nach oben",
-    "es": "Mover fila arriba",
-    "fr": "Déplacer la ligne vers le haut",
-    "pt": "Mover linha para cima",
-    "zh": "上移行",
-    "ko": "행 위로 이동",
-    "vi": "Đưa hàng lên",
-    "hi": "पंक्ति ऊपर ले जाएँ",
-    "pl": "Przenieś wiersz w górę"
-  },
-  "Move row down": {
-    "de": "Zeile nach unten",
-    "es": "Mover fila abajo",
-    "fr": "Déplacer la ligne vers le bas",
-    "pt": "Mover linha para baixo",
-    "zh": "下移行",
-    "ko": "행 아래로 이동",
-    "vi": "Đưa hàng xuống",
-    "hi": "पंक्ति नीचे ले जाएँ",
-    "pl": "Przenieś wiersz w dół"
-  },
-  "Move column left": {
-    "de": "Spalte nach links",
-    "es": "Mover columna a la izquierda",
-    "fr": "Déplacer la colonne à gauche",
-    "pt": "Mover coluna para a esquerda",
-    "zh": "左移列",
-    "ko": "열 왼쪽으로 이동",
-    "vi": "Đưa cột sang trái",
-    "hi": "स्तंभ बाईं ओर ले जाएँ",
-    "pl": "Przenieś kolumnę w lewo"
-  },
-  "Move column right": {
-    "de": "Spalte nach rechts",
-    "es": "Mover columna a la derecha",
-    "fr": "Déplacer la colonne à droite",
-    "pt": "Mover coluna para a direita",
-    "zh": "右移列",
-    "ko": "열 오른쪽으로 이동",
-    "vi": "Đưa cột sang phải",
-    "hi": "स्तंभ दाईं ओर ले जाएँ",
-    "pl": "Przenieś kolumnę w prawo"
-  },
-  "Align left": {
-    "de": "Linksbündig",
-    "es": "Alinear a la izquierda",
-    "fr": "Aligner à gauche",
-    "pt": "Alinhar à esquerda",
-    "zh": "左对齐",
-    "ko": "왼쪽 정렬",
-    "vi": "Căn trái",
-    "hi": "बाएँ संरेखित करें",
-    "pl": "Wyrównaj do lewej"
-  },
-  "Align center": {
-    "de": "Zentrieren",
-    "es": "Centrar",
-    "fr": "Centrer",
-    "pt": "Centralizar",
-    "zh": "居中",
-    "ko": "가운데 정렬",
-    "vi": "Căn giữa",
-    "hi": "केंद्र में संरेखित करें",
-    "pl": "Wyśrodkuj"
-  },
-  "Align right": {
-    "de": "Rechtsbündig",
-    "es": "Alinear a la derecha",
-    "fr": "Aligner à droite",
-    "pt": "Alinhar à direita",
-    "zh": "右对齐",
-    "ko": "오른쪽 정렬",
-    "vi": "Căn phải",
-    "hi": "दाएँ संरेखित करें",
-    "pl": "Wyrównaj do prawej"
-  },
-  "Table options": {
-    "de": "Tabellenoptionen",
-    "es": "Opciones de tabla",
-    "fr": "Options du tableau",
-    "pt": "Opções da tabela",
-    "zh": "表格选项",
-    "ko": "표 옵션",
-    "vi": "Tùy chọn bảng",
-    "hi": "तालिका विकल्प",
-    "pl": "Opcje tabeli"
-  },
-  "Merged cells are preserved. Reordering and resizing are available for regular tables.": {
-    "de": "Verbundene Zellen bleiben erhalten. Umordnen und Größenänderungen sind bei regulären Tabellen verfügbar.",
-    "es": "Las celdas combinadas se conservan. Las tablas regulares permiten reordenar y cambiar el tamaño.",
-    "fr": "Les cellules fusionnées sont préservées. Les tableaux réguliers permettent de réordonner et redimensionner.",
-    "pt": "As células mescladas são preservadas. Tabelas regulares permitem reordenar e redimensionar.",
-    "zh": "合并单元格会保留。普通表格支持重新排序和调整大小。",
-    "ko": "병합된 셀은 유지됩니다. 일반 표에서 순서와 크기를 변경할 수 있습니다.",
-    "vi": "Các ô đã gộp được giữ nguyên. Bảng thông thường hỗ trợ đổi thứ tự và kích thước.",
-    "hi": "मिले हुए कक्ष सुरक्षित रहते हैं। सामान्य तालिकाओं में क्रम और आकार बदल सकते हैं।",
-    "pl": "Scalone komórki pozostają bez zmian. Zwykłe tabele umożliwiają zmianę kolejności i rozmiaru."
-  },
-  "Resize image": {
-    "de": "Bildgröße ändern",
-    "es": "Cambiar tamaño de imagen",
-    "fr": "Redimensionner l’image",
-    "pt": "Redimensionar imagem",
-    "zh": "调整图片大小",
-    "ko": "이미지 크기 조절",
-    "vi": "Đổi kích thước ảnh",
-    "hi": "चित्र का आकार बदलें",
-    "pl": "Zmień rozmiar obrazu"
-  },
-  "Upload image": {
-    "de": "Bild hochladen",
-    "es": "Subir imagen",
-    "fr": "Importer une image",
-    "pt": "Enviar imagem",
-    "zh": "上传图片",
-    "ko": "이미지 업로드",
-    "vi": "Tải ảnh lên",
-    "hi": "चित्र अपलोड करें",
-    "pl": "Prześlij obraz"
-  },
-  "Image could not be added. Please try again.": {
-    "de": "Das Bild konnte nicht eingefügt werden. Bitte erneut versuchen.",
-    "es": "No se pudo añadir la imagen. Inténtalo de nuevo.",
-    "fr": "Impossible d’ajouter l’image. Réessayez.",
-    "pt": "Não foi possível adicionar a imagem. Tente novamente.",
-    "zh": "无法添加图片，请重试。",
-    "ko": "이미지를 추가할 수 없습니다. 다시 시도하세요.",
-    "vi": "Không thể thêm ảnh. Hãy thử lại.",
-    "hi": "चित्र नहीं जोड़ा जा सका। फिर से प्रयास करें।",
-    "pl": "Nie udało się dodać obrazu. Spróbuj ponownie."
-  },
-  "Inline": {
-    "de": "In der Textzeile",
-    "es": "En línea",
-    "fr": "Dans le texte",
-    "pt": "Na linha",
-    "zh": "行内",
-    "ko": "인라인",
-    "vi": "Trong dòng",
-    "hi": "पंक्ति में",
-    "pl": "W tekście"
-  },
-  "Move image": {
-    "de": "Bild verschieben",
-    "es": "Mover imagen",
-    "fr": "Déplacer l’image",
-    "pt": "Mover imagem",
-    "zh": "移动图片",
-    "ko": "이미지 이동",
-    "vi": "Di chuyển ảnh",
-    "hi": "चित्र खिसकाएँ",
-    "pl": "Przenieś obraz"
   },
   "Pick Solid Color": {
     "de": "Eigene Hintergrundfarbe",

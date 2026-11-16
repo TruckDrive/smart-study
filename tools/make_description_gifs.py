@@ -81,7 +81,7 @@ def hero():
     random.seed(7)
     dots = [(random.uniform(0, w), random.uniform(0, h), random.uniform(1, 2.6), random.choice((BLUE, CYAN, ORANGE, PINK)),
              random.randint(1, 2) * random.choice((-1, 1))) for _ in range(46)]
-    words = ["Your whole study workflow", "Study plans up to your exam", "Notebook, mind maps, timer and AI"]
+    words = ["Your whole study workflow", "Study plans up to your exam", "Browser, timer, music and AI"]
     base = background(w, h)
     frames = []
     for i in range(n):
@@ -120,7 +120,7 @@ def hero():
 def persian_flip():
     w, h, n = 720, 270, 64
     base = background(w, h)
-    rows = [("Study plan", "برنامهٔ مطالعه"), ("Notebook", "دفترچه"), ("Mind map", "نقشهٔ ذهنی"), ("Statistics", "آمار")]
+    rows = [("Study plan", "برنامهٔ مطالعه"), ("Statistics", "آمار")]
     frames = []
     for i in range(n):
         t = i / n

@@ -27,7 +27,6 @@ except Exception:
 # --- Translation Function ---
 try:
     from .locales import _
-    from . import workspace_strings  # noqa: F401 - registers the workspace labels on import
 except ImportError:
     def _(text): return text  # safety fallback
 
@@ -742,8 +741,6 @@ class SettingsDialog(QDialog):
         )
 
         features = [
-            ("mindmap_enabled", _("MindMap"),
-             _("A visual mind-mapping panel.")),
             ("gamification_sidebar_enabled", _("Gamification Sidebar"),
              _("Progress, rewards and motivation panel.")),
             ("music_player_enabled", _("Music Player"),
@@ -754,8 +751,6 @@ class SettingsDialog(QDialog):
              _("ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.")),
             ("website_viewer_enabled", _("Website Viewer"),
              _("Open websites in a panel without leaving Anki.")),
-            ("notebook_enabled", _("Notebook"),
-             _("Notes, to-dos and PDFs alongside your cards.")),
         ]
         for key, text, desc in features:
             self.add_sidebar_setting(key, text, layout, desc)

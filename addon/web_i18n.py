@@ -175,13 +175,12 @@ SURFACE_SOURCES: Dict[str, tuple[str, ...]] = {
         "Advanced Statistics", "An extra panel with detailed review statistics.",
         "Custom Deck Dashboard",
         "Replaces the standard overview with retention, hard cards and more.",
-        "MindMap", "A visual mind-mapping panel.", "Gamification Sidebar",
+        "Gamification Sidebar",
         "Progress, rewards and motivation panel.", "Music Player",
         "Background music while you study.", "Timer",
         "A focus timer with work and break intervals.", "AI Assistant",
         "ChatGPT, Claude, Gemini or NotebookLM next to your cards, with your own account.", "Website Viewer",
-        "Open websites in a panel without leaving Anki.", "Notebook",
-        "Notes, to-dos and PDFs alongside your cards.", "Set keyboard shortcut",
+        "Open websites in a panel without leaving Anki.", "Set keyboard shortcut",
         "Add Shortcut", "No changelog yet", "Supporters will be listed here soon",
         "A heartfelt thank you to everyone who supports Smart Study. This space is reserved for you.",
         "Smart Study error", "Show details", "Hide details", "Copy error",
@@ -207,7 +206,4 @@ def sources(surface: str) -> Iterable[str]:
 def translations(surface: str) -> Dict[str, str]:
     """Return exact-English-source → active-language translation."""
     result = {source: _(source) for source in sources(surface)}
-    if surface == 'settings':
-        from .workspace_strings import translations as workspace_translations
-        result.update(workspace_translations())
     return result

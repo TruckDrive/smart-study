@@ -1,7 +1,8 @@
 """Generates every image and sound that ships in addon/ (except bundled libraries).
 
 All artwork is drawn here from simple shapes plus Lucide icon geometry
-(ISC license, bundled in addon/web_roadmap/icons/). Sounds are synthesized.
+(ISC license, catalog in tools/lucide/, license text in addon/LICENSE-Lucide.txt).
+Sounds are synthesized.
 Run from the repo root:  python -I tools/make_assets.py
 Needs: Pillow (with WebP), rsvg-convert, ffmpeg.
 """
@@ -37,7 +38,7 @@ random.seed(7)
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 def _lucide():
-    with open(os.path.join(ADDON, "web_roadmap", "icons", "catalog.js"), encoding="utf-8") as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "lucide", "catalog.js"), encoding="utf-8") as f:
         s = f.read()
     data = json.loads(s[s.index("{"):s.rindex("}") + 1])
     return {i["id"].removeprefix("lucide-"): i["nodes"] for i in data["icons"]}
